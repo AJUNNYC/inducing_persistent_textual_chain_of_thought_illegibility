@@ -148,5 +148,32 @@
   "existing_pod_billing": "blocked: read-only provider inspection HTTP403",
   "fresh_task_restoration_verified": false,
   "scientific_generation_started": false,
-  "scientific_training_started": false
+  "scientific_training_started": false,
+  "static_integrity": {
+    "status": "VERIFIED",
+    "intended_static_files": 421,
+    "tracked_files": 377,
+    "inventory_source": "git",
+    "manifest_entries": 622,
+    "modules": 57,
+    "requirements": 90,
+    "local_markdown_links": 1324,
+    "errors": [],
+    "scope": "static integrity only; run unit/integration/live preflights and native Mermaid parser separately"
+  },
+  "github_publication": {
+    "status": "VERIFIED",
+    "verified_remote_commit": "9d411440903d8b0674a87fb3a69b2e3705b1565e",
+    "remote_tracked_files": 421,
+    "intended_files": 421,
+    "missing_paths": [],
+    "extra_paths": [],
+    "content_mismatch_paths": []
+  },
+  "runtime_freeze_cli": {
+    "status": "passed",
+    "actual_committed_source_and_gpu_lock_resolved": true,
+    "native_auxiliary_resolution_not_repeated": true,
+    "scientific_launch_authorized": false
+  }
 }
