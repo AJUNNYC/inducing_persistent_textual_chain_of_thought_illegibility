@@ -1,0 +1,15 @@
+# Keep runtime directory markers; never publish generated traces, checkpoints or caches by default.
+/data/**
+!/data/**/
+!/data/**/.gitkeep
+/artifacts/**
+!/artifacts/**/
+!/artifacts/**/.gitkeep
+.env
+.env.*
+*.pem
+*.key
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
