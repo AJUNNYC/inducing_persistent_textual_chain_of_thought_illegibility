@@ -1,6 +1,6 @@
 # rot13_data_construction.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested; all ten levels and short-mask cases are exercised.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -52,6 +52,14 @@ The following source comments retain the procedural detail of the supplied diagr
 - All lengths must fit the fixed 4096-token SFT limit.
 - A frozen clean source that fails its required acceptance checks is fatal; do not silently substitute another ID.
 - Reopen artifacts; verify split disjointness, all hashes and settings/seeds. Max sequence length 4096.
+
+## Implemented interface and evidence
+
+`rot13_masks(reasoning, example_id, seed=42)` freezes ten nested masks; `transform_rot13(reasoning, example_id, level, *, seed=42)` returns exact text plus seeds, source/content hashes and mask evidence. `construct_rot13_data` uses the shared SFT dataset writer for both model sizes and all ten levels.
+
+Eligible original Unicode word spans contain at least one ASCII Latin letter. Regions use early remainder allocation across three contiguous spans. Each anchor is the SHA-derived region seed modulo region size; expansion orders words by distance then original index, so equal-distance ties expand left first. Half-up rounding determines the exact total requested fraction; valid short traces may repeat masks. ASCII Latin letters rotate by 13 while numbers, non-ASCII text and punctuation retain their bytes. No model tokenizer truncation is permitted.
+
+Unit checks cover exact rotation, Unicode/numeric protection, stable ID seeds, nested contiguous region masks, dose error at most 1.5 eligible words and repeated short masks. The full-count SFT fixture exercises this actual transform for all twenty ROT13 datasets.
 
 ## Completion and failure boundary
 

@@ -2,7 +2,7 @@
 
 ## This is not another scientific protocol
 
-Fixed scientific choices below are copied from the supplied PDF and diagrams. Architectural filenames and role assignments implement the current repository request. Remaining permitted implementation conventions have **not** been filled with invented defaults. H.9 authorizes the implementing agent to select, test, document and freeze them before trained outcomes. Runtime credentials, account permissions and actual spending authorization cannot be fabricated. The repository itself contains blank executable/configuration files, so none of the unresolved implementation entries should be mistaken for completed work.
+Fixed scientific choices below are copied from the supplied PDF and diagrams. Architectural filenames and role assignments implement the current repository request. Permitted implementation conventions are resolved below and tested prospectively, with unresolved live prerequisites retained. H.9 authorizes the implementing agent to select, test, document and freeze them before trained outcomes. Runtime credentials, account permissions and actual spending authorization cannot be fabricated. Executed implementation evidence is distinguished from blocked live verification throughout the repository.
 
 ## Source precedence and already resolved conflicts
 
@@ -39,27 +39,31 @@ Sources: [H.1–H.9](../spec/experiment.pdf#page=68), [G](../spec/experiment.pdf
 
 These entries identify what the implementing agent must resolve before outcomes. They are not new user questions and do not justify inventing scientific freedoms.
 
-| ID | Convention to freeze | Constraint/source | Initial status |
+| ID | Frozen convention | Implementation/evidence | Status |
 |---|---|---|---|
-| convention_001 | Model/tokenizer and dataset revisions; exact authorized extraction access | E.2.3,E.2.8; H.9; construction model identities fixed | not_resolved |
-| convention_002 | Compatible Python/package/CUDA/TRL/quantization lock and hardware runtime | E.1.2,E.2.8; H.7–H.9; no unrecorded defaults affecting treatment | not_resolved |
-| convention_003 | UDPipe binary checksum, binding and actual English Aspell dictionary provenance | H.2.3; exact model/profile already selected | not_resolved |
-| convention_004 | Candidate normalization, deterministic source order, duplicate/overlap audit and tokenizer used for input cap | 3.1,B.1,E.2.2–E.2.4; no new semantic trace-quality filter | not_resolved |
-| convention_005 | Original word boundary segmentation, region remainder convention, stable hash seed and expansion tie-breaking | C.1.3,H.9; three regions, half-up counts, contiguous nested masks fixed | not_resolved |
-| convention_006 | Math/numeric recognition/protection mechanics and stochastic ordering/hash-seed behavior | C.1.4,H.2.3,H.9; same candidate/final transforms and fixed switches | not_resolved |
-| convention_007 | Native trace/final parsing, numeric normalization and choice-label extraction | C.3.2,D.1.2,H.4,H.9; no inferred or repaired answers | not_resolved |
-| convention_008 | Literal generation templates, payload serialization and prompt version hashes | C.3.2,D.1–D.2,H.4–H.5,H.9; prescribed judge instructions unchanged | not_resolved |
-| convention_009 | Completion-only SFT loss reduction and compatible trainer details | C.2.3,H.9; all fixed SFT settings, masks and exposure preserved | not_resolved |
-| convention_010 | Remaining RL optimizer/scheduler/precision/adapter/stabilization/microbatch details | H.7; actual eight-by-four one-update semantics and other fixed settings preserved | not_resolved |
-| convention_011 | Durable storage, locking, atomic publication, cache lookup/indexing and checkpoint recovery implementation | E.1–E.2; exact identities, counters and safe boundary semantics required | not_resolved |
-| convention_012 | Restricted MBPP executor and mechanical interface manifest extraction | E.2.7,H.4; exact resource caps and leakage prohibitions | not_resolved |
-| convention_013 | Exact design-aware resampling weights, finite-population treatment, numerical quantile and degenerate/missing-metric family handling | H.8; 10000 draws, seed 42, complete scalar family, no zero-width certainty | not_resolved |
-| convention_014 | Statistical simulation scenarios, seeds, replication budget and quantitative Monte Carlo acceptance rule | H.8.4; freeze before trained outcomes and obey failed-preflight stop | not_resolved |
-| convention_015 | Typed service signatures, record serialization, hash namespaces, runtime filenames | E.2.3,H.9; semantic contracts and finalized static paths preserved | not_resolved |
-| convention_016 | Operational configuration under actual account authorization, rates/quotas and the documented warning conflict | E.1.4–E.1.5,E.2.5,E.2.8; spending not inferred from scientific scope | awaiting_runtime_authorization |
+| convention_001 | Pinned HF commits in config; authorized public sources verified; LMSYS remains gated | configuration.py; candidate_manifest.py; operations/assets.py | VERIFIED public metadata; BLOCKED LMSYS |
+| convention_002 | Python3.12, hashed CPU/GPU locks, CUDA12.8.1 image, explicit trainer semantics | requirements_cpu.lock; requirements.lock; dockerfile | VERIFIED CPU install; GPU runtime BLOCKED |
+| convention_003 | Official English-EWT UD2.5 binary SHA784bd0fa…; actual Aspell dependency closure/hashes/settings | kazitext_data_construction.py; config.yaml | VERIFIED native auxiliary loading; deployment dictionaries must match |
+| convention_004 | NFKC prompt normalization, stable source content IDs/order, first-user extraction, exact overlap/token caps | candidate_manifest.py; test_candidate_manifest.py | VERIFIED fixture contracts; live gated corpus BLOCKED |
+| convention_005 | ASCII eligible spans, region remainders assigned left-to-right, half-up quotas, SHA seed42 tie-breaking | rot13_data_construction.py; test_rot13_data_construction.py | VERIFIED all ten nested masks |
+| convention_006 | Immutable math/numeric spans and lexical boundaries, separate seeded official worker PYTHONHASHSEED0 | kazitext_data_construction.py; test_kazitext_data_construction.py | Native replay/protection evidence recorded; structural rejection preserved |
+| convention_007 | Strict think/final separation, Decimal numeric canonicalization, literal choice labels, no answer repair | response_parsing.py; capability_scoring.py | VERIFIED parser/scorer adversarial fixtures |
+| convention_008 | Literal prescribed rubrics; canonical JSON payload hashes; native chat wrapper preserves entire assistant target | prompts/; render_sft_completion; output_generation.py | VERIFIED official tokenizer controls; live provider compatibility BLOCKED |
+| convention_009 | Per-example supervised token mean; microbatch1; native_training_template_v1; right padding; no packing; eager attention; nonreentrant checkpointing; seeded two-epoch exposure | sft_fit.py; config.yaml; test_sft_fit.py | VERIFIED real tiny PEFT CPU gradients and exact-state resume; full GPU fit BLOCKED |
+| convention_010 | Explicit AdamW constant schedule, BF16/NF4, sample std correction1, epsilon1e-4, maxnorm1, microbatch1/accum32, all completed tokens and fixed2048 loss denominator | grpo_policy_update.py; rl_setup.py; config.yaml | VERIFIED numeric/update/reward/resume fixtures; actual model GPU preflight BLOCKED |
+| convention_011 | Atomic manifests, immutable SHA identities, SQLite artifact index, locks, full optimizer/RNG checkpoints and scoped artifact hooks | storage.py; checkpointing.py; operations/artifacts.py | VERIFIED local crashes/corruption/reuse; Drive lifetime durability BLOCKED |
+| convention_012 | Pinned Python3.11 slim sandbox, trusted root supervisor/unprivileged worker, original tests retained, fixed resource caps | mbpp_sandbox.py; test_mbpp_sandbox.py | VERIFIED actual Docker isolation; original reference cap audit may block |
+| convention_013 | Paired design-aware Rao-Wu rescaling with actual finite populations/nested selection, float64 higher quantile, conservative missing/zero-variance handling, all10800 gates retained | simultaneous_bounds.py; test_simultaneous_bounds.py | Implemented; mandatory actual-frame coverage validation determines readiness |
+| convention_014 | Seven finite-population scenarios,100 repetitions each,10000 draws, seed42 namespaces, one-sided95%Wilson coverage lower bound>=.95 and zero structural errors; exact prospective futility stop | statistical_validation.py; frozen simulation plan | Frozen before trained outcomes; passing certificate unavailable until executed |
+| convention_015 | Canonical sorted JSON SHA256, uint32 derived seeds, typed records, lowercase namespaces, scientific projection plus full operational snapshot | identity.py; records.py; configuration.py | VERIFIED producer/consumer and source invalidation fixtures |
+| convention_016 | Actual authorization/rates/quotas required; warning75/80/90%; scheduling stop95%; independent Pod billing controller | cost_accounting.py; judge_client.py; operations/runpod.py | VERIFIED local guard tests; live authority/evidence BLOCKED |
 
 For each resolution, record the chosen value/algorithm, source constraint, rationale, code/config revision, fixture evidence, freeze time relative to trained outcome inspection and consequences for dependent caches. “Tested” must name the evidence; do not turn an empty table into a claim of a passing preflight.
 
 ## What may not be delegated away
 
 Do not change models, datasets, accepted counts, panel IDs/counts, training epochs/steps, intervention levels, reward weights or gates, construction thresholds, fixed judge prompts/models, or add adaptive scientific runs. No method switch after viewing trained outcomes when statistical validation fails. Fix implementation defects within the design, version the repair and invalidate affected derivatives, including baselines. Unresolvable mandatory preflight failures stop the affected launch. Sources: [H.9](../spec/experiment.pdf#page=80), [G.9–G.11](../spec/experiment.pdf#page=67).
+
+## Freeze and interpretation
+
+All choices were implemented before any trained experimental outcomes existed. Scientific configuration hashes retain code/dependency/model/data/prompt/parser/trainer/sandbox identities. Full operational snapshots separately retain paths, funding and quota evidence. Production runtime requires the actual committed source SHA and lock hash; an unversioned development source cannot authorize paid work. An implementation repair versions affected evidence and derivatives. Historical or wrong-population simulation evidence cannot certify the actual frozen panel. Failed mandatory coverage or reference-executor checks remain launch blockers.

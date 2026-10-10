@@ -1,6 +1,6 @@
 # configuration.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -15,7 +15,7 @@
 
 The source specifies a single machine-readable configuration with model/dataset/tokenizer revisions, generation settings, exact SFT/GRPO recipes, interventions, panel counts, storage and spending controls. Validate all fixed values and the forty-fit/two-trajectory matrix, and reject contradictory/missing required scientific fields. Resolve allowed technical defaults prospectively, record every default affecting data/output/loss/reward/measurement and hash a canonical representation with source/dependency revisions before training.
 
-Do not populate missing real model/dataset/tokenizer or binary hashes with placeholders that pass validation. Account credentials never belong in YAML/checkpoints/Git. The legacy spending-warning conflict is explicitly logged in `docs/decisions.md`; no unlimited authorization is implied by the initial $300 planning envelope. The blank `config.yaml` is intentionally invalid until the future implementer completes it and the required preflights.
+Do not populate missing real model/dataset/tokenizer or binary hashes with placeholders that pass validation. Account credentials never belong in YAML/checkpoints/Git. The legacy spending-warning conflict is explicitly logged in `docs/decisions.md`; no unlimited authorization is implied by the initial $300 planning envelope. The populated `config.yaml` validates the fixed scientific settings; launch still requires verified runtime identities and mandatory preflights.
 
 ## Interfaces and dependent procedures
 
@@ -50,3 +50,12 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`load_configuration(path, require_runtime=False)`, `validate_configuration(config, runtime=False)`, `scientific_configuration(config)`, `configuration_hash(config)`, `snapshot_hash(config)`, `freeze_configuration(config, path)` and `sft_matrix(config)` validate the selected scientific design. Immutable public model/dataset revisions are pinned in `config.yaml`; the actual English-EWT UDPipe binary and English Aspell contents/effective settings are pinned; unresolved code/dependency evidence blocks runtime freeze. Optional private `.env` loading uses literal assignments without shell expansion; injected variables take precedence. DATA_ROOT, ARTIFACT_ROOT and MODEL_CACHE_ROOT provide operational overrides. `OPERATIONAL_IDENTITY_EXCLUSIONS` explicitly lists funding/rate evidence, roots, credential bindings and quotas excluded from scientific identity; code/dependency/model/data/judge/loss/decoder and MBPP identities remain included. Every full resolved configuration gets a distinct immutable snapshot audit.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.
+
+KaziText content identity includes the verified UDPipe SHA256 and all resolved Aspell dictionary file names/hashes and effective non-locator options. Local UDPipe/Aspell paths remain separate operational locators. Actual clean-data preflight compares resolved dictionary contents/settings with this immutable scientific provenance.

@@ -1,6 +1,6 @@
 # readable_solution_audit.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py` |
 
 **Scientific sources:** H.4–H.6. [p. 72](../../../../../../../spec/experiment.pdf#page=72) · [p. 73](../../../../../../../spec/experiment.pdf#page=73) · [p. 74](../../../../../../../spec/experiment.pdf#page=74) · [p. 75](../../../../../../../spec/experiment.pdf#page=75) · [p. 76](../../../../../../../spec/experiment.pdf#page=76).
+
+## Implemented public interface and validation
+
+`audit_readable_solution(question, reasoning, judge_client)` uses the exact H.5 tri-state audit prompt and public question/interface without hidden answers, tests, state labels, or either numerical score. GPT-4o returns separate readable-solution and padding states. Provider failure or schema failure remains missing, and `uncertain` does not establish readable-solution absence. Shared request persistence preserves independent successes and enforces bounded retries, model identity, real price evidence, and spend authorization.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

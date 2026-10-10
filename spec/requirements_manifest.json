@@ -1,5 +1,5 @@
 {
-  "scope": "Index of principal enforceable constraints; detailed source comments, module cards and full PDF remain controlling. Not an executable config or passing-test report.",
+  "scope": "Traceability of82 preserved scientific/infrastructure requirements plus8 user/H.9 operational extensions. Implementation/local checks, pending actual integrations, final audit and empirical results are distinguished; not a passing-test report.",
   "requirements": [
     {
       "id": "req_scope",
@@ -10,12 +10,41 @@
         80
       ],
       "modules": [
-        "src/experiment_overview/experiment_overview.py"
+        "src/experiment_overview/experiment_overview.py",
+        "src/operations/workflow.py"
       ],
       "tests": [
-        "tests/unit/experiment_overview/test_experiment_overview.py"
+        "tests/unit/experiment_overview/test_experiment_overview.py",
+        "tests/unit/operations/test_operations.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "authorized_end_to_end_scientific_execution"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "remaining_checks": [
+          "Final cross-artifact audit, stabilized consolidated suite, cold-start audit and remote publication reconciliation."
+        ]
+      },
+      "module_cards": [
+        "docs/modules/experiment_overview/experiment_overview.md",
+        "docs/modules/operations/workflow.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/experiment_overview/experiment_overview.mmd",
+        "spec/mermaid/workflows/operations/workflow.mmd"
+      ]
     },
     {
       "id": "req_authority",
@@ -32,7 +61,29 @@
         "tests/unit/shared_procedures/test_configuration.py",
         "tests/unit/experiment_overview/test_experiment_overview.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/configuration.md",
+        "docs/modules/experiment_overview/experiment_overview.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/configuration.mmd",
+        "spec/mermaid/workflows/experiment_overview/experiment_overview.mmd"
+      ]
     },
     {
       "id": "req_models",
@@ -50,7 +101,31 @@
         "tests/unit/training/test_training.py",
         "tests/unit/shared_procedures/test_configuration.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_two_model_immutable_native_runtime"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/training.md",
+        "docs/modules/shared_procedures/configuration.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/training.mmd",
+        "spec/mermaid/workflows/shared_procedures/configuration.mmd"
+      ]
     },
     {
       "id": "req_matrix",
@@ -73,7 +148,35 @@
         "tests/unit/training/rl_grpo/test_rl_training.py",
         "tests/unit/evaluation/test_evaluation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual40_sft_fits_two_rl_trajectories62_evaluated_states"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/training.md",
+        "docs/modules/training/sft/sft_training.md",
+        "docs/modules/training/rl_grpo/rl_training.md",
+        "docs/modules/evaluation/evaluation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/training.mmd",
+        "spec/mermaid/workflows/training/sft/sft_training.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/rl_training.mmd",
+        "spec/mermaid/workflows/evaluation/evaluation.mmd"
+      ]
     },
     {
       "id": "req_fixed_design",
@@ -91,7 +194,29 @@
         "tests/unit/shared_procedures/test_configuration.py",
         "tests/unit/experiment_overview/test_experiment_overview.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/configuration.md",
+        "docs/modules/experiment_overview/experiment_overview.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/configuration.mmd",
+        "spec/mermaid/workflows/experiment_overview/experiment_overview.mmd"
+      ]
     },
     {
       "id": "req_lmsys",
@@ -108,7 +233,29 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "accepted_corpus_license_and_complete_frozen_source"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.mmd"
+      ]
     },
     {
       "id": "req_paired_sources",
@@ -126,7 +273,31 @@
         "tests/unit/data_generation_collection/test_data_generation.py",
         "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_paired_clean_generations"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/data_generation.md",
+        "docs/modules/data_generation_collection/sft_data/sft_data_preparation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/data_generation.mmd",
+        "spec/mermaid/workflows/data_generation_collection/sft_data/sft_data_preparation.mmd"
+      ]
     },
     {
       "id": "req_clean_generation",
@@ -141,7 +312,29 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_two_model_native_generation"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd"
+      ]
     },
     {
       "id": "req_clean_eligibility",
@@ -158,7 +351,31 @@
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py",
         "tests/unit/shared_procedures/test_records.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_two_model_parsing_and_all_transform_integrity"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.md",
+        "docs/modules/shared_procedures/records.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd",
+        "spec/mermaid/workflows/shared_procedures/records.mmd"
+      ]
     },
     {
       "id": "req_all_lengths",
@@ -177,7 +394,31 @@
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py",
         "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_tokenizers_and_complete_transform_runtime"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.md",
+        "docs/modules/data_generation_collection/sft_data/sft_data_preparation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd",
+        "spec/mermaid/workflows/data_generation_collection/sft_data/sft_data_preparation.mmd"
+      ]
     },
     {
       "id": "req_clean_not_correct",
@@ -194,7 +435,31 @@
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py",
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_clean_collection"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.md",
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.mmd",
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd"
+      ]
     },
     {
       "id": "req_deficit",
@@ -211,7 +476,31 @@
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py",
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_full_clean_collection_and_deficit_refills"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.md",
+        "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.mmd",
+        "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd"
+      ]
     },
     {
       "id": "req_accepted_counts",
@@ -227,7 +516,29 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual10100_jointly_accepted_pairs"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/sft_data_preparation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/sft_data_preparation.mmd"
+      ]
     },
     {
       "id": "req_rot13_regions",
@@ -243,7 +554,27 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/rot13/rot13_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/rot13/rot13_data_construction.mmd"
+      ]
     },
     {
       "id": "req_rot13_counts",
@@ -258,7 +589,27 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/rot13/rot13_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/rot13/rot13_data_construction.mmd"
+      ]
     },
     {
       "id": "req_rot13_short",
@@ -274,7 +625,27 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/rot13/rot13_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/rot13/rot13_data_construction.mmd"
+      ]
     },
     {
       "id": "req_transforms_protect",
@@ -292,7 +663,31 @@
         "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py",
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_official_kazitext_runtime"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/rot13/rot13_data_construction.md",
+        "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/rot13/rot13_data_construction.mmd",
+        "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd"
+      ]
     },
     {
       "id": "req_kazitext_identity",
@@ -307,7 +702,29 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "pinned_official_kazitext_and_auxiliary_assets"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd"
+      ]
     },
     {
       "id": "req_kazitext_grid",
@@ -323,7 +740,29 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "pinned_official_kazitext_runtime"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd"
+      ]
     },
     {
       "id": "req_kazitext_switches",
@@ -338,7 +777,29 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "pinned_official_kazitext_runtime"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd"
+      ]
     },
     {
       "id": "req_kazitext_runtime",
@@ -355,7 +816,31 @@
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py",
         "tests/unit/shared_procedures/test_identity.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_English_EWT_UDPipe_binding_and_dictionary"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md",
+        "docs/modules/shared_procedures/identity.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd",
+        "spec/mermaid/workflows/shared_procedures/identity.mmd"
+      ]
     },
     {
       "id": "req_frozen_sources",
@@ -374,7 +859,33 @@
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py",
         "tests/unit/shared_procedures/test_recovery_procedure.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_complete_frozen_sources_and_runtime_identity"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/sft_data/rot13/rot13_data_construction.md",
+        "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md",
+        "docs/modules/shared_procedures/recovery_procedure.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/sft_data/rot13/rot13_data_construction.mmd",
+        "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd",
+        "spec/mermaid/workflows/shared_procedures/recovery_procedure.mmd"
+      ]
     },
     {
       "id": "req_sft_fresh",
@@ -391,7 +902,31 @@
         "tests/unit/training/sft/test_sft_training.py",
         "tests/unit/training/sft/individual_fit/test_sft_fit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_cuda_independent_fits_and_exact_resume"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/sft/sft_training.md",
+        "docs/modules/training/sft/individual_fit/sft_fit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/sft/sft_training.mmd",
+        "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
+      ]
     },
     {
       "id": "req_sft_quant",
@@ -407,7 +942,29 @@
       "tests": [
         "tests/unit/training/sft/individual_fit/test_sft_fit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_NF4_BF16_runtime"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/sft/individual_fit/sft_fit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
+      ]
     },
     {
       "id": "req_sft_lora",
@@ -422,7 +979,29 @@
       "tests": [
         "tests/unit/training/sft/individual_fit/test_sft_fit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_selected_model_trainable_parameter_check"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/sft/individual_fit/sft_fit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
+      ]
     },
     {
       "id": "req_sft_optimization",
@@ -438,7 +1017,29 @@
       "tests": [
         "tests/unit/training/sft/individual_fit/test_sft_fit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_optimizer_gradients_and_full_schedule"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/sft/individual_fit/sft_fit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
+      ]
     },
     {
       "id": "req_sft_mask",
@@ -456,7 +1057,31 @@
         "tests/unit/training/sft/individual_fit/test_sft_fit.py",
         "tests/unit/shared_procedures/test_preflight.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_selected_model_loss_mask_gradient_preflight"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/sft/individual_fit/sft_fit.md",
+        "docs/modules/shared_procedures/preflight.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd",
+        "spec/mermaid/workflows/shared_procedures/preflight.mmd"
+      ]
     },
     {
       "id": "req_sft_save",
@@ -473,7 +1098,31 @@
         "tests/unit/training/sft/individual_fit/test_sft_fit.py",
         "tests/unit/shared_procedures/test_checkpointing.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_cuda_full_optimizer_scheduler_rng_resume"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/sft/individual_fit/sft_fit.md",
+        "docs/modules/shared_procedures/checkpointing.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd",
+        "spec/mermaid/workflows/shared_procedures/checkpointing.mmd"
+      ]
     },
     {
       "id": "req_rl_questions",
@@ -489,7 +1138,29 @@
       "tests": [
         "tests/unit/data_generation_collection/rl_data/test_rl_data_preparation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_official_immutable_GSM8K_training_selection"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/rl_data/rl_data_preparation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/rl_data/rl_data_preparation.mmd"
+      ]
     },
     {
       "id": "req_rl_group",
@@ -509,7 +1180,33 @@
         "tests/unit/training/rl_grpo/training_cycle/test_grpo_training_cycle.py",
         "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual8x4_cuda_grpo_update_preflight"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/rollouts/rollout_collection.md",
+        "docs/modules/training/rl_grpo/training_cycle/grpo_training_cycle.md",
+        "docs/modules/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rollouts/rollout_collection.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/grpo_training_cycle.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.mmd"
+      ]
     },
     {
       "id": "req_rl_generation",
@@ -525,7 +1222,29 @@
       "tests": [
         "tests/unit/training/rl_grpo/training_cycle/rollouts/test_rollout_collection.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_two_model_native_rollouts"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/rollouts/rollout_collection.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rollouts/rollout_collection.mmd"
+      ]
     },
     {
       "id": "req_rl_parser",
@@ -542,7 +1261,29 @@
         "tests/unit/shared_procedures/test_response_parsing.py",
         "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/response_parsing.md",
+        "docs/modules/training/rl_grpo/training_cycle/rewards/rl_reward.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/response_parsing.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/rl_reward.mmd"
+      ]
     },
     {
       "id": "req_rl_reward_gate",
@@ -559,7 +1300,31 @@
         "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py",
         "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_frozen_Sonnet_schema_controls"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/rewards/rl_reward.md",
+        "docs/modules/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/rl_reward.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.mmd"
+      ]
     },
     {
       "id": "req_rl_requests",
@@ -574,7 +1339,29 @@
       "tests": [
         "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_independent_frozen_Sonnet_calls"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.mmd"
+      ]
     },
     {
       "id": "req_rl_judge_settings",
@@ -591,7 +1378,31 @@
         "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py",
         "tests/unit/shared_procedures/test_judge_client.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_model_availability_native_parameters_and_schema"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.md",
+        "docs/modules/shared_procedures/judge_client.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.mmd",
+        "spec/mermaid/workflows/shared_procedures/judge_client.mmd"
+      ]
     },
     {
       "id": "req_rl_loss",
@@ -608,7 +1419,31 @@
         "tests/unit/training/rl_grpo/setup/test_rl_setup.py",
         "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_selected_model_cuda_token_loss_reference_gradient_preflight"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/setup/rl_setup.md",
+        "docs/modules/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/setup/rl_setup.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.mmd"
+      ]
     },
     {
       "id": "req_rl_recipe",
@@ -627,11 +1462,35 @@
         "tests/unit/training/rl_grpo/setup/test_rl_setup.py",
         "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_cuda_100_update_trajectories"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/setup/rl_setup.md",
+        "docs/modules/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/setup/rl_setup.mmd",
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.mmd"
+      ]
     },
     {
       "id": "req_rl_snapshots",
-      "requirement": "10 original-step snapshots per separate model run,steps10–100; no replacement by later state; at least latest2 full recovery states.",
+      "requirement": "10 original-step snapshots per separate model run,steps10\u2013100; no replacement by later state; at least latest2 full recovery states.",
       "source_sections": "C.3.5,E.1.3; rl_training diagram",
       "pdf_pages": [
         35,
@@ -645,7 +1504,31 @@
         "tests/unit/training/rl_grpo/test_rl_training.py",
         "tests/unit/shared_procedures/test_checkpointing.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual20_original_step_adapters_and_full_state_recovery"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/rl_training.md",
+        "docs/modules/shared_procedures/checkpointing.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/rl_training.mmd",
+        "spec/mermaid/workflows/shared_procedures/checkpointing.mmd"
+      ]
     },
     {
       "id": "req_zero_signal",
@@ -662,7 +1545,31 @@
         "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py",
         "tests/unit/shared_procedures/test_recovery_procedure.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_trajectory_diagnostics_without_resampling"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.md",
+        "docs/modules/shared_procedures/recovery_procedure.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.mmd",
+        "spec/mermaid/workflows/shared_procedures/recovery_procedure.mmd"
+      ]
     },
     {
       "id": "req_capability_counts",
@@ -681,7 +1588,31 @@
         "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py",
         "tests/unit/data_generation_collection/evaluation_data/test_evaluation_data_preparation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "complete_frozen_official_panel_with_verified_references"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md",
+        "docs/modules/data_generation_collection/evaluation_data/evaluation_data_preparation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd",
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/evaluation_data_preparation.mmd"
+      ]
     },
     {
       "id": "req_gsm_strata",
@@ -696,7 +1627,29 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "official_GSM_test_source_and_frozen_panel"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd"
+      ]
     },
     {
       "id": "req_mmlu_subjects",
@@ -713,7 +1666,29 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "official_all57_clean_subject_populations"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd"
+      ]
     },
     {
       "id": "req_arc_mbpp",
@@ -729,7 +1704,29 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "official_sources_and_real_MBPP_reference_execution"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd"
+      ]
     },
     {
       "id": "req_legibility_panel",
@@ -745,7 +1742,29 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/legibility_subset/test_legibility_subset_construction.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "official_verified_nested200_item_panel"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.mmd"
+      ]
     },
     {
       "id": "req_native_eval",
@@ -763,7 +1782,31 @@
         "tests/unit/data_generation_collection/evaluation_data/protocol/test_evaluation_protocol.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual62_state_native_inference"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/evaluation_protocol.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/evaluation_protocol.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.mmd"
+      ]
     },
     {
       "id": "req_same_raw",
@@ -781,7 +1824,31 @@
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/test_item_evaluation.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_native_raw_outputs_and_live_judgments"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.mmd"
+      ]
     },
     {
       "id": "req_baseline_reuse",
@@ -798,7 +1865,31 @@
         "tests/unit/evaluation/condition_groups/test_condition_evaluation.py",
         "tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_untouched_baseline_packages"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/condition_groups/condition_evaluation.md",
+        "docs/modules/evaluation/shared_model_evaluation/model_evaluation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/condition_groups/condition_evaluation.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/model_evaluation.mmd"
+      ]
     },
     {
       "id": "req_scoring",
@@ -814,7 +1905,29 @@
       "tests": [
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_mbpp_isolated_executor_preflight"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.mmd"
+      ]
     },
     {
       "id": "req_mbpp_public",
@@ -833,7 +1946,33 @@
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_public_prompt_and_isolated_reference_preflight"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.mmd"
+      ]
     },
     {
       "id": "req_mbpp_extract",
@@ -850,7 +1989,29 @@
         "tests/unit/shared_procedures/test_response_parsing.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/response_parsing.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/response_parsing.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.mmd"
+      ]
     },
     {
       "id": "req_mbpp_isolate",
@@ -866,7 +2027,29 @@
       "tests": [
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_Docker_security_and_resource_boundary_preflight"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.mmd"
+      ]
     },
     {
       "id": "req_mbpp_failure",
@@ -883,11 +2066,35 @@
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_sandbox_control_tasks"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.mmd"
+      ]
     },
     {
       "id": "req_scores",
-      "requirement": "Whole reasoning only,unchanged score rubrics,primary gpt-4o-2024-11-20 versus Sonnet diagnostic,separate raw1–9 scores,no average into truth.",
+      "requirement": "Whole reasoning only,unchanged score rubrics,primary gpt-4o-2024-11-20 versus Sonnet diagnostic,separate raw1\u20139 scores,no average into truth.",
       "source_sections": "D.2,H.5",
       "pdf_pages": [
         43,
@@ -901,7 +2108,29 @@
       "tests": [
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_GPT4o_and_Sonnet_availability_schema_controls"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.mmd"
+      ]
     },
     {
       "id": "req_judge_inputs",
@@ -920,7 +2149,31 @@
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_separate_judge_request_controls"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.mmd"
+      ]
     },
     {
       "id": "req_audit",
@@ -936,7 +2189,29 @@
       "tests": [
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_GPT4o_H5_schema_controls"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.mmd"
+      ]
     },
     {
       "id": "req_audit_vs_reward",
@@ -953,7 +2228,31 @@
         "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py",
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "live_distinct_training_and_heldout_service_controls"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/rewards/rl_reward.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/rl_reward.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.mmd"
+      ]
     },
     {
       "id": "req_option_a",
@@ -970,7 +2269,32 @@
         "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py",
         "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.md",
+        "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.mmd",
+        "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd"
+      ]
     },
     {
       "id": "req_missingness",
@@ -989,7 +2313,34 @@
         "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py",
         "tests/unit/shared_procedures/test_records.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.md",
+        "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md",
+        "docs/modules/shared_procedures/records.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.mmd",
+        "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd",
+        "spec/mermaid/workflows/shared_procedures/records.mmd"
+      ]
     },
     {
       "id": "req_denominators",
@@ -1006,7 +2357,32 @@
         "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py",
         "tests/unit/evaluation/results_analysis/test_results_analysis.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md",
+        "docs/modules/evaluation/results_analysis/results_analysis.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd",
+        "spec/mermaid/workflows/evaluation/results_analysis/results_analysis.mmd"
+      ]
     },
     {
       "id": "req_retention",
@@ -1022,12 +2398,35 @@
       "tests": [
         "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd"
+      ]
     },
     {
       "id": "req_opacity_floors",
       "requirement": "At each window level require qualified opacity>=.5 and baseline increase>=.2 on full and pooled common-correct legibility sets.",
-      "source_sections": "G.3–G.4,H.6",
+      "source_sections": "G.3\u2013G.4,H.6",
       "pdf_pages": [
         65,
         75
@@ -1038,7 +2437,30 @@
       "tests": [
         "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd"
+      ]
     },
     {
       "id": "req_transfer_pair",
@@ -1053,7 +2475,30 @@
       "tests": [
         "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd"
+      ]
     },
     {
       "id": "req_windows",
@@ -1071,7 +2516,32 @@
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py",
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.md",
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.mmd",
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.mmd"
+      ]
     },
     {
       "id": "req_baseline_diagnostic",
@@ -1087,7 +2557,29 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_baseline_repeatability.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_two_model_seeds42_43_44_baseline_repeatability"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.mmd"
+      ]
     },
     {
       "id": "req_paired_draws",
@@ -1102,7 +2594,30 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.mmd"
+      ]
     },
     {
       "id": "req_design_aware",
@@ -1119,7 +2634,32 @@
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py",
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.md",
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.mmd",
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.mmd"
+      ]
     },
     {
       "id": "req_bounds",
@@ -1134,7 +2674,30 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.mmd"
+      ]
     },
     {
       "id": "req_degeneracy",
@@ -1149,7 +2712,30 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.mmd"
+      ]
     },
     {
       "id": "req_simulation",
@@ -1165,7 +2751,30 @@
       "tests": [
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.mmd"
+      ]
     },
     {
       "id": "req_failed_validation",
@@ -1182,7 +2791,32 @@
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py",
         "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.md",
+        "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.mmd",
+        "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.mmd"
+      ]
     },
     {
       "id": "req_reporting",
@@ -1195,12 +2829,39 @@
         76
       ],
       "modules": [
-        "src/evaluation/results_analysis/results_analysis.py"
+        "src/evaluation/results_analysis/results_analysis.py",
+        "src/operations/reporting.py"
       ],
       "tests": [
-        "tests/unit/evaluation/results_analysis/test_results_analysis.py"
+        "tests/unit/evaluation/results_analysis/test_results_analysis.py",
+        "tests/integration/test_end_to_end.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/results_analysis/results_analysis.md",
+        "docs/modules/operations/reporting.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/results_analysis/results_analysis.mmd",
+        "spec/mermaid/workflows/operations/reporting.mmd"
+      ]
     },
     {
       "id": "req_limits",
@@ -1217,7 +2878,30 @@
       "tests": [
         "tests/unit/evaluation/results_analysis/test_results_analysis.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_mandatory_validation_failed",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "statistical_report": "artifacts/preflight/statistical_validation/report.json",
+        "statistical_report_hash": "79ffded9ddc2cd7af529abe3af092008b1777fca4df178b936373743e34a9ddc",
+        "statistical_observation": "Actual-frame decision_boundaries scenario failed after34/36joint successes with2failures; futility stop leaves other6scenarios unrun. No trained outcomes were inspected."
+      },
+      "module_cards": [
+        "docs/modules/evaluation/results_analysis/results_analysis.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/evaluation/results_analysis/results_analysis.mmd"
+      ]
     },
     {
       "id": "req_provenance",
@@ -1230,18 +2914,44 @@
       ],
       "modules": [
         "src/shared_procedures/records.py",
-        "src/shared_procedures/identity.py"
+        "src/shared_procedures/identity.py",
+        "src/operations/artifacts.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_records.py",
-        "tests/unit/shared_procedures/test_identity.py"
+        "tests/unit/shared_procedures/test_identity.py",
+        "tests/unit/operations/test_operations.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/records.md",
+        "docs/modules/shared_procedures/identity.md",
+        "docs/modules/operations/artifacts.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/records.mmd",
+        "spec/mermaid/workflows/shared_procedures/identity.mmd",
+        "spec/mermaid/workflows/operations/artifacts.mmd"
+      ]
     },
     {
       "id": "req_durable",
       "requirement": "Verified durable storage,exclusive writers,atomic publication where supported,reopen integrity,secondary backup and provider lifecycle checks.",
-      "source_sections": "E.1.3,E.2.3–E.2.5",
+      "source_sections": "E.1.3,E.2.3\u2013E.2.5",
       "pdf_pages": [
         50,
         51,
@@ -1250,13 +2960,45 @@
       ],
       "modules": [
         "src/shared_procedures/storage.py",
-        "src/shared_procedures/execution_state.py"
+        "src/shared_procedures/execution_state.py",
+        "src/operations/artifacts.py",
+        "src/operations/drive.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_storage.py",
-        "tests/unit/shared_procedures/test_execution_state.py"
+        "tests/unit/shared_procedures/test_execution_state.py",
+        "tests/unit/operations/test_operations.py",
+        "tests/unit/operations/test_drive.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_provider_storage_lifecycle_secondary_backup_and_readback"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/storage.md",
+        "docs/modules/shared_procedures/execution_state.md",
+        "docs/modules/operations/artifacts.md",
+        "docs/modules/operations/drive.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/storage.mmd",
+        "spec/mermaid/workflows/shared_procedures/execution_state.mmd",
+        "spec/mermaid/workflows/operations/artifacts.mmd",
+        "spec/mermaid/workflows/operations/drive.mmd"
+      ]
     },
     {
       "id": "req_cache",
@@ -1269,14 +3011,48 @@
       "modules": [
         "src/shared_procedures/judge_client.py",
         "src/shared_procedures/storage.py",
-        "src/shared_procedures/identity.py"
+        "src/shared_procedures/identity.py",
+        "src/operations/assets.py",
+        "src/operations/artifacts.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_judge_client.py",
         "tests/unit/shared_procedures/test_storage.py",
-        "tests/unit/shared_procedures/test_identity.py"
+        "tests/unit/shared_procedures/test_identity.py",
+        "tests/unit/operations/test_assets.py",
+        "tests/unit/operations/test_operations.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_runtime_and_provider_resume_identity"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/judge_client.md",
+        "docs/modules/shared_procedures/storage.md",
+        "docs/modules/shared_procedures/identity.md",
+        "docs/modules/operations/assets.md",
+        "docs/modules/operations/artifacts.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/judge_client.mmd",
+        "spec/mermaid/workflows/shared_procedures/storage.mmd",
+        "spec/mermaid/workflows/shared_procedures/identity.mmd",
+        "spec/mermaid/workflows/operations/assets.mmd",
+        "spec/mermaid/workflows/operations/artifacts.mmd"
+      ]
     },
     {
       "id": "req_retry",
@@ -1288,14 +3064,48 @@
       "modules": [
         "src/shared_procedures/recovery_procedure.py",
         "src/shared_procedures/execution_state.py",
-        "src/shared_procedures/judge_client.py"
+        "src/shared_procedures/judge_client.py",
+        "src/operations/assets.py",
+        "src/operations/drive.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_recovery_procedure.py",
         "tests/unit/shared_procedures/test_execution_state.py",
-        "tests/unit/shared_procedures/test_judge_client.py"
+        "tests/unit/shared_procedures/test_judge_client.py",
+        "tests/unit/operations/test_assets.py",
+        "tests/unit/operations/test_drive.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_worker_wide_counters_across_provider_gpu_and_storage_stages"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/recovery_procedure.md",
+        "docs/modules/shared_procedures/execution_state.md",
+        "docs/modules/shared_procedures/judge_client.md",
+        "docs/modules/operations/assets.md",
+        "docs/modules/operations/drive.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/recovery_procedure.mmd",
+        "spec/mermaid/workflows/shared_procedures/execution_state.mmd",
+        "spec/mermaid/workflows/shared_procedures/judge_client.mmd",
+        "spec/mermaid/workflows/operations/assets.mmd",
+        "spec/mermaid/workflows/operations/drive.mmd"
+      ]
     },
     {
       "id": "req_rl_pause",
@@ -1314,7 +3124,31 @@
         "tests/unit/training/rl_grpo/training_cycle/test_grpo_training_cycle.py",
         "tests/unit/shared_procedures/test_judge_client.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_live_reward_failure_and_cuda_boundary_resume"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/training/rl_grpo/training_cycle/grpo_training_cycle.md",
+        "docs/modules/shared_procedures/judge_client.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/training/rl_grpo/training_cycle/grpo_training_cycle.mmd",
+        "spec/mermaid/workflows/shared_procedures/judge_client.mmd"
+      ]
     },
     {
       "id": "req_oom",
@@ -1332,7 +3166,31 @@
         "tests/unit/shared_procedures/test_checkpointing.py",
         "tests/unit/shared_procedures/test_recovery_procedure.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "actual_safe_gpu_failure_recovery_before_any_replay"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/checkpointing.md",
+        "docs/modules/shared_procedures/recovery_procedure.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/checkpointing.mmd",
+        "spec/mermaid/workflows/shared_procedures/recovery_procedure.mmd"
+      ]
     },
     {
       "id": "req_costs",
@@ -1344,13 +3202,45 @@
       ],
       "modules": [
         "src/shared_procedures/cost_accounting.py",
-        "src/shared_procedures/configuration.py"
+        "src/shared_procedures/configuration.py",
+        "src/operations/runpod.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_cost_accounting.py",
-        "tests/unit/shared_procedures/test_configuration.py"
+        "tests/unit/shared_procedures/test_configuration.py",
+        "tests/unit/operations/test_runpod.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "partially_implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "partial_integration",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "current_actual_provider_rates_quotas_and_gpu_api_total_budget_allocation"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "known_limitations": [
+          "API CostLedger and RunPod GPU lifecycle controller currently enforce separate ceilings. Allocate a shared total ceiling explicitly before combined paid work; no integrated GPU accrual into the API ledger is claimed.",
+          "Actual storage pricing and provider billing/lifecycle are not locally demonstrated."
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/cost_accounting.md",
+        "docs/modules/shared_procedures/configuration.md",
+        "docs/modules/operations/runpod.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/cost_accounting.mmd",
+        "spec/mermaid/workflows/shared_procedures/configuration.mmd",
+        "spec/mermaid/workflows/operations/runpod.mmd"
+      ]
     },
     {
       "id": "req_credentials",
@@ -1363,19 +3253,56 @@
       "modules": [
         "src/shared_procedures/configuration.py",
         "src/shared_procedures/storage.py",
-        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py",
+        "src/operations/drive.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_configuration.py",
         "tests/unit/shared_procedures/test_storage.py",
-        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py",
+        "tests/unit/operations/test_drive.py",
+        "tests/unit/operations/test_consent_notebook.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "secure_real_OAuth_and_provider_authorization"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/configuration.md",
+        "docs/modules/shared_procedures/storage.md",
+        "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md",
+        "docs/modules/operations/drive.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/configuration.mmd",
+        "spec/mermaid/workflows/shared_procedures/storage.mmd",
+        "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.mmd",
+        "spec/mermaid/workflows/operations/drive.mmd"
+      ],
+      "operational_entrypoints": [
+        "scripts/create_google_consent_notebook.py"
+      ],
+      "operational_docs": [
+        "docs/operations/jupyter_consent.md"
+      ]
     },
     {
       "id": "req_preflight",
       "requirement": "Actual selected-model masks/gradients,full-state resume,provider calls/storage/sandbox/GRPO grouping/baseline/statistical/permission gates before affected launch.",
-      "source_sections": "E.2.8,G.9–G.10,H.7–H.9",
+      "source_sections": "E.2.8,G.9\u2013G.10,H.7\u2013H.9",
       "pdf_pages": [
         58,
         67,
@@ -1384,12 +3311,38 @@
         80
       ],
       "modules": [
-        "src/shared_procedures/preflight.py"
+        "src/shared_procedures/preflight.py",
+        "src/operations/hardware.py"
       ],
       "tests": [
-        "tests/unit/shared_procedures/test_preflight.py"
+        "tests/unit/shared_procedures/test_preflight.py",
+        "tests/unit/experiment_overview/test_experiment_overview.py"
       ],
-      "status": "specified_not_implemented"
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "pending",
+        "mandatory_statistical_validation": "failed_blocks_confirmatory_launch",
+        "scientific_results": "not_executed",
+        "external_dependencies": [
+          "all_mandatory_live_and_statistical_preflight_evidence"
+        ],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/preflight.md",
+        "docs/modules/operations/hardware.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/preflight.mmd",
+        "spec/mermaid/workflows/operations/hardware.mmd"
+      ]
     },
     {
       "id": "req_history",
@@ -1402,13 +3355,387 @@
       ],
       "modules": [
         "src/shared_procedures/preflight.py",
-        "src/experiment_overview/experiment_overview.py"
+        "src/experiment_overview/experiment_overview.py",
+        "src/operations/validation.py"
       ],
       "tests": [
         "tests/unit/shared_procedures/test_preflight.py",
+        "tests/unit/experiment_overview/test_experiment_overview.py",
+        "scripts/validate_repository.py"
+      ],
+      "status": "implemented_with_local_tests",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
+        "live_status": "not_required_for_this_local_implementation_check",
+        "mandatory_statistical_validation": "not_claimed_by_this_requirement",
+        "scientific_results": "not_executed",
+        "external_dependencies": [],
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "remaining_checks": [
+          "Final cross-artifact audit, stabilized consolidated suite, cold-start audit and remote publication reconciliation."
+        ]
+      },
+      "module_cards": [
+        "docs/modules/shared_procedures/preflight.md",
+        "docs/modules/experiment_overview/experiment_overview.md",
+        "docs/modules/operations/validation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/shared_procedures/preflight.mmd",
+        "spec/mermaid/workflows/experiment_overview/experiment_overview.mmd",
+        "spec/mermaid/workflows/operations/validation.mmd"
+      ]
+    },
+    {
+      "id": "req_ops_assets",
+      "requirement": "Automate immutable licensed model/dataset/transform provisioning with verified standard shared cache, bounded retries (3 per operation, 100 per worker), retained resumable blobs and SDK local-only loading.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: automated environment setup and reusable model/dataset assets; E.1.4,E.2.2,E.2.5; H.9",
+      "pdf_pages": [
+        52,
+        54,
+        56,
+        80
+      ],
+      "modules": [
+        "src/operations/assets.py"
+      ],
+      "tests": [
+        "tests/unit/operations/test_assets.py",
+        "tests/unit/operations/test_operations.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/assets.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/assets.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "live_immutable_assets_and_complete_auxiliary_runtime"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      }
+    },
+    {
+      "id": "req_ops_artifacts",
+      "requirement": "Register all permanent scientific outputs with exact provenance and checksums; replicate incrementally, reconcile remote contents, and retrieve only compatible verified artifacts.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: complete Google Drive artifact persistence; E.1.3,E.2.3,E.2.5; H.9",
+      "pdf_pages": [
+        50,
+        55,
+        56,
+        80
+      ],
+      "modules": [
+        "src/operations/artifacts.py"
+      ],
+      "tests": [
+        "tests/unit/operations/test_operations.py",
+        "tests/unit/operations/test_drive.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/artifacts.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/artifacts.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "real_project_Drive_authorization_and_full_artifact_sync"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      }
+    },
+    {
+      "id": "req_ops_drive",
+      "requirement": "Reuse the existing desktop OAuth client securely with exact drive.file consent, offline refresh, actual access-token scopes, designated account, project-confined folders and verified transfer; no secret publication.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: existing Google OAuth client, designated account and project-confined persistence; E.2.5; H.9",
+      "pdf_pages": [
+        56,
+        80
+      ],
+      "modules": [
+        "src/operations/drive.py"
+      ],
+      "tests": [
+        "tests/unit/operations/test_drive.py",
+        "tests/unit/operations/test_operations.py",
+        "tests/unit/operations/test_consent_notebook.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/drive.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/drive.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "real_consent_refresh_scope_account_and_project_folder_verification"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      },
+      "operational_entrypoints": [
+        "scripts/create_google_consent_notebook.py"
+      ],
+      "operational_docs": [
+        "docs/operations/jupyter_consent.md"
+      ]
+    },
+    {
+      "id": "req_ops_hardware",
+      "requirement": "Record observed CPU/RAM/disk/CUDA/BF16 and distinguish80 GB A100/H100 deployment recommendations from measured 14B maximum-length peak memory.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: explicit hardware/resource specifications; E.1.1,E.1.2; H.9",
+      "pdf_pages": [
+        49,
+        50,
+        80
+      ],
+      "modules": [
+        "src/operations/hardware.py"
+      ],
+      "tests": [
+        "tests/unit/experiment_overview/test_experiment_overview.py",
+        "tests/unit/shared_procedures/test_preflight.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/hardware.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/hardware.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "actual_authorized_gpu_and_peak_memory_preflight"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      }
+    },
+    {
+      "id": "req_ops_reporting",
+      "requirement": "Export actual analysis records and capability/opacity curves, retain all missing/indeterminate values and failures, label fixtures, and attach claim limits; never invent successful results.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: complete scientific results and report artifacts; D.2.5,G,H.6; H.9",
+      "pdf_pages": [
+        45,
+        65,
+        75,
+        76,
+        80
+      ],
+      "modules": [
+        "src/operations/reporting.py"
+      ],
+      "tests": [
+        "tests/integration/test_end_to_end.py",
+        "tests/unit/evaluation/results_analysis/test_results_analysis.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/reporting.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/reporting.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "actual_complete_experimental_results"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      }
+    },
+    {
+      "id": "req_ops_runpod",
+      "requirement": "Use only concretely authorized provider resources; existing-H100 authorization is 90 USD / 108000 seconds and does not authorize creating a new Pod. Monitor real price/time from outside the Pod and verify observed stop rather than accepted stop acknowledgment.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions. Existing-Pod budget is subsequent explicit user authorization.",
+      "source_sections": "User master request: authorized RunPod deployment; subsequent existing-H100 authorization 90 USD / 30 hours; E.1.5,E.2.5; H.9",
+      "pdf_pages": [
+        52,
+        56,
+        80
+      ],
+      "modules": [
+        "src/operations/runpod.py"
+      ],
+      "tests": [
+        "tests/unit/operations/test_runpod.py",
+        "tests/unit/operations/test_operations.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/runpod.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/runpod.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "actual_existing_Pod_ID_hourly_quote_billing_start_external_controller_and_termination"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ],
+        "known_limitations": [
+          "Current Pod identity/rate/billing evidence must be resolved before lifecycle guard accepts the pending authorization.",
+          "GPU and API ceilings require explicit allocation if funded by the same90USD authorization.",
+          "Controller host loss and provider failure require independent provider-console follow-up; STOP_UNCONFIRMED is not stopped billing."
+        ]
+      }
+    },
+    {
+      "id": "req_ops_validation",
+      "requirement": "Validate the complete static inventory, same-stem source/card/diagram mappings, requirement/test links and preserved PDFs; separately record final test, source/version and remote publication evidence.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: cross-artifact consistency, complete inventory and nine acceptance gates; E.2.8; H.9",
+      "pdf_pages": [
+        58,
+        80
+      ],
+      "modules": [
+        "src/operations/validation.py"
+      ],
+      "tests": [
+        "scripts/validate_repository.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/validation.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/validation.mmd"
+      ],
+      "status": "implemented_with_local_checks_final_audit_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "executable_static_validator_final_audit_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "final_coordinator_static_cold_start_and_remote_publication_audit"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      }
+    },
+    {
+      "id": "req_ops_workflow",
+      "requirement": "Expose modular dependency-aware stages, selected models/fits, verified source/configuration/checkpoint compatibility, exclusive GPU writers and retained complete outputs for automatic safe resume.",
+      "origin": "User implementation assignment and permitted H.9 operational conventions.",
+      "source_sections": "User master request: modular independently accessible execution and automatic compatible resumption; E.1.4,E.2.5; H.9",
+      "pdf_pages": [
+        52,
+        56,
+        80
+      ],
+      "modules": [
+        "src/operations/workflow.py"
+      ],
+      "tests": [
+        "tests/unit/operations/test_operations.py",
         "tests/unit/experiment_overview/test_experiment_overview.py"
       ],
-      "status": "specified_not_implemented"
+      "module_cards": [
+        "docs/modules/operations/workflow.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/workflow.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
+        "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "actual_selected_stages_real_adapter_handoffs_and_durable_resume"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/validation_report.md",
+          "docs/implementation_acceptance.md"
+        ]
+      }
     }
-  ]
+  ],
+  "requirement_counts": {
+    "original_scientific_and_infrastructure": 82,
+    "user_operational_extensions": 8,
+    "total": 90
+  },
+  "status_legend": {
+    "implemented_with_local_tests": "Implementation and declared local tests exist; final consolidated audit pending; no empirical outcome claimed.",
+    "implemented_with_local_tests_live_validation_pending": "Local implementation/fixture evidence exists; named actual hardware/service/artifact integration remains pending.",
+    "partially_implemented_with_local_tests_live_validation_pending": "Local components exist but a named integration gap remains before actual launch.",
+    "implemented_with_local_checks_final_audit_pending": "Executable local audit exists; final static/remote/cold-start reconciliation remains pending.",
+    "implemented_with_local_tests_mandatory_validation_failed": "Local implementation/contract checks exist, but the actual prospective coverage preflight failed; confirmatory launch is blocked. This is not a failed local unit-test claim."
+  }
 }

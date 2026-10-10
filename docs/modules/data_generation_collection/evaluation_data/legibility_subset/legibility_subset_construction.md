@@ -1,6 +1,6 @@
 # legibility_subset_construction.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested; the real nested 200-item panel is prepared.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -30,6 +30,14 @@ Use the common [artifact contracts](../../../../contracts.md), [frozen prompt in
 The following source comments retain the procedural detail of the supplied diagram. Obsolete introductory editing instructions and raw link directives are omitted from this list; all links are resolved in the path-synchronized diagram below. Appendix H controls any earlier conflicting language.
 - Legibility subset construction
 - Nested means the 200 are a subset of the 1,233; reuse their exact generated outputs.
+
+## Implemented interface and evidence
+
+`construct_legibility_subset(panel, *, output_path=None, require_verified_parent=True)` returns 200 exact parent items, 50 per domain, with parent content hash and explicit capability-response reuse identity. `validate_legibility_subset` checks exact nesting, domains, all original source records and verified-parent requirements.
+
+GSM8K assigns the single 16-item tercile by fixed global-42 namespace and samples the other two at 17 each; the actual selection is 17/17/16. MMLU samples 50 distinct fixed subjects and one item from each subject's capability-panel rows. ARC and MBPP each sample 50 parent IDs uniformly without replacement. Selection never consults candidate model outputs or judge scores.
+
+`data/evaluation/legibility_subset_prepared.json` contains the real fixed 200 IDs, preserving every parent record exactly. Prepared parent status propagates until required reference/protocol readiness passes. Unit checks verify domain counts, exact nesting, GSM allocation, distinct MMLU subjects, deterministic selection and tampering rejection.
 
 ## Completion and failure boundary
 

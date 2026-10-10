@@ -1,6 +1,6 @@
 # candidate_manifest.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested with deterministic source fixtures; public shard acquisition verified. Authorized LMSYS acquisition remains gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -22,6 +22,14 @@ The final population is source-filtered and trace-eligible, not representative o
 Use the common [artifact contracts](../../../../contracts.md), [frozen prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). Typed signatures/serialization are delegated implementation details; their scientific meaning is not. The named owner defines this module with its consumers before dependent integration.
 
 No separate child procedure is declared in this diagram. This does not exempt shared recovery, storage, provenance or validation contracts.
+
+## Implemented interface and evidence
+
+`prepare_candidate_manifest(rows, tokenizers, source_revision, evaluation_questions, *, authorized, output_path=None)` returns a verified JSON mapping with `candidates`, `exclusions`, immutable revision, ordered IDs and content hash. `load_lmsys_source(revision, *, authorized, streaming=True, cache_root=None)` reads only exact pinned upstream Parquet/Arrow shards after explicit authorization. The shard reader verifies upstream LFS SHA-256 or Git blob SHA-1 and byte counts, paginates authoritative metadata, and performs no internal retries.
+
+Normalization is Unicode NFKC, case folding and collapsed whitespace; original prompt bytes remain unchanged. Eligibility uses the source English label, first user turn, both frozen tokenizers at at most 200 input tokens, normalized exact deduplication and detectable evaluation overlap. Candidate ordering uses the SHA-derived seed namespace `candidates` with global 42 and ID tie breaking. No semantic-quality classifier or fuzzy overlap cutoff is added.
+
+Unit checks cover provenance, language/first-turn filtering, both tokenizer counts, normalized overlap, deterministic ordering, source authorization, metadata pagination and corrupted-cache rejection. The four public benchmark sources were actually downloaded with checksum verification. LMSYS is gated and no authorized scientific candidate manifest has been fabricated.
 
 ## Completion and failure boundary
 

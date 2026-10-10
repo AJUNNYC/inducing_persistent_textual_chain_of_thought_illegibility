@@ -1,6 +1,6 @@
 # output_generation.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py` |
 
 **Scientific sources:** D.1.2,D.2.4; E.2.3,E.2.7; H.4,H.9. [p. 5](../../../../../../spec/experiment.pdf#page=5) · [p. 41](../../../../../../spec/experiment.pdf#page=41) · [p. 44](../../../../../../spec/experiment.pdf#page=44) · [p. 55](../../../../../../spec/experiment.pdf#page=55) · [p. 57](../../../../../../spec/experiment.pdf#page=57) · [p. 72](../../../../../../spec/experiment.pdf#page=72) · [p. 80](../../../../../../spec/experiment.pdf#page=80).
+
+## Implemented public interface and validation
+
+`NativeGenerator(cache_root, *, backend=None).generate(state, item, seed=42)` uses the fixed native prompt, temperature 0.6, top-p 0.95, and 3,072-token cap. Production requires actual CUDA/BF16, exact pinned base/tokenizer revisions and verified adapter manifests, uses the canonical verified Hub cache with SDK networking disabled, and refuses CPU/disk layer offload. The record retains token IDs, exact decoded generated text, the terminal-EOS-normalized native output, known tokenizer prefill, stopping metadata, effective seed, and observed runtime metadata. Full record hashes detect metadata corruption. Injected backends are explicitly simulation and occupy separate cache identities.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

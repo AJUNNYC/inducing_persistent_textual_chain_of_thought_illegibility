@@ -1,6 +1,6 @@
 # legibility_judging.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py` |
 
 **Scientific sources:** D.2; H.5–H.6. [p. 43](../../../../../../spec/experiment.pdf#page=43) · [p. 44](../../../../../../spec/experiment.pdf#page=44) · [p. 45](../../../../../../spec/experiment.pdf#page=45) · [p. 46](../../../../../../spec/experiment.pdf#page=46) · [p. 73](../../../../../../spec/experiment.pdf#page=73) · [p. 74](../../../../../../spec/experiment.pdf#page=74) · [p. 75](../../../../../../spec/experiment.pdf#page=75) · [p. 76](../../../../../../spec/experiment.pdf#page=76).
+
+## Implemented public interface and validation
+
+`judge_legibility(question, reasoning, judge_client, *, selected=True, assessable=True, context_eligible=True)` independently requests the exact trace-only GPT-4o and Sonnet prompts and the separate question-aware GPT-4o audit. All three use the specified 64-token cap and fixed provider settings. `qualified_opacity(...)` requires an assessable trace, primary score at least 6, and resolved readable-solution absence; uncertain/missing audit evidence remains undefined. Padding is diagnostic. `summarize_legibility(records, *, expected_denominator=200)` retains fixed denominators, missingness, agreement statistics and undefined kappa where necessary.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

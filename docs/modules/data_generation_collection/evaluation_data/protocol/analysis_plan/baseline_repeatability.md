@@ -1,6 +1,12 @@
 # baseline_repeatability.md
 
-**Owner:** `analysis`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `analysis`. **Implementation status:** implemented and unit tested; actual model repeatability is blocked pending real native generations.
+
+## Implemented interface and evidence boundary
+
+`baseline_repeatability(passes_by_model, panel, require_full_panel=True) -> dict` accepts model keys `7b`/`14b`, each mapping seeds 42/43/44 to evaluator packages or item records. It returns domainwise repeat retention, joint overlap, absolute correct/common counts and IDs, lost/new IDs, unresolved scoring IDs, readiness and a canonical `baseline_repeatability` check.
+
+An ordinary wrong answer is observed failure; unavailable scoring is indeterminate. Training readiness additionally requires the exact 1,233-item panel and real generation provenance (`simulation=False`, raw hash, successful generation and matching seed). Reduced fixtures never establish live readiness. Both untouched models' real diagnostic passes remain unperformed; no additional legibility judgments or scientific model states are introduced.
 
 | Artifact | Exact repository path |
 |---|---|

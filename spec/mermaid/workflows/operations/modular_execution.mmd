@@ -1,0 +1,30 @@
+---
+title: "Implemented modular scientific execution"
+---
+flowchart TD
+    ASSETS["Pinned assets and native KaziText provenance"] --> PANELS["Frozen 1233 / nested 200 panels"]
+    PANELS --> CANDIDATES["Authorized LMSYS candidates"]
+    CANDIDATES --> GENERATION["Generation preflights: model, transforms, Drive, spending"]
+    GENERATION --> CLEAN["Paired native clean traces"]
+    CLEAN --> SFTDATA["40 transformed 10000 / 100 datasets"]
+    PANELS --> RLDATA["Ordered 800 GSM8K training questions"]
+    PANELS --> PLAN["216 windows / 10800 scalar gates"]
+    PLAN --> STATS["Prospective full-family coverage validation"]
+    PANELS --> BASE["Both native bases; seeds42 /43 /44"]
+    BASE --> REPEAT["Baseline repeatability"]
+    SFTDATA --> PREFLIGHT["Canonical required live preflights"]
+    RLDATA --> PREFLIGHT
+    STATS --> PREFLIGHT
+    REPEAT --> PREFLIGHT
+    PREFLIGHT --> SFT["40 independent SFT fits"]
+    PREFLIGHT --> RL["Two100-step trajectories;20 snapshots"]
+    SFT --> EVAL["60 trained states; common native protocol"]
+    RL --> EVAL
+    EVAL --> ANALYSIS["Paired design-aware analysis"]
+    BASE --> ANALYSIS
+    ANALYSIS --> REPORT["JSON / Markdown / plots"]
+    REPORT --> SYNC["Complete verified Drive reconciliation"]
+    CLEAN -. "required raw artifacts" .-> DRIVE["Indexed immediate permanent replication"]
+    SFT -. "full state and final adapter" .-> DRIVE
+    RL -. "full state and all scientific snapshots" .-> DRIVE
+    EVAL -. "raw generations and judgments" .-> DRIVE

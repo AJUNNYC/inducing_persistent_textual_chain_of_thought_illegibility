@@ -1,6 +1,6 @@
 # rl_data_preparation.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested; the real 800-question manifest has been prepared from pinned public GSM8K.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -32,6 +32,14 @@ The following source comments retain the procedural detail of the supplied diagr
 - Keep rejected source IDs and reasons; exclusions include detectable evaluation overlap.
 - No fixed training reasoning targets: current policies generate their own rollouts.
 - GSM8K easiness is not intrinsically disqualifying; inspect within-group opacity reward variation.
+
+## Implemented interface and evidence
+
+`load_rl_source(revision, *, cache_root=None)` reads checksummed pinned GSM8K train shards. `prepare_rl_data(rows, source_revision, evaluation_questions, *, output_path=None)` returns `questions` (800), fixed `batches` (100 ordered batches of eight), source revision, overlap/dedup exclusions, hashes and verified status. Records use `question_id`, alias `example_id`, exact `question`, normalized numeric `reference_answer` and source content hashes; no source reasoning target is passed to RL. `validate_rl_manifest` checks all counts, ID uniqueness, ordering/groups and hash identities.
+
+The reference comes only from the official `####` numeric answer. Normalized question overlap checks the full frozen benchmark frame, not only sampled evaluation IDs. Questions order by SHA-derived namespace `rl_questions` with global 42. The model never chooses substitutes or difficulty strata.
+
+Actual pinned GSM8K train rows (7473) were acquired and verified; `data/rl/manifest.json` contains the real fixed 800 questions and 100 batches, with no detected full-frame overlap/dedup exclusions. Unit checks cover reference parsing, exact counts/group order, repeatability, duplicates, detectable overlap and insufficient pools.
 
 ## Completion and failure boundary
 

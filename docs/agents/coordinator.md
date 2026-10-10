@@ -17,7 +17,7 @@ Read the full controlling PDF as needed for your scope, including H.1/H.9 preced
 
 ## Exclusive implementation write list
 
-These are the complete initial implementation-file assignments. Code files are currently empty; populate only within your scope. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
+These are the original implementation assignments. The implemented operational extensions are recorded in the canonical manifest; delegated integration ownership is documented in handoffs. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
 
 ```text
 pyproject.toml

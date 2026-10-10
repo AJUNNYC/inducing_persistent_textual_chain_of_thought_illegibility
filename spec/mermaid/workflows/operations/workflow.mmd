@@ -1,0 +1,7 @@
+---
+title: "workflow operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/workflow.py"]
+    CALL --> VERIFY["Dependency-checked modular stage graph;per-device locks and hash-verified completion reuse"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]

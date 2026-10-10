@@ -1,6 +1,6 @@
 # evaluation_data_preparation.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested; source preparation and launch readiness are separate.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -33,6 +33,14 @@ The following source comments retain the procedural detail of the supplied diagr
 - Evaluation data preparation
 - No selection based on trained-model outcomes. All 62 states use the same package.
 - Packaging failures use shared bounded recovery; frozen IDs and semantics cannot change.
+
+## Implemented interface and evidence
+
+`prepare_evaluation_data(pools, revisions, *, output_dir, protocol_builder=None, verify_mbpp_reference=None, analysis_plan=None, preflight_reports=None)` freezes the capability panel and nested legibility subset, then calls the agreed protocol builder with exact artifacts. Its package contains `capability_panel`, `legibility_subset`, `protocol`, artifact hashes, output paths, `status` and `launch_ready`.
+
+The package remains `prepared` and `launch_ready=False` when reference verification or the evaluation protocol is draft. It becomes verified only when the child artifacts and frozen protocol are verified. Child failures propagate through the shared orchestration boundary. A structurally valid source manifest never supplies an invented mandatory live preflight.
+
+Unit checks verify exact child calls, package identity, draft readiness and failure propagation. Actual source/panel paths are documented above; protocol release depends on real sandbox and prospective-analysis evidence produced by their owners.
 
 ## Completion and failure boundary
 

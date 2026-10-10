@@ -2,13 +2,13 @@
 
 ## Four different kinds of evidence
 
-**Scaffold integrity** checks whether this package's paths, names, source copies, mappings, links and intentionally blank implementation files are consistent. **Implementation unit/integration tests** check actual future code against fixtures and contracts. **Runtime preflights** check real selected models, hardware, APIs, storage and sandbox behavior. **Scientific results** are the completed training and frozen measurements. Passing the first does not establish any of the others. The completed scaffold audit is in [validation_report.md](validation_report.md); all experiment-code tests are blank placeholders.
+**Repository integrity** checks whether this package's paths,names,source copies,mappings,links and implemented module contracts are consistent. **Implementation unit/integration tests** check actual code against fixtures and contracts. **Runtime preflights** check real selected models, hardware, APIs, storage and sandbox behavior. **Scientific results** are the completed training and frozen measurements. Passing the first does not establish any of the others. The completed implementation audit is in [validation_report.md](validation_report.md); executed results and blocked live checks are recorded separately.
 
 The PDF explicitly distinguishes old offline checks from missing live integrations and scientific validation. See [E.2.1,E.2.8](../spec/experiment.pdf#page=53) and [H.1,H.9](../spec/experiment.pdf#page=68).
 
 ## Unit contracts to implement
 
-Each module has an exact unit-test path in its module document and manifest. Tests must check the contract, not merely import the blank module or assert a hardcoded total. Fixtures may exercise source-prescribed boundary cases without adding new training runs. Concrete required categories follow.
+Each module has an exact unit-test path in its module document and manifest. Tests must check the contract, not merely import a module or assert a hardcoded total. Fixtures may exercise source-prescribed boundary cases without adding new training runs. Concrete required categories follow.
 
 | Category | Required invariants and negative cases | Source |
 |---|---|---|
@@ -31,7 +31,7 @@ These are required behavior categories derived from source rules. The implementi
 
 ## Integration tests and handoffs
 
-| Exact placeholder | Integration requirement |
+| Exact test entrypoint | Integration requirement |
 |---|---|
 | `tests/integration/test_data_handoff.py` | Common accepted IDs, both source models, all forty verified train/validation variants and disjoint held-out manifests |
 | `tests/integration/test_training_handoff.py` | Worklists enumerate forty independent SFT fits and two separate RL trajectories; correct recipe/source identities and shared fit reuse |
@@ -45,9 +45,9 @@ Coordinator integration does not authorize scientific execution. These filenames
 
 ## Mandatory real preflights
 
-All files below are currently blank. The future program must implement the checks and record pass/fail/not-run evidence rather than assume a scaffold is sufficient.
+The checks below are implemented. They report actual passed/failed/blocked evidence; unavailable live services do not become passing fixtures.
 
-| Exact placeholder | Evidence required before affected paid launch |
+| Exact test entrypoint | Evidence required before affected paid launch |
 |---|---|
 | `tests/preflight/test_configuration.py` | Fully resolved validated scientific config, source/dependency hashes and no ambiguous unauthorized defaults |
 | `tests/preflight/test_model_runtime.py` | Exact two construction models/tokenizers/native delimiters; actual compatible precision/runtime/hardware |

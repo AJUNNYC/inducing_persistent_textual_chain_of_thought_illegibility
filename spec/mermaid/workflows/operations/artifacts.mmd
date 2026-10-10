@@ -1,0 +1,7 @@
+---
+title: "artifacts operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/artifacts.py"]
+    CALL --> VERIFY["Indexed artifact provenance;incremental permanent replication and complete compatible retrieval"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]

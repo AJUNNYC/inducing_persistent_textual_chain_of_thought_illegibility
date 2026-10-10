@@ -58,4 +58,4 @@ The main panel requires 76,446 generations. Four extra baseline-repeatability pa
 
 ## Failure is a specified outcome
 
-Stop affected launches on failed mandatory preflights. Preserve completed artifacts and honest failed, incomplete, paused or indeterminate states. Do not fabricate scores, checkpoints, funding authorization or successful validation. The original PDF's references to an earlier CPU-validated scaffold describe historical work; the blank files in this repository are not that previously tested executable package. [E.2.1,E.2.8](../spec/experiment.pdf#page=53), [H.9](../spec/experiment.pdf#page=80).
+Stop affected launches on failed mandatory preflights. Preserve completed artifacts and honest failed, incomplete, paused or indeterminate states. Do not fabricate scores, checkpoints, funding authorization or successful validation. The original PDF's references to an earlier CPU-validated scaffold describe historical work; current implementation evidence is recorded separately in validation_report.md. [E.2.1,E.2.8](../spec/experiment.pdf#page=53), [H.9](../spec/experiment.pdf#page=80).

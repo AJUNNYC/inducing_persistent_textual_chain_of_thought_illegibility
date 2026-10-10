@@ -1,6 +1,6 @@
 # storage.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,3 +50,10 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`atomic_write_json`, `atomic_write_bytes`, `read_json`, `append_jsonl`, `file_lock`, `publish_artifact` and `verify_artifact` implement fsync, atomic publication, one-writer locking, immutable identities and integrity checks. `register_artifact_hook`, `unregister_artifact_hook`, scoped `artifact_hook` and `notify_artifact` support verified replication; directory notifications verify the file inventory and send payloads before the completion manifest. Hook failures propagate. Local flush proves local publication; provider lifetime survival still requires actual evidence.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.

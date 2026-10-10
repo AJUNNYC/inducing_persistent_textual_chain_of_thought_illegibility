@@ -1,6 +1,6 @@
 # preflight.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -15,7 +15,7 @@
 
 Coordinate the required real checks: construction model/tokenizer/runtime identity; authorized/pinned source data and all transformed lengths/protected spans; actual completion-only masks and nonzero LoRA gradients; full checkpoint save/resume; genuine durable storage and intended stop/terminate survival; real judge schemas/version/quota/cache/retry/cost behavior; isolated MBPP execution and reference tests; exact eight-by-four GRPO update; baseline repeatability; prospectively validated simultaneous inference; and actual spending authorization.
 
-Keep unit/mocked checks separate from GPU/API/provider evidence. The old CPU-test count in the PDF is historical and does not describe this blank repository. Failed mandatory checks block affected launches; fix defects only within the frozen design and log revisions. Source-required scientific protocol revision, new credentials or more budget cannot be manufactured by routine implementation autonomy. H.9 still permits constructing the whole program, including its honest stop paths, without inventing those external facts.
+Keep unit/mocked checks separate from GPU/API/provider evidence. The old CPU-test count in the PDF is historical and does not describe the current implementation. Failed mandatory checks block affected launches; fix defects only within the frozen design and log revisions. Source-required scientific protocol revision, new credentials or more budget cannot be manufactured by routine implementation autonomy. H.9 still permits constructing the whole program, including its honest stop paths, without inventing those external facts.
 
 ## Interfaces and dependent procedures
 
@@ -50,3 +50,12 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`run_preflights(config, checks=None, output_dir=None, execute_live=False)`, `CheckResult`, `require_preflights` and `load_preflight_evidence` enforce named launch gates and report integrity/configuration identity. `--execute-live` executes available actual selected-model native/mask/LoRA/checkpoint controls, all five authorized provider request kinds, whole-corpus transform validation, the actual GRPO callback, MBPP reference/isolation callback and durable flush. Missing resources block affected checks; mocked checks cannot satisfy a live gate. Local persistence never supplies stop/delete lifetime evidence. The actual prospectively frozen statistical simulation report is imported with code/hash verification and currently records a failed mandatory coverage gate.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.
+
+`preflight_requirements(scope)` defines launch scopes; `run_preflights(..., scope="generation"|"training")` defaults to training. Generation requires configuration, actual selected-model native runtime, actual official transformation runtime, durable storage and current spending authorization. Full-corpus, mask/checkpoint, judges/MBPP/GRPO, baseline and statistical gates remain training requirements. Non-scoped gates are skipped without execution. Reports contain scope, required_names, scoped ready, training_ready and study_ready; a generation pass never claims training or full-study readiness. Use a separate `artifacts/preflight/generation/report.json` and call `require_preflights` with the matching scope/configuration hash.

@@ -1,6 +1,14 @@
 # results_analysis.md
 
-**Owner:** `analysis`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `analysis`. **Implementation status:** implemented and unit/integration tested; actual trained-state analysis is blocked pending native measurements and mandatory preflights.
+
+## Implemented interface and reports
+
+`analyze_results(records_by_state, plan, validation_report=None, confirmatory=False, draws=10000) -> dict` accepts canonical evaluator packages or aligned item records. Supplied package/record hashes, state identities, seed 42 and frozen question/domain membership are checked. Simulated provider/model records never authorize confirmation. A valid passing validation report must bind the plan, method, numerical implementation, full budget and report hash.
+
+Outputs include every window and scalar gate, explicit common-correct/legibility IDs and counts, baseline retention/lost/new sets, full/conditional denominators, raw per-judge means/medians/distributions and macro means, high/joint-high rates, the 9×9 confusion table, score-difference distribution and quadratic kappa. Missing paired scores or zero weighted expected disagreement leave kappa undefined. One constant judge and a varying judge can have a defined kappa of zero; single-category use alone does not make its denominator zero. Readable-solution/padding categories, qualifying-padding prevalence, malformed/truncated/infrastructure failures and missing evidence remain separate. Unavailable capability measurements are null; conservative positive counts are labeled separately.
+
+There are also 480 domain/judge paired raw-score-change interval entries, including explicit indeterminate missing entries. These descriptive percentile intervals use a separate frozen seed namespace, preserve pairing/nested finite sampling and never enter the construction success family. Curve coordinates retain the literal ROT13/KaziText levels or RL step, capability, measured opacity and Sonnet-versus-primary divergence; monotonicity is not assumed. This reporting makes no human-unreadability or causal-computation claim.
 
 | Artifact | Exact repository path |
 |---|---|

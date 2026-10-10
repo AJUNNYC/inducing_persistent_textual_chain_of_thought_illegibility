@@ -1,6 +1,6 @@
 # identity.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,3 +50,10 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`content_hash(value)`, `file_hash(path)`, `derive_seed(*parts)` and `artifact_identity(kind, **dependencies)` use SHA-256. Text hashes exact UTF-8 bytes; mappings use sorted compact UTF-8 JSON without nonfinite numbers. `derive_seed` uses the first 32 bits of the versioned structured hash, independent of process hash randomization.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.

@@ -1,8 +1,31 @@
 # runbook.md
 
-## This is an implementation/readiness sequence, not a command that has run
+## Executable stage interfaces
 
-The code and runtime configuration remain blank in this scaffold. The future coordinator implements the entrypoints and records actual evidence. This runbook summarizes the source-required ordering and operational safeguards without choosing new scientific settings. Sources: [E.1–E.2](../spec/experiment.pdf#page=49), [G.9–G.11](../spec/experiment.pdf#page=67), [H.1,H.9](../spec/experiment.pdf#page=68).
+Install using [environment instructions](operations/environment.md), then use the single `illegibility` CLI. Discovery commands do not provision paid infrastructure.
+
+```bash
+illegibility hardware
+illegibility validate
+illegibility plan --target rl_14b
+illegibility status
+illegibility provision --include-weights
+illegibility preflight
+illegibility preflight --execute-live
+illegibility run --target panels
+illegibility run --target rl_data
+illegibility run --target sft_data
+illegibility run --target rot13_7b_level_01
+illegibility run --target kazitext_14b_level_10
+illegibility run --target rl_7b
+illegibility run --target evaluate_rl_7b_step_010
+illegibility run --target analysis
+illegibility run --target sync
+```
+
+Inspect `plan` for exact IDs before choosing a target. Dependencies run automatically and completed outputs are reused only after hash/configuration/source/dependency verification. A changed or corrupt upstream artifact invalidates dependent completion. Trained stages require a passing canonical live preflight report. Unavailable authorization or scientific evidence produces BLOCKED rather than invented completion. `smoke` runs explicit fixture integrations; it does not authorize a scientific launch. Recovery uses the same target after restoring compatible persistent state.
+
+See [RunPod lifecycle](deployment/runpod.md), [Drive authorization](operations/google_drive.md) and [artifact compatibility](operations/artifacts.md). Local validation evidence is in [validation_report.md](validation_report.md); empirical results are intentionally absent.
 
 ## Before real data or paid work
 
@@ -10,7 +33,7 @@ Confirm authorization for source data and accounts, exact construction identitie
 
 ## Prepare frozen specifications and test implementation
 
-Implement shared contracts and safe state/recovery first, then integrate source, training, evaluation and analysis owners against declared fixtures. Construct benchmark manifests and public interfaces using frozen source sampling, and use those IDs for detectable-overlap exclusions. Build authorized LMSYS candidates and once-per-model responses under fixed settings. Validate every candidate through the same exact transforms later used for final datasets; freeze 10,000/100 common IDs only after all checks. Produce all forty verified SFT train/validation artifacts and the shared ordered 800-question RL manifest.
+Shared contracts, state/recovery and producer/consumer interfaces are implemented and exercised against explicit fixtures; run the required live gates before launch. Construct benchmark manifests and public interfaces using frozen source sampling, and use those IDs for detectable-overlap exclusions. Build authorized LMSYS candidates and once-per-model responses under fixed settings. Validate every candidate through the same exact transforms later used for final datasets; freeze 10,000/100 common IDs only after all checks. Produce all forty verified SFT train/validation artifacts and the shared ordered 800-question RL manifest.
 
 Complete the actual native evaluator, question-aware audit, MBPP sandbox and analysis routines before paid scientific training is treated as ready. Source-required baseline repeatability and statistical simulation validation are pre-outcome gates. Their failures cannot be handled by silently changing retention thresholds or sampling. Actual masks, gradients, grouping, checkpoints, providers, storage and authorization require real preflight evidence.
 

@@ -1,0 +1,181 @@
+---
+title: "Implementation extension path inventory"
+---
+flowchart TD
+    EXT["Operational implementations, deployment and validation evidence"]
+    p_2f754321d62f08[".dockerignore"]
+    EXT --> p_2f754321d62f08
+    p_a3046da0d15a27[".env.example"]
+    EXT --> p_a3046da0d15a27
+    p_bdcc6a2a85f645[".github/"]
+    EXT --> p_bdcc6a2a85f645
+    p_87ee5504a3e25a[".github/workflows/"]
+    EXT --> p_87ee5504a3e25a
+    p_c707f934fe5696[".github/workflows/validation.yml"]
+    EXT --> p_c707f934fe5696
+    p_b7bd55c11b781b["deploy/"]
+    EXT --> p_b7bd55c11b781b
+    p_8b6f0d357bb9df["deploy/runpod/"]
+    EXT --> p_8b6f0d357bb9df
+    p_a41587507a3cf4["deploy/runpod/pod.json"]
+    EXT --> p_a41587507a3cf4
+    p_254db0fb64a77d["dockerfile"]
+    EXT --> p_254db0fb64a77d
+    p_b42a2e46d7f183["docs/deployment/"]
+    EXT --> p_b42a2e46d7f183
+    p_ffc0aa76b10d2c["docs/deployment/runpod.md"]
+    EXT --> p_ffc0aa76b10d2c
+    p_b9671765a5cdf7["docs/evidence/"]
+    EXT --> p_b9671765a5cdf7
+    p_49b6ad4dbc9db7["docs/evidence/coordinator_validation.json"]
+    EXT --> p_49b6ad4dbc9db7
+    p_f2265002d8153e["docs/evidence/data_preparation.json"]
+    EXT --> p_f2265002d8153e
+    p_0ecd4f7b3fb21f["docs/evidence/evaluation_validation.json"]
+    EXT --> p_0ecd4f7b3fb21f
+    p_6c62b1c7fa12ac["docs/evidence/existing_runpod_inspection.json"]
+    EXT --> p_6c62b1c7fa12ac
+    p_f06f10df21bf2a["docs/evidence/kazitext_auxiliary_runtime.json"]
+    EXT --> p_f06f10df21bf2a
+    p_7dccb371ac4c38["docs/evidence/mbpp_isolation_checks.json"]
+    EXT --> p_7dccb371ac4c38
+    p_2aa6a0df775aeb["docs/evidence/mbpp_reference_tests.json"]
+    EXT --> p_2aa6a0df775aeb
+    p_a5be200cf1fe56["docs/evidence/mbpp_sandbox_check.json"]
+    EXT --> p_a5be200cf1fe56
+    p_02333b23e67f62["docs/evidence/mbpp_sandbox_prior_attempt.json"]
+    EXT --> p_02333b23e67f62
+    p_b60227362fc622["docs/evidence/readme.md"]
+    EXT --> p_b60227362fc622
+    p_76c95fe9d27cec["docs/evidence/scaffold_validation_report.md"]
+    EXT --> p_76c95fe9d27cec
+    p_a82a2202c321ff["docs/evidence/sft_implementation_report.json"]
+    EXT --> p_a82a2202c321ff
+    p_b5813b9b0435bc["docs/evidence/shared_infrastructure_validation.json"]
+    EXT --> p_b5813b9b0435bc
+    p_31a844925b2552["docs/evidence/statistical_validation_interrupted_plan.json"]
+    EXT --> p_31a844925b2552
+    p_dce6100e84ff8f["docs/evidence/statistical_validation_interrupted_report.json"]
+    EXT --> p_dce6100e84ff8f
+    p_c640d20867cfac["docs/evidence/statistical_validation_plan.json"]
+    EXT --> p_c640d20867cfac
+    p_dc00b75b8caffa["docs/evidence/statistical_validation_rejected_plan.json"]
+    EXT --> p_dc00b75b8caffa
+    p_a81ac79c161f37["docs/evidence/statistical_validation_rejected_report.json"]
+    EXT --> p_a81ac79c161f37
+    p_cbd29cac82fb95["docs/evidence/statistical_validation_report.json"]
+    EXT --> p_cbd29cac82fb95
+    p_75b1ef4740fdf4["docs/evidence/transformation_runtime.json"]
+    EXT --> p_75b1ef4740fdf4
+    p_dd5026d54adf97["docs/implementation_acceptance.md"]
+    EXT --> p_dd5026d54adf97
+    p_95257a56b10fc2["docs/modules/operations/"]
+    EXT --> p_95257a56b10fc2
+    p_44308c75eff0f8["docs/modules/operations/artifacts.md"]
+    EXT --> p_44308c75eff0f8
+    p_aa42c3987db4df["docs/modules/operations/assets.md"]
+    EXT --> p_aa42c3987db4df
+    p_cadea51d4ec19d["docs/modules/operations/drive.md"]
+    EXT --> p_cadea51d4ec19d
+    p_bd2271cd381f29["docs/modules/operations/hardware.md"]
+    EXT --> p_bd2271cd381f29
+    p_7616228588c878["docs/modules/operations/reporting.md"]
+    EXT --> p_7616228588c878
+    p_fd340910fb2fd1["docs/modules/operations/runpod.md"]
+    EXT --> p_fd340910fb2fd1
+    p_8d1dc293834e3b["docs/modules/operations/validation.md"]
+    EXT --> p_8d1dc293834e3b
+    p_ff19dcde76c453["docs/modules/operations/workflow.md"]
+    EXT --> p_ff19dcde76c453
+    p_fcd51c81ce4385["docs/operations/"]
+    EXT --> p_fcd51c81ce4385
+    p_514b3c08161786["docs/operations/artifacts.md"]
+    EXT --> p_514b3c08161786
+    p_2b47150477fdc0["docs/operations/environment.md"]
+    EXT --> p_2b47150477fdc0
+    p_fda90b10d97ad6["docs/operations/google_drive.md"]
+    EXT --> p_fda90b10d97ad6
+    p_f3faabb0109e25["docs/operations/jupyter_consent.md"]
+    EXT --> p_f3faabb0109e25
+    p_973d39fe9a7d95["requirements_cpu.lock"]
+    EXT --> p_973d39fe9a7d95
+    p_e39d38d904b1f3["scripts/authorize_google_drive.py"]
+    EXT --> p_e39d38d904b1f3
+    p_33cb887cb01d59["scripts/create_google_consent_notebook.py"]
+    EXT --> p_33cb887cb01d59
+    p_9b1bd16ed66d21["scripts/freeze_runtime_config.py"]
+    EXT --> p_9b1bd16ed66d21
+    p_67bb645960da60["scripts/manage_runpod.py"]
+    EXT --> p_67bb645960da60
+    p_9e568fd84943ef["scripts/refresh_dependency_locks.py"]
+    EXT --> p_9e568fd84943ef
+    p_455c33844c3ef8["scripts/setup_environment.py"]
+    EXT --> p_455c33844c3ef8
+    p_2f728834186a2f["scripts/synchronize_manifest.py"]
+    EXT --> p_2f728834186a2f
+    p_704e54ee887094["spec/mermaid/repository/implementation_extensions.mmd"]
+    EXT --> p_704e54ee887094
+    p_0c4a1095037a43["spec/mermaid/workflows/operations/"]
+    EXT --> p_0c4a1095037a43
+    p_28b1f63ccb7ccc["spec/mermaid/workflows/operations/artifacts.mmd"]
+    EXT --> p_28b1f63ccb7ccc
+    p_5a37408974c0ed["spec/mermaid/workflows/operations/assets.mmd"]
+    EXT --> p_5a37408974c0ed
+    p_ab9072d34652dc["spec/mermaid/workflows/operations/drive.mmd"]
+    EXT --> p_ab9072d34652dc
+    p_ae4263ce34c2e6["spec/mermaid/workflows/operations/hardware.mmd"]
+    EXT --> p_ae4263ce34c2e6
+    p_c411f265358029["spec/mermaid/workflows/operations/modular_execution.mmd"]
+    EXT --> p_c411f265358029
+    p_cd87d3c2518d25["spec/mermaid/workflows/operations/reporting.mmd"]
+    EXT --> p_cd87d3c2518d25
+    p_cf5ce94ed97cfe["spec/mermaid/workflows/operations/runpod.mmd"]
+    EXT --> p_cf5ce94ed97cfe
+    p_aad9de8680548a["spec/mermaid/workflows/operations/validation.mmd"]
+    EXT --> p_aad9de8680548a
+    p_3f920eb4f76226["spec/mermaid/workflows/operations/workflow.mmd"]
+    EXT --> p_3f920eb4f76226
+    p_eb252cd9c87762["src/operations/"]
+    EXT --> p_eb252cd9c87762
+    p_d97269f48de7da["src/operations/__init__.py"]
+    EXT --> p_d97269f48de7da
+    p_efd2d989db8a44["src/operations/artifacts.py"]
+    EXT --> p_efd2d989db8a44
+    p_897180adc673ea["src/operations/assets.py"]
+    EXT --> p_897180adc673ea
+    p_ea3192f4d44219["src/operations/drive.py"]
+    EXT --> p_ea3192f4d44219
+    p_faf43399c4e5d7["src/operations/hardware.py"]
+    EXT --> p_faf43399c4e5d7
+    p_ad1648066e01d0["src/operations/reporting.py"]
+    EXT --> p_ad1648066e01d0
+    p_fc5035e13cfd10["src/operations/runpod.py"]
+    EXT --> p_fc5035e13cfd10
+    p_667236f221af6c["src/operations/validation.py"]
+    EXT --> p_667236f221af6c
+    p_0bf58f6d84853c["src/operations/workflow.py"]
+    EXT --> p_0bf58f6d84853c
+    p_10e350a8a391f4["tests/unit/operations/"]
+    EXT --> p_10e350a8a391f4
+    p_c3f48a772aa350["tests/unit/operations/test_assets.py"]
+    EXT --> p_c3f48a772aa350
+    p_4faf667eb915f6["tests/unit/operations/test_consent_notebook.py"]
+    EXT --> p_4faf667eb915f6
+    p_a7a6af1a909d4f["tests/unit/operations/test_drive.py"]
+    EXT --> p_a7a6af1a909d4f
+    p_0211822d80d42b["tests/unit/operations/test_operations.py"]
+    EXT --> p_0211822d80d42b
+    p_f39b81f9d94d4f["tests/unit/operations/test_runpod.py"]
+    EXT --> p_f39b81f9d94d4f
+    p_65b1fadd69d228["tests/unit/test_overview_lifecycle.py"]
+    EXT --> p_65b1fadd69d228
+    p_f9d35d43770d39["tools/"]
+    EXT --> p_f9d35d43770d39
+    p_9c55b809c42834["tools/mermaid/"]
+    EXT --> p_9c55b809c42834
+    p_17c33e638c4c81["tools/mermaid/package.json"]
+    EXT --> p_17c33e638c4c81
+    p_c6ca129baccb73["tools/mermaid/package_lock.json"]
+    EXT --> p_c6ca129baccb73
+    p_08fcf104c58982["tools/mermaid/validate.mjs"]
+    EXT --> p_08fcf104c58982

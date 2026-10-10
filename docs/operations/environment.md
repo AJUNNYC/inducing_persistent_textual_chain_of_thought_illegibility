@@ -1,0 +1,22 @@
+# Reproducible environment and credentials
+
+Supported development runtime:Linux x86_64, Python3.12. The CPU lock installs PyTorch2.9.0+cpu, Transformers4.57.3, PEFT0.18.0, Accelerate1.12.0 and the data/statistics/testing packages. The GPU lock additionally pins BitsAndBytes0.48.2 and TRL0.26.2 with CUDA-enabled PyTorch2.9.0. Scientific GRPO semantics are implemented explicitly; installing TRL does not silently select a library trainer default.
+
+```bash
+python3.12 scripts/setup_environment.py --profile cpu --venv .venv
+python3.12 scripts/setup_environment.py --profile gpu --venv .venv --provision
+```
+
+The installer creates the venv, installs exact package hashes, installs this source without dependency resolution, validates the repository, inspects real hardware and runs local unit/integration tests. Optional `--drive` invokes the actual Drive roundtrip after OAuth files are available. Native KaziText dependencies need Aspell, English dictionaries, development headers and a C compiler; the Docker image supplies them. `aspell-python-py3==1.15` has a legacy source archive, so the lock refresh script explicitly preserves its verified PyPI hash rather than silently omitting it. Use `scripts/refresh_dependency_locks.py` to regenerate both locks after an intentional package change.
+
+Configuration is centralized in `config.yaml`; copy `.env.example` to a protected, ignored private `.env` for runtime variable names. Values are loaded without executing shell code. `MODEL_OPENAI_API_KEY` is the cloud-proxy compatible alias for `OPENAI_API_KEY`; `ANTHROPIC_API_KEY`,`RUNPOD_API_KEY` and gated-source `HF_TOKEN` remain runtime credentials. Google OAuth uses `GOOGLE_OAUTH_CLIENT_SECRET_FILE` and `GOOGLE_OAUTH_TOKEN_FILE`. Credential values are never part of the scientific configuration hash.
+
+`DATA_ROOT`,`ARTIFACT_ROOT` and `MODEL_CACHE_ROOT` bind persistent paths. HF caches live under the canonical cache root. Complete scientific identity excludes only the enumerated operational paths, credential bindings, funding/rate evidence and quota metadata; the full resolved snapshot is separately hashed and retained. Scientific model/data revisions, prompts, parsers, training settings, dependency lock, source commit and sandbox image remain identity inputs. Relocating storage or renewing authorization does not invalidate scientific data; changing treatment or implementation does.
+
+Before paid launch, use `scripts/freeze_runtime_config.py` to resolve the actual source commit and dependency-lock hash; preserve the executed image's `SOURCE_CODE_COMMIT`. Supply actual provider price/availability/quota evidence and explicit funding authorization in the operational configuration. No historical planning price or default envelope authorizes spending. The guard warns at75%,80% and90% and stops scheduling at95%, retaining both source warning descriptions conservatively.
+
+Public model/dataset revisions are pinned in configuration. `illegibility provision` obtains compatible assets and validates hashes; `--include-weights` includes model weights; `--offline` requires completed verified cache manifests. Public benchmark source loaders preserve actual upstream content and integrity. LMSYS extraction additionally requires accepted access/license terms and explicit authorization; a credential's presence alone does not grant research reuse permission.
+
+Stable `ILLEGIBILITY_WORKER_ID` values bind a shared persistent recovery ledger across API,storage,asset and training operations. Use `rot13`,`kazitext` and `rl` for separate authorized workers; the default is `coordinator`. Every operation namespaces its immutable inputs. All subsystems for one worker share the100retry ceiling,including SDK retries. Explicit fixture recovery paths remain isolated. Preserve existing ledgers across restart; migration only increases recorded usage and never clears prior retries.
+
+A clean clone resolves production provenance automatically with `python scripts/freeze_runtime_config.py --output /workspace/runtime_config.yaml --resolve-native-assets`. This records the actual committed source,the GPU lock hash and native auxiliary identities before any scientific outputs. It refuses dirty source or overwriting an existing configuration. Add authorized operational spending/price/quota records to this runtime copy,then pass `illegibility --config /workspace/runtime_config.yaml ...`. Re-freezing different native dictionaries after corpus construction invalidates derivatives and requires deliberate review; it is not automatic compatibility.

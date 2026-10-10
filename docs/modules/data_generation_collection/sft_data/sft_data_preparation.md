@@ -1,6 +1,6 @@
 # sft_data_preparation.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested with production-count explicit fixtures; scientific datasets await real paired sources.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -39,6 +39,18 @@ The following source comments retain the procedural detail of the supplied diagr
 - All levels share the same 10,000 train IDs and separate 100 validation IDs.
 - Accepted clean traces are untransformed, structurally valid baseline outputs, not verified correct reasoning.
 - Each trace has at least three eligible words; short traces and repeated masks remain eligible.
+
+## Implemented interface and evidence
+
+`prepare_sft_data` joins paired collection and both intervention families. `validate_accepted_pool` requires the exact common 10100 ordered IDs and source/model/tokenizer hashes. `build_sft_record` is the canonical single-record producer, and `build_sft_datasets(pool, tokenizers, output_dir, *, config_hash, kazitext=None, families=(...))` writes and reopens all forty train/validation dataset pairs. `validate_sft_bundle(bundle, pool, *, tokenizers=None, kazitext=None, recompute=False)` traverses actual files, exact counts/IDs, hashes, protected content and optionally recomputes every frozen transform/native rendered token count.
+
+Boundary records are JSON mappings with `example_id`, original `prompt`, transformed `reasoning`, exact `final_answer`, complete native `completion`, `split`, `model`, `model_id`, `method`, `family`, `level`, token counts, immutable source/trace/model/tokenizer/configuration hashes, transformation evidence, `identity` and `simulation`. Dataset descriptors contain `train_path`, `validation_path`, their content hashes and common source identity. Level paths are `family/model/level_XX/{train,validation}.jsonl`.
+
+The intact native-training renderer counts all assistant reasoning plus final bytes at the fixed 4096 total limit. Existing differing frozen files are fatal rather than silently overwritten. Every durable JSONL write/reuse invokes the shared artifact hook. Fixture datasets are explicitly simulation-marked; live readiness requires real traces and exact recomputation.
+
+`prepare_sft_data` propagates optional callback/stop-file controls and returns a truthful paused collection with `datasets=None`, without building partial scientific datasets.
+
+Unit and integration checks use the actual source-record producer, parser, ROT13 algorithm, serializer/readback, shared schemas and SFT consumer. The disk fixture writes/reopens the full forty conditions (404000 records with common 10000/100 splits and distinct model-specific sources); the handoff fixture constructs the complete SFT worklist and rejects altered source finals. External model/noise outputs in these tests are labeled fixtures.
 
 ## Completion and failure boundary
 

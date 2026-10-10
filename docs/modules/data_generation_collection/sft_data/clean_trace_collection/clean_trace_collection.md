@@ -1,6 +1,6 @@
 # clean_trace_collection.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested with a full-count paired collector fixture; scientific collection remains externally gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -34,6 +34,16 @@ The following source comments retain the procedural detail of the supplied diagr
 - Each model trace must pass structural checks, including at least three eligible original word spans.
 - No semantic correctness or quality filter. Clean means untransformed baseline output.
 - Filter English / prompt length, deduplicate and exclude detectable evaluation overlap before fixing candidate order.
+
+## Implemented interface and evidence
+
+`collect_clean_traces(candidate_manifest, generator, tokenizers, *, kazitext, output_dir, config_hash, batch_processor=process_clean_batch)` returns a verified accepted-pool mapping containing exactly 10100 paired records, common ordered `train_ids` (10000), `validation_ids` (100), rejected IDs, batch evidence and source/configuration hashes. The first request contains 10100 IDs; every refill contains exactly the remaining deficit and only new IDs. Insufficient fresh candidates is a recorded fatal shortage.
+
+Raw cache recovery reuses the original ordinary response. All paired source identities are frozen before any intervention dataset is released. The first 10000 common accepted IDs are training; the final 100 are validation. Fixture/production simulation metadata propagates into the pool.
+
+Optional callback or stop-file controls return `status="paused"` with `next_batch_start_cursor`, `next_candidate_position`, `next_operation`, committed IDs and source/configuration hashes. The default external file is `output_dir/STOP_REQUESTED`. A partial collector never publishes `accepted_pool.json`; the caller records pause and stops external billing. Remove the request before authorized resume; replay uses the same IDs and original durable raw responses.
+
+Unit checks exercise actual 10100-plus-exact-deficit control flow, common paired counts, disjoint ordered splits, wrong batch ordering and source shortage. No scientific accepted pool was created without the authorized LMSYS source and both real model runtimes.
 
 ## Completion and failure boundary
 

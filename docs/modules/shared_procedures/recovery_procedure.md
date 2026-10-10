@@ -1,6 +1,6 @@
 # recovery_procedure.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -87,3 +87,12 @@ flowchart TD
 %% Owner: shared_infrastructure
 %% Source sections: E.1–E.2; H.9
 ```
+
+
+## Implemented public interfaces and evidence
+
+`RecoveryManager(path, max_operation_retries=3, max_worker_retries=100).run`, `reserve_retry` and `counters` preserve counters across restart and rollback. Indexed SQLite transactions store each operation and the worker total; hot paths never export or rewrite the whole ledger. The durable database is `<path>.sqlite3`, uses WAL with FULL synchronous transactions, and imports existing JSON once without replacing it. `counters()` explicitly exports an audit. `snapshot_database(destination)` creates a coherent atomic SQLite backup including committed WAL state. Only `RetryableFailure` enters bounded recovery; unknown/frozen/quota failures and ordinary model outcomes propagate. Optional short `before_attempt` guards run before recording an attempt or charging a retry. SDK transport has no hidden retries.
+
+`RecoveryManager.for_worker(artifact_root=None, worker_id=None)` binds production judge, upload, asset and trainer operations to one worker budget. `worker_recovery_path` resolves ILLEGIBILITY_WORKER_RECOVERY_PATH, otherwise ARTIFACT_ROOT or the supplied artifact root, then `state/workers/<ILLEGIBILITY_WORKER_ID>/retries.json`; the default validated worker ID is coordinator. `configure_worker_recovery` binds startup, while explicitly supplied fixture paths stay isolated. `migrate_worker_recovery` imports only nondecreasing counter deltas from older production ledgers, preserving original files and budget exhaustion. Distinct stable worker IDs identify independent queues; operation keys include stage/run/item identity.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.

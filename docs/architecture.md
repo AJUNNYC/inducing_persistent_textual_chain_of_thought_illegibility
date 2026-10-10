@@ -4,7 +4,7 @@
 
 The complete static tree is [repository_layout.md](repository_layout.md). The machine-readable counterpart is [repository_manifest.json](../spec/repository_manifest.json). These are the finalized local filenames, not illustrative suggestions. A manifest entry specifies its owner, scientific/source basis and exact Mermaid path/node. Organizational choices implement the user's requested repository layout; they do not amend the experimental design.
 
-The original Mermaid directory hierarchy is retained after removing numerical ordering prefixes and replacing hyphens with underscores. Thus the data, SFT, GRPO, evaluation and shared-procedure nesting remains recognizable. No mandatory scientific workflow was discarded. Fourteen support responsibilities explicitly required by the PDF have their own source-derived diagrams and blank modules so they cannot disappear between the major workflows. The unmodified texts of the original 35 diagrams are retained as data in [mermaid_source.json](../spec/archive/mermaid_source.json); [source_map.md](source_map.md) provides every old-to-new correspondence.
+The original Mermaid directory hierarchy is retained after removing numerical ordering prefixes and replacing hyphens with underscores. Thus the data, SFT, GRPO, evaluation and shared-procedure nesting remains recognizable. No mandatory scientific workflow was discarded. Fourteen support responsibilities explicitly required by the PDF have their own source-derived diagrams and implemented modules so they cannot disappear between the major workflows. The unmodified texts of the original 35 diagrams are retained as data in [mermaid_source.json](../spec/archive/mermaid_source.json); [source_map.md](source_map.md) provides every old-to-new correspondence.
 
 ## Exact naming rule
 
@@ -35,14 +35,14 @@ Each module document also names its exact `tests/unit/.../test_<stem>.py` file. 
 | `src/training/` | Shared SFT procedure and independent family queues; two separate GRPO trajectories |
 | `src/evaluation/` | Condition/state/item reuse, native generation, scoring, independent judging and results analysis |
 | `src/shared_procedures/` | Configuration, records, stable identities, storage, checkpointing, API transport, parsing, costs, preflights, state and bounded recovery |
-| `tests/` | Blank unit, integration and real preflight test slots, not a passing suite |
-| `scripts/` | Blank coordinated execution and validation entrypoints |
-| `prompts/` | Blank destinations for frozen literal instructions and delegated generation templates |
-| `schemas/` | Blank destinations for typed record and response schemas described in the source contracts |
-| `config.yaml` | The single source-described resolved scientific configuration, initially blank |
-| `requirements.lock` / `pyproject.toml` | Blank runtime lock and packaging metadata; actual compatible revisions are implementation outputs |
-| `data/` | Empty namespaces for candidate, accepted, rejected, transformed, RL and evaluation inputs |
-| `artifacts/` | Empty namespaces for full training state, evaluation records, separate judge caches, reports, preflights and execution state |
+| `tests/` | Executed unit/integration fixtures and real preflight checks with explicit blocked-live status |
+| `scripts/` | Coordinated execution,setup,validation and lifecycle entrypoints |
+| `prompts/` | Frozen literal instructions and versioned native generation templates |
+| `schemas/` | Strict typed record and response schemas |
+| `config.yaml` | The single source-described resolved scientific configuration, populated with fixed science and explicit unresolved live authorization |
+| `requirements.lock` / `pyproject.toml` | Hashed CPU/GPU locks and installable packaging metadata |
+| `data/` | Runtime namespaces for candidate, accepted, rejected, transformed, RL and evaluation inputs |
+| `artifacts/` | Runtime namespaces for full training state, evaluation records, separate judge caches, reports, preflights and execution state |
 
 The exact file list is authoritative; this table only explains the roots. PDF basis: [E.2.2–E.2.5](../spec/experiment.pdf#page=54), [H.1,H.9](../spec/experiment.pdf#page=68).
 
@@ -58,9 +58,9 @@ The shared-infrastructure owner defines the serialized records and public servic
 
 `response_parsing.py` supplies common parsing mechanics but keeps phase-specific rules distinct. The RL final-answer contract is not silently imposed on SFT source generation or on all native evaluation prompts. `judge_client.py` supplies transport, quota control, cache/provenance and schema enforcement; it does not decide scientific reward weights, prompt semantics or uncertainty handling. `records.py` supplies serialization validation without changing field meaning. The MBPP runner is isolated from trainer and API secrets; a subprocess timeout alone is not the required sandbox.
 
-## Static scaffold versus runtime paths
+## Static source versus runtime paths
 
-The static tree contains only empty markers under `data/` and `artifacts/`. It intentionally does not create zero-byte adapters, manifests purporting to contain selected IDs, or fake generation records. The runtime hierarchy below is a frozen **path convention**, not a claim the PDF prescribed these exact names or that the files already exist. It mirrors source-defined models, families, levels, checkpoint identities and phases.
+Git contains directory markers; ignored local public-data/preflight artifacts are real executed evidence and remain outside the source tree. It intentionally does not create zero-byte adapters, manifests purporting to contain selected IDs, or fake generation records. The runtime hierarchy below is a frozen **path convention**, not a claim the PDF prescribed these exact names or that the files already exist. It mirrors source-defined models, families, levels, checkpoint identities and phases.
 
 ```text
 data/transformed/<family>/<model>/<level>/

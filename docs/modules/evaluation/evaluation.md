@@ -1,6 +1,6 @@
 # evaluation.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/test_evaluation.py` |
 
 **Scientific sources:** 4; D.1–D.2; E.2.7; G; H.4–H.6,H.9. [p. 5](../../../spec/experiment.pdf#page=5) · [p. 6](../../../spec/experiment.pdf#page=6) · [p. 41](../../../spec/experiment.pdf#page=41) · [p. 42](../../../spec/experiment.pdf#page=42) · [p. 43](../../../spec/experiment.pdf#page=43) · [p. 44](../../../spec/experiment.pdf#page=44) · [p. 45](../../../spec/experiment.pdf#page=45) · [p. 57](../../../spec/experiment.pdf#page=57) · [p. 65](../../../spec/experiment.pdf#page=65) · [p. 67](../../../spec/experiment.pdf#page=67) · [p. 72](../../../spec/experiment.pdf#page=72) · [p. 73](../../../spec/experiment.pdf#page=73) · [p. 74](../../../spec/experiment.pdf#page=74) · [p. 75](../../../spec/experiment.pdf#page=75) · [p. 76](../../../spec/experiment.pdf#page=76) · [p. 80](../../../spec/experiment.pdf#page=80).
+
+## Implemented public interface and validation
+
+`run_evaluation(states, protocol, generator, judge_client=None, *, sandbox=None, cache_root=None, analysis=None, confirmatory=False)` requires the complete 62-state design. It runs the two shared baselines and independent SFT/RL groups, then calls the analysis owner only after required records complete. Simulation is retained in every fixture record; failed groups cannot become confirmatory results. The canonical statistical validation report is passed to analysis rather than replaced by a Boolean readiness claim.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

@@ -1,6 +1,6 @@
 # records.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,3 +50,10 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`validate_record(kind, record)` and `validate_records(kind, records, expected_count=None, id_field='example_id')` enforce the implemented JSON schemas, counts, uniqueness and relevant actual content hashes. `ArtifactRecord`, `NativeResponse` and `OutcomeStatus` provide typed serialization. Accepted clean traces require complete provenance and twenty checks; rejected records retain explicit unknown values. Boolean reward audits and tri-state evaluation audits use separate exact schemas.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.

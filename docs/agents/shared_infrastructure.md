@@ -26,11 +26,10 @@ Read the full controlling PDF as needed for your scope, including H.1/H.9 preced
 
 ## Exclusive implementation write list
 
-These are the complete initial implementation-file assignments. Code files are currently empty; populate only within your scope. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
+These are the implementation-file assignments; the coordinator owns `requirements.lock` and packaging finalization under the current delegation. Implementation files are now populated and locally validated; modify only within your scope. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
 
 ```text
 config.yaml
-requirements.lock
 schemas/candidate_prompt.json
 schemas/clean_generation.json
 schemas/evaluation_audit_response.json
@@ -82,3 +81,18 @@ Return actual changed paths, source-to-requirement coverage, public interfaces a
 ## Stop conditions
 
 Stop affected work requiring invalid frozen input, impossible quotas, unbounded retry, unsupported scientific substitution or unavailable external authorization. Preserve completed valid artifacts and explicit partial/failed/indeterminate states. Ordinary model failure is not a request to resample. Do not claim the experiment is implemented because the directory tree or an empty test file exists.
+
+
+## Current implementation handoff
+
+All eleven shared modules, assigned schemas/configuration, preflight CLI and assigned unit/preflight tests are implemented. The coordinator additionally assigned `tests/integration/test_recovery_handoff.py` for actual CPU partial-update recovery and persistent retries. Public APIs and mode/provenance boundaries are documented in each corresponding module card. GPU/provider controls are explicit nonexperimental preflights, never replacements for the fixed scientific corpus or outcomes.
+
+Scientific configuration identity excludes only the explicitly enumerated operational keys in `OPERATIONAL_IDENTITY_EXCLUSIONS`; full resolved snapshot hashes remain immutable audits. The fixed scientific choices, accepted counts, models/datasets, alpha/fraction grid, SFT/GRPO recipes, reward criteria and construction thresholds are unchanged. Original PDFs are preserved.
+
+Evidence is tiered: actual CPU unit/integration tests, actual statistical simulation (failed mandatory coverage), actual MBPP sandbox evidence when available, and unavailable GPU/API/storage lifecycle/funding gates. `run_preflights(..., execute_live=True)` performs the supplied live checks when resources and current authorization exist, and records explicit blocked/failed results otherwise. No missing external fact is supplied as a successful preflight.
+
+Recovery and spending use indexed SQLite rather than whole-ledger JSON updates. Public logical paths remain compatible; `<path>.sqlite3` holds durable state and legacy JSON is preserved/imported. Production `RecoveryManager.for_worker` shares one 100-retry budget across judge/storage/asset/training operations, while explicit fixture paths remain isolated. Atomic SQLite backup APIs permit coherent independent replication. Actual negative tests cover cross-process budget contention, legacy migration, blocked pre-attempt guards, immutable spending replay, and indexed behavior with thousands of stored operations.
+
+Generation and training launch scopes are explicit. The generation gate does not depend on its own not-yet-generated corpus, baseline/statistical outcomes or paid judge controls. It requires actual selected-model and official transformation controls, durable storage and funding evidence. Training retains all thirteen gates, including real full-corpus validation and the failed statistical gate until resolved within the design. Scoped readiness is separate from training/study readiness.
+
+Final focused verification: shared unit/recovery/preflight scope passed 96 tests with 11 explicit resource/evidence skips in 30.90 seconds. Cross-consumer operations/SFT/RL-setup/recovery scope passed 73 tests in 88.99 seconds; these overlapping counts are not a combined global total. Machine-readable evidence is generated at `artifacts/preflight/shared_infrastructure/validation.json`. The coordinator owns source commits, dependency freeze, consolidated validation and sanitized publication.

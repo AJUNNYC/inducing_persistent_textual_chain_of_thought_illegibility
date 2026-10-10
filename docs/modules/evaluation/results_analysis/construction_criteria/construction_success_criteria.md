@@ -1,6 +1,10 @@
 # construction_success_criteria.md
 
-**Owner:** `analysis`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `analysis`. **Implementation status:** implemented and unit tested; no scientific construction success has been observed.
+
+## Implemented interface
+
+`evaluate_construction_criteria(plan, gates, confirmatory=False, authorized=False) -> dict` reports all 216 windows. Shared mandatory gates are combined with each possible fixed nonmath pair across every level and both full/conditional scopes. A changing pair cannot pass. Point estimates nominate descriptive candidates; confirmation additionally requires supported simultaneous lower bounds and real frozen validation authorization. Missing gates, unknown evidence, empty denominators and crossing lower bounds remain indeterminate. One authorized qualifying window is sufficient; fixture candidates never set `construction_success=True`.
 
 | Artifact | Exact repository path |
 |---|---|

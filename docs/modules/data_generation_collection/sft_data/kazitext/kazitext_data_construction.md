@@ -1,6 +1,6 @@
 # kazitext_data_construction.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented with the unmodified official source; real auxiliary runtime and all twenty model/level requests passed exact replay.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -70,6 +70,18 @@ The following source comments retain the procedural detail of the supplied diagr
 - All lengths must fit the fixed 4096-token SFT limit.
 - A frozen clean source that fails its required acceptance checks is fatal; do not silently substitute another ID.
 - Reopen artifacts; verify split disjointness, all hashes and settings/seeds. Max sequence length 4096.
+
+## Implemented interface and evidence
+
+`OfficialKaziText(source_dir, udpipe_model, *, aspell_dictionary_files, expected_udpipe_sha256=None, timeout=120, python_executable=...)` verifies the exact Git revision, clean tracked source, profile hash, model bytes and effective English Aspell dependencies. Its persistent isolated worker imports the unmodified upstream source, configures the exact UDPipe model explicitly and records actual dependency versions. `transform(reasoning, example_id, level, *, model_id)` returns protected reasoning, edit measurements, seeds and immutable runtime identities. `construct_kazitext_data` delegates common dataset validation.
+
+`provision_kazitext_assets(destination, *, source_dir=None, udpipe_path=None)` provisions the public source and individual official model, resolves native Aspell recursively and writes an auxiliary provenance manifest. The authoritative LINDAT model has 16309608 bytes, upstream MD5 `4284eb5c16348e716d739b8ecec7de6d` and verified SHA-256 `784bd0fa85e3d831fd02a55290d0acfd05c953159dc38cc33d52e1b28add9957`. Download verification, TLS and native loading remain enabled. The helper does not submit license acceptance or replace unavailable assets. Native package provisioning belongs to the environment installer.
+
+Global 42 derives independent immutable `(example_id, model_id, level)` request seeds; `PYTHONHASHSEED=0` stabilizes official unordered structures. This permits exact candidate-preflight/final replay despite rejected intervening IDs. Numeric/math spans and adjacent lexical boundary punctuation/whitespace are copied exactly (`math_prose_segments_v2`); official noising affects intervening prose, including its internal whitespace and punctuation. The boundary extension repairs the discovered `12. The` → `12the` failure while keeping every official switch and alpha unchanged. This version invalidates any prior protection identity.
+
+Actual CPU verification loaded the binary, resolved ten English dictionary/configuration files, checked real Aspell suggestions, and ran all twenty model/level transforms twice (40 native transforms). All replay/protection checks passed; evidence is `artifacts/preflight/kazitext_auxiliary_runtime.json`. This diagnostic runtime check is not scientific clean data. `run_transformation_preflight(config, output_dir)` is the separate actual generation-stage control gate. It provisions/verifies exact assets, compares all effective Aspell options to the scientific freeze, loads both pinned native tokenizers, and checks all forty method/model/level variants with exact replay, intact assistant reasoning/final rendering, protected content and native4096 limits. Its evidence marks `control_preflight=True`, `scientific_results=False`; it cannot replace the full actual10100-pair/404000-record clean-data gate.
+
+Unit checks additionally cover literal settings, protected splitting, dictionary dependency closure/location-independent identities and fatal cached-binary corruption.
 
 ## Completion and failure boundary
 

@@ -1,6 +1,6 @@
 # capability_panel_construction.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested; real fixed 1233-item panel prepared, with selected MBPP reference certification owned by evaluation.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -46,6 +46,16 @@ The following source comments retain the procedural detail of the supplied diagr
 - Withhold every scoring test, reference implementation, helper body, algorithm fragment,
 - assertion, expected output and solution comment from prompts and judge inputs.
 - This is a project-specific withheld-test MBPP variant, not directly comparable to published test-visible scores.
+
+## Implemented interface and evidence
+
+`load_evaluation_sources(revisions, *, cache_root=None)` reads actual immutable GSM8K test, MMLU-Redux-2.0 saved Arrow datasets, ARC-Easy test and every sanitized MBPP split. `construct_capability_panel(pools, revisions, *, output_path=None, verify_mbpp_reference=None)` freezes JSON `items`, revisions, source/exclusion/population/stratum metadata and the exact 300/399/331/203 quotas. `validate_capability_panel(..., require_verified=True)` separates prepared source selection from mandatory reference verification.
+
+GSM8K reference whitespace-word counts define three stable ranked source terciles (440/440/439); sample 100 per tercile. MMLU uses only exact `error_type == "ok"`, samples seven per each of 57 fixed subjects and records actual clean population sizes. ARC-Easy and sanitized MBPP sample uniformly without replacement. Random namespaces derive from global 42. Selected IDs are never changed after original-reference failures.
+
+`extract_mbpp_interface(reference_code, scoring_tests)` mechanically exposes only tested callable names, parameters and literal defaults; original implementations, helper bodies, imports and assertions remain hidden. Hidden source `test_imports` become test setup for the original reference suite. Reference execution is a supplied actual restricted-sandbox callback; absence leaves status `prepared`, and an ordinary failure is fatal rather than resampled.
+
+Actual acquired frames contain GSM8K1319, MMLU5700 (5330 clean, 370 excluded), ARC2376 and MBPP427. `data/evaluation/official_pools.json` records those real sources; `capability_panel_prepared.json` fixes 1233 actual selected IDs. Unit checks cover exact source quotas/clean statuses/strata, AST interface privacy, source questions and fatal reference failures. Mandatory sandbox evidence is supplied by the evaluation owner.
 
 ## Completion and failure boundary
 

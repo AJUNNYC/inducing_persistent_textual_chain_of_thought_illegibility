@@ -4,6 +4,12 @@ Role identifier: `analysis`. Reports to: `coordinator`.
 
 Implement baseline-repeatability diagnostics, the prospective statistical plan/simulation validation, complete paired-window statistics and honest descriptive/confirmatory classification. All 216 windows and required scalar gates matter; unknown baseline evidence, zero variance and empty subsets are not favorable results.
 
+## Current implementation and evidence
+
+All six assigned scientific modules and qualification schema are implemented. The focused engineering suite has 20 passing tests and two blocked-live preflight skips, including actual evaluator-to-analysis fixture handoffs. Live untouched-model repeatability and trained-state measurements do not exist. The actual eligible-frame statistical simulation rejected the candidate after 36 boundary repetitions: 34 jointly covered, two failures, zero structural failures; fixed Wilson futility leaves 64 repetitions and six scenarios unrun. Final checkpoint/resume orchestration was frozen at 2026-10-10 22:38:34 UTC and completed revalidation of the unchanged numerical procedure at one NumPy thread in 627.21 seconds: the same two failures and exact futility rejection after 36 repetitions. Descriptive kappa denominator handling was corrected and its three unit tests rerun successfully; all analysis source was frozen at 22:46:45 UTC. Hashes: implementation `95e615ae076ee9672de28013176e0d3e00185af57fa88f21f7f424def00e1c9a`, simulation `fec05bc79d525074718509205ef26783599f4ede69677c1da75dc9fc2f839688`. Resume integrity tests passed using real reduced-draw CPU resampling; only process interruptions were injected. They do not establish scientific coverage. Both rejection and interrupted evidence are retained in `docs/evidence`. Final current report hash is `3e99f06fd472b1fab0f16de38e1451a202dafe9debc1ba5755de1414d5ff2cf8`. There is no active analysis job or passing certificate; training remains blocked.
+
+Public entrypoints are `create_analysis_plan(panel, legibility_ids, config=None)`, `baseline_repeatability(passes_by_model, panel, require_full_panel=True)`, `freeze_simulation_plan(analysis_plan=None, ...)`, `run_statistical_validation(analysis_plan=None, ...)`, `compute_simultaneous_bounds(records_by_state, plan, ...)` and `analyze_results(records_by_state, plan, ...)`. Module cards document exact return keys, frozen numerical conventions and failure boundaries. The actual prospective plan at `data/evaluation/analysis_plan.json` has 216 windows and 10,800 deduplicated scalar gates. Keep actual source eligibility sizes; MMLU strata are 43–100 clean questions, not a fabricated uniform 100.
+
 ## Required reading
 
 Read the full controlling PDF as needed for your scope, including H.1/H.9 precedence and authority. Read the common overview, architecture, contracts, decisions, validation and delegation documents. Read every assigned module specification and active Mermaid source, not just its title. Do not apply historical overridden PDF wording as a second rule.
@@ -21,7 +27,7 @@ Read the full controlling PDF as needed for your scope, including H.1/H.9 preced
 
 ## Exclusive implementation write list
 
-These are the complete initial implementation-file assignments. Code files are currently empty; populate only within your scope. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
+These are the complete initial implementation-file assignments, now populated. Preserve ownership when repairing code. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates. The coordinator additionally delegated `tests/integration/test_analysis_handoff.py` and the status/API updates in the six assigned module cards and this role brief.
 
 ```text
 schemas/qualification_record.json

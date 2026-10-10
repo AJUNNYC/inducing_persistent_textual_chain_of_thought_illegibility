@@ -1,6 +1,12 @@
 # prospective_analysis_plan.md
 
-**Owner:** `analysis`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `analysis`. **Implementation status:** implemented; registry/design/hash tests pass. A frozen plan is prospective specification, not a passing scientific preflight.
+
+## Implemented interface and conventions
+
+`create_analysis_plan(panel, legibility_ids, config=None) -> dict` accepts preparation packages or their row/ID lists. Every row requires its immutable item ID, domain, stratum and actual eligible finite-population size. The returned plan contains 216 windows, 10,800 deduplicated scalar gates, all three transfer pairs, full nested design metadata and `plan_hash`. `verify_analysis_plan(plan)` rejects altered frozen contents. Fixture plans cannot authorize confirmation.
+
+The selected actual panel's prospective plan is generated at `data/evaluation/analysis_plan.json`; its hash is `8422201afde6701451a5999a22fe0c4e171357be221186492ddfc93668e833ad`. MMLU clean eligible strata contain 43–100 items rather than an assumed 100 each. The statistical simulation freeze binds these actual strata and this plan. No trained outcomes exist. Statistical coverage remains a separate mandatory gate; descriptive reporting never releases training through it.
 
 | Artifact | Exact repository path |
 |---|---|

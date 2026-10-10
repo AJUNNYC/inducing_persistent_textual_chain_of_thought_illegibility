@@ -1,6 +1,6 @@
 # condition_evaluation.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/condition_groups/test_condition_evaluation.py` |
 
 **Scientific sources:** C.3.6; D.1–D.2; G; H.5–H.6. [p. 35](../../../../spec/experiment.pdf#page=35) · [p. 36](../../../../spec/experiment.pdf#page=36) · [p. 38](../../../../spec/experiment.pdf#page=38) · [p. 41](../../../../spec/experiment.pdf#page=41) · [p. 43](../../../../spec/experiment.pdf#page=43) · [p. 65](../../../../spec/experiment.pdf#page=65) · [p. 67](../../../../spec/experiment.pdf#page=67) · [p. 73](../../../../spec/experiment.pdf#page=73) · [p. 75](../../../../spec/experiment.pdf#page=75) · [p. 76](../../../../spec/experiment.pdf#page=76).
+
+## Implemented public interface and validation
+
+`evaluate_conditions(group, states, baselines, protocol, generator, judge_client=None, *, sandbox=None, cache_root=None, require_full_matrix=True)` checks exactly 40 SFT or 20 RL states and evaluates both shared baselines before dependent conditions. Condition labels must match model, level/step, and family. Durable raw/item caches reuse identical baseline outputs across independent groups. Infrastructure failures produce explicit partial packages and remaining condition IDs.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

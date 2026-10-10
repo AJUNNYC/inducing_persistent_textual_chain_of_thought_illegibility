@@ -1,6 +1,6 @@
 # capability_scoring.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,14 @@
 | Unit test slot | `tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py` |
 
 **Scientific sources:** D.1.2; E.2.3,E.2.7; H.4. [p. 5](../../../../../../spec/experiment.pdf#page=5) · [p. 40](../../../../../../spec/experiment.pdf#page=40) · [p. 41](../../../../../../spec/experiment.pdf#page=41) · [p. 55](../../../../../../spec/experiment.pdf#page=55) · [p. 57](../../../../../../spec/experiment.pdf#page=57) · [p. 72](../../../../../../spec/experiment.pdf#page=72).
+
+## Implemented public interface and validation
+
+`score_capability(item, parsed, *, sandbox=None, raw_hash=None)` applies exact numeric/choice rules to the separated final answer and extracts at most one explicit Python code fence for MBPP. It does not infer answers from reasoning or repair code. MBPP receives approved public entrypoint names and unchanged hidden setup/tests only after generation. Resource/task failures are observed incorrect outputs; broken or unsupported executor operations produce `correct=None` with an infrastructure status. Raw/parser/scorer/reference dependencies remain recorded.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
+
+The actual current executor passed the original suites for all 427 sanitized MBPP reference tasks, including the exact selected 203. The [full reference receipt](../../../../../evidence/mbpp_reference_tests.json) preserves per-task identities and outcomes; the [isolation receipt](../../../../../evidence/mbpp_isolation_checks.json) separately verifies the restricted supervisor/worker boundary. This certifies reference scoring infrastructure and does not claim generated-model accuracy.
 
 ## Responsibility and controlling details
 

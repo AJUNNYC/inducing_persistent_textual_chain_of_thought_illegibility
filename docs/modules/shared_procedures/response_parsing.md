@@ -1,6 +1,6 @@
 # response_parsing.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,3 +50,10 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`parse_native_output(text)` returns exact reasoning/final substrings and explicit validity without repairing boundaries. Known native generation prefixes are supplied by callers. `parse_rl_output(text, truncated=False)` accepts one exact final boxed numeric line; a cap-truncated response remains valid only when its complete final marker exists. `normalize_numeric_answer` uses exact rational/decimal normalization with validated comma grouping, signs, one terminating punctuation, fractions and bounded scientific notation. Choice labels and one surrounding Python fence have independent mechanical helpers. No missing answer is inferred.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.

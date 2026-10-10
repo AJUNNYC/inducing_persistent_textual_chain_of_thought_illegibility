@@ -1,6 +1,6 @@
 # item_evaluation.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/shared_model_evaluation/item_evaluation/test_item_evaluation.py` |
 
 **Scientific sources:** D.1–D.2; E.2.3,E.2.7; H.4–H.6. [p. 41](../../../../../spec/experiment.pdf#page=41) · [p. 44](../../../../../spec/experiment.pdf#page=44) · [p. 45](../../../../../spec/experiment.pdf#page=45) · [p. 55](../../../../../spec/experiment.pdf#page=55) · [p. 57](../../../../../spec/experiment.pdf#page=57) · [p. 72](../../../../../spec/experiment.pdf#page=72) · [p. 73](../../../../../spec/experiment.pdf#page=73) · [p. 74](../../../../../spec/experiment.pdf#page=74) · [p. 75](../../../../../spec/experiment.pdf#page=75).
+
+## Implemented public interface and validation
+
+`evaluate_item(state, item, protocol, generator, judge_client=None, *, sandbox=None, cache_root=None, seed=42)` joins capability scoring and scheduled assessments from the same raw hash. Records retain raw/parsed/capability/legibility provenance alongside analysis fields `correct`, `primary_score`, `secondary_score`, `readable_solution`, `padding`, `assessable`, and `qualified_opacity`. Ordinary malformed or truncated outputs remain observed failures; executor/provider failures remain missing. Diagnostic seeds 43/44 and items outside the fixed nested subset never invoke judges. Durable caches separate fixture and production dependencies.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

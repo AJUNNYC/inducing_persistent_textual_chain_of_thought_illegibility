@@ -1,6 +1,6 @@
 # source_map.md
 
-All scientific specifications derive from the supplied updated PDF and revised Mermaid package. Local filenames, exact ownership and the 14 extracted support-module boundaries are organizational choices made for the requested scaffold, not new experimental parameters. The original 67-page PDF is retained unchanged. The authoritative 81-page PDF is retained unchanged; its title uses the visible title page. No web research or prior-chat architectural sketch substitutes for these sources.
+All scientific specifications derive from the supplied updated PDF and revised Mermaid package. Local filenames, exact ownership and the 14 extracted support-module boundaries are organizational choices made for the requested architecture, not new experimental parameters. The original 67-page PDF is retained unchanged. The authoritative 81-page PDF is retained unchanged; its title uses the visible title page. No web research or prior-chat architectural sketch substitutes for these sources.
 
 [Source hashes](../spec/source_provenance.json) · [Full page-indexed PDF extraction](protocol_reference.md) · [Canonical path inventory](../spec/repository_manifest.json) · [Original Mermaid text archive](../spec/archive/mermaid_source.json)
 
@@ -102,7 +102,7 @@ All 35 revised original workflows are preserved procedurally. Numerical folder p
 
 ## Source-derived support modules
 
-| Extracted responsibility | Source | Why it has a separate blank module |
+| Extracted responsibility | Source | Why it has a separate implemented module |
 |---|---|---|
 | `configuration` | E.2.3; H.1,H.9 | Load, validate, resolve and hash the scientific configuration; preserve fixed settings and stop on invalid input. |
 | `records` | E.2.3; H.5–H.6,H.9 | Validate typed handoff records, identifiers, dependency hashes, explicit statuses and required provenance. |
@@ -121,8 +121,8 @@ All 35 revised original workflows are preserved procedurally. Numerical folder p
 
 ## Structural diagram coverage
 
-Repository diagrams use exact repository-relative path labels and containment edges. They represent every static tracked file/directory, including their own `.mmd` paths, all Markdown documents, blank files and runtime directory markers. These are organizational maps, not additional scientific procedures. `runtime_rules.mmd` separately records the approved dynamic path conventions and is not counted as evidence runtime records exist. `delegation.mmd` records the seven role names and brief paths.
+Repository diagrams use exact repository-relative path labels and containment edges. They represent every static tracked file/directory, including their own `.mmd` paths, all Markdown documents,implemented files and runtime directory markers. These are organizational maps, not additional scientific procedures. `runtime_rules.mmd` separately records the approved dynamic path conventions and is not counted as evidence runtime records exist. `delegation.mmd` records the seven role names and brief paths.
 
 ## Source omissions and historical claims
 
-No full editable original LaTeX is supplied by the source PDF; this task preserves the PDFs rather than inventing a re-typeset replacement. The previous appendix LaTeX build package is not copied as live Python experiment code, because the user requested blank implementation files and this task does not amend the PDF. No private credentials, unavailable model/dataset revisions, actual source IDs, external tokenizer hash, implementation test results or scientific outputs are manufactured. Old descriptions of already CPU-checked code remain historical PDF content, not claims about this scaffold.
+No full editable original LaTeX is supplied by the source PDF; this task preserves the PDFs rather than inventing a re-typeset replacement. The previous appendix LaTeX build package is not copied as live Python experiment code, because this task implements the first-stage software while preserving the controlling PDF. No private credentials, unavailable model/dataset revisions, actual source IDs, external tokenizer hash, implementation test results or scientific outputs are manufactured. Old descriptions of already CPU-checked code remain historical PDF content, not current validation evidence.

@@ -17,7 +17,7 @@
         68,
         80
       ],
-      "sections": "Sections 1–5; E.1–E.2; G.1; H.1,H.9",
+      "sections": "Sections 1\u20135; E.1\u2013E.2; G.1; H.1,H.9",
       "old_path": "00-experiment-overview/experiment-overview.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -74,7 +74,7 @@
         70,
         71
       ],
-      "sections": "3.1; B.1; E.2.2–E.2.4; H.2.3,H.3",
+      "sections": "3.1; B.1; E.2.2\u2013E.2.4; H.2.3,H.3",
       "old_path": "01-data-generation-collection/01-sft-data/01-clean-trace-collection/clean-trace-collection.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -101,7 +101,7 @@
         55,
         71
       ],
-      "sections": "3.2; C.1.1–C.1.3; C.2.3; E.2.4; H.3",
+      "sections": "3.2; C.1.1\u2013C.1.3; C.2.3; E.2.4; H.3",
       "old_path": "01-data-generation-collection/01-sft-data/02-rot13/rot13-data-construction.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -131,7 +131,7 @@
         70,
         71
       ],
-      "sections": "C.1.4; C.2.3; E.2.4; H.2–H.3",
+      "sections": "C.1.4; C.2.3; E.2.4; H.2\u2013H.3",
       "old_path": "01-data-generation-collection/01-sft-data/03-kazitext/kazitext-data-construction.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -165,7 +165,7 @@
         70,
         71
       ],
-      "sections": "3.1; B.1; C.1–C.2.3; E.2.2–E.2.4; H.2–H.3",
+      "sections": "3.1; B.1; C.1\u2013C.2.3; E.2.2\u2013E.2.4; H.2\u2013H.3",
       "old_path": "01-data-generation-collection/01-sft-data/sft-data-preparation.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -329,7 +329,7 @@
         76,
         80
       ],
-      "sections": "D.1–D.2; G; H.4–H.6,H.9",
+      "sections": "D.1\u2013D.2; G; H.4\u2013H.6,H.9",
       "old_path": "01-data-generation-collection/03-evaluation-data/03-protocol/evaluation-protocol.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -386,7 +386,7 @@
         70,
         71
       ],
-      "sections": "3.1; B.1; C.1; C.2.3; E.2.2–E.2.4; H.2–H.3",
+      "sections": "3.1; B.1; C.1; C.2.3; E.2.2\u2013E.2.4; H.2\u2013H.3",
       "old_path": "01-data-generation-collection/data-generation.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -414,7 +414,7 @@
         56,
         80
       ],
-      "sections": "C.2.2–C.2.4; E.1.3; E.2.4,E.2.6; H.9",
+      "sections": "C.2.2\u2013C.2.4; E.1.3; E.2.4,E.2.6; H.9",
       "old_path": "02-training/01-sft/01-individual-fit/sft-fit.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -445,7 +445,7 @@
         54,
         56
       ],
-      "sections": "C.2; E.1.1–E.1.3; E.2.2,E.2.5",
+      "sections": "C.2; E.1.1\u2013E.1.3; E.2.2,E.2.5",
       "old_path": "02-training/01-sft/sft-training.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -472,7 +472,7 @@
         57,
         77
       ],
-      "sections": "C.3.5; E.1.2–E.1.3; E.2.6; H.7",
+      "sections": "C.3.5; E.1.2\u2013E.1.3; E.2.6; H.7",
       "old_path": "02-training/02-rl-grpo/01-setup/rl-setup.mmd",
       "kind": "original_workflow",
       "child_modules": [],
@@ -521,7 +521,7 @@
         52,
         76
       ],
-      "sections": "C.3.3–C.3.4; E.1.4; H.6.3",
+      "sections": "C.3.3\u2013C.3.4; E.1.4; H.6.3",
       "old_path": "02-training/02-rl-grpo/02-training-cycle/02-rewards/01-sonnet-judgment/sonnet-opacity-judgment.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -550,7 +550,7 @@
         76,
         77
       ],
-      "sections": "C.3.2–C.3.5; E.1.4; H.6.3,H.7",
+      "sections": "C.3.2\u2013C.3.5; E.1.4; H.6.3,H.7",
       "old_path": "02-training/02-rl-grpo/02-training-cycle/02-rewards/rl-reward.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -577,7 +577,7 @@
         57,
         77
       ],
-      "sections": "C.3.5; E.1.3–E.1.4; E.2.6; H.7",
+      "sections": "C.3.5; E.1.3\u2013E.1.4; E.2.6; H.7",
       "old_path": "02-training/02-rl-grpo/02-training-cycle/03-policy-update/grpo-policy-update.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -606,7 +606,7 @@
         57,
         77
       ],
-      "sections": "C.3.4–C.3.5; E.1.3–E.1.4; E.2.6; H.7",
+      "sections": "C.3.4\u2013C.3.5; E.1.3\u2013E.1.4; E.2.6; H.7",
       "old_path": "02-training/02-rl-grpo/02-training-cycle/grpo-training-cycle.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -640,7 +640,7 @@
         57,
         77
       ],
-      "sections": "C.3; E.1.1–E.1.4; E.2.6; H.7",
+      "sections": "C.3; E.1.1\u2013E.1.4; E.2.6; H.7",
       "old_path": "02-training/02-rl-grpo/rl-training.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -671,7 +671,7 @@
         77,
         80
       ],
-      "sections": "2; C.2–C.3; E.1.1; E.2.2; H.7,H.9",
+      "sections": "2; C.2\u2013C.3; E.1.1; E.2.2; H.7,H.9",
       "old_path": "02-training/training.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -702,7 +702,7 @@
         75,
         76
       ],
-      "sections": "C.3.6; D.1–D.2; G; H.5–H.6",
+      "sections": "C.3.6; D.1\u2013D.2; G; H.5\u2013H.6",
       "old_path": "03-evaluation/01-condition-groups/condition-evaluation.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -778,7 +778,7 @@
         75,
         76
       ],
-      "sections": "H.4–H.6",
+      "sections": "H.4\u2013H.6",
       "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/03-legibility-judging/01-readable-solution-audit/readable-solution-audit.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -808,7 +808,7 @@
         75,
         76
       ],
-      "sections": "D.2; H.5–H.6",
+      "sections": "D.2; H.5\u2013H.6",
       "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/03-legibility-judging/legibility-judging.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -838,7 +838,7 @@
         74,
         75
       ],
-      "sections": "D.1–D.2; E.2.3,E.2.7; H.4–H.6",
+      "sections": "D.1\u2013D.2; E.2.3,E.2.7; H.4\u2013H.6",
       "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/item-evaluation.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -870,7 +870,7 @@
         75,
         76
       ],
-      "sections": "4; D.1–D.2; E.2.7; H.4–H.6",
+      "sections": "4; D.1\u2013D.2; E.2.7; H.4\u2013H.6",
       "old_path": "03-evaluation/02-shared-model-evaluation/model-evaluation.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -966,7 +966,7 @@
         76,
         80
       ],
-      "sections": "4; D.1–D.2; E.2.7; G; H.4–H.6,H.9",
+      "sections": "4; D.1\u2013D.2; E.2.7; G; H.4\u2013H.6,H.9",
       "old_path": "03-evaluation/evaluation.mmd",
       "kind": "original_workflow",
       "child_modules": [
@@ -997,7 +997,7 @@
         57,
         80
       ],
-      "sections": "E.1–E.2; H.9",
+      "sections": "E.1\u2013E.2; H.9",
       "old_path": "04-shared-procedures/recovery-procedure.mmd",
       "kind": "original_workflow",
       "child_modules": [],
@@ -1047,7 +1047,7 @@
         75,
         80
       ],
-      "sections": "E.2.3; H.5–H.6,H.9",
+      "sections": "E.2.3; H.5\u2013H.6,H.9",
       "purpose": "Validate typed handoff records, identifiers, dependency hashes, explicit statuses and required provenance.",
       "kind": "source_derived_support",
       "child_modules": [],
@@ -1145,7 +1145,7 @@
         73,
         74
       ],
-      "sections": "C.3.3–C.3.4; D.2.4–D.2.6; E.1.4; H.5",
+      "sections": "C.3.3\u2013C.3.4; D.2.4\u2013D.2.6; E.1.4; H.5",
       "purpose": "Separate provider transports and per-pass caches; validate schemas and returned identities; preserve outcomes without fabricated rewards or grades.",
       "kind": "source_derived_support",
       "child_modules": [],
@@ -1197,7 +1197,7 @@
         56,
         76
       ],
-      "sections": "5; B.1.4; C.2.4; E.1.4–E.1.5,E.2.5; H.6.4",
+      "sections": "5; B.1.4; C.2.4; E.1.4\u2013E.1.5,E.2.5; H.6.4",
       "purpose": "Track GPU, API, storage and in-flight costs; enforce current authorization and block new spending when unavailable.",
       "kind": "source_derived_support",
       "child_modules": [],
@@ -1225,7 +1225,7 @@
         79,
         80
       ],
-      "sections": "5; E.1–E.2.8; G.9–G.10; H.4,H.7–H.9",
+      "sections": "5; E.1\u2013E.2.8; G.9\u2013G.10; H.4,H.7\u2013H.9",
       "purpose": "Check model/runtime identity, actual loss masks and gradients, persistence/recovery, APIs, sandbox, baseline measurement and statistical readiness before affected launches.",
       "kind": "source_derived_support",
       "child_modules": [],
@@ -1252,7 +1252,7 @@
         57,
         80
       ],
-      "sections": "E.1–E.2; H.9",
+      "sections": "E.1\u2013E.2; H.9",
       "purpose": "Track jobs, original steps, attempts, persistent retry counts and explicit pending/running/paused/failed/complete states; prevent duplicate writers.",
       "kind": "source_derived_support",
       "child_modules": [],
@@ -1277,7 +1277,7 @@
         56,
         71
       ],
-      "sections": "3.1; B.1; E.2.2–E.2.4; H.3",
+      "sections": "3.1; B.1; E.2.2\u2013E.2.4; H.3",
       "purpose": "Construct authorized English LMSYS first-turn candidates at most 200 tokens, deduplicate, remove detectable overlap and freeze deterministic order.",
       "kind": "source_derived_support",
       "child_modules": [],
@@ -1350,6 +1350,265 @@
         "req_simulation",
         "req_failed_validation"
       ]
+    },
+    {
+      "name": "assets",
+      "code": "src/operations/assets.py",
+      "doc": "docs/modules/operations/assets.md",
+      "diagram": "spec/mermaid/workflows/operations/assets.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_assets"
+      ],
+      "purpose": "Bounded immutable upstream provisioning, verified standard Hub blobs/snapshots, local-only SDK model loading and license authorization.",
+      "test": "tests/unit/operations/test_assets.py",
+      "tests": [
+        "tests/unit/operations/test_assets.py",
+        "tests/unit/operations/test_operations.py"
+      ],
+      "dependencies": [
+        "src/shared_procedures/recovery_procedure.py",
+        "src/shared_procedures/identity.py",
+        "src/shared_procedures/storage.py",
+        "src/operations/drive.py"
+      ],
+      "sections": "User master request: automated environment setup and reusable model/dataset assets; E.1.4,E.2.2,E.2.5; H.9",
+      "pages": [
+        52,
+        54,
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest"
+    },
+    {
+      "name": "artifacts",
+      "code": "src/operations/artifacts.py",
+      "doc": "docs/modules/operations/artifacts.md",
+      "diagram": "spec/mermaid/workflows/operations/artifacts.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_artifacts"
+      ],
+      "purpose": "Indexed immutable artifact provenance, incremental permanent replication, remote reconciliation and exact-compatible retrieval.",
+      "test": "tests/unit/operations/test_operations.py",
+      "tests": [
+        "tests/unit/operations/test_operations.py",
+        "tests/unit/operations/test_drive.py"
+      ],
+      "dependencies": [
+        "src/operations/drive.py",
+        "src/shared_procedures/identity.py",
+        "src/shared_procedures/storage.py"
+      ],
+      "sections": "User master request: complete Google Drive artifact persistence; E.1.3,E.2.3,E.2.5; H.9",
+      "pages": [
+        50,
+        55,
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest"
+    },
+    {
+      "name": "drive",
+      "code": "src/operations/drive.py",
+      "doc": "docs/modules/operations/drive.md",
+      "diagram": "spec/mermaid/workflows/operations/drive.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_drive"
+      ],
+      "purpose": "Restricted drive.file OAuth consent and refresh, actual token-scope/account/project checks and integrity-checked bounded media transport.",
+      "test": "tests/unit/operations/test_drive.py",
+      "tests": [
+        "tests/unit/operations/test_drive.py",
+        "tests/unit/operations/test_operations.py",
+        "tests/unit/operations/test_consent_notebook.py"
+      ],
+      "dependencies": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "sections": "User master request: existing Google OAuth client, designated account and project-confined persistence; E.2.5; H.9",
+      "pages": [
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest",
+      "entrypoints": [
+        "scripts/create_google_consent_notebook.py"
+      ],
+      "operational_docs": [
+        "docs/operations/jupyter_consent.md"
+      ]
+    },
+    {
+      "name": "hardware",
+      "code": "src/operations/hardware.py",
+      "doc": "docs/modules/operations/hardware.md",
+      "diagram": "spec/mermaid/workflows/operations/hardware.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_hardware"
+      ],
+      "purpose": "Inspect observed CPU/RAM/disk/CUDA/BF16 prerequisites separately from recommendations and unexecuted peak-memory measurements.",
+      "test": "tests/unit/experiment_overview/test_experiment_overview.py",
+      "tests": [
+        "tests/unit/experiment_overview/test_experiment_overview.py",
+        "tests/unit/shared_procedures/test_preflight.py"
+      ],
+      "dependencies": [],
+      "sections": "User master request: explicit hardware/resource specifications; E.1.1,E.1.2; H.9",
+      "pages": [
+        49,
+        50,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest"
+    },
+    {
+      "name": "reporting",
+      "code": "src/operations/reporting.py",
+      "doc": "docs/modules/operations/reporting.md",
+      "diagram": "spec/mermaid/workflows/operations/reporting.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_reporting"
+      ],
+      "purpose": "Export exact analysis records, honest missing/indeterminate values, fixture labels and actual capability/opacity curve coordinates.",
+      "test": "tests/integration/test_end_to_end.py",
+      "tests": [
+        "tests/integration/test_end_to_end.py",
+        "tests/unit/evaluation/results_analysis/test_results_analysis.py"
+      ],
+      "dependencies": [
+        "src/shared_procedures/storage.py"
+      ],
+      "sections": "User master request: complete scientific results and report artifacts; D.2.5,G,H.6; H.9",
+      "pages": [
+        45,
+        65,
+        75,
+        76,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest"
+    },
+    {
+      "name": "runpod",
+      "code": "src/operations/runpod.py",
+      "doc": "docs/modules/operations/runpod.md",
+      "diagram": "spec/mermaid/workflows/operations/runpod.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_runpod"
+      ],
+      "purpose": "Concrete authorization guards and external existing-Pod cost/runtime monitoring with bounded observed stop confirmation; no implicit new-Pod authorization.",
+      "test": "tests/unit/operations/test_runpod.py",
+      "tests": [
+        "tests/unit/operations/test_runpod.py",
+        "tests/unit/operations/test_operations.py"
+      ],
+      "dependencies": [
+        "src/shared_procedures/identity.py",
+        "src/shared_procedures/storage.py"
+      ],
+      "sections": "User master request: authorized RunPod deployment; subsequent existing-H100 authorization 90 USD / 30 hours; E.1.5,E.2.5; H.9",
+      "pages": [
+        52,
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest"
+    },
+    {
+      "name": "validation",
+      "code": "src/operations/validation.py",
+      "doc": "docs/modules/operations/validation.md",
+      "diagram": "spec/mermaid/workflows/operations/validation.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_validation"
+      ],
+      "purpose": "Repeatable static source/path/card/diagram/requirement/link/PDF integrity audit, explicitly independent of live scientific readiness.",
+      "test": "scripts/validate_repository.py",
+      "tests": [
+        "scripts/validate_repository.py"
+      ],
+      "dependencies": [],
+      "sections": "User master request: cross-artifact consistency, complete inventory and nine acceptance gates; E.2.8; H.9",
+      "pages": [
+        58,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "executable_static_validation_command"
+    },
+    {
+      "name": "workflow",
+      "code": "src/operations/workflow.py",
+      "doc": "docs/modules/operations/workflow.md",
+      "diagram": "spec/mermaid/workflows/operations/workflow.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User implementation assignment and permitted H.9 operational conventions; not an original scientific workflow.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_workflow"
+      ],
+      "purpose": "Composable dependency graph with immutable configuration/code/output identities, per-device serialization and verified completed-stage reuse.",
+      "test": "tests/unit/operations/test_operations.py",
+      "tests": [
+        "tests/unit/operations/test_operations.py",
+        "tests/unit/experiment_overview/test_experiment_overview.py"
+      ],
+      "dependencies": [
+        "src/shared_procedures/identity.py",
+        "src/shared_procedures/storage.py",
+        "src/operations/drive.py"
+      ],
+      "sections": "User master request: modular independently accessible execution and automatic compatible resumption; E.1.4,E.2.5; H.9",
+      "pages": [
+        52,
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_final_consolidated_validation_pending",
+      "test_kind": "pytest"
     }
-  ]
+  ],
+  "source_module_counts": {
+    "original_workflow": 35,
+    "source_derived_support": 14,
+    "user_operational_extension": 8,
+    "total": 57
+  },
+  "validation_scope": "Paths and test mappings record implementations, not passing live checks or scientific results. Original49 scientific workflow/support metadata is preserved."
 }

@@ -1,0 +1,7 @@
+---
+title: "drive operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/drive.py"]
+    CALL --> VERIFY["Existing desktop OAuth;restricted drive.file;refresh;resumable transport and verified project ancestry"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]

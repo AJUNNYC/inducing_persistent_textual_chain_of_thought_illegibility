@@ -1,6 +1,6 @@
 # cost_accounting.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,3 +50,12 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`CostLedger(path, authorization=...).reserve`, `commit`, `release`, `totals` and `record_resource` persist actual charges and in-flight reservations. Missing authorization/evidence, overrun and ambiguous-billing release are refused. Source warning thresholds and the local reward-service allowance are recorded without increasing the approved ceiling. `estimate_judge_cost` requires actual usage and provided rates; `request_forecast` reports the source workload, not observed spending.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.
+
+Indexed SQLite transactions store operation reservations/charges and append audit events. Grand and reward-category totals update in constant-size transactions; reserve, commit, release and totals never scan or rewrite full history. `<path>.sqlite3` uses WAL and FULL synchronous transactions; legacy JSON is imported once and retained. `read()` exports the full audit only when requested. `snapshot_database(destination)` creates a coherent atomic backup for durable replication, including committed WAL state.

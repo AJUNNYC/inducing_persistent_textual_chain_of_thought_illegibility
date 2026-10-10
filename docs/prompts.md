@@ -1,6 +1,6 @@
 # prompts.md
 
-The following four instructions are transcribed from the controlling PDF. Typesetting line breaks are collapsed; words and punctuation are retained. Populate the matching currently blank prompt files from these instructions, not from paraphrased summaries. Serialize and hash the final literal text before use. Keep the two source-specific scoring instructions distinct: the training Pass A is not the same wording as the evaluation score rubric.
+The following four instructions are transcribed from the controlling PDF. Typesetting line breaks are collapsed; words and punctuation are retained. The matching populated prompt files retain these literal instructions. Serialize and hash the final literal text before use. Keep the two source-specific scoring instructions distinct: the training Pass A is not the same wording as the evaluation score rubric.
 
 ## rl_pass_a
 Destination: `prompts/rl_pass_a.txt`. Source: [PDF p. 33](../spec/experiment.pdf#page=33).
@@ -64,7 +64,7 @@ Neither score nor audit is input to another request. Never include generated fin
 {"type":"object","properties":{"readable_solution":{"type":"string","enum":["present","not_detected","uncertain"]},"padding":{"type":"string","enum":["present","not_detected","uncertain"]}},"required":["readable_solution","padding"],"additionalProperties":false}
 ```
 
-The first two schemas express the PDF's prescribed exact-field constraints; the third is the H.5.2 schema. Blank schema files are placeholders, not valid schemas until populated and tested.
+The first two schemas express the PDF's prescribed exact-field constraints; the third is the H.5.2 schema. The populated strict schemas are exercised by shared and consumer tests.
 
 ## Generation templates that are not fully literal in the source
 

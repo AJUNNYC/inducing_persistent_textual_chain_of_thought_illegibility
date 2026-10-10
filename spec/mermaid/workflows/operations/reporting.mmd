@@ -1,0 +1,7 @@
+---
+title: "reporting operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/reporting.py"]
+    CALL --> VERIFY["Export actual analysis records;all window statuses and prescribed-strength curves"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]

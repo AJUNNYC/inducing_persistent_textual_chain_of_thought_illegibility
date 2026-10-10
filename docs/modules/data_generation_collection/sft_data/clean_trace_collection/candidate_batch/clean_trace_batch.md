@@ -1,6 +1,6 @@
 # clean_trace_batch.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested with explicit model/tokenizer/noise fixtures; real clean generation requires authorized source and GPU preflights.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -48,6 +48,16 @@ The following source comments retain the procedural detail of the supplied diagr
 - No semantic correctness, judge-quality, extra minimum reasoning length or reasoning-step filter is permitted.
 - Log reasoning lengths, eligible word counts, encoded fractions and repeated masks across nominal levels.
 - Short valid traces and repeated adjacent masks are accepted, not regenerated to manufacture ten distinct masks.
+
+## Implemented interface and evidence
+
+`NativeCleanGenerator(models, *, device_map="auto", torch_dtype="bfloat16", cache_root=None)` loads each untouched frozen base lazily and emits native responses at temperature 0.6, top-p 0.95 and at most 3072 new tokens. `process_clean_batch(candidates, generator, tokenizers, *, kazitext, output_dir, config_hash)` saves full raw responses before parsing, then returns paired accepted/rejected JSON mappings. `validate_clean_trace` preserves explicit missing fields on boundary rejection and retains semantically wrong traces.
+
+Acceptance checks nonempty native reasoning/final boundaries, complete generation, at least three eligible words, full intact native-training sequence at most 4096 tokens and all twenty exact model-specific transformation variants. The shared SFT renderer preserves the entire target even when the model's inference history template strips previous reasoning. Infrastructure failures propagate; ordinary rejection never regenerates that candidate. Every durable raw/pair artifact immediately invokes the shared storage notification hook.
+
+Production and injected fixture caches have distinct `execution_mode` directories and `simulation` identities. Fixture responses cannot enter live clean-data readiness. Optional `stop_requested` callbacks pause before model loading/generation or paired validation. Completed raw/pair records have already passed durable write/readback and the synchronous storage notification hook. `CleanDataPause.progress` names the exact next operation and completed IDs; resumption uses original raw caches. No native sample or scientific criterion is changed.
+
+Unit checks cover exact bytes, truncation/malformed rejection, paired structural acceptance, full reasoning token counting, raw cache reuse and generator failures. Actual base-model generation has not run in this CPU environment.
 
 ## Completion and failure boundary
 

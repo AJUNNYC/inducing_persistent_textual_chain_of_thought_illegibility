@@ -1,0 +1,7 @@
+---
+title: "hardware operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/hardware.py"]
+    CALL --> VERIFY["Inspect actual CPU/RAM/disk/CUDA/BF16; distinguish runtime observations from unmeasured peak memory"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]

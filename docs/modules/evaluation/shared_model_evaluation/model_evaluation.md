@@ -1,6 +1,6 @@
 # model_evaluation.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,12 @@
 | Unit test slot | `tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py` |
 
 **Scientific sources:** 4; D.1–D.2; E.2.7; H.4–H.6. [p. 5](../../../../spec/experiment.pdf#page=5) · [p. 6](../../../../spec/experiment.pdf#page=6) · [p. 41](../../../../spec/experiment.pdf#page=41) · [p. 43](../../../../spec/experiment.pdf#page=43) · [p. 44](../../../../spec/experiment.pdf#page=44) · [p. 45](../../../../spec/experiment.pdf#page=45) · [p. 57](../../../../spec/experiment.pdf#page=57) · [p. 72](../../../../spec/experiment.pdf#page=72) · [p. 73](../../../../spec/experiment.pdf#page=73) · [p. 75](../../../../spec/experiment.pdf#page=75) · [p. 76](../../../../spec/experiment.pdf#page=76).
+
+## Implemented public interface and validation
+
+`evaluate_model(state, protocol, generator, judge_client=None, *, sandbox=None, cache_root=None, seed=42)` follows the immutable panel order with one native generation per item. Capability denominators remain 300/399/331/203; unavailable observations retain `correct=None`, and incomplete domain accuracy remains undefined. Required infrastructure failures stop dependent work with exact remaining IDs. Completed model packages and raw/item/legibility/audit artifacts are published through the shared durable artifact hook.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
 ## Responsibility and controlling details
 

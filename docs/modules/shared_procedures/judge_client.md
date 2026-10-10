@@ -1,6 +1,6 @@
 # judge_client.md
 
-**Owner:** `shared_infrastructure`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `shared_infrastructure`. **Implementation status:** implemented with actual local CPU tests; mandatory live integrations remain separately gated.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -17,7 +17,7 @@ Provide shared transport, bounded concurrency, request validation, persistent in
 
 RL reward concurrency is at most eight in-flight requests, and actual account quotas take priority. Respect Retry-After, otherwise exponential backoff with jitter. Maximum three retries per operation includes SDK retries, with the shared 100-worker retry cap and persistent counters. Quota/billing/unclassified failures do not retry indefinitely. Persist successful passes before the corresponding update and preserve them if another call fails. Record sent/completed-committed/failed states; timeouts cannot guarantee exactly-once billing. Evaluation records unavailable results honestly; RL cannot update using missing rewards.
 
-A requested/returned model mismatch or provider version discontinuity is recorded and handled under the source stop/report constraints, not silently pooled. Schema validity does not prove substantive judge accuracy. Integration checks on actual providers remain unperformed in the scaffold.
+A requested/returned model mismatch or provider version discontinuity is recorded and handled under the source stop/report constraints, not silently pooled. Schema validity does not prove substantive judge accuracy. Actual provider integration is an explicit runnable preflight and remains unavailable in this environment without credentials, current prices/quotas and spending authorization.
 
 ## Interfaces and dependent procedures
 
@@ -52,3 +52,10 @@ flowchart TD
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
 ```
+
+
+## Implemented public interfaces and evidence
+
+`JudgeClient(cache_root, state_root, transport=None, cost_ledger=None, concurrency=8, provider_prices=None, pricing_evidence=None, quota_limits=None, quota_evidence=None).request(kind, model, prompt, trace, question=None, settings=None, schema=None, estimated_cost=None)` persists independent pass records. Exact five request kinds, source model/settings/schemas, production versus simulation identity, returned-version discontinuities and raw/parsed integrity are enforced. Real HTTPS calls require current authorization, booked prices/evidence and actual account quota/evidence. Persistent request/token reservations and bounded retries use the shared worker state. Successful raw responses can be reconciled after a crash without a duplicate call. `conservative_reservation` computes a UTF-8 byte plus framing/output upper reservation. No provider integration is claimed from fixture transport.
+
+Local verification uses `PYTHONPATH=src python -m pytest tests/unit/shared_procedures tests/integration/test_recovery_handoff.py --import-mode=importlib`. Tests exercise positive behavior and actual negative cases, including schema/model/hash failures, no-auth spending blocks, persistent retry exhaustion, fixture-cache exclusion and real CPU optimizer restoration. CUDA/API/lifecycle evidence is reported separately; passing local tests does not authorize or certify scientific launch.

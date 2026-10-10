@@ -1,6 +1,6 @@
 # evaluation_protocol.md
 
-**Owner:** `evaluation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `evaluation`. **Implementation status:** implemented; unit/integration verification and remaining live gates are recorded below.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -10,6 +10,14 @@
 | Unit test slot | `tests/unit/data_generation_collection/evaluation_data/protocol/test_evaluation_protocol.py` |
 
 **Scientific sources:** D.1–D.2; G; H.4–H.6,H.9. [p. 41](../../../../../spec/experiment.pdf#page=41) · [p. 42](../../../../../spec/experiment.pdf#page=42) · [p. 43](../../../../../spec/experiment.pdf#page=43) · [p. 44](../../../../../spec/experiment.pdf#page=44) · [p. 45](../../../../../spec/experiment.pdf#page=45) · [p. 65](../../../../../spec/experiment.pdf#page=65) · [p. 67](../../../../../spec/experiment.pdf#page=67) · [p. 72](../../../../../spec/experiment.pdf#page=72) · [p. 73](../../../../../spec/experiment.pdf#page=73) · [p. 74](../../../../../spec/experiment.pdf#page=74) · [p. 75](../../../../../spec/experiment.pdf#page=75) · [p. 76](../../../../../spec/experiment.pdf#page=76) · [p. 80](../../../../../spec/experiment.pdf#page=80).
+
+## Implemented public interface and validation
+
+`build_evaluation_protocol(panel, legibility, *, analysis_plan=None, preflight_reports=None, require_ready=False, configuration_hash=None)` checks the fixed 1,233-item panel and nested 200-item selection, binds prompt/parser/scorer/native/executor code hashes, and emits a draft until all real launch gates pass. `freeze_evaluation_protocol(...)` and `validate_protocol(...)` enforce the frozen state. Canonical report checks are `model_runtime`, `judge_services`, `mbpp_sandbox`, `baseline_repeatability`, `statistical_validation`, and `durable_storage`; legacy native/judge names have explicit aliases. Hash-verified reports must match the configuration and carry actual live evidence. MBPP certification must additionally bind this exact selected panel, current executor implementation bytes, and current supervisor/worker identities. A draft can support baseline preflights but cannot authorize trained evaluation.
+
+Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
+
+The current MBPP gate has actual passing evidence for the fixed selected 203 original suites and isolation/resource probes. The exhaustive diagnostic also passed all 427 sanitized references. The [reference report](../../../../evidence/mbpp_reference_tests.json) and [isolation report](../../../../evidence/mbpp_isolation_checks.json) preserve this evidence without changing panel IDs or task limits. This one passing gate cannot freeze a protocol whose other required gates remain unavailable.
 
 ## Responsibility and controlling details
 

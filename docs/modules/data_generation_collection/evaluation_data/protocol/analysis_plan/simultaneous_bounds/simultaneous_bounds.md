@@ -1,6 +1,14 @@
 # simultaneous_bounds.md
 
-**Owner:** `analysis`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `analysis`. **Implementation status:** implemented and unit tested; actual eligible-frame coverage validation rejected this candidate; confirmatory launch is blocked.
+
+## Implemented interface and frozen construction
+
+`compute_simultaneous_bounds(records_by_state, plan, draws=10000, seed=42, batch_size=128) -> dict` aligns the entire 62-state question vector and computes every scalar gate. `maximum_standardized_bounds(point, replicates, registry, unresolved=None)` implements the H.8.3 upward-deviation formula. Qualification is never inferred from this numerical computation alone.
+
+The frozen candidate is `nested_rao_wu_conservative_v1`: multinomial `n−1` Rao-Wu rescaled multipliers with first-stage factor `sqrt(1−n/N)`, followed by nested legibility `l−1` multipliers with factor `sqrt(1−l/n)` on the same question vectors. GSM strata remain fixed; MMLU capability keeps all 57 fixed subjects and legibility adds its separate 50-of-57 subject stage. Both nested variance components are retained with intended conservatism. The actual eligible-frame simulation nevertheless failed the prospectively fixed joint-coverage rule; retaining these components does not establish conservative bounds. This construction is not certified by precedent or passing unit tests.
+
+Numerical conventions are float64 totals/replicates, bootstrap sample standard deviation (`ddof=1`), 128-draw batches, a distinct seed-42 namespace and empirical 95th percentile `method="higher"`. Zero/unsupported variance (32 machine epsilons), any undefined draw, empty denominator or required unresolved evidence produces an indeterminate gate with a natural-range lower bound; no such gate disappears from the family. Infrastructure-missing baseline generation remains unknown, separately from an ordinary observed unassessable trace. Resampled weighted intersection denominators are recomputed, never fixed to their observed counts.
 
 | Artifact | Exact repository path |
 |---|---|

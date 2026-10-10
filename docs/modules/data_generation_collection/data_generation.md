@@ -1,6 +1,6 @@
 # data_generation.md
 
-**Owner:** `data_preparation`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `data_preparation`. **Implementation status:** Implemented and tested; all three data branches have concrete producers and explicit readiness.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -35,6 +35,14 @@ The following source comments retain the procedural detail of the supplied diagr
 - Both transformation families use the same prompt IDs and split at every level.
 - Evaluation data and protocol must be ready before outcome inspection; independent domain preparation can proceed in parallel.
 - Blue boxes expand into detailed procedures; output boxes state verified handoff artifacts.
+
+## Implemented interface and evidence
+
+`prepare_data(...)` coordinates actual evaluation preparation, the common paired SFT source/interventions and fixed RL questions. It constructs evaluation overlap exclusions from all eligible source-frame questions, preserves original child identities and records complete output paths/hashes. Evaluation/protocol draft status prevents a training-ready package.
+
+All child calls share immutable source revisions and configuration identity. The function does not hide child failures, replace frozen IDs, transform final answers, fabricate missing external assets or mark simulations as live scientific evidence. The common paired source feeds all forty intervention conditions and the independent fixed 800-question manifest feeds only RL.
+
+Unit checks exercise orchestration with explicit fixtures, full source-frame overlap forwarding and child exception propagation. Real public source frames, the 1233/200 selections and 800 RL manifest are prepared. Real paired clean generation/SFT remain blocked on authorized LMSYS access, real construction-model runtime and mandatory preflights.
 
 ## Completion and failure boundary
 

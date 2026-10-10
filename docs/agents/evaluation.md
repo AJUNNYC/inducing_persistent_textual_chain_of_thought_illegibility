@@ -25,7 +25,7 @@ Read the full controlling PDF as needed for your scope, including H.1/H.9 preced
 
 ## Exclusive implementation write list
 
-These are the complete initial implementation-file assignments. Code files are currently empty; populate only within your scope. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
+These are the complete initial implementation-file assignments. The assigned code and tests are populated; maintain edits within this scope. Editing a shared source document, another owner's implementation or the canonical path layout requires coordinator review and synchronized updates.
 
 ```text
 prompts/evaluation_arc_easy.txt
@@ -55,6 +55,16 @@ tests/unit/evaluation/shared_model_evaluation/item_evaluation/test_item_evaluati
 tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py
 tests/unit/evaluation/test_evaluation.py
 ```
+
+## Implemented handoff and current boundary
+
+All ten assigned modules and six evaluation prompts are implemented. The public interfaces, unchanged scientific rules, cache identities, and failure distinctions appear in the corresponding module cards. The coordinator additionally assigned `tests/integration/test_evaluation_handoff.py` and these module/agent documentation updates.
+
+[Owned validation evidence](../evidence/evaluation_validation.json) records fixture-based unit and interoperability checks, including strict missingness and production/simulation boundaries. [Actual MBPP sandbox evidence](../evidence/mbpp_sandbox_check.json) binds the real supervisor/worker, immutable container, original tests, selected 203 item identities, and exhaustive 427 diagnostics. Source references and generated code are never repaired to obtain a passing result, and failed diagnostic attempts remain preserved. The separate supervisor prevents candidate stdout or mutable candidate globals from forging test completion.
+
+The final focused command passed 44 tests. The current actual MBPP certification passed all 427 original sanitized suites and the exact fixed selected 203, with no unsupported reference cases; its separate isolation/resource probes also passed. The [per-reference report](../evidence/mbpp_reference_tests.json) and [isolation report](../evidence/mbpp_isolation_checks.json) preserve complete evidence, while the [prior failed attempt](../evidence/mbpp_sandbox_prior_attempt.json) remains visible. `verified_reference_callback(report_path, *, panel, image=...)` independently checks current executor identity, report integrity, selected bindings, and all 203 retained successes before source-panel certification.
+
+No scientific outcome is claimed by these checks. Actual GPU generation, pinned live judge services, baseline repeatability, statistical validation and durable cloud storage still require their own passing launch evidence; unavailable hardware or external authorization remains explicit. Trained evaluation cannot use a draft protocol.
 
 ## Required handoff
 

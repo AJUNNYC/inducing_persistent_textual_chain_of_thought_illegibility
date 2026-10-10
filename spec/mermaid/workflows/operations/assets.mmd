@@ -1,0 +1,7 @@
+---
+title: "assets operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/assets.py"]
+    CALL --> VERIFY["Bounded immutable upstream provisioning with cache integrity and license authorization"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]

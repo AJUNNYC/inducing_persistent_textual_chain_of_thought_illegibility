@@ -1,0 +1,7 @@
+---
+title: "runpod operational implementation"
+---
+flowchart TD
+    INPUT["Validated configuration and immutable inputs"] --> CALL["src/operations/runpod.py"]
+    CALL --> VERIFY["Concrete authorized REST lifecycle and external persisted billing guard"]
+    VERIFY --> OUT["Actual verified / failed / blocked evidence"]
