@@ -1,0 +1,19 @@
+{
+  "title": "Inducing Persistent Textual Chain-of-Thought Illegibility",
+  "source_policy": "Scientific content derived solely from the supplied controlling PDF and revised Mermaid files; file layout and ownership are explicit organizational conventions.",
+  "pdf": {
+    "path": "spec/experiment.pdf",
+    "pages": 81,
+    "sha256": "160a88b33fd7e970aa0dfc6bac20c729115f4bab75178f89c488e97c6fb15e69"
+  },
+  "original_pdf": {
+    "path": "spec/archive/experiment_original.pdf",
+    "pages": 67,
+    "sha256": "db5e7dcd68b7632f2c222468a02affabe8526bedc48ef2b7139c31077343a704"
+  },
+  "original_revised_mermaid_count": 35,
+  "source_archive": "spec/archive/mermaid_source.json",
+  "full_original_latex_available": false,
+  "scientific_results_included": false,
+  "live_integrations_validated": false
+}
