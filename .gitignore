@@ -13,3 +13,14 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+.secrets/
+*.egg-info/
+.cache/
+node_modules/
+build/
+dist/
+.env.example
+!/.env.example
+
+# npm uses a temporary standard filename from the canonical tracked lock.
+tools/mermaid/package-lock.json

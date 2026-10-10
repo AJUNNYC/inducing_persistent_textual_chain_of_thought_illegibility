@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "evaluation_record",
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "raw_output": {
+      "type": "string"
+    },
+    "reasoning": {
+      "type": "string"
+    },
+    "final_answer": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "correct": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "identity": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "domain": {
+      "enum": [
+        "gsm8k",
+        "mmlu",
+        "arc",
+        "mbpp"
+      ]
+    },
+    "selected": {
+      "type": "boolean"
+    },
+    "assessable": {
+      "type": "boolean"
+    },
+    "qualified_opacity": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "primary_score": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "maximum": 9
+    },
+    "secondary_score": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "maximum": 9
+    },
+    "readable_solution": {
+      "enum": [
+        "present",
+        "not_detected",
+        "uncertain",
+        null
+      ]
+    },
+    "padding": {
+      "enum": [
+        "present",
+        "not_detected",
+        "uncertain",
+        null
+      ]
+    },
+    "raw": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "parsed": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "capability": {
+      "type": "object"
+    },
+    "legibility": {
+      "type": "object"
+    },
+    "scientific_evidence_status": {
+      "enum": [
+        "recorded",
+        "indeterminate"
+      ]
+    }
+  },
+  "required": [
+    "identity",
+    "state_id",
+    "question_id",
+    "domain",
+    "seed",
+    "status",
+    "correct",
+    "selected",
+    "assessable",
+    "qualified_opacity",
+    "primary_score",
+    "secondary_score",
+    "readable_solution",
+    "padding"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "complete"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "public_question",
+          "raw",
+          "parsed",
+          "capability",
+          "legibility",
+          "scientific_evidence_status"
+        ]
+      }
+    }
+  ]
+}

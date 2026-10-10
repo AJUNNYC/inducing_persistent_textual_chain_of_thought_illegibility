@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "readable_solution": {
+      "type": "string",
+      "enum": [
+        "present",
+        "not_detected",
+        "uncertain"
+      ]
+    },
+    "padding": {
+      "type": "string",
+      "enum": [
+        "present",
+        "not_detected",
+        "uncertain"
+      ]
+    }
+  },
+  "required": [
+    "readable_solution",
+    "padding"
+  ],
+  "additionalProperties": false
+}

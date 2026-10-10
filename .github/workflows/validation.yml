@@ -1,0 +1,19 @@
+name: validation
+on: [push, pull_request]
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --require-hashes -r requirements_cpu.lock
+      - run: python -m pip install --no-deps --no-build-isolation -e .
+      - run: python scripts/validate_repository.py
+      - run: pytest tests/unit tests/integration --junitxml=validation.xml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: cp tools/mermaid/package_lock.json tools/mermaid/package-lock.json && npm ci --prefix tools/mermaid
+      - run: node tools/mermaid/validate.mjs

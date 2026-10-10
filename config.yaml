@@ -1,0 +1,325 @@
+seed: 42
+generation:
+  temperature: 0.6
+  top_p: 0.95
+  max_new_tokens: 3072
+  system_prompt: null
+data:
+  sft_train_count: 10000
+  sft_validation_count: 100
+  rl_count: 800
+  prompt_max_tokens: 200
+  minimum_eligible_words: 3
+interventions:
+  rot13:
+    fractions:
+    - '0.1'
+    - '0.2'
+    - '0.3'
+    - '0.4'
+    - '0.5'
+    - '0.6'
+    - '0.7'
+    - '0.8'
+    - '0.9'
+    - '1.0'
+  kazitext:
+    alphas:
+    - '0.200'
+    - '0.301'
+    - '0.454'
+    - '0.684'
+    - '1.031'
+    - '1.553'
+    - '2.339'
+    - '3.524'
+    - '5.310'
+    - '8.000'
+    revision: 435f68748fdded6d79446b8ab6bdf76fbde88818
+    profile: profiles/dev/en_clean_second_learners.json
+    profile_sha256: 8c723dd5925fc872b4ee8a5191f585dee95d1146e849fc80f5e84f3cd0f62d73
+    lang: en
+    alpha_std: 0
+    alpha_uniformity_prob: 0
+    beta: 0
+    no_word_order: true
+    no_error_sentence_boost: 0
+    spelling_detailed_ratio: 0.3
+    strip_all_diacritics: false
+    other_error_aspects_enabled: true
+    udpipe_model: english-ewt-ud-2.5-191206.udpipe
+    udpipe_sha256: 784bd0fa85e3d831fd02a55290d0acfd05c953159dc38cc33d52e1b28add9957
+    aspell_dictionary_provenance:
+      files:
+      - name: en-common.rws
+        sha256: 9d943ec12759193083807920d066ca1399dade58ee265d1ebc8717f372e027bf
+      - name: en-wo_accents-only.rws
+        sha256: 9d8efaedf389d2afa19ab9fada0060b862e8b62b2493ee8a1dd6d62b716c2820
+      - name: en-wo_accents.multi
+        sha256: 3ba8e2c725fe8abbe7a021edfabbb0362e1b53c15dcc0296495efb3deff9d4c0
+      - name: en.dat
+        sha256: abd5a0fb4a5c5be260f603ced735ee7ade2b046fdccffe726a708eac4b7778b6
+      - name: en.multi
+        sha256: 3158dcdac420cd3ca5c15b7d39fcb1c67ef00f306fa8f0845810141002e0bf74
+      - name: en_affix.dat
+        sha256: 1b30f656e5d4f83ce2e8c2ec62d4c1e365e40d4c4ff5e485d0bedf083558d7d5
+      - name: en_phonet.dat
+        sha256: c3256e7ade0fc9cc36b32316ecc8facb61b1257eee7dd6b02d1adbca602b26ab
+      - name: iso-8859-1.cmap
+        sha256: 9de3aed252bba752373efe8954ffe2b49d4b7b0bfff57f770dddda69e665ff4e
+      - name: iso-8859-1.cset
+        sha256: 981608b54fff0b5acc52d8ca11e5a03ee363348f5f5180ea07460e28bbbe601f
+      - name: standard.kbd
+        sha256: 8d0af7403a8cf8db7e4b7eac01b2ad09fc40903d5b3a131b9a52dbf9d9839758
+      settings:
+        actual-lang: en
+        affix-char: /
+        affix-compress: false
+        backup: true
+        byte-offsets: false
+        camel-case: false
+        clean-affixes: true
+        clean-words: false
+        encoding: UTF-8
+        filter:
+        - url
+        guess: false
+        ignore: 1
+        ignore-accents: false
+        ignore-case: false
+        ignore-repl: false
+        invisible-soundslike: false
+        jargon: ''
+        keyboard: standard
+        keymapping: aspell
+        lang: en
+        language-tag: en
+        master-flags: ''
+        mode: url
+        module: default
+        module-search-order: []
+        norm-form: nfc
+        norm-required: false
+        norm-strict: false
+        normalize: true
+        partially-expand: false
+        reverse: false
+        run-together: false
+        run-together-limit: 2
+        run-together-min: 3
+        save-repl: true
+        set-prefix: true
+        size: '60'
+        skip-invalid-words: true
+        spelling: ''
+        sug-mode: normal
+        sug-repl-table: true
+        sug-split-char:
+        - ' '
+        - '-'
+        sug-typo-analysis: true
+        suggest: true
+        time: false
+        use-other-dicts: true
+        validate-affixes: true
+        validate-words: true
+        variety:
+        - default
+        warn: true
+sft:
+  quantization: nf4
+  load_in_4bit: true
+  double_quantization: true
+  compute_dtype: bfloat16
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  target_modules: &id001
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+  learning_rate: 0.0002
+  optimizer: paged_adamw_32bit
+  scheduler: cosine
+  warmup_ratio: 0.03
+  epochs: 2
+  effective_batch_size: 16
+  microbatch_size: 1
+  gradient_accumulation_steps: 16
+  max_seq_length: 4096
+  weight_decay: 0
+  max_grad_norm: 0.3
+  gradient_checkpointing: true
+  early_stopping: false
+  checkpoint_interval: 100
+  loss_mask: completion_only
+  loss_reduction: mean_supervised_tokens_per_example_then_mean_examples
+  training_template_version: native_training_template_v1
+rl:
+  steps: 100
+  questions_per_step: 8
+  completions_per_question: 4
+  temperature: 1.0
+  top_p: 1.0
+  top_k: 0
+  repetition_penalty: 1.0
+  max_new_tokens: 2048
+  lora_rank: 32
+  lora_alpha: 32
+  learning_rate: 5.0e-06
+  beta: 0.01
+  opacity_weight: 0.5
+  checkpoint_interval: 10
+  loss_type: dr_grpo
+  scale_rewards: group
+  num_iterations: 1
+  importance_sampling_level: token
+  epsilon: 0.2
+  epsilon_high: 0.2
+  reference_policy: frozen_original
+  mask_truncated_completions: false
+  use_vllm: false
+  reshuffle: false
+  entropy_bonus: 0
+  optimizer: adamw
+  scheduler: constant
+  compute_dtype: bfloat16
+  weight_decay: 0.0
+  lora_dropout: 0.0
+  target_modules: *id001
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-08
+  max_grad_norm: 1.0
+  advantage_epsilon: 0.0001
+  quantization: nf4
+  load_in_4bit: true
+  double_quantization: true
+  std_correction: 1
+  microbatch_size: 1
+  gradient_accumulation_steps: 32
+evaluation:
+  capability_counts:
+    gsm8k: 300
+    mmlu: 399
+    arc: 331
+    mbpp: 203
+  legibility_per_domain: 50
+  seed: 42
+  repeatability_seeds:
+  - 43
+  - 44
+  mbpp:
+    cpu_count: 1
+    memory_bytes: 1073741824
+    cpu_seconds: 5
+    wall_seconds: 10
+judges:
+  primary_model: gpt-4o-2024-11-20
+  secondary_model: claude-sonnet-5-5
+  reward_model: claude-sonnet-5-5
+  max_tokens: 64
+  gpt_temperature: 0
+  sonnet_thinking_type: between_tools
+  sonnet_effort: low
+  max_concurrency: 8
+  quota_limits: null
+  quota_evidence: null
+recovery:
+  max_operation_retries: 3
+  max_worker_retries: 100
+analysis:
+  bootstrap_draws: 10000
+  seed: 42
+  total_windows: 216
+  coverage: 0.95
+criteria:
+  minimum_window_length: 3
+  per_level_retention: 0.8
+  joint_retention: 0.6
+  qualified_opacity: 0.5
+  opacity_increase: 0.2
+  primary_score_threshold: 6
+  transfer_nonmath_domains: 2
+version: resolved_science_v1
+models:
+  7b:
+    id: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+    revision: 916b56a44061fd5cd7d6a8fb632557ed4f724f60
+    tokenizer_revision: 916b56a44061fd5cd7d6a8fb632557ed4f724f60
+  14b:
+    id: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+    revision: 1df8507178afcc1bef68cd8c393f61a886323761
+    tokenizer_revision: 1df8507178afcc1bef68cd8c393f61a886323761
+datasets:
+  lmsys:
+    id: lmsys/lmsys-chat-1m
+    revision: 200748d9d3cddcc9d782887541057aca0b18c5da
+  gsm8k:
+    id: openai/gsm8k
+    revision: 740312add88f781978c0658806c59bc2815b9866
+  mmlu:
+    id: edinburgh-dawg/mmlu-redux-2.0
+    revision: 372ea425445d51e1ba1188c56e5e893f8138621f
+  arc:
+    id: allenai/ai2_arc
+    revision: 210d026faf9955653af8916fad021475a3f00453
+    configuration: ARC-Easy
+  mbpp:
+    id: google-research-datasets/mbpp
+    revision: 4bb6404fdc6cacfda99d4ac4205087b89d32030c
+    configuration: sanitized
+runtime:
+  artifact_root: artifacts
+  data_root: data
+  cache_root: /workspace/model_cache
+  dependency_lock_hash: null
+  implementation_revision: null
+  durability_evidence: null
+  code_version: implementation_v1
+  credential_env:
+    openai:
+    - MODEL_OPENAI_API_KEY
+    - OPENAI_API_KEY
+    anthropic:
+    - ANTHROPIC_API_KEY
+    runpod:
+    - RUNPOD_API_KEY
+    google_drive:
+    - GOOGLE_APPLICATION_CREDENTIALS
+    - GOOGLE_OAUTH_TOKEN_FILE
+spending:
+  authorized: false
+  authorized_usd: 0
+  planning_envelope_usd: 300
+  warning_fractions:
+  - 0.75
+  - 0.8
+  - 0.9
+  scheduling_stop_fraction: 0.95
+  reward_service_allowance_usd: 75
+  authorization_evidence: null
+  provider_prices: null
+  pricing_evidence: null
+operations:
+  drive_folder_id: null
+  runpod_template_id: null
+  persistent_volume_id: null
+  backup_root: null
+  gpu_minimum_vram_gb: 48
+  udpipe_path: /workspace/illegibility_aux/udpipe/english-ewt-ud-2.5-191206.udpipe
+  aspell_dictionary_files:
+  - /workspace/illegibility_aux/aspell/data/en-wo_accents.multi
+  - /workspace/illegibility_aux/aspell/data/en.dat
+  - /workspace/illegibility_aux/aspell/data/en.multi
+  - /workspace/illegibility_aux/aspell/data/en_affix.dat
+  - /workspace/illegibility_aux/aspell/data/en_phonet.dat
+  - /workspace/illegibility_aux/aspell/data/iso-8859-1.cmap
+  - /workspace/illegibility_aux/aspell/data/iso-8859-1.cset
+  - /workspace/illegibility_aux/aspell/data/standard.kbd
+  - /workspace/illegibility_aux/aspell/dictionaries/en-common.rws
+  - /workspace/illegibility_aux/aspell/dictionaries/en-wo_accents-only.rws

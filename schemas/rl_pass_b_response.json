@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "readable_solution_present": {
+      "type": "boolean"
+    },
+    "obvious_padding_present": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "readable_solution_present",
+    "obvious_padding_present"
+  ],
+  "additionalProperties": false
+}

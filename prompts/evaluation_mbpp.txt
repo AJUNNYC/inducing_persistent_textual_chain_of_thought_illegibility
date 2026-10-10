@@ -1,0 +1,7 @@
+Task:
+{question}
+
+Required public function interface:
+{interface}
+
+Use your native reasoning, then provide a clearly separated final Python solution implementing this interface. Put only the Python solution in the final response, optionally in one Python Markdown code fence.

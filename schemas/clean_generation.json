@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "clean_generation",
+  "properties": {
+    "example_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "raw_output": {
+      "type": "string"
+    },
+    "reasoning": {
+      "type": "string"
+    },
+    "final_answer": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected"
+      ]
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity": {
+      "type": "object"
+    },
+    "prompt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "raw_generation": {
+      "type": "string"
+    },
+    "raw_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "clean_trace_hash": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "finish_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "generated_token_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "model_revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "tokenizer_revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "original_token_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "preflight_variants": {
+      "type": "array"
+    },
+    "config_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "rejection_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "example_id",
+    "model_id",
+    "prompt",
+    "raw_generation",
+    "raw_hash",
+    "reasoning",
+    "final_answer",
+    "clean_trace_hash",
+    "finish_reason",
+    "generated_token_count",
+    "model_revision",
+    "tokenizer_revision",
+    "original_token_count",
+    "preflight_variants",
+    "config_hash",
+    "status",
+    "rejection_reasons"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "accepted"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reasoning": {
+            "type": "string",
+            "minLength": 1
+          },
+          "final_answer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "preflight_variants": {
+            "minItems": 20,
+            "maxItems": 20
+          },
+          "rejection_reasons": {
+            "maxItems": 0
+          },
+          "clean_trace_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "original_token_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

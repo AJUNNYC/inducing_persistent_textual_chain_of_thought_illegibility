@@ -1,0 +1,5 @@
+{question}
+
+Give any intermediate reasoning you choose, then end once with a final line in this exact form:
+Final answer: \boxed{NUMBER}
+Replace NUMBER with your numeric answer.

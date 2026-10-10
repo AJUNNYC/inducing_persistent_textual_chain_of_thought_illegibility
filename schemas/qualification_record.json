@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "construction_qualification_record_v1",
+  "type": "object",
+  "required": ["window_id", "branch", "model", "levels", "status", "transfer_pairs", "gate_ids"],
+  "properties": {
+    "window_id": {"type": "string", "minLength": 1},
+    "branch": {"enum": ["rot13", "kazitext", "rl"]},
+    "model": {"enum": ["7b", "14b"]},
+    "levels": {"type": "array", "minItems": 3, "maxItems": 10, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 10}},
+    "status": {"enum": ["passed", "failed", "indeterminate"]},
+    "mandatory_status": {"enum": ["passed", "failed", "indeterminate"]},
+    "transfer_domains": {"type": "object"},
+    "transfer_pairs": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "object", "required": ["domains", "status"], "properties": {"domains": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"enum": ["mmlu", "arc", "mbpp"]}}, "status": {"enum": ["passed", "failed", "indeterminate"]}}}},
+    "qualifying_pairs": {"type": "array"},
+    "gate_ids": {"type": "object", "required": ["mandatory", "transfer"], "properties": {"mandatory": {"type": "array", "items": {"type": "string"}}, "transfer": {"type": "object", "required": ["mmlu", "arc", "mbpp"]}}}
+  },
+  "additionalProperties": false
+}

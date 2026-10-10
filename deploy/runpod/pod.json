@@ -1,0 +1,28 @@
+{
+  "name": "persistent_cot_illegibility",
+  "imageName": "REPLACE_WITH_AUTHORIZED_REGISTRY_IMAGE_DIGEST",
+  "gpuTypeIds": [
+    "NVIDIA A100 80GB PCIe",
+    "NVIDIA H100 80GB HBM3"
+  ],
+  "gpuCount": 1,
+  "cloudType": "SECURE",
+  "containerDiskInGb": 30,
+  "volumeInGb": 250,
+  "volumeMountPath": "/workspace",
+  "minRAMPerGPU": 64,
+  "minVCPUPerGPU": 8,
+  "ports": [
+    "22/tcp"
+  ],
+  "env": {},
+  "dockerStartCmd": [
+    "/bin/bash",
+    "-lc",
+    "illegibility hardware && exec sleep infinity"
+  ],
+  "dockerEntrypoint": [
+    "/usr/bin/tini",
+    "--"
+  ]
+}

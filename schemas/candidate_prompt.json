@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "candidate_prompt",
+  "properties": {
+    "example_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "source_content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "candidate_order": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_dataset": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_split": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deduplication_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_token_counts": {
+      "type": "object",
+      "properties": {
+        "7b": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "14b": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "7b",
+        "14b"
+      ]
+    },
+    "normalization_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "extraction_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "eligible"
+    }
+  },
+  "required": [
+    "example_id",
+    "prompt",
+    "source_id",
+    "source_index",
+    "source_dataset",
+    "source_split",
+    "source_revision",
+    "source_content_hash",
+    "deduplication_identity",
+    "input_token_counts",
+    "normalization_version",
+    "extraction_version",
+    "candidate_order",
+    "status"
+  ]
+}
