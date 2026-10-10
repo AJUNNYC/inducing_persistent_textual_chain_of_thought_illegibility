@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/configuration.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: E.2.3; H.1,H.9; PDF pages 54, 55, 68, 80.
+%% Repository module: src/shared_procedures/configuration.py
+%% Module documentation: docs/modules/shared_procedures/configuration.md
+%% Unit test: tests/unit/shared_procedures/test_configuration.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/configuration.py"]
+    CONTRACT["Load, validate, resolve and hash the scientific configuration; preserve fixed settings and stop on invalid input."]
+    DOCUMENT["docs/modules/shared_procedures/configuration.md"]
+    TEST["tests/unit/shared_procedures/test_configuration.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

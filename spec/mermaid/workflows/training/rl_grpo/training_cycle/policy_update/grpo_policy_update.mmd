@@ -1,0 +1,45 @@
+---
+title: "spec/mermaid/workflows/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.mmd"
+---
+flowchart TD
+%% GRPO policy optimization
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% A rollback requirement never advances the completed-step counter.
+%% Caller restores last verified exact-run checkpoint and replays required steps with new attempt IDs.
+%% Retry budgets persist across rollback; zero-variance groups are measured outcomes, not runtime errors.
+%% Never synthesize reward variation or fabricate missing historical checkpoints.
+%% Save steps 10,20,...,100, including policy, optimizer, scheduler, RNG and data position.
+%% GRPO with Dr. GRPO loss normalization: loss_type=dr_grpo, scale_rewards=group, num_iterations=1.
+%% Token-level importance sampling; symmetric epsilon=epsilon_high=.2; fixed original reference, no synchronization.
+%% Use the frozen constant Dr. GRPO denominator rather than a response-length denominator.
+%% Invalid truncated responses remain in the loss; no entropy bonus or adaptive reward changes.
+%% Verify the actual 8-question / 4-completion grouping and one optimizer update in a controlled preflight fixture.
+%% Child: RECOVER => ../../../../shared_procedures/recovery_procedure.mmd
+    INPUT["32 verified rewards in groups of four responses"]
+    LOG["Log correctness, opacity, group variance and KL"]
+    UPDATE["Perform one 32-completion GRPO update with Dr. GRPO normalization"]
+    DUE{"Completed step divisible by 10?"}
+    SAVE["Save and verify full checkpoint"]
+    OUT["Return verified boundary after a completed step"]
+    RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover / roll back state"]
+    ROLLBACK["Return rollback requirement to run coordinator"]
+    STOP["Stop: recovery unavailable or exhausted"]
+    INPUT --> LOG --> UPDATE --> DUE
+    DUE -->|No| OUT
+    DUE -->|Yes| SAVE --> OUT
+    UPDATE -.->|Failure| RECOVER
+    SAVE -.->|Failure| RECOVER
+    RECOVER -->|Verified live state and save retry| SAVE
+    RECOVER -->|Partial state with rollback permitted| ROLLBACK
+    RECOVER -->|Not permitted| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class RECOVER detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py
+%% Module documentation: docs/modules/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.md
+%% Unit test: tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py
+%% Owner: rl
+%% Source sections: C.3.5; E.1.3–E.1.4; E.2.6; H.7

@@ -1,0 +1,38 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/sft_data/sft_data_preparation.mmd"
+---
+flowchart TD
+%% SFT data preparation
+%% Edit quoted node labels directly; this is native Mermaid.
+%% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
+%% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
+%% SFT data preparation
+%% Both models use the same IDs; each model contributes its own traces.
+%% Candidate order / rules are fixed first; accepted IDs are frozen only after collection.
+%% Every child must return a verified completion; stop propagates to this parent.
+%% Transformed-data construction
+%% All levels share the same 10,000 train IDs and separate 100 validation IDs.
+%% Accepted clean traces are untransformed, structurally valid baseline outputs, not verified correct reasoning.
+%% Each trace has at least three eligible words; short traces and repeated masks remain eligible.
+%% Child: COLLECT => clean_trace_collection/clean_trace_collection.mmd
+%% Child: ROT => rot13/rot13_data_construction.mmd
+%% Child: KAZ => kazitext/kazitext_data_construction.mmd
+    INPUT["Fixed candidate order, rules and model identities"]
+    COLLECT["src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py<br/>Clean trace collection<br/>Collect 10,100 accepted clean pairs"]
+    FREEZE["Freeze common IDs and traces from each model<br/>10,000 train + 100 validation"]
+    ROT["src/data_generation_collection/sft_data/rot13/rot13_data_construction.py<br/>ROT13 data construction<br/>Construct datasets for both models at all 10 levels"]
+    KAZ["src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py<br/>KaziText data construction<br/>Construct datasets for both models at all 10 levels"]
+    WAIT["Wait for both verified transformation families"]
+    OUT["Release 40 verified train / validation pairs"]
+    INPUT --> COLLECT --> FREEZE
+    FREEZE --> ROT --> WAIT
+    FREEZE --> KAZ --> WAIT
+    WAIT --> OUT
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class COLLECT,ROT,KAZ detail
+
+%% Repository module: src/data_generation_collection/sft_data/sft_data_preparation.py
+%% Module documentation: docs/modules/data_generation_collection/sft_data/sft_data_preparation.md
+%% Unit test: tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py
+%% Owner: data_preparation
+%% Source sections: 3.1; B.1; C.1–C.2.3; E.2.2–E.2.4; H.2–H.3

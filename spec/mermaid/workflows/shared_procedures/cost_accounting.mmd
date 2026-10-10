@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/cost_accounting.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: 5; B.1.4; C.2.4; E.1.4–E.1.5,E.2.5; H.6.4; PDF pages 6, 19, 30, 51, 52, 56, 76.
+%% Repository module: src/shared_procedures/cost_accounting.py
+%% Module documentation: docs/modules/shared_procedures/cost_accounting.md
+%% Unit test: tests/unit/shared_procedures/test_cost_accounting.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/cost_accounting.py"]
+    CONTRACT["Track GPU, API, storage and in-flight costs; enforce current authorization and block new spending when unavailable."]
+    DOCUMENT["docs/modules/shared_procedures/cost_accounting.md"]
+    TEST["tests/unit/shared_procedures/test_cost_accounting.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/checkpointing.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: E.1.3; E.2.3,E.2.6; PDF pages 50, 51, 55, 56, 57.
+%% Repository module: src/shared_procedures/checkpointing.py
+%% Module documentation: docs/modules/shared_procedures/checkpointing.md
+%% Unit test: tests/unit/shared_procedures/test_checkpointing.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/checkpointing.py"]
+    CONTRACT["Save, verify and restore full training state at original step identities; retain specified recovery and scientific snapshots."]
+    DOCUMENT["docs/modules/shared_procedures/checkpointing.md"]
+    TEST["tests/unit/shared_procedures/test_checkpointing.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

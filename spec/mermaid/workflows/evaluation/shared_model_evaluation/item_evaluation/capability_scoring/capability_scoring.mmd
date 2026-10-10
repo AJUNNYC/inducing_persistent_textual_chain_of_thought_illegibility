@@ -1,0 +1,39 @@
+---
+title: "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.mmd"
+---
+flowchart TD
+%% Capability scoring
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Missing / malformed answers follow the frozen scoring policy; preserve these outcomes.
+%% MBPP wrong code, test failures or task-defined timeouts are outcomes; broken sandbox is infrastructure failure.
+%% Score dependency identity includes raw hash, parser/scorer and reference/test versions.
+%% Known infrastructure failures use bounded recovery; exhausted failures return incomplete, not incorrect.
+%% MBPP uses task plus the frozen public interface, with scoring tests and reference implementations withheld from generation.
+%% Extract the designated final code field; optionally remove one surrounding Python code fence only.
+%% Execute exactly that code. Never repair indentation, rename functions or insert missing code.
+%% Syntax errors, failing tests and task-defined timeouts are unsuccessful model outcomes; broken executor is infrastructure failure.
+%% No test feedback or repair loop. Report this project-specific withheld-test MBPP variant explicitly.
+    INPUT["Parsed answer and frozen scoring specification"]
+    CACHE["Check exact score dependency identity"]
+    HIT{"Valid score cached?"}
+    DOMAIN{"Which task type?"}
+    NUM["GSM8K<br/>Numeric exact match"]
+    CHOICE["MMLU / ARC<br/>Fixed parsing of choice labels"]
+    PARSECODE["Extract final code; remove at most one Python fence; make no repairs"]
+    CODE["MBPP<br/>Isolated tests with no network or host access<br/>1 CPU and 1 GiB memory<br/>5 CPU seconds and 10 wall seconds"]
+    SAVE["Save score and output status"]
+    OUT["Return verified capability outcome"]
+    INPUT --> CACHE --> HIT
+    HIT -->|Yes| OUT
+    HIT -->|No| DOMAIN
+    DOMAIN -->|Math| NUM --> SAVE
+    DOMAIN -->|Multiple choice| CHOICE --> SAVE
+    DOMAIN -->|Code| PARSECODE --> CODE --> SAVE
+    SAVE --> OUT
+
+%% Repository module: src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py
+%% Module documentation: docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.md
+%% Unit test: tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py
+%% Owner: evaluation
+%% Source sections: D.1.2; E.2.3,E.2.7; H.4

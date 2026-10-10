@@ -1,0 +1,44 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd"
+---
+flowchart TD
+%% Capability panel construction
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Record pool revisions, source IDs and exclusions; validate MBPP tests before freezing.
+%% MBPP prompts expose only the task and mechanically extracted public function interface.
+%% The interface manifest contains required entry point names, parameters and defaults from the pinned source.
+%% Withhold every scoring test, reference implementation, helper body, algorithm fragment,
+%% assertion, expected output and solution comment from prompts and judge inputs.
+%% This is a project-specific withheld-test MBPP variant, not directly comparable to published test-visible scores.
+%% Child: REPAIR => ../../../shared_procedures/recovery_procedure.mmd
+    INPUT["Fix eligibility / overlap rules<br/>Sampling seed 42"]
+    GSM["GSM8K test: 300<br/>100 per tercile of reference length"]
+    MMLU["MMLU Redux 2.0: 399<br/>7 items with clean labels per subject<br/>57 subjects"]
+    ARC["ARC Easy test: 331<br/>Uniform fixed sample"]
+    MBPP["Sanitized MBPP: 203<br/>From 427 verified tasks"]
+    INTERFACE["Freeze required public function interfaces; withhold scoring tests and solutions"]
+    JOIN["Wait for all four domain selections"]
+    CHECK{"Counts, uniqueness, references<br/>and exclusions valid?"}
+    REPAIR["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Repair construction before freezing"]
+    OUT["Return 1,233 verified items"]
+    STOP["Stop: impossible quotas or rules"]
+    INPUT --> GSM --> JOIN
+    INPUT --> MMLU --> JOIN
+    INPUT --> ARC --> JOIN
+    INPUT --> MBPP --> INTERFACE --> JOIN
+    JOIN --> CHECK
+    CHECK -->|Yes| OUT
+    CHECK -->|No| REPAIR
+    REPAIR -->|Same rules and retry permitted| INPUT
+    REPAIR -->|Not permitted| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class REPAIR detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py
+%% Module documentation: docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md
+%% Unit test: tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py
+%% Owner: data_preparation
+%% Source sections: D.1.2; H.4

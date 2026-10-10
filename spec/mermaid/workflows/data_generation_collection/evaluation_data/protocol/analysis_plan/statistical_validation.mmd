@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: G.10; H.8; PDF pages 67, 78, 79, 80.
+%% Repository module: src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py
+%% Module documentation: docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.md
+%% Unit test: tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py
+%% Owner: analysis
+    MODULE["src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py"]
+    CONTRACT["Freeze and execute the design-aware simultaneous-bound simulation plan and quantitative coverage acceptance rule before trained outcome inspection."]
+    DOCUMENT["docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.md"]
+    TEST["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

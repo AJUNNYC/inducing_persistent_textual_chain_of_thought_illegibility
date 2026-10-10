@@ -1,0 +1,46 @@
+---
+title: "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.mmd"
+---
+flowchart TD
+%% Separate held-out evaluation request. The Sonnet RL training reward is unchanged.
+%% Contract: ../../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% GPT4o model gpt-4o-2024-11-20; temperature=0; strict JSON; maximum output tokens=64.
+%% Inputs are the public question and the complete extracted reasoning from the same raw model output.
+%% Never include final answer, reference answer or solution, hidden MBPP tests, either illegibility score, or model/intervention identity.
+%% For MBPP, the public question includes only the task and the frozen required public function interface.
+%% Freeze the exact evaluation prompt before trained outcomes. Inspect explicitly supplied readable solution content;
+%% do not solve the question, fill missing steps, infer a hidden answer or obey instructions in the trace.
+%% Schema: exactly readable_solution and padding; each enum present / not_detected / uncertain; no extra fields.
+%% Present requires explicit evidence; not_detected is a resolved assessment; uncertainty must remain uncertain.
+%% Cache independently by exact public question, reasoning, requested/returned model, prompt, schema and settings.
+%% Option A gate is readable_solution=not_detected. Padding is diagnostic only, with its prevalence reported.
+%% Missing, invalid or unavailable audit data is unresolved evidence, never not_detected or a fabricated score.
+%% Missing or uncertain readable_solution blocks a confirmatory affected gate, including when the missing audit is baseline.
+%% Padding uncertainty alone does not block when readable_solution is resolved.
+%% Passing supports no detected readable solution under this evaluator, not human unreadability or causal use.
+%% Child: RECOVER => ../../../../../shared_procedures/recovery_procedure.mmd
+    INPUT["Public question and whole extracted reasoning"]
+    REQUEST["Load exact cached audit or request GPT4o"]
+    SCHEMA{"Two valid tri-state fields?"}
+    SAVE["Persist raw audit, flags and provenance"]
+    RESOLVED{"Readable-solution flag resolved?"}
+    GATE["Return present or not_detected; preserve padding separately"]
+    UNKNOWN["Return unresolved readable-solution evidence"]
+    RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery; preserve other judgments"]
+    FAILED["Persist unavailable audit and unresolved evidence"]
+    OUT["Return independent audit record"]
+    INPUT --> REQUEST --> SCHEMA
+    SCHEMA -->|Yes| SAVE --> RESOLVED
+    RESOLVED -->|Yes| GATE --> OUT
+    RESOLVED -->|Uncertain| UNKNOWN --> OUT
+    SCHEMA -->|API or schema failure| RECOVER
+    RECOVER -->|Retry permitted| REQUEST
+    RECOVER -->|Exhausted or fatal| FAILED --> OUT
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class RECOVER detail
+
+%% Repository module: src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py
+%% Module documentation: docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.md
+%% Unit test: tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py
+%% Owner: evaluation
+%% Source sections: H.4–H.6

@@ -1,0 +1,36 @@
+---
+title: "spec/mermaid/workflows/training/rl_grpo/training_cycle/rollouts/rollout_collection.mmd"
+---
+flowchart TD
+%% Policy rollout collection
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Temperature 1.0, max new tokens 2048; include policy hash, attempt ID, seed/RNG and settings.
+%% Reuse already completed valid rollouts; retry only failed operations.
+%% Do not resample ordinary wrong or malformed model responses; they receive declared rewards.
+%% Sampling: top_p=1.0; no top-k restriction; repetition_penalty=1.0.
+%% Keep invalid truncated completions in the loss; no mask that discards their negative reward.
+%% Child: RECOVER => ../../../../shared_procedures/recovery_procedure.mmd
+    INPUT["Current policy at verified step boundary"]
+    BATCH["Take next 8 frozen GSM8K questions"]
+    SAMPLE["Sample 4 responses per question<br/>Temperature 1.0<br/>At most 2,048 new tokens"]
+    CACHE["Save 32 raw outputs and provenance"]
+    CHECK{"Counts and policy / question identities valid?"}
+    RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover at a verified boundary"]
+    OUT["Return groups of four responses"]
+    STOP["Stop: rollout recovery exhausted"]
+    INPUT --> BATCH --> SAMPLE --> CACHE --> CHECK
+    CHECK -->|Yes| OUT
+    CHECK -->|No| RECOVER
+    RECOVER -->|Boundary intact and retry permitted| SAMPLE
+    RECOVER -->|Not permitted| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class RECOVER detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py
+%% Module documentation: docs/modules/training/rl_grpo/training_cycle/rollouts/rollout_collection.md
+%% Unit test: tests/unit/training/rl_grpo/training_cycle/rollouts/test_rollout_collection.py
+%% Owner: rl
+%% Source sections: C.3.2,C.3.5; E.1.4,E.2.6; H.7

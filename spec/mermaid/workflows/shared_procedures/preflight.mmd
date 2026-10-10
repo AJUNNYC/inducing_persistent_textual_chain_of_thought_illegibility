@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/preflight.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: 5; E.1–E.2.8; G.9–G.10; H.4,H.7–H.9; PDF pages 6, 49, 50, 51, 57, 58, 67, 72, 77, 79, 80.
+%% Repository module: src/shared_procedures/preflight.py
+%% Module documentation: docs/modules/shared_procedures/preflight.md
+%% Unit test: tests/unit/shared_procedures/test_preflight.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/preflight.py"]
+    CONTRACT["Check model/runtime identity, actual loss masks and gradients, persistence/recovery, APIs, sandbox, baseline measurement and statistical readiness before affected launches."]
+    DOCUMENT["docs/modules/shared_procedures/preflight.md"]
+    TEST["tests/unit/shared_procedures/test_preflight.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

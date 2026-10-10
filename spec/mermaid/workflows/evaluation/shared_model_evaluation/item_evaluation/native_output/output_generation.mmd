@@ -1,0 +1,45 @@
+---
+title: "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.mmd"
+---
+flowchart TD
+%% Native evaluation output generation
+%% Edit quoted node labels directly; this is native Mermaid.
+%% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
+%% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
+%% Native evaluation output generation
+%% No opacity instruction. Temperature .6, top_p .95, seed 42; token limits frozen in protocol.
+%% Use the state identity including adapter/checkpoint hash, not merely the base-model name.
+%% Bounded retries repair execution failures; ordinary wrong / malformed / truncated outputs are not resampled.
+%% Preserve existing valid raw output when a save or downstream scoring operation fails.
+%% Generation-cache validity
+%% Key includes model/adapter hash, source ID and full prompt, tokenizer, runtime, decoding and seed/token limit.
+%% Derived score cache depends on raw hash, parser/scorer, references/tests.
+%% Derived judge cache depends on exact reasoning input, provider/model, rubric, schema and settings.
+%% Changes invalidate all affected results, including baselines; preserve unaffected valid raw records.
+%% Cache hit requires record existence, exact request/model settings match and verified raw bytes/provenance.
+%% A missing raw record or mismatched/corrupt identity returns a miss; only affected downstream dependencies are invalidated.
+%% Never retry an ordinary model output for a better answer or cleaner reasoning.
+%% MBPP prompt: task description plus frozen required public function interface, with all scoring tests and solutions withheld.
+%% Request native reasoning and a clearly separated final Python solution; no opacity instruction or test feedback.
+%% One generation per task; no repair loop. This withheld-test MBPP variant must be labeled in reports.
+    INPUT["Exact model, question and generation settings"]
+    HIT{"Exact verified cache hit for raw output?"}
+    LOAD["Load matching raw output"]
+    INVALIDATE["Invalidate affected stale derived records"]
+    GEN["Generate native answer once<br/>No opacity instruction<br/>3,072 new tokens with seed 42<br/>Never resample an ordinary bad answer"]
+    SAVE["Save raw output and provenance"]
+    OUT["Return raw output"]
+    STOP["Stop after bounded recovery fails"]
+    INPUT --> HIT
+    HIT -->|Yes| LOAD --> OUT
+    HIT -->|No| INVALIDATE --> GEN --> SAVE --> OUT
+    GEN -.->|Unrecoverable| STOP
+    SAVE -.->|Unrecoverable| STOP
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py
+%% Module documentation: docs/modules/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.md
+%% Unit test: tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py
+%% Owner: evaluation
+%% Source sections: D.1.2,D.2.4; E.2.3,E.2.7; H.4,H.9

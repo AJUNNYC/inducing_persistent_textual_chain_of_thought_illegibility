@@ -1,0 +1,37 @@
+---
+title: "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/rl_reward.mmd"
+---
+flowchart TD
+%% RL reward computation
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Invoke once per response; parent waits for all 32 rewards.
+%% O=(J*-1)/8; J*=min(J,3) if readable solution flagged, otherwise J.
+%% Q=0 if padding flagged, otherwise 1. Incorrect / invalid answers invoke no judge.
+%% An API/schema failure is an infrastructure failure, never a fabricated numerical reward.
+%% This two-pass Sonnet training reward is unchanged by the separate post-training GPT4o Option A audit.
+%% Training still uses the readable-solution score cap and padding bonus suppression exactly as specified.
+%% Child: JUDGE => sonnet_judgment/sonnet_opacity_judgment.mmd
+    INPUT["One cached response and reference answer"]
+    VERIFY{"Verify final answer"}
+    INVALID["Invalid or missing answer<br/>Reward equals negative 1"]
+    WRONG["Valid incorrect answer<br/>Reward = 0"]
+    JUDGE["src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py<br/>Sonnet opacity judgment"]
+    BONUS["Correct answer<br/>Reward = 1 + 0.5 × O × Q"]
+    OUT["Return verified response reward"]
+    STOP["Return infrastructure failure<br/>No fabricated reward or partial group update"]
+    INPUT --> VERIFY
+    VERIFY -->|Invalid| INVALID --> OUT
+    VERIFY -->|Incorrect| WRONG --> OUT
+    VERIFY -->|Correct| JUDGE --> BONUS --> OUT
+    JUDGE -.->|Unrecoverable| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class JUDGE detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/training/rl_grpo/training_cycle/rewards/rl_reward.py
+%% Module documentation: docs/modules/training/rl_grpo/training_cycle/rewards/rl_reward.md
+%% Unit test: tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py
+%% Owner: rl
+%% Source sections: C.3.2–C.3.5; E.1.4; H.6.3,H.7

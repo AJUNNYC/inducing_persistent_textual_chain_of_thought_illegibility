@@ -1,0 +1,38 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/recovery_procedure.mmd"
+---
+flowchart TD
+%% Shared bounded recovery
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: recovery_procedure.mmd applies to execution failures.
+%% Missing finite retry configuration is fatal; counters persist across re-entry, restart and rollback.
+%% Ordinary bad model answers / rejected candidates / zero variance are outcomes, not execution failures.
+%% Invalid frozen sources, impossible quotas, unclassified faults or changed scientific semantics stop the worker.
+%% Repairs invalidate all affected derived results, including baselines; retain unaffected valid upstream results.
+%% Partially updated training state requires full-checkpoint rollback; reward cache is insufficient.
+%% Both per-operation and global retry limits apply; verified checkpoint backups retain original step identity.
+    INPUT["Execution failure with operation identity"]
+    CONFIG["Load persistent retry counters<br/>At most 3 retries per operation<br/>Count SDK retries within that allowance<br/>At most 100 retries per worker"]
+    SAFE{"Known safe repair and budget available?"}
+    COUNT["Persist attempt increment"]
+    REPAIR["Retry only the failed operation<br/>Respect Retry After or bounded backoff<br/>Keep valid cached outputs"]
+    VERIFY{"State and artifacts verified?"}
+    OUT["Return safe retry / resume permission"]
+    STOP["Stop affected worker and preserve results<br/>No retry for quota failure or frozen input faults"]
+    INPUT --> CONFIG --> SAFE
+    SAFE -->|Yes| COUNT --> REPAIR --> VERIFY
+    SAFE -->|No| STOP
+    VERIFY -->|Yes| OUT
+    VERIFY -->|No| SAFE
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Three retries per judge request are inherited from the design. Extending this limit to known artifact repairs
+%% and setting a 100-retry worker cap are new engineering defaults. Counters survive restarts and rollback.
+%% Waits use Retry-After when provided, otherwise exponential backoff with jitter. Never retry a model outcome.
+
+%% Repository module: src/shared_procedures/recovery_procedure.py
+%% Module documentation: docs/modules/shared_procedures/recovery_procedure.md
+%% Unit test: tests/unit/shared_procedures/test_recovery_procedure.py
+%% Owner: shared_infrastructure
+%% Source sections: E.1–E.2; H.9

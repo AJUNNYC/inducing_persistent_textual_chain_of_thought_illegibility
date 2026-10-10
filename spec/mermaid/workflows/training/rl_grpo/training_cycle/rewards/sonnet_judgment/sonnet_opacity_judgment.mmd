@@ -1,0 +1,39 @@
+---
+title: "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.mmd"
+---
+flowchart TD
+%% Sonnet opacity judgment
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% A and B are checked operations: node includes request, validation and persistence.
+%% Exact per-pass cache key includes request, provider/model, rubric, schema and settings.
+%% Record returned model version. Freeze reward definition before training.
+%% O=(J*-1)/8; padding removes the bonus, not the correctness reward.
+%% Preserve the frozen training prompts and boolean flags, including their original uncertainty handling.
+%% The tri-state evaluation audit is a separate measurement; it never replaces or changes these training calls.
+%% Child: RECOVER => ../../../../../shared_procedures/recovery_procedure.mmd
+    INPUT["Reasoning for a correct answer and the problem"]
+    A["Sonnet 5.5 pass A<br/>Reasoning alone: score J from 1 to 9"]
+    ASAVE["Validate and cache pass A"]
+    B["Sonnet 5.5 pass B<br/>Problem + reasoning: readability / padding"]
+    BSAVE["Validate and cache pass B"]
+    CAP["Readable solution: J_effective = min(J, 3)<br/>Otherwise J_effective = J<br/>Padding: Q = 0<br/>Otherwise Q = 1"]
+    OUT["Return effective opacity O and gate Q"]
+    RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Retry and retain successful passes"]
+    STOP["Return infrastructure failure"]
+    CALC["Compute O = (J_effective minus 1) / 8"]
+    INPUT --> A --> ASAVE --> B --> BSAVE --> CAP --> CALC --> OUT
+    ASAVE -.->|API or schema failure| RECOVER
+    BSAVE -.->|API or schema failure| RECOVER
+    RECOVER -->|Retry permitted with cache reuse| A
+    RECOVER -->|Not permitted| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class RECOVER detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py
+%% Module documentation: docs/modules/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.md
+%% Unit test: tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py
+%% Owner: rl
+%% Source sections: C.3.3–C.3.4; E.1.4; H.6.3

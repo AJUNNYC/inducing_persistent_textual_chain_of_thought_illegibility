@@ -1,0 +1,45 @@
+---
+title: "spec/mermaid/workflows/training/rl_grpo/setup/rl_setup.mmd"
+---
+flowchart TD
+%% RL setup and resumption
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% LoRA rank/alpha 32/32; LR 5e-6; KL coefficient .01.
+%% Rollout temperature 1.0; maximum new tokens 2048.
+%% Pin logical-step, gradient accumulation and group semantics; check against the 8-question / 4-rollout contract.
+%% Known setup failures use shared bounded recovery before returning STOP.
+%% Checkpoint presence is not enough: exact run identity and state integrity must match.
+%% Explicit GRPO with Dr. GRPO loss normalization, never an unspecified installed-trainer default.
+%% loss_type=dr_grpo; scale_rewards=group; num_iterations=1; token-level importance sampling.
+%% epsilon=0.2; epsilon_high=0.2; frozen original reference policy; no reference synchronization.
+%% mask_truncated_completions=False, so invalid truncated responses retain their stipulated negative reward in loss.
+%% top_p=1.0; no top-k restriction; repetition_penalty=1.0; no added entropy bonus or adaptive reward.
+%% Preserve LoRA rank/alpha 32/32, LR 5e-6, KL .01, temperature 1.0 and completion cap 2048.
+%% Exactly 8 distinct questions x 4 responses = 32 completions precede one logical optimizer update.
+%% Freeze a compatible pinned runtime and microbatch arrangement; verify with logged IDs and a controlled fixture.
+%% Dependency versions and remaining implementation conventions are delegated; scientific settings are fixed.
+    INPUT["Exact run identity and pinned runtime"]
+    MATCH{"Verified matching full checkpoint?"}
+    RESTORE["Restore policy, optimizer, scheduler,<br/>RNG and completed question / step position"]
+    FRESH["Untouched base and fresh LoRA adapter"]
+    RECIPE["Apply fixed GRPO recipe with Dr. GRPO loss, group scaling and one update per rollout batch"]
+    CHECK{"32-completion update fixture, gradients, reward service and recovery verified?"}
+    OUT["Return verified state at an optimizer boundary"]
+    STOP["Stop: invalid run or setup"]
+    INPUT --> MATCH
+    MATCH -->|Yes| RESTORE --> RECIPE
+    MATCH -->|No checkpoint| FRESH --> RECIPE
+    MATCH -->|Invalid existing checkpoint| STOP
+    RECIPE --> CHECK
+    CHECK -->|Yes| OUT
+    CHECK -->|No| STOP
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+%% A permitted restart before the first full checkpoint uses the fixed recipe and recorded seed/RNG; mark replay attempts.
+
+%% Repository module: src/training/rl_grpo/setup/rl_setup.py
+%% Module documentation: docs/modules/training/rl_grpo/setup/rl_setup.md
+%% Unit test: tests/unit/training/rl_grpo/setup/test_rl_setup.py
+%% Owner: rl
+%% Source sections: C.3.5; E.1.2–E.1.3; E.2.6; H.7

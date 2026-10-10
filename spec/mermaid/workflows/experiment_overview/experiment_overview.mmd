@@ -1,0 +1,26 @@
+---
+title: "spec/mermaid/workflows/experiment_overview/experiment_overview.mmd"
+---
+flowchart LR
+%% Experiment overview
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Entry point for the complete diagram hierarchy. See ../../readme.md for module division guidance.
+%% The accompanying revised PDF Appendix H resolves earlier conflicts and freezes the supplied decisions.
+%% Technical conventions may be selected, documented, tested and frozen before trained outcomes.
+%% The fixed scientific design may not change; failed mandatory preflight blocks the affected launch.
+%% Contract: ../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Child: DATA => ../data_generation_collection/data_generation.mmd
+%% Child: TRAIN => ../training/training.mmd
+%% Child: EVAL => ../evaluation/evaluation.mmd
+    DATA["src/data_generation_collection/data_generation.py<br/>Data generation/collection"]
+    TRAIN["src/training/training.py<br/>Training"]
+    EVAL["src/evaluation/evaluation.py<br/>Evaluation"]
+    DATA --> TRAIN --> EVAL
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class DATA,TRAIN,EVAL detail
+
+%% Repository module: src/experiment_overview/experiment_overview.py
+%% Module documentation: docs/modules/experiment_overview/experiment_overview.md
+%% Unit test: tests/unit/experiment_overview/test_experiment_overview.py
+%% Owner: coordinator
+%% Source sections: Sections 1–5; E.1–E.2; G.1; H.1,H.9

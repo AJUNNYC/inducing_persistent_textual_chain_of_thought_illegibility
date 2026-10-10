@@ -1,0 +1,38 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/rl_data/rl_data_preparation.mmd"
+---
+flowchart TD
+%% RL data preparation
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Keep rejected source IDs and reasons; exclusions include detectable evaluation overlap.
+%% No fixed training reasoning targets: current policies generate their own rollouts.
+%% GSM8K easiness is not intrinsically disqualifying; inspect within-group opacity reward variation.
+%% Child: REPAIR => ../../shared_procedures/recovery_procedure.mmd
+    INPUT["Pinned GSM8K training pool"]
+    ORDER["Fix eligibility, exclusions and ID order"]
+    SELECT["Select 800 unique questions<br/>with valid numeric references"]
+    ENOUGH{"Fixed quota feasible?"}
+    FREEZE["Freeze same 800 ordered IDs<br/>for 7B and 14B"]
+    SAVE["Save 100 batches of 8 questions"]
+    VALID{"Manifest integrity verified?"}
+    REPAIR["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Repair affected artifacts"]
+    OUT["Release verified GRPO questions"]
+    STOP["Stop: shortage or invalid frozen data"]
+    INPUT --> ORDER --> SELECT --> ENOUGH
+    ENOUGH -->|No| STOP
+    ENOUGH -->|Yes| FREEZE --> SAVE --> VALID
+    VALID -->|Yes| OUT
+    VALID -->|No| REPAIR
+    REPAIR -->|Permitted| SAVE
+    REPAIR -->|Not permitted| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class REPAIR detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/data_generation_collection/rl_data/rl_data_preparation.py
+%% Module documentation: docs/modules/data_generation_collection/rl_data/rl_data_preparation.md
+%% Unit test: tests/unit/data_generation_collection/rl_data/test_rl_data_preparation.py
+%% Owner: data_preparation
+%% Source sections: C.3.2,C.3.5; E.2.2; H.7

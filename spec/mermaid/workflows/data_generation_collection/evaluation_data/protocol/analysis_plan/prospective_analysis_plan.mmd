@@ -1,0 +1,53 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.mmd"
+---
+flowchart TD
+%% Prospective analysis plan
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Do not invent unspecified scientific thresholds or retroactively choose them.
+%% Final versus any-checkpoint claims differ; RL checkpoints are dependent observations.
+%% Causal usefulness is not a first-stage success requirement; ablations are optional post-training diagnostics.
+%% Enumerate all 36 windows of at least three consecutive levels per branch/model pair, 216 windows total.
+%% Family includes every required scalar retention, common-correct, opacity-floor and paired-increase gate,
+%% plus every eligible transfer domain; never restrict uncertainty adjustment to the eventual winning window.
+%% Use 10000 design-aware paired bootstrap draws, seed 42, with the same question outcome vector across all states.
+%% Validate maximum-statistic simultaneous lower bounds on simulated populations before trained outcomes or confirmatory launch.
+%% Simulation coverage includes boundaries, correlated checkpoints, uneven domains, small conditional subsets and extreme proportions.
+%% Respect GSM strata, within-subject MMLU sampling and nested legibility selection; all 57 capability subjects are covered.
+%% A missing/uncertain required audit or primary score makes affected confirmatory claims indeterminate, including baseline differences.
+%% Zero estimated variance is never certainty. Freeze validated degeneracy handling or block confirmatory launch.
+%% Failed mandatory statistical validation cannot trigger a method switch after viewing trained outcomes.
+%% Descriptive reporting never authorizes an affected training launch through a failed mandatory preflight.
+%% A reporting mode may govern available measurements; it does not waive any required launch gate.
+%% This is a required implementation preflight, not a claim that validation has already been performed.
+%% Child: RULE => simultaneous_bounds/simultaneous_bounds.mmd
+    INPUT["Define endpoints before outcome inspection"]
+    THRESH["src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py<br/>Construction success criteria<br/>Selected numbers and shared correct opacity"]
+    RULE["src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py<br/>Validate and freeze 95 percent simultaneous lower bounds across all 216 windows"]
+    MISSING["Freeze Option A indicators, baseline pairing and full or conditional denominators"]
+    READY{"Measurement preflight and analysis plan frozen?"}
+    CLAIMS["Freeze confirmatory analysis plan"]
+    MODE{"Explicit mode for reporting measurements only chosen?"}
+    DESCRIPTIVE["Freeze descriptive reporting only; mandatory launch gates still apply"]
+    STOP["Stop confirmatory launch until preflight passes"]
+    BASE["Check baseline answer repeatability<br/>Capability seeds 42, 43 and 44"]
+    INPUT --> THRESH --> BASE --> RULE --> MISSING --> READY
+    READY -->|Yes| CLAIMS
+    READY -->|No| MODE
+    MODE -->|Yes| DESCRIPTIVE
+    MODE -->|No| STOP
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Numeric goals are selected. The measurement protocol and uncertainty procedure require preflight.
+
+%% Child: THRESH => ../../../../evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class RULE,THRESH detail
+
+%% Repository module: src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py
+%% Module documentation: docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.md
+%% Unit test: tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py
+%% Owner: analysis
+%% Source sections: G; H.6,H.8,H.9

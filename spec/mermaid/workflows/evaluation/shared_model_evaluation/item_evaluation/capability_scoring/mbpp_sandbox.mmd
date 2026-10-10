@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: D.1.2; E.2.7; H.4; PDF pages 41, 57, 72.
+%% Repository module: src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py
+%% Module documentation: docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md
+%% Unit test: tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py
+%% Owner: evaluation
+    MODULE["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"]
+    CONTRACT["Isolate untrusted generated code; withhold hidden tests from prompts and secrets from execution; enforce one CPU, one GiB, five CPU seconds and ten wall seconds."]
+    DOCUMENT["docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md"]
+    TEST["tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

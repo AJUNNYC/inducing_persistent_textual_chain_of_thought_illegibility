@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: 3.1; B.1; E.2.2–E.2.4; H.3; PDF pages 3, 17, 18, 54, 55, 56, 71.
+%% Repository module: src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py
+%% Module documentation: docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.md
+%% Unit test: tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py
+%% Owner: data_preparation
+    MODULE["src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py"]
+    CONTRACT["Construct authorized English LMSYS first-turn candidates at most 200 tokens, deduplicate, remove detectable overlap and freeze deterministic order."]
+    DOCUMENT["docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.md"]
+    TEST["tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

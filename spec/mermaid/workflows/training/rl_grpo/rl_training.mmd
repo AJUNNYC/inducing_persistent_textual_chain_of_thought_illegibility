@@ -1,0 +1,42 @@
+---
+title: "spec/mermaid/workflows/training/rl_grpo/rl_training.mmd"
+---
+flowchart TD
+%% RL training runs
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Separate trajectories; no training-time reasoning ablations.
+%% Both sizes use the same 800 question IDs and order.
+%% GRPO with Dr. GRPO loss normalization; no adaptive runs or extra updates.
+%% Each logical step uses eight distinct questions and four completions per question before one optimizer update.
+%% Controlled fixtures must verify actual logged question IDs and update boundaries, not only divisibility.
+%% Child: SETUP => setup/rl_setup.mmd
+%% Child: CYCLE => training_cycle/grpo_training_cycle.mmd
+    INPUT["Frozen 800 questions and GRPO recipe"]
+    NEXT["Select unfinished run<br/>7B then 14B on one GPU"]
+    SETUP["src/training/rl_grpo/setup/rl_setup.py<br/>RL setup and resumption<br/>Set up or resume the exact model run"]
+    CYCLE["src/training/rl_grpo/training_cycle/grpo_training_cycle.py<br/>GRPO training cycle"]
+    FINAL["Verify all 10 scheduled checkpoints<br/>And provenance of each original step"]
+    ALL{"Both model runs complete?"}
+    OUT["Release 20 checkpoints and GPU"]
+    STOP["Report partial runs and stop worker"]
+    INPUT --> NEXT --> SETUP --> CYCLE --> FINAL --> ALL
+    ALL -->|No| NEXT
+    ALL -->|Yes| OUT
+    SETUP -.->|Fatal| STOP
+    CYCLE -.->|Fatal| STOP
+    FINAL -.->|Fatal| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class SETUP,CYCLE detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+%% RL checkpoint completion
+%% Backups must match original step identities; a later policy cannot stand in for an earlier checkpoint.
+%% Bound restoration attempts through shared recovery; persistent restoration errors stop the worker.
+%% Completion may restore matching verified original-step backups under bounded recovery; otherwise stop and report missing states.
+
+%% Repository module: src/training/rl_grpo/rl_training.py
+%% Module documentation: docs/modules/training/rl_grpo/rl_training.md
+%% Unit test: tests/unit/training/rl_grpo/test_rl_training.py
+%% Owner: rl
+%% Source sections: C.3; E.1.1–E.1.4; E.2.6; H.7

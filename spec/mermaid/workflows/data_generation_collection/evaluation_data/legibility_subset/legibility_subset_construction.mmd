@@ -1,0 +1,31 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.mmd"
+---
+flowchart TD
+%% Legibility subset construction
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Nested means the 200 are a subset of the 1,233; reuse their exact generated outputs.
+%% Child: REPAIR => ../../../shared_procedures/recovery_procedure.mmd
+    INPUT["Frozen capability panel with 1,233 items"]
+    RULE["Fixed deterministic subset rule"]
+    SELECT["Select 50 items per domain<br/>GSM8K: 17, 17 and 16 by length stratum<br/>MMLU: one item in 50 distinct subjects<br/>200 total"]
+    CHECK{"Unique IDs and quotas correct?<br/>All items inside capability panel?"}
+    REPAIR["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Repair subset construction"]
+    OUT["Freeze verified subset of 200 items"]
+    STOP["Stop: frozen parent or rules invalid"]
+    INPUT --> RULE --> SELECT --> CHECK
+    CHECK -->|Yes| OUT
+    CHECK -->|No| REPAIR
+    REPAIR -->|Permitted| SELECT
+    REPAIR -->|Not permitted| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class REPAIR detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py
+%% Module documentation: docs/modules/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.md
+%% Unit test: tests/unit/data_generation_collection/evaluation_data/legibility_subset/test_legibility_subset_construction.py
+%% Owner: data_preparation
+%% Source sections: D.2.3; H.8.2

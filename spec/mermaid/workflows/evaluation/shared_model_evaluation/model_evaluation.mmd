@@ -1,0 +1,37 @@
+---
+title: "spec/mermaid/workflows/evaluation/shared_model_evaluation/model_evaluation.mmd"
+---
+flowchart TD
+%% One model state evaluation
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Common to all 62 states: 2 untouched bases + 40 SFT + 20 RL.
+%% Known audit defects queue affected items under bounded recovery; invalid frozen sources are fatal.
+%% Ordinary malformed model outputs are completed outcome records, not missing infrastructure records.
+%% Each assessable item in the nested 200 uses two score calls and a separate GPT4o artifact audit.
+%% Baselines use the same gate and audit as trained states; never treat unresolved baseline evidence as zero opacity.
+%% Child: ITEM => item_evaluation/item_evaluation.mmd
+    INPUT["One exact model state and frozen package"]
+    SETUP["Verify generation, scoring and judge identities"]
+    NEXT["Next unfinished item among 1,233"]
+    ITEM["src/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.py<br/>One evaluation item<br/>Use one raw output"]
+    DONE{"All 1,233 item records complete?"}
+    AUDIT["Verify coverage and dependency provenance"]
+    OUT["Return verified package for the model state"]
+    STOP["Return incomplete package with failure counts"]
+    INPUT --> SETUP --> NEXT --> ITEM --> DONE
+    DONE -->|No| NEXT
+    DONE -->|Yes| AUDIT --> OUT
+    SETUP -.->|Fatal| STOP
+    ITEM -.->|Recovery exhausted| STOP
+    AUDIT -.->|Integrity failure| STOP
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class ITEM detail
+    classDef stop fill:#fbe9e7,stroke:#b45448
+    class STOP stop
+
+%% Repository module: src/evaluation/shared_model_evaluation/model_evaluation.py
+%% Module documentation: docs/modules/evaluation/shared_model_evaluation/model_evaluation.md
+%% Unit test: tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py
+%% Owner: evaluation
+%% Source sections: 4; D.1–D.2; E.2.7; H.4–H.6

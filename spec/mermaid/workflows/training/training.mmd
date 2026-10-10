@@ -1,0 +1,36 @@
+---
+title: "spec/mermaid/workflows/training/training.mmd"
+---
+flowchart TD
+%% Training
+%% Edit quoted node labels directly; this is native Mermaid.
+%% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
+%% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
+%% RL uses the same fixed 800 questions and order for both sizes. Four rollouts form each GRPO group.
+%% Independent SFT family queues run on their own GPUs; RL model trajectories run sequentially.
+%% Exact-condition full checkpoints may resume a run; another level's adapter is never a warm start.
+%% No training-time reasoning ablations. Earlier valid outputs are preserved if a worker stops.
+%% RL uses GRPO with Dr. GRPO loss normalization and the fixed settings in rl_grpo/setup/rl_setup.mmd.
+%% The post-training GPT4o artifact audit does not change the Sonnet two-pass training reward.
+%% Child: SFT => sft/sft_training.mmd
+%% Child: RL => rl_grpo/rl_training.mmd
+    INPUT["Verified data and pinned training recipes"]
+    SFT["src/training/sft/sft_training.py<br/>SFT training schedule<br/>40 independent fits<br/>ROT13 and KaziText for 7B and 14B<br/>2 epochs per fit"]
+    SFTOUT["40 final adapters<br/>Every fit starts from its untouched base"]
+    RL["src/training/rl_grpo/rl_training.py<br/>RL training: GRPO with Dr. GRPO normalization; 2 runs of 100 steps; unchanged Sonnet reward"]
+    RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]
+    BASE["Retain the 2 untouched base identities"]
+    WAIT["Wait for all verified trained states<br/>and matching base identities"]
+    OUT["62 states: 2 bases + 40 SFT + 20 RL<br/>No reasoning ablations during training"]
+    INPUT --> SFT --> SFTOUT --> WAIT
+    INPUT --> RL --> RLOUT --> WAIT
+    INPUT --> BASE --> WAIT
+    WAIT --> OUT
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class SFT,RL detail
+
+%% Repository module: src/training/training.py
+%% Module documentation: docs/modules/training/training.md
+%% Unit test: tests/unit/training/test_training.py
+%% Owner: coordinator
+%% Source sections: 2; C.2–C.3; E.1.1; E.2.2; H.7,H.9

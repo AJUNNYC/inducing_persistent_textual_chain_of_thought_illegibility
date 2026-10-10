@@ -1,0 +1,34 @@
+---
+title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
+---
+flowchart TD
+%% SFT training schedule
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
+%% Within each queue, select the next unfinished fit until all 20 are verified.
+%% A failed fit stops that queue and yields a partial report; the other queue may finish valid work.
+%% Child: ROTFIT => individual_fit/sft_fit.mmd
+%% Child: KAZFIT => individual_fit/sft_fit.mmd
+    INPUT["40 verified condition datasets"]
+    PLAN["Two independent family queues"]
+    ROT["ROT13 queue: GPU A<br/>20 independent fits"]
+    KAZ["KaziText queue: GPU B<br/>20 independent fits"]
+    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the ROT13 queue"]
+    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the KaziText queue"]
+    ROTDONE["Verify 20 fits<br/>Release GPU A"]
+    KAZDONE["Verify 20 fits<br/>Release GPU B"]
+    WAIT["Wait for both verified queues"]
+    OUT["Release all 40 final adapters"]
+    INPUT --> PLAN
+    PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT
+    PLAN --> KAZ --> KAZFIT --> KAZDONE --> WAIT
+    WAIT --> OUT
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class ROTFIT,KAZFIT detail
+
+%% Repository module: src/training/sft/sft_training.py
+%% Module documentation: docs/modules/training/sft/sft_training.md
+%% Unit test: tests/unit/training/sft/test_sft_training.py
+%% Owner: sft
+%% Source sections: C.2; E.1.1–E.1.3; E.2.2,E.2.5

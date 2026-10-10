@@ -1,0 +1,31 @@
+---
+title: "spec/mermaid/workflows/data_generation_collection/evaluation_data/evaluation_data_preparation.mmd"
+---
+flowchart TD
+%% Evaluation data preparation
+%% Edit quoted node labels directly; this is native Mermaid source.
+%% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
+%% No selection based on trained-model outcomes. All 62 states use the same package.
+%% Packaging failures use shared bounded recovery; frozen IDs and semantics cannot change.
+%% Child: CAP => capability_panel/capability_panel_construction.mmd
+%% Child: LEG => legibility_subset/legibility_subset_construction.mmd
+%% Child: PROTO => protocol/evaluation_protocol.mmd
+    INPUT["Pinned official evaluation pools"]
+    CAP["src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py<br/>Capability panel construction"]
+    FREEZE["Freeze 1,233 capability IDs and references"]
+    LEG["src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py<br/>Legibility subset construction<br/>Subset nested within the capability panel"]
+    PROTO["src/data_generation_collection/evaluation_data/protocol/evaluation_protocol.py<br/>Evaluation protocol<br/>Specify the frozen protocol"]
+    JOIN["Wait for verified panels and protocol"]
+    OUT["Save and release common package with hashes"]
+    INPUT --> CAP --> FREEZE
+    FREEZE --> LEG --> JOIN
+    FREEZE --> PROTO --> JOIN
+    JOIN --> OUT
+    classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
+    class CAP,LEG,PROTO detail
+
+%% Repository module: src/data_generation_collection/evaluation_data/evaluation_data_preparation.py
+%% Module documentation: docs/modules/data_generation_collection/evaluation_data/evaluation_data_preparation.md
+%% Unit test: tests/unit/data_generation_collection/evaluation_data/test_evaluation_data_preparation.py
+%% Owner: data_preparation
+%% Source sections: D.1.2; D.2.3; E.2.2; H.4,H.8.2

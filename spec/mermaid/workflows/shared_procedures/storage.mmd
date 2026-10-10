@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/storage.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: E.1.1,E.1.3; E.2.3,E.2.5; PDF pages 49, 50, 51, 55, 56.
+%% Repository module: src/shared_procedures/storage.py
+%% Module documentation: docs/modules/shared_procedures/storage.md
+%% Unit test: tests/unit/shared_procedures/test_storage.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/storage.py"]
+    CONTRACT["Publish verified artifacts atomically where supported, enforce exclusive ownership and durable storage, and invalidate stale dependencies."]
+    DOCUMENT["docs/modules/shared_procedures/storage.md"]
+    TEST["tests/unit/shared_procedures/test_storage.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

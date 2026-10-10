@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/judge_client.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: C.3.3–C.3.4; D.2.4–D.2.6; E.1.4; H.5; PDF pages 33, 34, 45, 46, 51, 52, 73, 74.
+%% Repository module: src/shared_procedures/judge_client.py
+%% Module documentation: docs/modules/shared_procedures/judge_client.md
+%% Unit test: tests/unit/shared_procedures/test_judge_client.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/judge_client.py"]
+    CONTRACT["Separate provider transports and per-pass caches; validate schemas and returned identities; preserve outcomes without fabricated rewards or grades."]
+    DOCUMENT["docs/modules/shared_procedures/judge_client.md"]
+    TEST["tests/unit/shared_procedures/test_judge_client.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

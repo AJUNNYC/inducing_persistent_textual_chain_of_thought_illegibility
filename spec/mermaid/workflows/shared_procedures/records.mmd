@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/records.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: E.2.3; H.5–H.6,H.9; PDF pages 55, 73, 74, 75, 80.
+%% Repository module: src/shared_procedures/records.py
+%% Module documentation: docs/modules/shared_procedures/records.md
+%% Unit test: tests/unit/shared_procedures/test_records.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/records.py"]
+    CONTRACT["Validate typed handoff records, identifiers, dependency hashes, explicit statuses and required provenance."]
+    DOCUMENT["docs/modules/shared_procedures/records.md"]
+    TEST["tests/unit/shared_procedures/test_records.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST

@@ -1,0 +1,17 @@
+---
+title: "spec/mermaid/workflows/shared_procedures/execution_state.mmd"
+---
+flowchart TD
+%% Source-derived support responsibility, separated into this module by the requested repository organization.
+%% Scientific source: E.1–E.2; H.9; PDF pages 49, 50, 52, 53, 55, 56, 57, 80.
+%% Repository module: src/shared_procedures/execution_state.py
+%% Module documentation: docs/modules/shared_procedures/execution_state.md
+%% Unit test: tests/unit/shared_procedures/test_execution_state.py
+%% Owner: shared_infrastructure
+    MODULE["src/shared_procedures/execution_state.py"]
+    CONTRACT["Track jobs, original steps, attempts, persistent retry counts and explicit pending/running/paused/failed/complete states; prevent duplicate writers."]
+    DOCUMENT["docs/modules/shared_procedures/execution_state.md"]
+    TEST["tests/unit/shared_procedures/test_execution_state.py"]
+    MODULE --> CONTRACT
+    MODULE -.-> DOCUMENT
+    MODULE -.-> TEST
