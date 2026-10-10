@@ -1,0 +1,56 @@
+---
+title: "spec/mermaid/repository/support_layout.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_eb7526362ee767["prompts/"]
+    p_f2e29289dbf5e2["prompts/evaluation_arc_easy.txt"]
+    p_1224b08967ce05["prompts/evaluation_gsm8k.txt"]
+    p_c7ab990d2093f2["prompts/evaluation_legibility.txt"]
+    p_f067a24d6c9d4a["prompts/evaluation_mbpp.txt"]
+    p_4aa222f535deff["prompts/evaluation_mmlu.txt"]
+    p_03c17e21b7e4f8["prompts/evaluation_readable_solution.txt"]
+    p_4132f66f8c92d8["prompts/rl_generation.txt"]
+    p_1f614970e7437a["prompts/rl_pass_a.txt"]
+    p_9632ae15c9774f["prompts/rl_pass_b.txt"]
+    p_fd70ea1de98fdc["schemas/"]
+    p_a01a29fdb91727["schemas/candidate_prompt.json"]
+    p_e3215e935eb0a5["schemas/clean_generation.json"]
+    p_5273a8d07e65ec["schemas/evaluation_audit_response.json"]
+    p_66d4ce4ba5e90e["schemas/evaluation_record.json"]
+    p_a6a0fef6f5f333["schemas/judge_record.json"]
+    p_11e9c5cd740c21["schemas/optimizer_checkpoint.json"]
+    p_7581884f1ec2d6["schemas/qualification_record.json"]
+    p_a6b06312528422["schemas/rl_pass_b_response.json"]
+    p_23ca015d87ec13["schemas/score_response.json"]
+    p_7dd667be10ed16["schemas/sft_training_record.json"]
+    p_8c5967fd8486f3["scripts/"]
+    p_1a7c9f9b5a0840["scripts/run_experiment.py"]
+    p_5db50e4653f724["scripts/run_preflight.py"]
+    p_8de5342769eaeb["scripts/validate_repository.py"]
+    p_eb7526362ee767 --> p_f2e29289dbf5e2
+    p_eb7526362ee767 --> p_1224b08967ce05
+    p_eb7526362ee767 --> p_c7ab990d2093f2
+    p_eb7526362ee767 --> p_f067a24d6c9d4a
+    p_eb7526362ee767 --> p_4aa222f535deff
+    p_eb7526362ee767 --> p_03c17e21b7e4f8
+    p_eb7526362ee767 --> p_4132f66f8c92d8
+    p_eb7526362ee767 --> p_1f614970e7437a
+    p_eb7526362ee767 --> p_9632ae15c9774f
+    p_fd70ea1de98fdc --> p_a01a29fdb91727
+    p_fd70ea1de98fdc --> p_e3215e935eb0a5
+    p_fd70ea1de98fdc --> p_5273a8d07e65ec
+    p_fd70ea1de98fdc --> p_66d4ce4ba5e90e
+    p_fd70ea1de98fdc --> p_a6a0fef6f5f333
+    p_fd70ea1de98fdc --> p_11e9c5cd740c21
+    p_fd70ea1de98fdc --> p_7581884f1ec2d6
+    p_fd70ea1de98fdc --> p_a6b06312528422
+    p_fd70ea1de98fdc --> p_23ca015d87ec13
+    p_fd70ea1de98fdc --> p_7dd667be10ed16
+    p_8c5967fd8486f3 --> p_1a7c9f9b5a0840
+    p_8c5967fd8486f3 --> p_5db50e4653f724
+    p_8c5967fd8486f3 --> p_8de5342769eaeb
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_eb7526362ee767,p_fd70ea1de98fdc,p_8c5967fd8486f3 folder
+    class p_f2e29289dbf5e2,p_1224b08967ce05,p_c7ab990d2093f2,p_f067a24d6c9d4a,p_4aa222f535deff,p_03c17e21b7e4f8,p_4132f66f8c92d8,p_1f614970e7437a,p_9632ae15c9774f,p_a01a29fdb91727,p_e3215e935eb0a5,p_5273a8d07e65ec,p_66d4ce4ba5e90e,p_a6a0fef6f5f333,p_11e9c5cd740c21,p_7581884f1ec2d6,p_a6b06312528422,p_23ca015d87ec13,p_7dd667be10ed16,p_1a7c9f9b5a0840,p_5db50e4653f724,p_8de5342769eaeb file

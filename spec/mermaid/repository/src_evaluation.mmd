@@ -1,0 +1,70 @@
+---
+title: "spec/mermaid/repository/src_evaluation.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_35494cb45813ef["src/evaluation/"]
+    p_55cc148ceef841["src/evaluation/__init__.py"]
+    p_72867e2bee1b3b["src/evaluation/condition_groups/"]
+    p_cf18fe1f6cdd9c["src/evaluation/condition_groups/__init__.py"]
+    p_d8917b55cdbeb3["src/evaluation/condition_groups/condition_evaluation.py"]
+    p_4c44eb7f4a4198["src/evaluation/evaluation.py"]
+    p_1b540502066801["src/evaluation/results_analysis/"]
+    p_385e0c3ec61586["src/evaluation/results_analysis/__init__.py"]
+    p_4bdc4dd22bebaa["src/evaluation/results_analysis/construction_criteria/"]
+    p_02b5b6a3847e46["src/evaluation/results_analysis/construction_criteria/__init__.py"]
+    p_3e84d38e9aac73["src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"]
+    p_d17419d0f95574["src/evaluation/results_analysis/results_analysis.py"]
+    p_24ee0cb362ba4f["src/evaluation/shared_model_evaluation/"]
+    p_f7018571e50961["src/evaluation/shared_model_evaluation/__init__.py"]
+    p_a3b8dcf857f0c9["src/evaluation/shared_model_evaluation/item_evaluation/"]
+    p_b5e0f727506a6f["src/evaluation/shared_model_evaluation/item_evaluation/__init__.py"]
+    p_5ec795164b2132["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/"]
+    p_91c8e97fab0ee8["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/__init__.py"]
+    p_246fde9a83a8d5["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py"]
+    p_75d9ff21772432["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"]
+    p_df615d42d33c5a["src/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.py"]
+    p_b0cfb78e6a5fcc["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/"]
+    p_5948f246a0f8d1["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/__init__.py"]
+    p_f41c44725c595a["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py"]
+    p_0dd51d44743664["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/"]
+    p_c142aa726142b0["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/__init__.py"]
+    p_463960cade672f["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py"]
+    p_dc657699a40d41["src/evaluation/shared_model_evaluation/item_evaluation/native_output/"]
+    p_6938d65d66e756["src/evaluation/shared_model_evaluation/item_evaluation/native_output/__init__.py"]
+    p_af26c0181ea46e["src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py"]
+    p_868c5954f00557["src/evaluation/shared_model_evaluation/model_evaluation.py"]
+    p_35494cb45813ef --> p_55cc148ceef841
+    p_35494cb45813ef --> p_72867e2bee1b3b
+    p_72867e2bee1b3b --> p_cf18fe1f6cdd9c
+    p_72867e2bee1b3b --> p_d8917b55cdbeb3
+    p_35494cb45813ef --> p_4c44eb7f4a4198
+    p_35494cb45813ef --> p_1b540502066801
+    p_1b540502066801 --> p_385e0c3ec61586
+    p_1b540502066801 --> p_4bdc4dd22bebaa
+    p_4bdc4dd22bebaa --> p_02b5b6a3847e46
+    p_4bdc4dd22bebaa --> p_3e84d38e9aac73
+    p_1b540502066801 --> p_d17419d0f95574
+    p_35494cb45813ef --> p_24ee0cb362ba4f
+    p_24ee0cb362ba4f --> p_f7018571e50961
+    p_24ee0cb362ba4f --> p_a3b8dcf857f0c9
+    p_a3b8dcf857f0c9 --> p_b5e0f727506a6f
+    p_a3b8dcf857f0c9 --> p_5ec795164b2132
+    p_5ec795164b2132 --> p_91c8e97fab0ee8
+    p_5ec795164b2132 --> p_246fde9a83a8d5
+    p_5ec795164b2132 --> p_75d9ff21772432
+    p_a3b8dcf857f0c9 --> p_df615d42d33c5a
+    p_a3b8dcf857f0c9 --> p_b0cfb78e6a5fcc
+    p_b0cfb78e6a5fcc --> p_5948f246a0f8d1
+    p_b0cfb78e6a5fcc --> p_f41c44725c595a
+    p_b0cfb78e6a5fcc --> p_0dd51d44743664
+    p_0dd51d44743664 --> p_c142aa726142b0
+    p_0dd51d44743664 --> p_463960cade672f
+    p_a3b8dcf857f0c9 --> p_dc657699a40d41
+    p_dc657699a40d41 --> p_6938d65d66e756
+    p_dc657699a40d41 --> p_af26c0181ea46e
+    p_24ee0cb362ba4f --> p_868c5954f00557
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_35494cb45813ef,p_72867e2bee1b3b,p_1b540502066801,p_4bdc4dd22bebaa,p_24ee0cb362ba4f,p_a3b8dcf857f0c9,p_5ec795164b2132,p_b0cfb78e6a5fcc,p_0dd51d44743664,p_dc657699a40d41 folder
+    class p_55cc148ceef841,p_cf18fe1f6cdd9c,p_d8917b55cdbeb3,p_4c44eb7f4a4198,p_385e0c3ec61586,p_02b5b6a3847e46,p_3e84d38e9aac73,p_d17419d0f95574,p_f7018571e50961,p_b5e0f727506a6f,p_91c8e97fab0ee8,p_246fde9a83a8d5,p_75d9ff21772432,p_df615d42d33c5a,p_5948f246a0f8d1,p_f41c44725c595a,p_c142aa726142b0,p_463960cade672f,p_6938d65d66e756,p_af26c0181ea46e,p_868c5954f00557 file

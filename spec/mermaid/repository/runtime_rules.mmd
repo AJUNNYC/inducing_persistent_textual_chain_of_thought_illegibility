@@ -1,0 +1,25 @@
+---
+title: "spec/mermaid/repository/runtime_rules.mmd"
+---
+flowchart TD
+%% Runtime naming conventions only. Braced templates are not present files or scientific output claims.
+    docs["docs/architecture.md"]
+    transform["data/transformed/{family}/{model}/{level}/"]
+    sft["artifacts/training/sft/{family}/{model}/{level}/"]
+    rl["artifacts/training/rl/{model}/{step}/"]
+    evaluation["artifacts/evaluation/{record_kind}/{state_id}/"]
+    judge["artifacts/judge_cache/{request_kind}/"]
+    preflight["artifacts/preflight/{check_name}/"]
+    state["artifacts/state/{worker_id}/"]
+    identity["src/shared_procedures/identity.py"]
+    storage["src/shared_procedures/storage.py"]
+    docs --> transform
+    docs --> sft
+    docs --> rl
+    docs --> evaluation
+    docs --> judge
+    docs --> preflight
+    docs --> state
+    identity -.-> sft
+    identity -.-> rl
+    storage -.-> evaluation

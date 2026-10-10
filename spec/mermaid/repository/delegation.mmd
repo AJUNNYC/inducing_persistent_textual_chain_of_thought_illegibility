@@ -1,0 +1,130 @@
+---
+title: "spec/mermaid/repository/delegation.mmd"
+---
+flowchart TD
+%% Owner roles are repository organization under PDF H.9, not extra experimental conditions.
+    coordinator["coordinator"]
+    coordinator_brief["docs/agents/coordinator.md"]
+    coordinator -.-> coordinator_brief
+    shared_infrastructure["shared_infrastructure"]
+    shared_infrastructure_brief["docs/agents/shared_infrastructure.md"]
+    shared_infrastructure -.-> shared_infrastructure_brief
+    coordinator --> shared_infrastructure
+    data_preparation["data_preparation"]
+    data_preparation_brief["docs/agents/data_preparation.md"]
+    data_preparation -.-> data_preparation_brief
+    coordinator --> data_preparation
+    sft["sft"]
+    sft_brief["docs/agents/sft.md"]
+    sft -.-> sft_brief
+    coordinator --> sft
+    rl["rl"]
+    rl_brief["docs/agents/rl.md"]
+    rl -.-> rl_brief
+    coordinator --> rl
+    evaluation["evaluation"]
+    evaluation_brief["docs/agents/evaluation.md"]
+    evaluation -.-> evaluation_brief
+    coordinator --> evaluation
+    analysis["analysis"]
+    analysis_brief["docs/agents/analysis.md"]
+    analysis -.-> analysis_brief
+    coordinator --> analysis
+    m_experiment_overview["src/experiment_overview/experiment_overview.py"]
+    coordinator --> m_experiment_overview
+    m_clean_trace_batch["src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py"]
+    data_preparation --> m_clean_trace_batch
+    m_clean_trace_collection["src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py"]
+    data_preparation --> m_clean_trace_collection
+    m_rot13_data_construction["src/data_generation_collection/sft_data/rot13/rot13_data_construction.py"]
+    data_preparation --> m_rot13_data_construction
+    m_kazitext_data_construction["src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"]
+    data_preparation --> m_kazitext_data_construction
+    m_sft_data_preparation["src/data_generation_collection/sft_data/sft_data_preparation.py"]
+    data_preparation --> m_sft_data_preparation
+    m_rl_data_preparation["src/data_generation_collection/rl_data/rl_data_preparation.py"]
+    data_preparation --> m_rl_data_preparation
+    m_capability_panel_construction["src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py"]
+    data_preparation --> m_capability_panel_construction
+    m_legibility_subset_construction["src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py"]
+    data_preparation --> m_legibility_subset_construction
+    m_simultaneous_bounds["src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py"]
+    analysis --> m_simultaneous_bounds
+    m_prospective_analysis_plan["src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py"]
+    analysis --> m_prospective_analysis_plan
+    m_evaluation_protocol["src/data_generation_collection/evaluation_data/protocol/evaluation_protocol.py"]
+    evaluation --> m_evaluation_protocol
+    m_evaluation_data_preparation["src/data_generation_collection/evaluation_data/evaluation_data_preparation.py"]
+    data_preparation --> m_evaluation_data_preparation
+    m_data_generation["src/data_generation_collection/data_generation.py"]
+    data_preparation --> m_data_generation
+    m_sft_fit["src/training/sft/individual_fit/sft_fit.py"]
+    sft --> m_sft_fit
+    m_sft_training["src/training/sft/sft_training.py"]
+    sft --> m_sft_training
+    m_rl_setup["src/training/rl_grpo/setup/rl_setup.py"]
+    rl --> m_rl_setup
+    m_rollout_collection["src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py"]
+    rl --> m_rollout_collection
+    m_sonnet_opacity_judgment["src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py"]
+    rl --> m_sonnet_opacity_judgment
+    m_rl_reward["src/training/rl_grpo/training_cycle/rewards/rl_reward.py"]
+    rl --> m_rl_reward
+    m_grpo_policy_update["src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py"]
+    rl --> m_grpo_policy_update
+    m_grpo_training_cycle["src/training/rl_grpo/training_cycle/grpo_training_cycle.py"]
+    rl --> m_grpo_training_cycle
+    m_rl_training["src/training/rl_grpo/rl_training.py"]
+    rl --> m_rl_training
+    m_training["src/training/training.py"]
+    coordinator --> m_training
+    m_condition_evaluation["src/evaluation/condition_groups/condition_evaluation.py"]
+    evaluation --> m_condition_evaluation
+    m_output_generation["src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py"]
+    evaluation --> m_output_generation
+    m_capability_scoring["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py"]
+    evaluation --> m_capability_scoring
+    m_readable_solution_audit["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py"]
+    evaluation --> m_readable_solution_audit
+    m_legibility_judging["src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py"]
+    evaluation --> m_legibility_judging
+    m_item_evaluation["src/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.py"]
+    evaluation --> m_item_evaluation
+    m_model_evaluation["src/evaluation/shared_model_evaluation/model_evaluation.py"]
+    evaluation --> m_model_evaluation
+    m_construction_success_criteria["src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"]
+    analysis --> m_construction_success_criteria
+    m_results_analysis["src/evaluation/results_analysis/results_analysis.py"]
+    analysis --> m_results_analysis
+    m_evaluation["src/evaluation/evaluation.py"]
+    evaluation --> m_evaluation
+    m_recovery_procedure["src/shared_procedures/recovery_procedure.py"]
+    shared_infrastructure --> m_recovery_procedure
+    m_configuration["src/shared_procedures/configuration.py"]
+    shared_infrastructure --> m_configuration
+    m_records["src/shared_procedures/records.py"]
+    shared_infrastructure --> m_records
+    m_identity["src/shared_procedures/identity.py"]
+    shared_infrastructure --> m_identity
+    m_storage["src/shared_procedures/storage.py"]
+    shared_infrastructure --> m_storage
+    m_checkpointing["src/shared_procedures/checkpointing.py"]
+    shared_infrastructure --> m_checkpointing
+    m_judge_client["src/shared_procedures/judge_client.py"]
+    shared_infrastructure --> m_judge_client
+    m_response_parsing["src/shared_procedures/response_parsing.py"]
+    shared_infrastructure --> m_response_parsing
+    m_cost_accounting["src/shared_procedures/cost_accounting.py"]
+    shared_infrastructure --> m_cost_accounting
+    m_preflight["src/shared_procedures/preflight.py"]
+    shared_infrastructure --> m_preflight
+    m_execution_state["src/shared_procedures/execution_state.py"]
+    shared_infrastructure --> m_execution_state
+    m_candidate_manifest["src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py"]
+    data_preparation --> m_candidate_manifest
+    m_mbpp_sandbox["src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"]
+    evaluation --> m_mbpp_sandbox
+    m_baseline_repeatability["src/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.py"]
+    analysis --> m_baseline_repeatability
+    m_statistical_validation["src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py"]
+    analysis --> m_statistical_validation

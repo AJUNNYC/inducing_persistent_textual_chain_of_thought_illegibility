@@ -1,0 +1,92 @@
+---
+title: "spec/mermaid/repository/src_data_generation_collection.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_945700ad9842dd["src/data_generation_collection/"]
+    p_3e42541a4ea4db["src/data_generation_collection/__init__.py"]
+    p_320920534c4b4f["src/data_generation_collection/data_generation.py"]
+    p_b9249cacbaff72["src/data_generation_collection/evaluation_data/"]
+    p_d61ef27f36951d["src/data_generation_collection/evaluation_data/__init__.py"]
+    p_e9b80f0ffbe6a5["src/data_generation_collection/evaluation_data/capability_panel/"]
+    p_9a5d4bca62cf26["src/data_generation_collection/evaluation_data/capability_panel/__init__.py"]
+    p_d4ed10078bc1d1["src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py"]
+    p_8d9aec20180c6a["src/data_generation_collection/evaluation_data/evaluation_data_preparation.py"]
+    p_c38552da0adbf4["src/data_generation_collection/evaluation_data/legibility_subset/"]
+    p_014aa6d0e978a4["src/data_generation_collection/evaluation_data/legibility_subset/__init__.py"]
+    p_e2f2021a49e62c["src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py"]
+    p_3c01ce6d1e4333["src/data_generation_collection/evaluation_data/protocol/"]
+    p_f41429d7812498["src/data_generation_collection/evaluation_data/protocol/__init__.py"]
+    p_31c8cad06b7d5b["src/data_generation_collection/evaluation_data/protocol/analysis_plan/"]
+    p_1286e11cd98e4e["src/data_generation_collection/evaluation_data/protocol/analysis_plan/__init__.py"]
+    p_3d9ff70b728dbf["src/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.py"]
+    p_38f75b0e35d644["src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py"]
+    p_c50be7389577e9["src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/"]
+    p_c135e1bed6dc29["src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/__init__.py"]
+    p_fbe9beb7d852c5["src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py"]
+    p_663cb03d56e23d["src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py"]
+    p_0cf4a2b0157b6f["src/data_generation_collection/evaluation_data/protocol/evaluation_protocol.py"]
+    p_009caa6c52c1a6["src/data_generation_collection/rl_data/"]
+    p_5dc12e016f21d5["src/data_generation_collection/rl_data/__init__.py"]
+    p_ec8d5511642861["src/data_generation_collection/rl_data/rl_data_preparation.py"]
+    p_f4220fbe6bdef7["src/data_generation_collection/sft_data/"]
+    p_56c0da1570d315["src/data_generation_collection/sft_data/__init__.py"]
+    p_4149df6e37c577["src/data_generation_collection/sft_data/clean_trace_collection/"]
+    p_37f409122bcf26["src/data_generation_collection/sft_data/clean_trace_collection/__init__.py"]
+    p_277f91d2f79ff8["src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/"]
+    p_e27e63521850d5["src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/__init__.py"]
+    p_645cc1ea7f3fe9["src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py"]
+    p_19a517123fd58b["src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py"]
+    p_9cd988227d40c6["src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py"]
+    p_c0ba73568ceb08["src/data_generation_collection/sft_data/kazitext/"]
+    p_b9fa36980fd913["src/data_generation_collection/sft_data/kazitext/__init__.py"]
+    p_5cab9cccc333cc["src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"]
+    p_03f3eb417631f6["src/data_generation_collection/sft_data/rot13/"]
+    p_7498db260a154b["src/data_generation_collection/sft_data/rot13/__init__.py"]
+    p_2c806acd2cb869["src/data_generation_collection/sft_data/rot13/rot13_data_construction.py"]
+    p_6121f4ff522c78["src/data_generation_collection/sft_data/sft_data_preparation.py"]
+    p_945700ad9842dd --> p_3e42541a4ea4db
+    p_945700ad9842dd --> p_320920534c4b4f
+    p_945700ad9842dd --> p_b9249cacbaff72
+    p_b9249cacbaff72 --> p_d61ef27f36951d
+    p_b9249cacbaff72 --> p_e9b80f0ffbe6a5
+    p_e9b80f0ffbe6a5 --> p_9a5d4bca62cf26
+    p_e9b80f0ffbe6a5 --> p_d4ed10078bc1d1
+    p_b9249cacbaff72 --> p_8d9aec20180c6a
+    p_b9249cacbaff72 --> p_c38552da0adbf4
+    p_c38552da0adbf4 --> p_014aa6d0e978a4
+    p_c38552da0adbf4 --> p_e2f2021a49e62c
+    p_b9249cacbaff72 --> p_3c01ce6d1e4333
+    p_3c01ce6d1e4333 --> p_f41429d7812498
+    p_3c01ce6d1e4333 --> p_31c8cad06b7d5b
+    p_31c8cad06b7d5b --> p_1286e11cd98e4e
+    p_31c8cad06b7d5b --> p_3d9ff70b728dbf
+    p_31c8cad06b7d5b --> p_38f75b0e35d644
+    p_31c8cad06b7d5b --> p_c50be7389577e9
+    p_c50be7389577e9 --> p_c135e1bed6dc29
+    p_c50be7389577e9 --> p_fbe9beb7d852c5
+    p_31c8cad06b7d5b --> p_663cb03d56e23d
+    p_3c01ce6d1e4333 --> p_0cf4a2b0157b6f
+    p_945700ad9842dd --> p_009caa6c52c1a6
+    p_009caa6c52c1a6 --> p_5dc12e016f21d5
+    p_009caa6c52c1a6 --> p_ec8d5511642861
+    p_945700ad9842dd --> p_f4220fbe6bdef7
+    p_f4220fbe6bdef7 --> p_56c0da1570d315
+    p_f4220fbe6bdef7 --> p_4149df6e37c577
+    p_4149df6e37c577 --> p_37f409122bcf26
+    p_4149df6e37c577 --> p_277f91d2f79ff8
+    p_277f91d2f79ff8 --> p_e27e63521850d5
+    p_277f91d2f79ff8 --> p_645cc1ea7f3fe9
+    p_4149df6e37c577 --> p_19a517123fd58b
+    p_4149df6e37c577 --> p_9cd988227d40c6
+    p_f4220fbe6bdef7 --> p_c0ba73568ceb08
+    p_c0ba73568ceb08 --> p_b9fa36980fd913
+    p_c0ba73568ceb08 --> p_5cab9cccc333cc
+    p_f4220fbe6bdef7 --> p_03f3eb417631f6
+    p_03f3eb417631f6 --> p_7498db260a154b
+    p_03f3eb417631f6 --> p_2c806acd2cb869
+    p_f4220fbe6bdef7 --> p_6121f4ff522c78
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_945700ad9842dd,p_b9249cacbaff72,p_e9b80f0ffbe6a5,p_c38552da0adbf4,p_3c01ce6d1e4333,p_31c8cad06b7d5b,p_c50be7389577e9,p_009caa6c52c1a6,p_f4220fbe6bdef7,p_4149df6e37c577,p_277f91d2f79ff8,p_c0ba73568ceb08,p_03f3eb417631f6 folder
+    class p_3e42541a4ea4db,p_320920534c4b4f,p_d61ef27f36951d,p_9a5d4bca62cf26,p_d4ed10078bc1d1,p_8d9aec20180c6a,p_014aa6d0e978a4,p_e2f2021a49e62c,p_f41429d7812498,p_1286e11cd98e4e,p_3d9ff70b728dbf,p_38f75b0e35d644,p_c135e1bed6dc29,p_fbe9beb7d852c5,p_663cb03d56e23d,p_0cf4a2b0157b6f,p_5dc12e016f21d5,p_ec8d5511642861,p_56c0da1570d315,p_37f409122bcf26,p_e27e63521850d5,p_645cc1ea7f3fe9,p_19a517123fd58b,p_9cd988227d40c6,p_b9fa36980fd913,p_5cab9cccc333cc,p_7498db260a154b,p_2c806acd2cb869,p_6121f4ff522c78 file

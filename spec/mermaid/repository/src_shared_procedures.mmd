@@ -1,0 +1,34 @@
+---
+title: "spec/mermaid/repository/src_shared_procedures.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_b0de273460f9a6["src/shared_procedures/"]
+    p_b835995e76a661["src/shared_procedures/__init__.py"]
+    p_36af03212ff2e7["src/shared_procedures/checkpointing.py"]
+    p_3777e916acb174["src/shared_procedures/configuration.py"]
+    p_40c0bd75feef6d["src/shared_procedures/cost_accounting.py"]
+    p_e1350ff95760d4["src/shared_procedures/execution_state.py"]
+    p_0c942285c7ee8b["src/shared_procedures/identity.py"]
+    p_605535dfe94ddf["src/shared_procedures/judge_client.py"]
+    p_15039845802b66["src/shared_procedures/preflight.py"]
+    p_735ac514f7f590["src/shared_procedures/records.py"]
+    p_40b433a493c9b7["src/shared_procedures/recovery_procedure.py"]
+    p_f61fbd465b0ed5["src/shared_procedures/response_parsing.py"]
+    p_fad4156bdfb371["src/shared_procedures/storage.py"]
+    p_b0de273460f9a6 --> p_b835995e76a661
+    p_b0de273460f9a6 --> p_36af03212ff2e7
+    p_b0de273460f9a6 --> p_3777e916acb174
+    p_b0de273460f9a6 --> p_40c0bd75feef6d
+    p_b0de273460f9a6 --> p_e1350ff95760d4
+    p_b0de273460f9a6 --> p_0c942285c7ee8b
+    p_b0de273460f9a6 --> p_605535dfe94ddf
+    p_b0de273460f9a6 --> p_15039845802b66
+    p_b0de273460f9a6 --> p_735ac514f7f590
+    p_b0de273460f9a6 --> p_40b433a493c9b7
+    p_b0de273460f9a6 --> p_f61fbd465b0ed5
+    p_b0de273460f9a6 --> p_fad4156bdfb371
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_b0de273460f9a6 folder
+    class p_b835995e76a661,p_36af03212ff2e7,p_3777e916acb174,p_40c0bd75feef6d,p_e1350ff95760d4,p_0c942285c7ee8b,p_605535dfe94ddf,p_15039845802b66,p_735ac514f7f590,p_40b433a493c9b7,p_f61fbd465b0ed5,p_fad4156bdfb371 file

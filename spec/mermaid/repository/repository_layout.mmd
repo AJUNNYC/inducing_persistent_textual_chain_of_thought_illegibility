@@ -1,0 +1,47 @@
+---
+title: "spec/mermaid/repository/repository_layout.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_cdb4ee2aea69cc["inducing_persistent_textual_chain_of_thought_illegibility/"]
+    p_bc37d034bad564[".gitignore"]
+    p_0f50505ce22407["artifacts/"]
+    p_d8d0422389f03d["config.yaml"]
+    p_3a6eb0790f39ac["data/"]
+    p_46b42b4229cd7a["docs/"]
+    p_eb7526362ee767["prompts/"]
+    p_50c86b7ed8ac2c["pyproject.toml"]
+    p_5a831ea67cf5cf["readme.md"]
+    p_ddfde0dd1838fd["requirements.lock"]
+    p_fd70ea1de98fdc["schemas/"]
+    p_8c5967fd8486f3["scripts/"]
+    p_d4f02eaafd1a9e["spec/"]
+    p_25a6634263c1b1["src/"]
+    p_59830ebc3a4184["tests/"]
+    p_cdb4ee2aea69cc --> p_bc37d034bad564
+    p_cdb4ee2aea69cc --> p_0f50505ce22407
+    p_cdb4ee2aea69cc --> p_d8d0422389f03d
+    p_cdb4ee2aea69cc --> p_3a6eb0790f39ac
+    p_cdb4ee2aea69cc --> p_46b42b4229cd7a
+    p_cdb4ee2aea69cc --> p_eb7526362ee767
+    p_cdb4ee2aea69cc --> p_50c86b7ed8ac2c
+    p_cdb4ee2aea69cc --> p_5a831ea67cf5cf
+    p_cdb4ee2aea69cc --> p_ddfde0dd1838fd
+    p_cdb4ee2aea69cc --> p_fd70ea1de98fdc
+    p_cdb4ee2aea69cc --> p_8c5967fd8486f3
+    p_cdb4ee2aea69cc --> p_d4f02eaafd1a9e
+    p_cdb4ee2aea69cc --> p_25a6634263c1b1
+    p_cdb4ee2aea69cc --> p_59830ebc3a4184
+%% Child: p_d4f02eaafd1a9e => spec_layout.mmd
+%% Child: p_46b42b4229cd7a => docs_layout.mmd
+%% Child: p_25a6634263c1b1 => src_layout.mmd
+%% Child: p_59830ebc3a4184 => tests_layout.mmd
+%% Child: p_8c5967fd8486f3 => support_layout.mmd
+%% Child: p_eb7526362ee767 => support_layout.mmd
+%% Child: p_fd70ea1de98fdc => support_layout.mmd
+%% Child: p_3a6eb0790f39ac => runtime_layout.mmd
+%% Child: p_0f50505ce22407 => runtime_layout.mmd
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_cdb4ee2aea69cc,p_0f50505ce22407,p_3a6eb0790f39ac,p_46b42b4229cd7a,p_eb7526362ee767,p_fd70ea1de98fdc,p_8c5967fd8486f3,p_d4f02eaafd1a9e,p_25a6634263c1b1,p_59830ebc3a4184 folder
+    class p_bc37d034bad564,p_d8d0422389f03d,p_50c86b7ed8ac2c,p_5a831ea67cf5cf,p_ddfde0dd1838fd file

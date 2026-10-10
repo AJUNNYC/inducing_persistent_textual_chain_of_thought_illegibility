@@ -1,0 +1,24 @@
+---
+title: "spec/mermaid/repository/src_layout.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_25a6634263c1b1["src/"]
+    p_945700ad9842dd["src/data_generation_collection/"]
+    p_35494cb45813ef["src/evaluation/"]
+    p_a3cb124f3d826b["src/experiment_overview/"]
+    p_b0de273460f9a6["src/shared_procedures/"]
+    p_342b4b1fc8acf5["src/training/"]
+    p_25a6634263c1b1 --> p_945700ad9842dd
+    p_25a6634263c1b1 --> p_35494cb45813ef
+    p_25a6634263c1b1 --> p_a3cb124f3d826b
+    p_25a6634263c1b1 --> p_b0de273460f9a6
+    p_25a6634263c1b1 --> p_342b4b1fc8acf5
+%% Child: p_945700ad9842dd => src_data_generation_collection.mmd
+%% Child: p_35494cb45813ef => src_evaluation.mmd
+%% Child: p_a3cb124f3d826b => src_experiment_overview.mmd
+%% Child: p_b0de273460f9a6 => src_shared_procedures.mmd
+%% Child: p_342b4b1fc8acf5 => src_training.mmd
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_25a6634263c1b1,p_945700ad9842dd,p_35494cb45813ef,p_a3cb124f3d826b,p_b0de273460f9a6,p_342b4b1fc8acf5 folder

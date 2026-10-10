@@ -1,0 +1,14 @@
+---
+title: "spec/mermaid/repository/src_experiment_overview.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_a3cb124f3d826b["src/experiment_overview/"]
+    p_7bd0420bee3958["src/experiment_overview/__init__.py"]
+    p_82d7e6d4c16d93["src/experiment_overview/experiment_overview.py"]
+    p_a3cb124f3d826b --> p_7bd0420bee3958
+    p_a3cb124f3d826b --> p_82d7e6d4c16d93
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_a3cb124f3d826b folder
+    class p_7bd0420bee3958,p_82d7e6d4c16d93 file

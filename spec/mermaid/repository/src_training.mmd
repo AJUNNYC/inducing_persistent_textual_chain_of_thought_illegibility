@@ -1,0 +1,68 @@
+---
+title: "spec/mermaid/repository/src_training.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_342b4b1fc8acf5["src/training/"]
+    p_9e8551eb6ff03a["src/training/__init__.py"]
+    p_648212d48f5699["src/training/rl_grpo/"]
+    p_b516856b1b8bcc["src/training/rl_grpo/__init__.py"]
+    p_f28ebb2d927fae["src/training/rl_grpo/rl_training.py"]
+    p_ab6653f1c02c01["src/training/rl_grpo/setup/"]
+    p_728a9d6af98d54["src/training/rl_grpo/setup/__init__.py"]
+    p_ef8da10bc30748["src/training/rl_grpo/setup/rl_setup.py"]
+    p_da47e9f0dc714e["src/training/rl_grpo/training_cycle/"]
+    p_943d9f41d99863["src/training/rl_grpo/training_cycle/__init__.py"]
+    p_600cf60259cc9b["src/training/rl_grpo/training_cycle/grpo_training_cycle.py"]
+    p_8485b78060b0cc["src/training/rl_grpo/training_cycle/policy_update/"]
+    p_85856cff520978["src/training/rl_grpo/training_cycle/policy_update/__init__.py"]
+    p_d864775f723505["src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py"]
+    p_ecb31ca782ef64["src/training/rl_grpo/training_cycle/rewards/"]
+    p_9093b811518898["src/training/rl_grpo/training_cycle/rewards/__init__.py"]
+    p_d760143e29f95e["src/training/rl_grpo/training_cycle/rewards/rl_reward.py"]
+    p_6698f3716d80ba["src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/"]
+    p_3e8d4500b9e2c8["src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/__init__.py"]
+    p_5e41454ed78aff["src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py"]
+    p_30d0a869aa984c["src/training/rl_grpo/training_cycle/rollouts/"]
+    p_e7793fa5d345e7["src/training/rl_grpo/training_cycle/rollouts/__init__.py"]
+    p_54c1aa8ca681d6["src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py"]
+    p_7362df9bf7cba5["src/training/sft/"]
+    p_4de794d3efcf18["src/training/sft/__init__.py"]
+    p_1ca464d1467997["src/training/sft/individual_fit/"]
+    p_f11050668563c9["src/training/sft/individual_fit/__init__.py"]
+    p_0c33b5c5aae15c["src/training/sft/individual_fit/sft_fit.py"]
+    p_47134078eceaff["src/training/sft/sft_training.py"]
+    p_f079878db015e4["src/training/training.py"]
+    p_342b4b1fc8acf5 --> p_9e8551eb6ff03a
+    p_342b4b1fc8acf5 --> p_648212d48f5699
+    p_648212d48f5699 --> p_b516856b1b8bcc
+    p_648212d48f5699 --> p_f28ebb2d927fae
+    p_648212d48f5699 --> p_ab6653f1c02c01
+    p_ab6653f1c02c01 --> p_728a9d6af98d54
+    p_ab6653f1c02c01 --> p_ef8da10bc30748
+    p_648212d48f5699 --> p_da47e9f0dc714e
+    p_da47e9f0dc714e --> p_943d9f41d99863
+    p_da47e9f0dc714e --> p_600cf60259cc9b
+    p_da47e9f0dc714e --> p_8485b78060b0cc
+    p_8485b78060b0cc --> p_85856cff520978
+    p_8485b78060b0cc --> p_d864775f723505
+    p_da47e9f0dc714e --> p_ecb31ca782ef64
+    p_ecb31ca782ef64 --> p_9093b811518898
+    p_ecb31ca782ef64 --> p_d760143e29f95e
+    p_ecb31ca782ef64 --> p_6698f3716d80ba
+    p_6698f3716d80ba --> p_3e8d4500b9e2c8
+    p_6698f3716d80ba --> p_5e41454ed78aff
+    p_da47e9f0dc714e --> p_30d0a869aa984c
+    p_30d0a869aa984c --> p_e7793fa5d345e7
+    p_30d0a869aa984c --> p_54c1aa8ca681d6
+    p_342b4b1fc8acf5 --> p_7362df9bf7cba5
+    p_7362df9bf7cba5 --> p_4de794d3efcf18
+    p_7362df9bf7cba5 --> p_1ca464d1467997
+    p_1ca464d1467997 --> p_f11050668563c9
+    p_1ca464d1467997 --> p_0c33b5c5aae15c
+    p_7362df9bf7cba5 --> p_47134078eceaff
+    p_342b4b1fc8acf5 --> p_f079878db015e4
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_342b4b1fc8acf5,p_648212d48f5699,p_ab6653f1c02c01,p_da47e9f0dc714e,p_8485b78060b0cc,p_ecb31ca782ef64,p_6698f3716d80ba,p_30d0a869aa984c,p_7362df9bf7cba5,p_1ca464d1467997 folder
+    class p_9e8551eb6ff03a,p_b516856b1b8bcc,p_f28ebb2d927fae,p_728a9d6af98d54,p_ef8da10bc30748,p_943d9f41d99863,p_600cf60259cc9b,p_85856cff520978,p_d864775f723505,p_9093b811518898,p_d760143e29f95e,p_3e8d4500b9e2c8,p_5e41454ed78aff,p_e7793fa5d345e7,p_54c1aa8ca681d6,p_4de794d3efcf18,p_f11050668563c9,p_0c33b5c5aae15c,p_47134078eceaff,p_f079878db015e4 file

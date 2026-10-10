@@ -1,0 +1,178 @@
+---
+title: "spec/mermaid/repository/unit_tests_layout.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_3fcb9fec680b12["tests/unit/"]
+    p_bbe5fbb61fedfa["tests/unit/data_generation_collection/"]
+    p_a72ebc09daf3f2["tests/unit/data_generation_collection/evaluation_data/"]
+    p_3c17ad90c30b0e["tests/unit/data_generation_collection/evaluation_data/capability_panel/"]
+    p_fee8398f2b73f0["tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"]
+    p_77c0deb39b1ea0["tests/unit/data_generation_collection/evaluation_data/legibility_subset/"]
+    p_63037a72934c97["tests/unit/data_generation_collection/evaluation_data/legibility_subset/test_legibility_subset_construction.py"]
+    p_af56c043d01756["tests/unit/data_generation_collection/evaluation_data/protocol/"]
+    p_ce08f6642b1a74["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/"]
+    p_f2910b9eccaa00["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/"]
+    p_3b318f2766fdc5["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"]
+    p_cce93d8b24faf9["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_baseline_repeatability.py"]
+    p_f4860dc47e9b1f["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py"]
+    p_e32b70fb0d01f4["tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"]
+    p_b81fb5af76b232["tests/unit/data_generation_collection/evaluation_data/protocol/test_evaluation_protocol.py"]
+    p_39dad737e38abb["tests/unit/data_generation_collection/evaluation_data/test_evaluation_data_preparation.py"]
+    p_2768cc48b5af1f["tests/unit/data_generation_collection/rl_data/"]
+    p_296d856ded5290["tests/unit/data_generation_collection/rl_data/test_rl_data_preparation.py"]
+    p_8d6bd51ba70faa["tests/unit/data_generation_collection/sft_data/"]
+    p_389f570a8d4726["tests/unit/data_generation_collection/sft_data/clean_trace_collection/"]
+    p_5102f18246b62d["tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/"]
+    p_521fe6671d7f1f["tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"]
+    p_64b321347add4f["tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py"]
+    p_ea428cd5f6bfe3["tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py"]
+    p_c2f80aa7653e56["tests/unit/data_generation_collection/sft_data/kazitext/"]
+    p_d33ca17637f9e6["tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"]
+    p_588914f6ff055d["tests/unit/data_generation_collection/sft_data/rot13/"]
+    p_e6b3319f3202ce["tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"]
+    p_745b7279e3c76d["tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"]
+    p_042b540a47373f["tests/unit/data_generation_collection/test_data_generation.py"]
+    p_9b4947ac2db952["tests/unit/evaluation/"]
+    p_e106043de69145["tests/unit/evaluation/condition_groups/"]
+    p_433d26432658f8["tests/unit/evaluation/condition_groups/test_condition_evaluation.py"]
+    p_3e4f7b9a38f675["tests/unit/evaluation/results_analysis/"]
+    p_098e4168fc1cd5["tests/unit/evaluation/results_analysis/construction_criteria/"]
+    p_b5f8720ca9aa3a["tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"]
+    p_d192ce77c4c9ac["tests/unit/evaluation/results_analysis/test_results_analysis.py"]
+    p_0cd771f56d41a2["tests/unit/evaluation/shared_model_evaluation/"]
+    p_169b1504fe9a2d["tests/unit/evaluation/shared_model_evaluation/item_evaluation/"]
+    p_065f5fa7fb2515["tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/"]
+    p_0e2e49ee3bfadc["tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"]
+    p_e2c41a7c89c598["tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"]
+    p_7be11c6536088b["tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/"]
+    p_17f0fd20325879["tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/"]
+    p_764de265a19933["tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"]
+    p_1a55037f67fa36["tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py"]
+    p_0e2da2ee842193["tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/"]
+    p_0d5227be101ec8["tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py"]
+    p_f7035badedacc2["tests/unit/evaluation/shared_model_evaluation/item_evaluation/test_item_evaluation.py"]
+    p_72fb8242582c33["tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py"]
+    p_a8dd4f71bda6c7["tests/unit/evaluation/test_evaluation.py"]
+    p_82b26c030e29ed["tests/unit/experiment_overview/"]
+    p_ae0091be23c899["tests/unit/experiment_overview/test_experiment_overview.py"]
+    p_5d1340ab2695e3["tests/unit/shared_procedures/"]
+    p_4d66dc96c6238a["tests/unit/shared_procedures/test_checkpointing.py"]
+    p_0f65a393dff05e["tests/unit/shared_procedures/test_configuration.py"]
+    p_b004460a313756["tests/unit/shared_procedures/test_cost_accounting.py"]
+    p_08fe29ecb220fe["tests/unit/shared_procedures/test_execution_state.py"]
+    p_6faf74552efd33["tests/unit/shared_procedures/test_identity.py"]
+    p_c4095c719a2bc4["tests/unit/shared_procedures/test_judge_client.py"]
+    p_b6276af99f9850["tests/unit/shared_procedures/test_preflight.py"]
+    p_172a6ae9ad22fa["tests/unit/shared_procedures/test_records.py"]
+    p_ebf89cc267a023["tests/unit/shared_procedures/test_recovery_procedure.py"]
+    p_a95e5e9213a590["tests/unit/shared_procedures/test_response_parsing.py"]
+    p_2a01b248bdca7a["tests/unit/shared_procedures/test_storage.py"]
+    p_239f95bbf6cba8["tests/unit/training/"]
+    p_83d22476b55a40["tests/unit/training/rl_grpo/"]
+    p_1eec69634a1149["tests/unit/training/rl_grpo/setup/"]
+    p_cb9e4dbecc47b4["tests/unit/training/rl_grpo/setup/test_rl_setup.py"]
+    p_db4c8ebb6d29a0["tests/unit/training/rl_grpo/test_rl_training.py"]
+    p_f4746cf5ec2e13["tests/unit/training/rl_grpo/training_cycle/"]
+    p_30a231271d349a["tests/unit/training/rl_grpo/training_cycle/policy_update/"]
+    p_64935a388a8ea2["tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"]
+    p_28487bb2745662["tests/unit/training/rl_grpo/training_cycle/rewards/"]
+    p_1b2568bcfd5018["tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/"]
+    p_219cb0fddbf3e8["tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py"]
+    p_6fef977379b455["tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py"]
+    p_5ca05960a8c598["tests/unit/training/rl_grpo/training_cycle/rollouts/"]
+    p_2d76f19f651e19["tests/unit/training/rl_grpo/training_cycle/rollouts/test_rollout_collection.py"]
+    p_db0b021884a6cf["tests/unit/training/rl_grpo/training_cycle/test_grpo_training_cycle.py"]
+    p_aed0047b65539a["tests/unit/training/sft/"]
+    p_39f8ce6efe5f34["tests/unit/training/sft/individual_fit/"]
+    p_83bf7f7d220e95["tests/unit/training/sft/individual_fit/test_sft_fit.py"]
+    p_31423b345f4839["tests/unit/training/sft/test_sft_training.py"]
+    p_de8676d820de7b["tests/unit/training/test_training.py"]
+    p_3fcb9fec680b12 --> p_bbe5fbb61fedfa
+    p_bbe5fbb61fedfa --> p_a72ebc09daf3f2
+    p_a72ebc09daf3f2 --> p_3c17ad90c30b0e
+    p_3c17ad90c30b0e --> p_fee8398f2b73f0
+    p_a72ebc09daf3f2 --> p_77c0deb39b1ea0
+    p_77c0deb39b1ea0 --> p_63037a72934c97
+    p_a72ebc09daf3f2 --> p_af56c043d01756
+    p_af56c043d01756 --> p_ce08f6642b1a74
+    p_ce08f6642b1a74 --> p_f2910b9eccaa00
+    p_f2910b9eccaa00 --> p_3b318f2766fdc5
+    p_ce08f6642b1a74 --> p_cce93d8b24faf9
+    p_ce08f6642b1a74 --> p_f4860dc47e9b1f
+    p_ce08f6642b1a74 --> p_e32b70fb0d01f4
+    p_af56c043d01756 --> p_b81fb5af76b232
+    p_a72ebc09daf3f2 --> p_39dad737e38abb
+    p_bbe5fbb61fedfa --> p_2768cc48b5af1f
+    p_2768cc48b5af1f --> p_296d856ded5290
+    p_bbe5fbb61fedfa --> p_8d6bd51ba70faa
+    p_8d6bd51ba70faa --> p_389f570a8d4726
+    p_389f570a8d4726 --> p_5102f18246b62d
+    p_5102f18246b62d --> p_521fe6671d7f1f
+    p_389f570a8d4726 --> p_64b321347add4f
+    p_389f570a8d4726 --> p_ea428cd5f6bfe3
+    p_8d6bd51ba70faa --> p_c2f80aa7653e56
+    p_c2f80aa7653e56 --> p_d33ca17637f9e6
+    p_8d6bd51ba70faa --> p_588914f6ff055d
+    p_588914f6ff055d --> p_e6b3319f3202ce
+    p_8d6bd51ba70faa --> p_745b7279e3c76d
+    p_bbe5fbb61fedfa --> p_042b540a47373f
+    p_3fcb9fec680b12 --> p_9b4947ac2db952
+    p_9b4947ac2db952 --> p_e106043de69145
+    p_e106043de69145 --> p_433d26432658f8
+    p_9b4947ac2db952 --> p_3e4f7b9a38f675
+    p_3e4f7b9a38f675 --> p_098e4168fc1cd5
+    p_098e4168fc1cd5 --> p_b5f8720ca9aa3a
+    p_3e4f7b9a38f675 --> p_d192ce77c4c9ac
+    p_9b4947ac2db952 --> p_0cd771f56d41a2
+    p_0cd771f56d41a2 --> p_169b1504fe9a2d
+    p_169b1504fe9a2d --> p_065f5fa7fb2515
+    p_065f5fa7fb2515 --> p_0e2e49ee3bfadc
+    p_065f5fa7fb2515 --> p_e2c41a7c89c598
+    p_169b1504fe9a2d --> p_7be11c6536088b
+    p_7be11c6536088b --> p_17f0fd20325879
+    p_17f0fd20325879 --> p_764de265a19933
+    p_7be11c6536088b --> p_1a55037f67fa36
+    p_169b1504fe9a2d --> p_0e2da2ee842193
+    p_0e2da2ee842193 --> p_0d5227be101ec8
+    p_169b1504fe9a2d --> p_f7035badedacc2
+    p_0cd771f56d41a2 --> p_72fb8242582c33
+    p_9b4947ac2db952 --> p_a8dd4f71bda6c7
+    p_3fcb9fec680b12 --> p_82b26c030e29ed
+    p_82b26c030e29ed --> p_ae0091be23c899
+    p_3fcb9fec680b12 --> p_5d1340ab2695e3
+    p_5d1340ab2695e3 --> p_4d66dc96c6238a
+    p_5d1340ab2695e3 --> p_0f65a393dff05e
+    p_5d1340ab2695e3 --> p_b004460a313756
+    p_5d1340ab2695e3 --> p_08fe29ecb220fe
+    p_5d1340ab2695e3 --> p_6faf74552efd33
+    p_5d1340ab2695e3 --> p_c4095c719a2bc4
+    p_5d1340ab2695e3 --> p_b6276af99f9850
+    p_5d1340ab2695e3 --> p_172a6ae9ad22fa
+    p_5d1340ab2695e3 --> p_ebf89cc267a023
+    p_5d1340ab2695e3 --> p_a95e5e9213a590
+    p_5d1340ab2695e3 --> p_2a01b248bdca7a
+    p_3fcb9fec680b12 --> p_239f95bbf6cba8
+    p_239f95bbf6cba8 --> p_83d22476b55a40
+    p_83d22476b55a40 --> p_1eec69634a1149
+    p_1eec69634a1149 --> p_cb9e4dbecc47b4
+    p_83d22476b55a40 --> p_db4c8ebb6d29a0
+    p_83d22476b55a40 --> p_f4746cf5ec2e13
+    p_f4746cf5ec2e13 --> p_30a231271d349a
+    p_30a231271d349a --> p_64935a388a8ea2
+    p_f4746cf5ec2e13 --> p_28487bb2745662
+    p_28487bb2745662 --> p_1b2568bcfd5018
+    p_1b2568bcfd5018 --> p_219cb0fddbf3e8
+    p_28487bb2745662 --> p_6fef977379b455
+    p_f4746cf5ec2e13 --> p_5ca05960a8c598
+    p_5ca05960a8c598 --> p_2d76f19f651e19
+    p_f4746cf5ec2e13 --> p_db0b021884a6cf
+    p_239f95bbf6cba8 --> p_aed0047b65539a
+    p_aed0047b65539a --> p_39f8ce6efe5f34
+    p_39f8ce6efe5f34 --> p_83bf7f7d220e95
+    p_aed0047b65539a --> p_31423b345f4839
+    p_239f95bbf6cba8 --> p_de8676d820de7b
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_3fcb9fec680b12,p_bbe5fbb61fedfa,p_a72ebc09daf3f2,p_3c17ad90c30b0e,p_77c0deb39b1ea0,p_af56c043d01756,p_ce08f6642b1a74,p_f2910b9eccaa00,p_2768cc48b5af1f,p_8d6bd51ba70faa,p_389f570a8d4726,p_5102f18246b62d,p_c2f80aa7653e56,p_588914f6ff055d,p_9b4947ac2db952,p_e106043de69145,p_3e4f7b9a38f675,p_098e4168fc1cd5,p_0cd771f56d41a2,p_169b1504fe9a2d,p_065f5fa7fb2515,p_7be11c6536088b,p_17f0fd20325879,p_0e2da2ee842193,p_82b26c030e29ed,p_5d1340ab2695e3,p_239f95bbf6cba8,p_83d22476b55a40,p_1eec69634a1149,p_f4746cf5ec2e13,p_30a231271d349a,p_28487bb2745662,p_1b2568bcfd5018,p_5ca05960a8c598,p_aed0047b65539a,p_39f8ce6efe5f34 folder
+    class p_fee8398f2b73f0,p_63037a72934c97,p_3b318f2766fdc5,p_cce93d8b24faf9,p_f4860dc47e9b1f,p_e32b70fb0d01f4,p_b81fb5af76b232,p_39dad737e38abb,p_296d856ded5290,p_521fe6671d7f1f,p_64b321347add4f,p_ea428cd5f6bfe3,p_d33ca17637f9e6,p_e6b3319f3202ce,p_745b7279e3c76d,p_042b540a47373f,p_433d26432658f8,p_b5f8720ca9aa3a,p_d192ce77c4c9ac,p_0e2e49ee3bfadc,p_e2c41a7c89c598,p_764de265a19933,p_1a55037f67fa36,p_0d5227be101ec8,p_f7035badedacc2,p_72fb8242582c33,p_a8dd4f71bda6c7,p_ae0091be23c899,p_4d66dc96c6238a,p_0f65a393dff05e,p_b004460a313756,p_08fe29ecb220fe,p_6faf74552efd33,p_c4095c719a2bc4,p_b6276af99f9850,p_172a6ae9ad22fa,p_ebf89cc267a023,p_a95e5e9213a590,p_2a01b248bdca7a,p_cb9e4dbecc47b4,p_db4c8ebb6d29a0,p_64935a388a8ea2,p_219cb0fddbf3e8,p_6fef977379b455,p_2d76f19f651e19,p_db0b021884a6cf,p_83bf7f7d220e95,p_31423b345f4839,p_de8676d820de7b file

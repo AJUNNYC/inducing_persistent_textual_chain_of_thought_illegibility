@@ -1,0 +1,117 @@
+---
+title: "spec/mermaid/repository/runtime_layout.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_0f50505ce22407["artifacts/"]
+    p_c5c761a29bccd3["artifacts/evaluation/"]
+    p_2ce8a582cb7e07["artifacts/evaluation/audits/"]
+    p_627bc33402bcad["artifacts/evaluation/audits/.gitkeep"]
+    p_3eaf3b04f83687["artifacts/evaluation/capability/"]
+    p_d61e1c6979b586["artifacts/evaluation/capability/.gitkeep"]
+    p_9f16ab8b26117c["artifacts/evaluation/legibility/"]
+    p_0f8b9d44b4c739["artifacts/evaluation/legibility/.gitkeep"]
+    p_56c7e7dd5531e7["artifacts/evaluation/raw/"]
+    p_b045885d4eb073["artifacts/evaluation/raw/.gitkeep"]
+    p_e3be0665f7d681["artifacts/judge_cache/"]
+    p_63c0d7f2f24d88["artifacts/judge_cache/evaluation_audit/"]
+    p_dfb479ab65563c["artifacts/judge_cache/evaluation_audit/.gitkeep"]
+    p_7a55d039324292["artifacts/judge_cache/evaluation_gpt4o/"]
+    p_95f3db7b5b564d["artifacts/judge_cache/evaluation_gpt4o/.gitkeep"]
+    p_1fd81a192b6db9["artifacts/judge_cache/evaluation_sonnet/"]
+    p_bdbfd367302ab4["artifacts/judge_cache/evaluation_sonnet/.gitkeep"]
+    p_bf60775e350748["artifacts/judge_cache/rl_pass_a/"]
+    p_d30d2d3e463b16["artifacts/judge_cache/rl_pass_a/.gitkeep"]
+    p_2a9ff1a4b69809["artifacts/judge_cache/rl_pass_b/"]
+    p_ceeabf39bef327["artifacts/judge_cache/rl_pass_b/.gitkeep"]
+    p_5f574b682c19e4["artifacts/manifests/"]
+    p_5fb8f7ff686c26["artifacts/manifests/.gitkeep"]
+    p_fb951808bdaafb["artifacts/preflight/"]
+    p_4cd566910577d2["artifacts/preflight/.gitkeep"]
+    p_93804412837ee1["artifacts/reports/"]
+    p_c7545d4df9c91f["artifacts/reports/.gitkeep"]
+    p_7da76dd3612ea0["artifacts/state/"]
+    p_43427388298d20["artifacts/state/.gitkeep"]
+    p_f2d5ae927f8a71["artifacts/training/"]
+    p_fa2a51a1c3ec19["artifacts/training/rl/"]
+    p_46b36379d88ace["artifacts/training/rl/.gitkeep"]
+    p_367001f1f8c371["artifacts/training/sft/"]
+    p_add4d87e7f1a5c["artifacts/training/sft/kazitext/"]
+    p_9dfca6e85833e7["artifacts/training/sft/kazitext/.gitkeep"]
+    p_466177c6075002["artifacts/training/sft/rot13/"]
+    p_5af77054e8e658["artifacts/training/sft/rot13/.gitkeep"]
+    p_3a6eb0790f39ac["data/"]
+    p_234abb1d92074d["data/candidates/"]
+    p_2c8176e3b183d9["data/candidates/.gitkeep"]
+    p_b6832cde754936["data/clean_traces/"]
+    p_6e98a17348b159["data/clean_traces/.gitkeep"]
+    p_c12ea0e66937fa["data/evaluation/"]
+    p_16c5a34a5974a4["data/evaluation/.gitkeep"]
+    p_6f4acd4b956a6c["data/manifests/"]
+    p_7f3ec07adab2db["data/manifests/.gitkeep"]
+    p_bc8e109cd65379["data/rejected_responses/"]
+    p_921ffcd792adc8["data/rejected_responses/.gitkeep"]
+    p_2ea3fdd2df9822["data/rl/"]
+    p_041767de7c528d["data/rl/.gitkeep"]
+    p_102277e5e20037["data/transformed/"]
+    p_d3d33b16a3eac4["data/transformed/kazitext/"]
+    p_05de0c227718e7["data/transformed/kazitext/.gitkeep"]
+    p_4729a9fce78b83["data/transformed/rot13/"]
+    p_a5723ea40cc348["data/transformed/rot13/.gitkeep"]
+    p_0f50505ce22407 --> p_c5c761a29bccd3
+    p_c5c761a29bccd3 --> p_2ce8a582cb7e07
+    p_2ce8a582cb7e07 --> p_627bc33402bcad
+    p_c5c761a29bccd3 --> p_3eaf3b04f83687
+    p_3eaf3b04f83687 --> p_d61e1c6979b586
+    p_c5c761a29bccd3 --> p_9f16ab8b26117c
+    p_9f16ab8b26117c --> p_0f8b9d44b4c739
+    p_c5c761a29bccd3 --> p_56c7e7dd5531e7
+    p_56c7e7dd5531e7 --> p_b045885d4eb073
+    p_0f50505ce22407 --> p_e3be0665f7d681
+    p_e3be0665f7d681 --> p_63c0d7f2f24d88
+    p_63c0d7f2f24d88 --> p_dfb479ab65563c
+    p_e3be0665f7d681 --> p_7a55d039324292
+    p_7a55d039324292 --> p_95f3db7b5b564d
+    p_e3be0665f7d681 --> p_1fd81a192b6db9
+    p_1fd81a192b6db9 --> p_bdbfd367302ab4
+    p_e3be0665f7d681 --> p_bf60775e350748
+    p_bf60775e350748 --> p_d30d2d3e463b16
+    p_e3be0665f7d681 --> p_2a9ff1a4b69809
+    p_2a9ff1a4b69809 --> p_ceeabf39bef327
+    p_0f50505ce22407 --> p_5f574b682c19e4
+    p_5f574b682c19e4 --> p_5fb8f7ff686c26
+    p_0f50505ce22407 --> p_fb951808bdaafb
+    p_fb951808bdaafb --> p_4cd566910577d2
+    p_0f50505ce22407 --> p_93804412837ee1
+    p_93804412837ee1 --> p_c7545d4df9c91f
+    p_0f50505ce22407 --> p_7da76dd3612ea0
+    p_7da76dd3612ea0 --> p_43427388298d20
+    p_0f50505ce22407 --> p_f2d5ae927f8a71
+    p_f2d5ae927f8a71 --> p_fa2a51a1c3ec19
+    p_fa2a51a1c3ec19 --> p_46b36379d88ace
+    p_f2d5ae927f8a71 --> p_367001f1f8c371
+    p_367001f1f8c371 --> p_add4d87e7f1a5c
+    p_add4d87e7f1a5c --> p_9dfca6e85833e7
+    p_367001f1f8c371 --> p_466177c6075002
+    p_466177c6075002 --> p_5af77054e8e658
+    p_3a6eb0790f39ac --> p_234abb1d92074d
+    p_234abb1d92074d --> p_2c8176e3b183d9
+    p_3a6eb0790f39ac --> p_b6832cde754936
+    p_b6832cde754936 --> p_6e98a17348b159
+    p_3a6eb0790f39ac --> p_c12ea0e66937fa
+    p_c12ea0e66937fa --> p_16c5a34a5974a4
+    p_3a6eb0790f39ac --> p_6f4acd4b956a6c
+    p_6f4acd4b956a6c --> p_7f3ec07adab2db
+    p_3a6eb0790f39ac --> p_bc8e109cd65379
+    p_bc8e109cd65379 --> p_921ffcd792adc8
+    p_3a6eb0790f39ac --> p_2ea3fdd2df9822
+    p_2ea3fdd2df9822 --> p_041767de7c528d
+    p_3a6eb0790f39ac --> p_102277e5e20037
+    p_102277e5e20037 --> p_d3d33b16a3eac4
+    p_d3d33b16a3eac4 --> p_05de0c227718e7
+    p_102277e5e20037 --> p_4729a9fce78b83
+    p_4729a9fce78b83 --> p_a5723ea40cc348
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_0f50505ce22407,p_c5c761a29bccd3,p_2ce8a582cb7e07,p_3eaf3b04f83687,p_9f16ab8b26117c,p_56c7e7dd5531e7,p_e3be0665f7d681,p_63c0d7f2f24d88,p_7a55d039324292,p_1fd81a192b6db9,p_bf60775e350748,p_2a9ff1a4b69809,p_5f574b682c19e4,p_fb951808bdaafb,p_93804412837ee1,p_7da76dd3612ea0,p_f2d5ae927f8a71,p_fa2a51a1c3ec19,p_367001f1f8c371,p_add4d87e7f1a5c,p_466177c6075002,p_3a6eb0790f39ac,p_234abb1d92074d,p_b6832cde754936,p_c12ea0e66937fa,p_6f4acd4b956a6c,p_bc8e109cd65379,p_2ea3fdd2df9822,p_102277e5e20037,p_d3d33b16a3eac4,p_4729a9fce78b83 folder
+    class p_627bc33402bcad,p_d61e1c6979b586,p_0f8b9d44b4c739,p_b045885d4eb073,p_dfb479ab65563c,p_95f3db7b5b564d,p_bdbfd367302ab4,p_d30d2d3e463b16,p_ceeabf39bef327,p_5fb8f7ff686c26,p_4cd566910577d2,p_c7545d4df9c91f,p_43427388298d20,p_46b36379d88ace,p_9dfca6e85833e7,p_5af77054e8e658,p_2c8176e3b183d9,p_6e98a17348b159,p_16c5a34a5974a4,p_7f3ec07adab2db,p_921ffcd792adc8,p_041767de7c528d,p_05de0c227718e7,p_a5723ea40cc348 file

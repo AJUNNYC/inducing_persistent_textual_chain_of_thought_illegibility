@@ -1,0 +1,55 @@
+---
+title: "spec/mermaid/repository/tests_layout.mmd"
+---
+flowchart LR
+%% Exact repository containment. These edges are organizational, not scientific dataflow.
+    p_59830ebc3a4184["tests/"]
+    p_b40bc1374968e4["tests/integration/"]
+    p_4f104fecb54046["tests/integration/test_analysis_handoff.py"]
+    p_254fc5b902b01a["tests/integration/test_data_handoff.py"]
+    p_0b2512d4f4fac7["tests/integration/test_end_to_end.py"]
+    p_6b7c625690c44a["tests/integration/test_evaluation_handoff.py"]
+    p_8885a603f1ca55["tests/integration/test_recovery_handoff.py"]
+    p_118bb7585ede85["tests/integration/test_reward_transaction.py"]
+    p_943cb28cee3d77["tests/integration/test_training_handoff.py"]
+    p_ccba072122544b["tests/preflight/"]
+    p_31b8f5d9fd9307["tests/preflight/test_baseline_repeatability.py"]
+    p_20335afbb7a23d["tests/preflight/test_clean_data.py"]
+    p_29f37d1c77f36c["tests/preflight/test_configuration.py"]
+    p_bb8dbac1733842["tests/preflight/test_durable_storage.py"]
+    p_c6f635e63f1803["tests/preflight/test_full_checkpoint_resume.py"]
+    p_acd58a7167b25d["tests/preflight/test_grpo_update.py"]
+    p_ed16d9e8561708["tests/preflight/test_judge_services.py"]
+    p_9c2a31e4a8b000["tests/preflight/test_loss_mask_gradients.py"]
+    p_2bf2554e24ae3b["tests/preflight/test_mbpp_sandbox.py"]
+    p_d0da59014fd168["tests/preflight/test_model_runtime.py"]
+    p_70802249e71a2b["tests/preflight/test_spending_authorization.py"]
+    p_bb45e25ec28a56["tests/preflight/test_statistical_coverage.py"]
+    p_3fcb9fec680b12["tests/unit/"]
+    p_59830ebc3a4184 --> p_b40bc1374968e4
+    p_b40bc1374968e4 --> p_4f104fecb54046
+    p_b40bc1374968e4 --> p_254fc5b902b01a
+    p_b40bc1374968e4 --> p_0b2512d4f4fac7
+    p_b40bc1374968e4 --> p_6b7c625690c44a
+    p_b40bc1374968e4 --> p_8885a603f1ca55
+    p_b40bc1374968e4 --> p_118bb7585ede85
+    p_b40bc1374968e4 --> p_943cb28cee3d77
+    p_59830ebc3a4184 --> p_ccba072122544b
+    p_ccba072122544b --> p_31b8f5d9fd9307
+    p_ccba072122544b --> p_20335afbb7a23d
+    p_ccba072122544b --> p_29f37d1c77f36c
+    p_ccba072122544b --> p_bb8dbac1733842
+    p_ccba072122544b --> p_c6f635e63f1803
+    p_ccba072122544b --> p_acd58a7167b25d
+    p_ccba072122544b --> p_ed16d9e8561708
+    p_ccba072122544b --> p_9c2a31e4a8b000
+    p_ccba072122544b --> p_2bf2554e24ae3b
+    p_ccba072122544b --> p_d0da59014fd168
+    p_ccba072122544b --> p_70802249e71a2b
+    p_ccba072122544b --> p_bb45e25ec28a56
+    p_59830ebc3a4184 --> p_3fcb9fec680b12
+%% Child: p_3fcb9fec680b12 => unit_tests_layout.mmd
+    classDef folder fill:#eef3f8,stroke:#4b647a
+    classDef file fill:#ffffff,stroke:#9ba8b5
+    class p_59830ebc3a4184,p_b40bc1374968e4,p_ccba072122544b,p_3fcb9fec680b12 folder
+    class p_4f104fecb54046,p_254fc5b902b01a,p_0b2512d4f4fac7,p_6b7c625690c44a,p_8885a603f1ca55,p_118bb7585ede85,p_943cb28cee3d77,p_31b8f5d9fd9307,p_20335afbb7a23d,p_29f37d1c77f36c,p_bb8dbac1733842,p_c6f635e63f1803,p_acd58a7167b25d,p_ed16d9e8561708,p_9c2a31e4a8b000,p_2bf2554e24ae3b,p_d0da59014fd168,p_70802249e71a2b,p_bb45e25ec28a56 file
