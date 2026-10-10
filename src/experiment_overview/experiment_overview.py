@@ -116,7 +116,9 @@ class Experiment:
 
     def source_pools(self):
         from data_generation_collection.evaluation_data.capability_panel.capability_panel_construction import load_evaluation_sources
-        path=self.data/'evaluation'/'official_pools.json'
+        # This wrapper is distinct from the plain upstream source export used
+        # by native sandbox certification and panel construction.
+        path=self.data/'evaluation'/'official_pools_cache.json'
         if path.exists():
             record=self.load(path)
             if record['revisions'] != {k:v['revision'] for k,v in self.config['datasets'].items() if k!='lmsys'}:

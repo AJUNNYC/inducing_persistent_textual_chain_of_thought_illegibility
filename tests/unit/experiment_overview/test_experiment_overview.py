@@ -142,13 +142,32 @@ def test_sft_state_consumes_verified_adapter_and_exact_identity(experiment,monke
 def test_cached_source_bytes_are_verified_before_reuse(experiment):
     revisions={key:value['revision'] for key,value in experiment.config['datasets'].items() if key!='lmsys'}
     pools={'gsm8k':[{'question':'original'}]}
-    path=experiment.data/'evaluation'/'official_pools.json'
+    path=experiment.data/'evaluation'/'official_pools_cache.json'
     atomic_write_json(path,{'revisions':revisions,'pools':pools,'content_hash':content_hash(pools)})
     assert experiment.source_pools()==pools
     corrupt={'revisions':revisions,'pools':{'gsm8k':[{'question':'corrupted'}]},'content_hash':content_hash(pools)}
     atomic_write_json(path,corrupt)
     with pytest.raises(RuntimeError,match='content changed'):
         experiment.source_pools()
+
+
+def test_source_wrapper_preserves_existing_official_export(experiment,monkeypatch):
+    import data_generation_collection.evaluation_data.capability_panel.capability_panel_construction as panel
+    exported={'gsm8k':[{'question':'official source fixture'}]}
+    plain=experiment.data/'evaluation'/'official_pools.json'
+    atomic_write_json(plain,exported)
+    original=plain.read_bytes()
+    calls=[]
+    def verified_loader(revisions,*,cache_root):
+        calls.append((revisions,cache_root))
+        return exported
+    monkeypatch.setattr(panel,'load_evaluation_sources',verified_loader)
+    assert experiment.source_pools()==exported
+    assert experiment.source_pools()==exported and len(calls)==1
+    assert plain.read_bytes()==original
+    wrapped=json.loads((plain.parent/'official_pools_cache.json').read_text())
+    assert wrapped['content_hash']==content_hash(exported)
+    assert wrapped['revisions']['gsm8k']==experiment.config['datasets']['gsm8k']['revision']
 
 
 def test_kazitext_constructs_with_actual_auxiliary_provisioner_contract(experiment,monkeypatch):
