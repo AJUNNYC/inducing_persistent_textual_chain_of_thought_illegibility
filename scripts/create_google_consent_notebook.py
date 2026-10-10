@@ -41,10 +41,15 @@ def checked_callback(callback, expected_state):
         or parsed.fragment or parsed.netloc != "localhost:8765"):
         raise ValueError("Invalid consent callback")
     query = parse_qs(parsed.query, keep_blank_values=True)
-    if (set(query) - {"state", "code", "scope", "authuser", "prompt", "hd"}
+    if (set(query) - {"state", "code", "scope", "authuser", "prompt", "hd", "iss"}
         or len(query.get("state", [])) != 1 or len(query.get("code", [])) != 1
         or not query["code"][0] or not hmac.compare_digest(query["state"][0], expected_state)):
         raise ValueError("Invalid consent callback state or authorization")
+    # Google may identify the authorization server using RFC 9207's optional
+    # issuer parameter. Accept only its exact issuer; never trust another server
+    # or an ambiguous repeated/blank value, even with a matching request state.
+    if "iss" in query and query["iss"] != ["https://accounts.google.com"]:
+        raise ValueError("Invalid consent callback issuer")
     # OAuthlib requires a secure authorization-response URL for parsing. This
     # normalization matches run_local_server; the actual token POST stays TLS
     # to the validated Google token endpoint, with the original redirect URI.
@@ -129,6 +134,7 @@ try:
     # enforced. Never send a callback from a previous consent attempt.
     if flow.oauth2session._state != expected_state:
         raise ValueError("OAuth session state does not match the consent request")
+    failure_message = "Google token exchange failed. No token was saved. Rerun this cell for a new consent URL and matching callback; if it repeats, check network access to oauth2.googleapis.com."
     flow.fetch_token(authorization_response=authorization_response)
     credentials = flow.credentials
     failure_message = "Offline refresh authorization was not established. Rerun this cell and complete Google consent again."

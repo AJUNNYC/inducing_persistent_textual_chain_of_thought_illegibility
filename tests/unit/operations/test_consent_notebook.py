@@ -2,6 +2,9 @@
 import importlib.util
 import json
 from pathlib import Path
+import sys
+from types import ModuleType, SimpleNamespace
+from urllib.parse import urlencode
 
 import pytest
 
@@ -26,6 +29,34 @@ def test_valid_matching_callback_normalizes_only_parser_transport(helpers):
     callback = 'http://localhost:8765/?state=public_fixture_nonce&code=public_fixture_code&scope=drive.file'
     assert helpers['checked_callback'](callback, 'public_fixture_nonce') == callback.replace('http:', 'https:', 1)
     assert helpers['REDIRECT_URI'] == 'http://localhost:8765/'
+
+
+def test_current_google_callback_with_exact_issuer_is_accepted(helpers):
+    query = urlencode({'state': 'public_fixture_nonce', 'code': 'public_fixture_code',
+                       'scope': helpers['SCOPE'], 'authuser': '0', 'prompt': 'consent',
+                       'iss': 'https://accounts.google.com'})
+    callback = 'http://localhost:8765/?' + query
+    assert helpers['checked_callback'](callback, 'public_fixture_nonce') == callback.replace('http:', 'https:', 1)
+
+
+@pytest.mark.parametrize('issuer_query', [
+    'iss=',
+    'iss=https%3A%2F%2Fevil.example',
+    'iss=http%3A%2F%2Faccounts.google.com',
+    'iss=https%3A%2F%2Faccounts.google.com%2F',
+    'iss=https%3A%2F%2Faccounts.google.com&iss=https%3A%2F%2Faccounts.google.com',
+    'iss=https%3A%2F%2Faccounts.google.com&iss=',
+])
+def test_untrusted_blank_or_duplicate_callback_issuer_is_rejected(helpers, issuer_query):
+    callback = 'http://localhost:8765/?state=nonce&code=fixture&' + issuer_query
+    with pytest.raises(ValueError):
+        helpers['checked_callback'](callback, 'nonce')
+
+
+def test_trusted_issuer_does_not_allow_mismatched_state(helpers):
+    callback = 'http://localhost:8765/?state=old_nonce&code=fixture&iss=https%3A%2F%2Faccounts.google.com'
+    with pytest.raises(ValueError):
+        helpers['checked_callback'](callback, 'nonce')
 
 
 @pytest.mark.parametrize('callback', [
@@ -106,3 +137,48 @@ def test_generated_notebook_is_standalone_empty_and_uses_dedicated_kernel(genera
     assert 'getpass.getpass(' in consent and 'flow.oauth2session._state != expected_state' in consent
     assert 'allow_redirects=False' in consent and 'except BaseException:' in consent
     assert 'from operations' not in consent and 'from shared_procedures' not in consent
+
+
+@pytest.mark.parametrize('callback_state,expected_failure,exchange_attempted', [
+    ('old_nonce', 'The callback was not accepted.', False),
+    ('nonce', 'Google token exchange failed.', True),
+])
+def test_consent_distinguishes_callback_and_exchange_failures_without_private_output(
+        generator, helpers, monkeypatch, capsys, callback_state, expected_failure, exchange_attempted):
+    """Execute both failure boundaries with offline SDK doubles and public fixtures."""
+    calls = []
+    session = SimpleNamespace(_state='nonce', close=lambda: calls.append('close'))
+
+    def fail_exchange(**kwargs):
+        calls.append('exchange')
+        raise RuntimeError('PUBLIC_FIXTURE_EXCEPTION_DETAIL_MUST_NOT_BE_DISPLAYED')
+
+    flow = SimpleNamespace(oauth2session=session,
+        authorization_url=lambda **kwargs: ('https://accounts.google.com/public_fixture', 'nonce'),
+        fetch_token=fail_exchange)
+    modules = {
+        'requests': {},
+        'google_auth_oauthlib.flow': {'InstalledAppFlow': SimpleNamespace(
+            from_client_secrets_file=lambda *args, **kwargs: flow)},
+        'google.auth.transport.requests': {'Request': object},
+        'googleapiclient.discovery': {'build': lambda *args, **kwargs: pytest.fail('No service call expected')},
+    }
+    for name, attributes in modules.items():
+        module = ModuleType(name)
+        module.__dict__.update(attributes)
+        monkeypatch.setitem(sys.modules, name, module)
+    callback = 'http://localhost:8765/?' + urlencode({
+        'state': callback_state, 'code': 'PUBLIC_FIXTURE_CODE_MUST_NOT_BE_DISPLAYED',
+        'iss': 'https://accounts.google.com'})
+    monkeypatch.setattr(helpers['getpass'], 'getpass', lambda prompt: callback)
+    helpers['checked_client_path'] = lambda: None
+    exec(compile(generator.CONSENT, '<offline_consent_fixture>', 'exec'), helpers)
+    output = capsys.readouterr().out
+    assert expected_failure in output
+    assert ('exchange' in calls) is exchange_attempted
+    assert 'close' in calls
+    assert 'PUBLIC_FIXTURE_EXCEPTION_DETAIL_MUST_NOT_BE_DISPLAYED' not in output
+    assert 'PUBLIC_FIXTURE_CODE_MUST_NOT_BE_DISPLAYED' not in output
+    assert 'Traceback' not in output
+    assert all(helpers[name] is None for name in ('flow', 'credentials', 'callback_url', 'authorization_response',
+        'expected_state', 'consent_url', 'token_info', 'account', 'private_document', 'service'))
