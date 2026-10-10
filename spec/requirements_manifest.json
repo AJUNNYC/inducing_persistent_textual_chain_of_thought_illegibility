@@ -1,0 +1,1414 @@
+{
+  "scope": "Index of principal enforceable constraints; detailed source comments, module cards and full PDF remain controlling. Not an executable config or passing-test report.",
+  "requirements": [
+    {
+      "id": "req_scope",
+      "requirement": "First-stage data, SFT, RL, native evaluation, construction analysis, storage, scheduling, costs and recovery; downstream probes separate.",
+      "source_sections": "H.1,H.9",
+      "pdf_pages": [
+        68,
+        80
+      ],
+      "modules": [
+        "src/experiment_overview/experiment_overview.py"
+      ],
+      "tests": [
+        "tests/unit/experiment_overview/test_experiment_overview.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_authority",
+      "requirement": "H has explicit subject precedence; G retains criteria except approved H operational changes; all remaining fixed settings hold.",
+      "source_sections": "H.1",
+      "pdf_pages": [
+        68
+      ],
+      "modules": [
+        "src/shared_procedures/configuration.py",
+        "src/experiment_overview/experiment_overview.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_configuration.py",
+        "tests/unit/experiment_overview/test_experiment_overview.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_models",
+      "requirement": "Use both DeepSeek-R1-Distill-Qwen-7B and 14B with their own untouched baselines; no Qwen3 substitution.",
+      "source_sections": "2,H.1",
+      "pdf_pages": [
+        2,
+        68
+      ],
+      "modules": [
+        "src/training/training.py",
+        "src/shared_procedures/configuration.py"
+      ],
+      "tests": [
+        "tests/unit/training/test_training.py",
+        "tests/unit/shared_procedures/test_configuration.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_matrix",
+      "requirement": "40 independent SFT fits, 2 separate RL trajectories and 20 RL snapshots plus 2 bases; 62 main evaluated states.",
+      "source_sections": "2,C.2.4,C.3.5",
+      "pdf_pages": [
+        2,
+        30,
+        35
+      ],
+      "modules": [
+        "src/training/training.py",
+        "src/training/sft/sft_training.py",
+        "src/training/rl_grpo/rl_training.py",
+        "src/evaluation/evaluation.py"
+      ],
+      "tests": [
+        "tests/unit/training/test_training.py",
+        "tests/unit/training/sft/test_sft_training.py",
+        "tests/unit/training/rl_grpo/test_rl_training.py",
+        "tests/unit/evaluation/test_evaluation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_fixed_design",
+      "requirement": "No outcome-adaptive source counts, levels, epochs/steps, rewards, thresholds or extra scientific runs.",
+      "source_sections": "G.11,H.9",
+      "pdf_pages": [
+        67,
+        80
+      ],
+      "modules": [
+        "src/shared_procedures/configuration.py",
+        "src/experiment_overview/experiment_overview.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_configuration.py",
+        "tests/unit/experiment_overview/test_experiment_overview.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_lmsys",
+      "requirement": "Authorized English LMSYS first user turns at most 200 input tokens, deduplication and detectable-overlap exclusions, fixed candidate order.",
+      "source_sections": "3.1,B.1,E.2.2",
+      "pdf_pages": [
+        3,
+        17,
+        54
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_paired_sources",
+      "requirement": "Same accepted prompt IDs/text across models, but each model supplies its own immutable clean traces reused across both SFT families.",
+      "source_sections": "3.1,E.2.2",
+      "pdf_pages": [
+        3,
+        54
+      ],
+      "modules": [
+        "src/data_generation_collection/data_generation.py",
+        "src/data_generation_collection/sft_data/sft_data_preparation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/test_data_generation.py",
+        "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_clean_generation",
+      "requirement": "Native clean generation temperature 0.6, top_p 0.95, max 3072 new tokens, no added system prompt.",
+      "source_sections": "3.1",
+      "pdf_pages": [
+        3
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_clean_eligibility",
+      "requirement": "Both outputs completed with nonempty parsed reasoning and final response, at least 3 eligible original words, all required integrity checks.",
+      "source_sections": "H.3",
+      "pdf_pages": [
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py",
+        "src/shared_procedures/records.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py",
+        "tests/unit/shared_procedures/test_records.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_all_lengths",
+      "requirement": "Clean and every required variant for both model tokenizers fit total 4096 tokens before accepting a shared candidate.",
+      "source_sections": "C.2.3,H.2.3,H.3",
+      "pdf_pages": [
+        30,
+        70,
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py",
+        "src/data_generation_collection/sft_data/sft_data_preparation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py",
+        "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_clean_not_correct",
+      "requirement": "No semantic correctness/quality/minimum-step/extra-length filter; clean means untransformed output.",
+      "source_sections": "H.3",
+      "pdf_pages": [
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py",
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py",
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_deficit",
+      "requirement": "Initial 10100 new IDs and exact remaining-deficit refill with new IDs; once per ordinary candidate/model, retained rejected responses.",
+      "source_sections": "Clean collection/batch diagrams; H.3",
+      "pdf_pages": [
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py",
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py",
+        "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_accepted_counts",
+      "requirement": "Exactly 10000 accepted train IDs plus 100 separate validation IDs, shared across all forty configurations.",
+      "source_sections": "E.2.2,H.3",
+      "pdf_pages": [
+        54,
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/sft_data_preparation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rot13_regions",
+      "requirement": "Original eligible words contain ASCII letters; three consecutive near-equal nonempty regions and one stable anchor per region.",
+      "source_sections": "C.1.3,H.3",
+      "pdf_pages": [
+        25,
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rot13_counts",
+      "requirement": "Ten fractions k/10; floor(p*n+1/2) per region, fixed adjacent expansion, nested contiguous masks and full final coverage.",
+      "source_sections": "C.1.3",
+      "pdf_pages": [
+        25
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rot13_short",
+      "requirement": "Log realized encoded fractions and repeated short masks; do not regenerate or reject solely to get ten distinct transformations.",
+      "source_sections": "C.1.3,H.3",
+      "pdf_pages": [
+        25,
+        71
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_transforms_protect",
+      "requirement": "Preserve prompts and whole final answers; KaziText also protects numeric and mathematical spans, verified after every transform.",
+      "source_sections": "C.1.4,H.2.3",
+      "pdf_pages": [
+        27,
+        70
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py",
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py",
+        "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_kazitext_identity",
+      "requirement": "Use exact source revision 435f68748fdded6d79446b8ab6bdf76fbde88818 and specified development profile/hash.",
+      "source_sections": "H.2.1",
+      "pdf_pages": [
+        69
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_kazitext_grid",
+      "requirement": "Use literal .200,.301,.454,.684,1.031,1.553,2.339,3.524,5.310,8.000, not the inconsistent overview or live recomputation.",
+      "source_sections": "C.1.4,H.2.1",
+      "pdf_pages": [
+        27,
+        69
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_kazitext_switches",
+      "requirement": "lang en, alpha_std 0, alpha_uniformity_prob 0, beta 0, no_word_order true, no_error_sentence_boost 0, spelling_detailed_ratio .3, strip_all_diacritics false, other aspects on.",
+      "source_sections": "H.2.2",
+      "pdf_pages": [
+        70
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_kazitext_runtime",
+      "requirement": "Load selected English-EWT UD2.5 UDPipe binary, record real checksum, pin binding/dictionary; canonical order and exact candidate/final stochastic behavior.",
+      "source_sections": "H.2.3",
+      "pdf_pages": [
+        70
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py",
+        "src/shared_procedures/identity.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py",
+        "tests/unit/shared_procedures/test_identity.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_frozen_sources",
+      "requirement": "After freeze, invalid source/quotas stop; known artifact repairs preserve IDs/settings/seeds, no replacement panel or high-alpha truncation.",
+      "source_sections": "C.2.3; transformation/recovery diagrams",
+      "pdf_pages": [
+        30
+      ],
+      "modules": [
+        "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py",
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py",
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py",
+        "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py",
+        "tests/unit/shared_procedures/test_recovery_procedure.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_sft_fresh",
+      "requirement": "One reusable fit engine; every family/model/level independent from untouched base except exact-fit full-state resume.",
+      "source_sections": "C.2.4; sft_training diagram",
+      "pdf_pages": [
+        30
+      ],
+      "modules": [
+        "src/training/sft/sft_training.py",
+        "src/training/sft/individual_fit/sft_fit.py"
+      ],
+      "tests": [
+        "tests/unit/training/sft/test_sft_training.py",
+        "tests/unit/training/sft/individual_fit/test_sft_fit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_sft_quant",
+      "requirement": "Completion-only NF4 4-bit double quantization, BF16, gradient checkpointing, frozen embeddings/LM head.",
+      "source_sections": "C.2.2",
+      "pdf_pages": [
+        28,
+        29
+      ],
+      "modules": [
+        "src/training/sft/individual_fit/sft_fit.py"
+      ],
+      "tests": [
+        "tests/unit/training/sft/individual_fit/test_sft_fit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_sft_lora",
+      "requirement": "LoRA rank8/scaling16/dropout.05 and all seven prescribed attention/MLP projection targets.",
+      "source_sections": "C.2.2",
+      "pdf_pages": [
+        28
+      ],
+      "modules": [
+        "src/training/sft/individual_fit/sft_fit.py"
+      ],
+      "tests": [
+        "tests/unit/training/sft/individual_fit/test_sft_fit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_sft_optimization",
+      "requirement": "LR2e-4, paged AdamW32, cosine,3%warmup,zero decay,max grad norm.3,two epochs,micro1/accum16/effective16,4096 cap,seed42.",
+      "source_sections": "C.2.2",
+      "pdf_pages": [
+        28,
+        29
+      ],
+      "modules": [
+        "src/training/sft/individual_fit/sft_fit.py"
+      ],
+      "tests": [
+        "tests/unit/training/sft/individual_fit/test_sft_fit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_sft_mask",
+      "requirement": "Loss on full assistant target only; prompt/padding masked; reduction fixed/logged; no silent truncation, early stopping or extra validation-selected training.",
+      "source_sections": "C.2.3; sft_fit diagram",
+      "pdf_pages": [
+        29,
+        30
+      ],
+      "modules": [
+        "src/training/sft/individual_fit/sft_fit.py",
+        "src/shared_procedures/preflight.py"
+      ],
+      "tests": [
+        "tests/unit/training/sft/individual_fit/test_sft_fit.py",
+        "tests/unit/shared_procedures/test_preflight.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_sft_save",
+      "requirement": "Full state every100 optimizer steps and final; latest2 valid recovery points plus each final adapter; final loss on fixed100 validation.",
+      "source_sections": "E.1.3; sft_fit diagram",
+      "pdf_pages": [
+        50
+      ],
+      "modules": [
+        "src/training/sft/individual_fit/sft_fit.py",
+        "src/shared_procedures/checkpointing.py"
+      ],
+      "tests": [
+        "tests/unit/training/sft/individual_fit/test_sft_fit.py",
+        "tests/unit/shared_procedures/test_checkpointing.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_questions",
+      "requirement": "Same800 distinct official GSM8K training IDs/order for both models,100 batches of8, numeric references and no fixed target reasoning.",
+      "source_sections": "C.3.2,C.3.5",
+      "pdf_pages": [
+        32,
+        35
+      ],
+      "modules": [
+        "src/data_generation_collection/rl_data/rl_data_preparation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/rl_data/test_rl_data_preparation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_group",
+      "requirement": "Actual8 distinct questions by4 completions,32 verified rewards before exactly1 logical update.",
+      "source_sections": "C.3.5,H.7",
+      "pdf_pages": [
+        35,
+        77
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py",
+        "src/training/rl_grpo/training_cycle/grpo_training_cycle.py",
+        "src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/rollouts/test_rollout_collection.py",
+        "tests/unit/training/rl_grpo/training_cycle/test_grpo_training_cycle.py",
+        "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_generation",
+      "requirement": "Temperature1,cap2048,top_p1,no top_k restriction,repetition penalty1; preserve ordinary wrong/malformed/truncated outcomes.",
+      "source_sections": "C.3.5,H.7",
+      "pdf_pages": [
+        35,
+        77
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/rollouts/test_rollout_collection.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_parser",
+      "requirement": "Declared single final-answer/boxed-number rule and deterministic normalization; never infer a missing answer or use generative correctness grading.",
+      "source_sections": "C.3.2",
+      "pdf_pages": [
+        32
+      ],
+      "modules": [
+        "src/shared_procedures/response_parsing.py",
+        "src/training/rl_grpo/training_cycle/rewards/rl_reward.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_response_parsing.py",
+        "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_reward_gate",
+      "requirement": "Invalid=-1,wrong=0 with no judge; correct=1+.5*O*Q; readable score cap3 and padding bonus suppression.",
+      "source_sections": "C.3.4",
+      "pdf_pages": [
+        34
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/rewards/rl_reward.py",
+        "src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py",
+        "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_requests",
+      "requirement": "Two separate exact Sonnet requests for correct outputs, reasoning-only A and question+reasoning B, boolean training flags and original uncertainty semantics.",
+      "source_sections": "C.3.3",
+      "pdf_pages": [
+        33
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_judge_settings",
+      "requirement": "claude-sonnet-5-5,between_tools,effort low,max64,output_config.format strict JSON,no nondefault temperature,no tools.",
+      "source_sections": "C.3.3",
+      "pdf_pages": [
+        33
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py",
+        "src/shared_procedures/judge_client.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py",
+        "tests/unit/shared_procedures/test_judge_client.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_loss",
+      "requirement": "Dr.GRPO constant maximum-length normalization, group reward scaling, num_iterations1,token importance,symmetric clipping.2,frozen unsynchronized original reference.",
+      "source_sections": "H.7",
+      "pdf_pages": [
+        77
+      ],
+      "modules": [
+        "src/training/rl_grpo/setup/rl_setup.py",
+        "src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/setup/test_rl_setup.py",
+        "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_recipe",
+      "requirement": "LoRA32/32,LR5e-6,KL.01,use_vllm false,100 steps each,no entropy bonus or adaptive reward; no truncated-completion masking.",
+      "source_sections": "C.3.5,E.1.2,H.7",
+      "pdf_pages": [
+        35,
+        49,
+        77
+      ],
+      "modules": [
+        "src/training/rl_grpo/setup/rl_setup.py",
+        "src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/setup/test_rl_setup.py",
+        "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_snapshots",
+      "requirement": "10 original-step snapshots per separate model run,steps10–100; no replacement by later state; at least latest2 full recovery states.",
+      "source_sections": "C.3.5,E.1.3; rl_training diagram",
+      "pdf_pages": [
+        35,
+        50
+      ],
+      "modules": [
+        "src/training/rl_grpo/rl_training.py",
+        "src/shared_procedures/checkpointing.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/test_rl_training.py",
+        "tests/unit/shared_procedures/test_checkpointing.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_zero_signal",
+      "requirement": "Log zero reward-group variance and effective bonus variation; no manufactured signal or resampling ordinary outcomes.",
+      "source_sections": "C.3.6; policy update/recovery diagrams",
+      "pdf_pages": [
+        36
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py",
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py",
+        "tests/unit/shared_procedures/test_recovery_procedure.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_capability_counts",
+      "requirement": "Frozen1233=300 GSM+399 MMLU+331 ARC+203 MBPP; same IDs all62 states.",
+      "source_sections": "D.1.2",
+      "pdf_pages": [
+        38,
+        40,
+        41
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py",
+        "src/data_generation_collection/evaluation_data/evaluation_data_preparation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py",
+        "tests/unit/data_generation_collection/evaluation_data/test_evaluation_data_preparation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_gsm_strata",
+      "requirement": "GSM test100 per reference-word-length tercile,stable tie-break,seed42 without-replacement.",
+      "source_sections": "D.1.2",
+      "pdf_pages": [
+        40
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_mmlu_subjects",
+      "requirement": "MMLU seven clean-labeled sampled items in all57 subjects; actual eligible populations recorded; no individual subject inference.",
+      "source_sections": "D.1.2; capability diagram",
+      "pdf_pages": [
+        39,
+        40,
+        41
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_arc_mbpp",
+      "requirement": "Fixed uniform official ARC-Easy test331 and sanitized MBPP203 from427,stable-ID sort and seed42.",
+      "source_sections": "D.1.2",
+      "pdf_pages": [
+        40,
+        41
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_legibility_panel",
+      "requirement": "Exactly200 nested IDs,50/domain; seed42 distinct namespace, GSM17/17/16 and MMLU one question in50 selected subjects.",
+      "source_sections": "D.2.3",
+      "pdf_pages": [
+        43,
+        44
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/legibility_subset/test_legibility_subset_construction.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_native_eval",
+      "requirement": "Same native no-opacity prompts/temp.6/top_p.95/seed42/cap3072 across all domains/states.",
+      "source_sections": "D.1.2; H.9; evaluation_protocol diagram",
+      "pdf_pages": [
+        41,
+        80
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/evaluation_protocol.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/test_evaluation_protocol.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_same_raw",
+      "requirement": "Raw generation saved first; scoring and all three judging requests reuse same item output; no extra legibility generation.",
+      "source_sections": "D.2,E.2.7; item_evaluation diagram",
+      "pdf_pages": [
+        44,
+        57
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/test_item_evaluation.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_baseline_reuse",
+      "requirement": "Same exact two untouched baseline packages shared across SFT/RL,including audit; no mismatched cache or duplicate regeneration.",
+      "source_sections": "C.3.6; condition_evaluation diagram",
+      "pdf_pages": [
+        36
+      ],
+      "modules": [
+        "src/evaluation/condition_groups/condition_evaluation.py",
+        "src/evaluation/shared_model_evaluation/model_evaluation.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/condition_groups/test_condition_evaluation.py",
+        "tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_scoring",
+      "requirement": "Numeric/choice exact rules and execution MBPP pass@1; ordinary malformed answers kept unsuccessful,not resampled.",
+      "source_sections": "D.1.2,H.4",
+      "pdf_pages": [
+        41,
+        72
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_mbpp_public",
+      "requirement": "Only original public task and mechanically extracted callable name/parameters/defaults; hide tests/reference bodies/helpers/assertions/derived expected answers.",
+      "source_sections": "H.4",
+      "pdf_pages": [
+        72
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_mbpp_extract",
+      "requirement": "Final-code field only,strip at most one Python fence,no indentation/function/code repair,no feedback loop.",
+      "source_sections": "H.4",
+      "pdf_pages": [
+        72
+      ],
+      "modules": [
+        "src/shared_procedures/response_parsing.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_response_parsing.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_mbpp_isolate",
+      "requirement": "Separate least-privilege disposable sandbox,no network or host secrets,read-only allowed inputs,1CPU,1GiB,5CPU sec,10wall sec.",
+      "source_sections": "E.2.7,H.4",
+      "pdf_pages": [
+        57,
+        72
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_mbpp_failure",
+      "requirement": "Task-defined timeouts/syntax/test failures are outcomes; broken executor is infrastructure; report project-specific withheld-test variant.",
+      "source_sections": "H.4",
+      "pdf_pages": [
+        72
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_scores",
+      "requirement": "Whole reasoning only,unchanged score rubrics,primary gpt-4o-2024-11-20 versus Sonnet diagnostic,separate raw1–9 scores,no average into truth.",
+      "source_sections": "D.2,H.5",
+      "pdf_pages": [
+        43,
+        44,
+        45,
+        73
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_judge_inputs",
+      "requirement": "No translation/ROT13 decoding/truncation/selective quotes; no final/reference answers,condition identity or score cross-feed; question only to audit.",
+      "source_sections": "D.2.4,H.5",
+      "pdf_pages": [
+        44,
+        73,
+        74
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_audit",
+      "requirement": "Third independent GPT-4o call,temp0,cap64,strict exactly readable_solution/padding enums present/not_detected/uncertain and exact H.5.2 instruction.",
+      "source_sections": "H.5",
+      "pdf_pages": [
+        73,
+        74
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_audit_vs_reward",
+      "requirement": "Tri-state held-out audit never changes original boolean Sonnet reward,score cap or padding bonus gate.",
+      "source_sections": "H.6.3",
+      "pdf_pages": [
+        76
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/rewards/rl_reward.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_option_a",
+      "requirement": "Confirmed qualified opacity requires assessable+valid primary score>=6+resolved readable_solution not_detected; padding alone diagnostic.",
+      "source_sections": "H.6.1",
+      "pdf_pages": [
+        75
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py",
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py",
+        "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_missingness",
+      "requirement": "Required unknown primary/readable evidence produces affected indeterminacy,including baseline; never zero unknown baseline to inflate increase.",
+      "source_sections": "H.6.1",
+      "pdf_pages": [
+        75
+      ],
+      "modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py",
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py",
+        "src/shared_procedures/records.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py",
+        "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py",
+        "tests/unit/shared_procedures/test_records.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_denominators",
+      "requirement": "Keep full denominators200/50; conditional subset IDs/counts explicit and baseline compared on same IDs; pooled conditional ratio not macro-mean.",
+      "source_sections": "H.6.2",
+      "pdf_pages": [
+        75
+      ],
+      "modules": [
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py",
+        "src/evaluation/results_analysis/results_analysis.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py",
+        "tests/unit/evaluation/results_analysis/test_results_analysis.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_retention",
+      "requirement": "All4 domains:>=.8 of baseline-correct IDs per level and>=.6 jointly through entire window; new successes do not replace lost originals.",
+      "source_sections": "G.2,H.6.3",
+      "pdf_pages": [
+        65,
+        76
+      ],
+      "modules": [
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_opacity_floors",
+      "requirement": "At each window level require qualified opacity>=.5 and baseline increase>=.2 on full and pooled common-correct legibility sets.",
+      "source_sections": "G.3–G.4,H.6",
+      "pdf_pages": [
+        65,
+        75
+      ],
+      "modules": [
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_transfer_pair",
+      "requirement": "Same fixed pair of3 nonmath domains satisfies both full/conditional absolute/difference gates throughout the entire window.",
+      "source_sections": "H.6.3",
+      "pdf_pages": [
+        76
+      ],
+      "modules": [
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_windows",
+      "requirement": "All36 contiguous windows of>=3 among10 levels per branch/model,216 total; all scalar gates and possible transfer domains in family.",
+      "source_sections": "G.10,H.8.1",
+      "pdf_pages": [
+        67,
+        78
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py",
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py",
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_baseline_diagnostic",
+      "requirement": "Untouched models same1233 items at42/43/44,80% repeat retention/60% common checks,no extra legibility; uncalibrated failure blocks measurement readiness.",
+      "source_sections": "G.9,H.6.4",
+      "pdf_pages": [
+        67,
+        76
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_baseline_repeatability.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_paired_draws",
+      "requirement": "10000 seed42 design-aware paired draws,whole outcome vectors,common intersections/denominators/fractions/differences recomputed in every draw.",
+      "source_sections": "H.8.1",
+      "pdf_pages": [
+        78
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_design_aware",
+      "requirement": "Preserve GSM strata/nested allocation,uniform ARC/MBPP sampling,finite population structure,and fixed57 MMLU subjects versus separately selected50 legibility subjects.",
+      "source_sections": "H.8.2",
+      "pdf_pages": [
+        78
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py",
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py",
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_bounds",
+      "requirement": "Source max-standardized upward-deviation critical value,nonnegative95th percentile,LCB=estimate-q*bootstrapSE over complete scalar family.",
+      "source_sections": "H.8.3",
+      "pdf_pages": [
+        79
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_degeneracy",
+      "requirement": "Zero variance not certainty; no dropping missing/undefined troublesome gates; frozen conservative family handling and affected indeterminate status.",
+      "source_sections": "H.8.3",
+      "pdf_pages": [
+        79
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_simulation",
+      "requirement": "Prospectively fix simulation generators/sampling/seeds/replication/quantitative joint95% Monte Carlo acceptance; boundaries,correlation,uneven/small/extreme cases.",
+      "source_sections": "H.8.4",
+      "pdf_pages": [
+        79,
+        80
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_failed_validation",
+      "requirement": "Failed mandatory validation blocks confirmatory launch,no post-outcome method switch or extra adaptive data/training; descriptive mode no waiver.",
+      "source_sections": "H.8.4; prospective_analysis_plan diagram",
+      "pdf_pages": [
+        80
+      ],
+      "modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py",
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py"
+      ],
+      "tests": [
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py",
+        "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_reporting",
+      "requirement": "All domains/windows/counts/failures and per-judge raw mean/median/macro/high rates/confusion/differences/agreement/quadratic kappa; undefined stays undefined.",
+      "source_sections": "D.2.5,G,H.6",
+      "pdf_pages": [
+        45,
+        65,
+        75,
+        76
+      ],
+      "modules": [
+        "src/evaluation/results_analysis/results_analysis.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/results_analysis/test_results_analysis.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_limits",
+      "requirement": "No construction-only claim of causal opaque computation,human unreadability,natural private code/intent or independent training-seed/judge uncertainty coverage.",
+      "source_sections": "G,H.6.3,H.8",
+      "pdf_pages": [
+        65,
+        76,
+        78
+      ],
+      "modules": [
+        "src/evaluation/results_analysis/results_analysis.py"
+      ],
+      "tests": [
+        "tests/unit/evaluation/results_analysis/test_results_analysis.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_provenance",
+      "requirement": "Typed source/clean/transformed/checkpoint/evaluation/judge records with exact identity,hashes,seeds,revisions and explicit statuses.",
+      "source_sections": "E.2.3,H.5",
+      "pdf_pages": [
+        55,
+        73,
+        74
+      ],
+      "modules": [
+        "src/shared_procedures/records.py",
+        "src/shared_procedures/identity.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_records.py",
+        "tests/unit/shared_procedures/test_identity.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_durable",
+      "requirement": "Verified durable storage,exclusive writers,atomic publication where supported,reopen integrity,secondary backup and provider lifecycle checks.",
+      "source_sections": "E.1.3,E.2.3–E.2.5",
+      "pdf_pages": [
+        50,
+        51,
+        55,
+        56
+      ],
+      "modules": [
+        "src/shared_procedures/storage.py",
+        "src/shared_procedures/execution_state.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_storage.py",
+        "tests/unit/shared_procedures/test_execution_state.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_cache",
+      "requirement": "Exact dependency identities and separate pass caches; preserve valid raw/upstream data and invalidate affected derivatives including baselines.",
+      "source_sections": "E.1.4,E.2.7; output/recovery diagrams",
+      "pdf_pages": [
+        52,
+        57
+      ],
+      "modules": [
+        "src/shared_procedures/judge_client.py",
+        "src/shared_procedures/storage.py",
+        "src/shared_procedures/identity.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_judge_client.py",
+        "tests/unit/shared_procedures/test_storage.py",
+        "tests/unit/shared_procedures/test_identity.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_retry",
+      "requirement": "Max3 retries/operation incl SDK,max100/worker,persist through restart/rollback; known safe bounded backoff only, no model-outcome or quota retries.",
+      "source_sections": "H.9; recovery diagram",
+      "pdf_pages": [
+        80
+      ],
+      "modules": [
+        "src/shared_procedures/recovery_procedure.py",
+        "src/shared_procedures/execution_state.py",
+        "src/shared_procedures/judge_client.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_recovery_procedure.py",
+        "tests/unit/shared_procedures/test_execution_state.py",
+        "tests/unit/shared_procedures/test_judge_client.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_rl_pause",
+      "requirement": "Missing required reward pauses before policy update,never partial group/fabricated reward; persist cache/unfinished metadata at valid boundary.",
+      "source_sections": "E.1.4,E.2.6",
+      "pdf_pages": [
+        52,
+        56,
+        57
+      ],
+      "modules": [
+        "src/training/rl_grpo/training_cycle/grpo_training_cycle.py",
+        "src/shared_procedures/judge_client.py"
+      ],
+      "tests": [
+        "tests/unit/training/rl_grpo/training_cycle/test_grpo_training_cycle.py",
+        "tests/unit/shared_procedures/test_judge_client.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_oom",
+      "requirement": "Stop unsafe OOM process and restore last already verified checkpoint;no assumed emergency save or changed models/batch/length budget.",
+      "source_sections": "E.1.2",
+      "pdf_pages": [
+        49,
+        50
+      ],
+      "modules": [
+        "src/shared_procedures/checkpointing.py",
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_checkpointing.py",
+        "tests/unit/shared_procedures/test_recovery_procedure.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_costs",
+      "requirement": "Actual permission/rates/quotas,in-flight charges and GPU/API/storage accounting; initial envelope not unlimited authorization; source warning conflict explicit.",
+      "source_sections": "E.1.5,E.2.5",
+      "pdf_pages": [
+        52,
+        56
+      ],
+      "modules": [
+        "src/shared_procedures/cost_accounting.py",
+        "src/shared_procedures/configuration.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_cost_accounting.py",
+        "tests/unit/shared_procedures/test_configuration.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_credentials",
+      "requirement": "Credentials not in YAML,checkpoints,source or sandbox; external access/authorization prerequisite not fabricated implementation output.",
+      "source_sections": "E.2.5,H.9",
+      "pdf_pages": [
+        56,
+        80
+      ],
+      "modules": [
+        "src/shared_procedures/configuration.py",
+        "src/shared_procedures/storage.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_configuration.py",
+        "tests/unit/shared_procedures/test_storage.py",
+        "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_preflight",
+      "requirement": "Actual selected-model masks/gradients,full-state resume,provider calls/storage/sandbox/GRPO grouping/baseline/statistical/permission gates before affected launch.",
+      "source_sections": "E.2.8,G.9–G.10,H.7–H.9",
+      "pdf_pages": [
+        58,
+        67,
+        77,
+        79,
+        80
+      ],
+      "modules": [
+        "src/shared_procedures/preflight.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_preflight.py"
+      ],
+      "status": "specified_not_implemented"
+    },
+    {
+      "id": "req_history",
+      "requirement": "Historical CPU checks describe older scaffold,not this blank repository; separate specification,implementation tests,live integration and scientific evidence.",
+      "source_sections": "E.2.1,E.2.8,H.1",
+      "pdf_pages": [
+        53,
+        57,
+        68
+      ],
+      "modules": [
+        "src/shared_procedures/preflight.py",
+        "src/experiment_overview/experiment_overview.py"
+      ],
+      "tests": [
+        "tests/unit/shared_procedures/test_preflight.py",
+        "tests/unit/experiment_overview/test_experiment_overview.py"
+      ],
+      "status": "specified_not_implemented"
+    }
+  ]
+}

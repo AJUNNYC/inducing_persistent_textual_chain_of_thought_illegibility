@@ -1,0 +1,1355 @@
+{
+  "naming_rule": "Identical relative stem across src (.py), docs/modules (.md), spec/mermaid/workflows (.mmd).",
+  "modules": [
+    {
+      "name": "experiment_overview",
+      "code": "src/experiment_overview/experiment_overview.py",
+      "doc": "docs/modules/experiment_overview/experiment_overview.md",
+      "diagram": "spec/mermaid/workflows/experiment_overview/experiment_overview.mmd",
+      "test": "tests/unit/experiment_overview/test_experiment_overview.py",
+      "owner": "coordinator",
+      "pages": [
+        2,
+        3,
+        49,
+        54,
+        65,
+        68,
+        80
+      ],
+      "sections": "Sections 1–5; E.1–E.2; G.1; H.1,H.9",
+      "old_path": "00-experiment-overview/experiment-overview.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/data_generation.py",
+        "src/training/training.py",
+        "src/evaluation/evaluation.py"
+      ],
+      "requirements": [
+        "req_scope",
+        "req_authority",
+        "req_fixed_design",
+        "req_history"
+      ]
+    },
+    {
+      "name": "clean_trace_batch",
+      "code": "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py",
+      "doc": "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd",
+      "test": "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py",
+      "owner": "data_preparation",
+      "pages": [
+        3,
+        25,
+        30,
+        55,
+        70,
+        71
+      ],
+      "sections": "3.1; C.1.3; C.2.3; E.2.4; H.2.3,H.3",
+      "old_path": "01-data-generation-collection/01-sft-data/01-clean-trace-collection/01-candidate-batch/clean-trace-batch.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_clean_generation",
+        "req_clean_eligibility",
+        "req_all_lengths",
+        "req_clean_not_correct",
+        "req_deficit"
+      ]
+    },
+    {
+      "name": "clean_trace_collection",
+      "code": "src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py",
+      "doc": "docs/modules/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.mmd",
+      "test": "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py",
+      "owner": "data_preparation",
+      "pages": [
+        3,
+        18,
+        54,
+        55,
+        70,
+        71
+      ],
+      "sections": "3.1; B.1; E.2.2–E.2.4; H.2.3,H.3",
+      "old_path": "01-data-generation-collection/01-sft-data/01-clean-trace-collection/clean-trace-collection.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py"
+      ],
+      "requirements": [
+        "req_clean_not_correct",
+        "req_deficit"
+      ]
+    },
+    {
+      "name": "rot13_data_construction",
+      "code": "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py",
+      "doc": "docs/modules/data_generation_collection/sft_data/rot13/rot13_data_construction.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/sft_data/rot13/rot13_data_construction.mmd",
+      "test": "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py",
+      "owner": "data_preparation",
+      "pages": [
+        3,
+        24,
+        25,
+        26,
+        30,
+        55,
+        71
+      ],
+      "sections": "3.2; C.1.1–C.1.3; C.2.3; E.2.4; H.3",
+      "old_path": "01-data-generation-collection/01-sft-data/02-rot13/rot13-data-construction.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_rot13_regions",
+        "req_rot13_counts",
+        "req_rot13_short",
+        "req_transforms_protect",
+        "req_frozen_sources"
+      ]
+    },
+    {
+      "name": "kazitext_data_construction",
+      "code": "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py",
+      "doc": "docs/modules/data_generation_collection/sft_data/kazitext/kazitext_data_construction.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/sft_data/kazitext/kazitext_data_construction.mmd",
+      "test": "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py",
+      "owner": "data_preparation",
+      "pages": [
+        26,
+        27,
+        30,
+        55,
+        69,
+        70,
+        71
+      ],
+      "sections": "C.1.4; C.2.3; E.2.4; H.2–H.3",
+      "old_path": "01-data-generation-collection/01-sft-data/03-kazitext/kazitext-data-construction.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_transforms_protect",
+        "req_kazitext_identity",
+        "req_kazitext_grid",
+        "req_kazitext_switches",
+        "req_kazitext_runtime",
+        "req_frozen_sources"
+      ]
+    },
+    {
+      "name": "sft_data_preparation",
+      "code": "src/data_generation_collection/sft_data/sft_data_preparation.py",
+      "doc": "docs/modules/data_generation_collection/sft_data/sft_data_preparation.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/sft_data/sft_data_preparation.mmd",
+      "test": "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py",
+      "owner": "data_preparation",
+      "pages": [
+        3,
+        18,
+        25,
+        27,
+        30,
+        54,
+        55,
+        69,
+        70,
+        71
+      ],
+      "sections": "3.1; B.1; C.1–C.2.3; E.2.2–E.2.4; H.2–H.3",
+      "old_path": "01-data-generation-collection/01-sft-data/sft-data-preparation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py",
+        "src/data_generation_collection/sft_data/rot13/rot13_data_construction.py",
+        "src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py"
+      ],
+      "requirements": [
+        "req_paired_sources",
+        "req_all_lengths",
+        "req_accepted_counts"
+      ]
+    },
+    {
+      "name": "rl_data_preparation",
+      "code": "src/data_generation_collection/rl_data/rl_data_preparation.py",
+      "doc": "docs/modules/data_generation_collection/rl_data/rl_data_preparation.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/rl_data/rl_data_preparation.mmd",
+      "test": "tests/unit/data_generation_collection/rl_data/test_rl_data_preparation.py",
+      "owner": "data_preparation",
+      "pages": [
+        32,
+        35,
+        54,
+        77
+      ],
+      "sections": "C.3.2,C.3.5; E.2.2; H.7",
+      "old_path": "01-data-generation-collection/02-rl-data/rl-data-preparation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_rl_questions"
+      ]
+    },
+    {
+      "name": "capability_panel_construction",
+      "code": "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/capability_panel/test_capability_panel_construction.py",
+      "owner": "data_preparation",
+      "pages": [
+        38,
+        40,
+        41,
+        72
+      ],
+      "sections": "D.1.2; H.4",
+      "old_path": "01-data-generation-collection/03-evaluation-data/01-capability-panel/capability-panel-construction.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_capability_counts",
+        "req_gsm_strata",
+        "req_mmlu_subjects",
+        "req_arc_mbpp",
+        "req_mbpp_public"
+      ]
+    },
+    {
+      "name": "legibility_subset_construction",
+      "code": "src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/legibility_subset/test_legibility_subset_construction.py",
+      "owner": "data_preparation",
+      "pages": [
+        43,
+        44,
+        78
+      ],
+      "sections": "D.2.3; H.8.2",
+      "old_path": "01-data-generation-collection/03-evaluation-data/02-legibility-subset/legibility-subset-construction.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_legibility_panel"
+      ]
+    },
+    {
+      "name": "simultaneous_bounds",
+      "code": "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/test_simultaneous_bounds.py",
+      "owner": "analysis",
+      "pages": [
+        67,
+        75,
+        76,
+        78,
+        79,
+        80
+      ],
+      "sections": "G.10; H.6,H.8",
+      "old_path": "01-data-generation-collection/03-evaluation-data/03-protocol/01-analysis-plan/01-simultaneous-bounds/simultaneous-bounds.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_windows",
+        "req_paired_draws",
+        "req_design_aware",
+        "req_bounds",
+        "req_degeneracy"
+      ]
+    },
+    {
+      "name": "prospective_analysis_plan",
+      "code": "src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_prospective_analysis_plan.py",
+      "owner": "analysis",
+      "pages": [
+        65,
+        66,
+        67,
+        75,
+        76,
+        78,
+        79,
+        80
+      ],
+      "sections": "G; H.6,H.8,H.9",
+      "old_path": "01-data-generation-collection/03-evaluation-data/03-protocol/01-analysis-plan/prospective-analysis-plan.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py",
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"
+      ],
+      "requirements": [
+        "req_windows",
+        "req_failed_validation"
+      ]
+    },
+    {
+      "name": "evaluation_protocol",
+      "code": "src/data_generation_collection/evaluation_data/protocol/evaluation_protocol.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/protocol/evaluation_protocol.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/evaluation_protocol.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/protocol/test_evaluation_protocol.py",
+      "owner": "evaluation",
+      "pages": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        65,
+        67,
+        72,
+        73,
+        74,
+        75,
+        76,
+        80
+      ],
+      "sections": "D.1–D.2; G; H.4–H.6,H.9",
+      "old_path": "01-data-generation-collection/03-evaluation-data/03-protocol/evaluation-protocol.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py"
+      ],
+      "requirements": [
+        "req_native_eval"
+      ]
+    },
+    {
+      "name": "evaluation_data_preparation",
+      "code": "src/data_generation_collection/evaluation_data/evaluation_data_preparation.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/evaluation_data_preparation.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/evaluation_data_preparation.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/test_evaluation_data_preparation.py",
+      "owner": "data_preparation",
+      "pages": [
+        38,
+        40,
+        41,
+        43,
+        54,
+        72,
+        78
+      ],
+      "sections": "D.1.2; D.2.3; E.2.2; H.4,H.8.2",
+      "old_path": "01-data-generation-collection/03-evaluation-data/evaluation-data-preparation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py",
+        "src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py",
+        "src/data_generation_collection/evaluation_data/protocol/evaluation_protocol.py"
+      ],
+      "requirements": [
+        "req_capability_counts"
+      ]
+    },
+    {
+      "name": "data_generation",
+      "code": "src/data_generation_collection/data_generation.py",
+      "doc": "docs/modules/data_generation_collection/data_generation.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/data_generation.mmd",
+      "test": "tests/unit/data_generation_collection/test_data_generation.py",
+      "owner": "data_preparation",
+      "pages": [
+        3,
+        17,
+        18,
+        27,
+        30,
+        54,
+        55,
+        69,
+        70,
+        71
+      ],
+      "sections": "3.1; B.1; C.1; C.2.3; E.2.2–E.2.4; H.2–H.3",
+      "old_path": "01-data-generation-collection/data-generation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/sft_data/sft_data_preparation.py",
+        "src/data_generation_collection/rl_data/rl_data_preparation.py",
+        "src/data_generation_collection/evaluation_data/evaluation_data_preparation.py"
+      ],
+      "requirements": [
+        "req_paired_sources"
+      ]
+    },
+    {
+      "name": "sft_fit",
+      "code": "src/training/sft/individual_fit/sft_fit.py",
+      "doc": "docs/modules/training/sft/individual_fit/sft_fit.md",
+      "diagram": "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd",
+      "test": "tests/unit/training/sft/individual_fit/test_sft_fit.py",
+      "owner": "sft",
+      "pages": [
+        28,
+        29,
+        30,
+        50,
+        55,
+        56,
+        80
+      ],
+      "sections": "C.2.2–C.2.4; E.1.3; E.2.4,E.2.6; H.9",
+      "old_path": "02-training/01-sft/01-individual-fit/sft-fit.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_sft_fresh",
+        "req_sft_quant",
+        "req_sft_lora",
+        "req_sft_optimization",
+        "req_sft_mask",
+        "req_sft_save"
+      ]
+    },
+    {
+      "name": "sft_training",
+      "code": "src/training/sft/sft_training.py",
+      "doc": "docs/modules/training/sft/sft_training.md",
+      "diagram": "spec/mermaid/workflows/training/sft/sft_training.mmd",
+      "test": "tests/unit/training/sft/test_sft_training.py",
+      "owner": "sft",
+      "pages": [
+        28,
+        29,
+        30,
+        49,
+        50,
+        54,
+        56
+      ],
+      "sections": "C.2; E.1.1–E.1.3; E.2.2,E.2.5",
+      "old_path": "02-training/01-sft/sft-training.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/training/sft/individual_fit/sft_fit.py",
+        "src/training/sft/individual_fit/sft_fit.py"
+      ],
+      "requirements": [
+        "req_matrix",
+        "req_sft_fresh"
+      ]
+    },
+    {
+      "name": "rl_setup",
+      "code": "src/training/rl_grpo/setup/rl_setup.py",
+      "doc": "docs/modules/training/rl_grpo/setup/rl_setup.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/setup/rl_setup.mmd",
+      "test": "tests/unit/training/rl_grpo/setup/test_rl_setup.py",
+      "owner": "rl",
+      "pages": [
+        35,
+        49,
+        50,
+        56,
+        57,
+        77
+      ],
+      "sections": "C.3.5; E.1.2–E.1.3; E.2.6; H.7",
+      "old_path": "02-training/02-rl-grpo/01-setup/rl-setup.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_rl_loss",
+        "req_rl_recipe"
+      ]
+    },
+    {
+      "name": "rollout_collection",
+      "code": "src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py",
+      "doc": "docs/modules/training/rl_grpo/training_cycle/rollouts/rollout_collection.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/training_cycle/rollouts/rollout_collection.mmd",
+      "test": "tests/unit/training/rl_grpo/training_cycle/rollouts/test_rollout_collection.py",
+      "owner": "rl",
+      "pages": [
+        32,
+        35,
+        52,
+        56,
+        57,
+        77
+      ],
+      "sections": "C.3.2,C.3.5; E.1.4,E.2.6; H.7",
+      "old_path": "02-training/02-rl-grpo/02-training-cycle/01-rollouts/rollout-collection.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_rl_group",
+        "req_rl_generation"
+      ]
+    },
+    {
+      "name": "sonnet_opacity_judgment",
+      "code": "src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py",
+      "doc": "docs/modules/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.mmd",
+      "test": "tests/unit/training/rl_grpo/training_cycle/rewards/sonnet_judgment/test_sonnet_opacity_judgment.py",
+      "owner": "rl",
+      "pages": [
+        33,
+        34,
+        51,
+        52,
+        76
+      ],
+      "sections": "C.3.3–C.3.4; E.1.4; H.6.3",
+      "old_path": "02-training/02-rl-grpo/02-training-cycle/02-rewards/01-sonnet-judgment/sonnet-opacity-judgment.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_rl_reward_gate",
+        "req_rl_requests",
+        "req_rl_judge_settings"
+      ]
+    },
+    {
+      "name": "rl_reward",
+      "code": "src/training/rl_grpo/training_cycle/rewards/rl_reward.py",
+      "doc": "docs/modules/training/rl_grpo/training_cycle/rewards/rl_reward.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/training_cycle/rewards/rl_reward.mmd",
+      "test": "tests/unit/training/rl_grpo/training_cycle/rewards/test_rl_reward.py",
+      "owner": "rl",
+      "pages": [
+        32,
+        33,
+        34,
+        35,
+        51,
+        52,
+        76,
+        77
+      ],
+      "sections": "C.3.2–C.3.5; E.1.4; H.6.3,H.7",
+      "old_path": "02-training/02-rl-grpo/02-training-cycle/02-rewards/rl-reward.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/training/rl_grpo/training_cycle/rewards/sonnet_judgment/sonnet_opacity_judgment.py"
+      ],
+      "requirements": [
+        "req_rl_parser",
+        "req_rl_reward_gate",
+        "req_audit_vs_reward"
+      ]
+    },
+    {
+      "name": "grpo_policy_update",
+      "code": "src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py",
+      "doc": "docs/modules/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.mmd",
+      "test": "tests/unit/training/rl_grpo/training_cycle/policy_update/test_grpo_policy_update.py",
+      "owner": "rl",
+      "pages": [
+        35,
+        50,
+        52,
+        56,
+        57,
+        77
+      ],
+      "sections": "C.3.5; E.1.3–E.1.4; E.2.6; H.7",
+      "old_path": "02-training/02-rl-grpo/02-training-cycle/03-policy-update/grpo-policy-update.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_rl_group",
+        "req_rl_loss",
+        "req_rl_recipe",
+        "req_zero_signal"
+      ]
+    },
+    {
+      "name": "grpo_training_cycle",
+      "code": "src/training/rl_grpo/training_cycle/grpo_training_cycle.py",
+      "doc": "docs/modules/training/rl_grpo/training_cycle/grpo_training_cycle.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/training_cycle/grpo_training_cycle.mmd",
+      "test": "tests/unit/training/rl_grpo/training_cycle/test_grpo_training_cycle.py",
+      "owner": "rl",
+      "pages": [
+        34,
+        35,
+        50,
+        52,
+        56,
+        57,
+        77
+      ],
+      "sections": "C.3.4–C.3.5; E.1.3–E.1.4; E.2.6; H.7",
+      "old_path": "02-training/02-rl-grpo/02-training-cycle/grpo-training-cycle.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/training/rl_grpo/training_cycle/rollouts/rollout_collection.py",
+        "src/training/rl_grpo/training_cycle/rewards/rl_reward.py",
+        "src/training/rl_grpo/training_cycle/policy_update/grpo_policy_update.py",
+        "src/training/rl_grpo/setup/rl_setup.py"
+      ],
+      "requirements": [
+        "req_rl_group",
+        "req_rl_pause"
+      ]
+    },
+    {
+      "name": "rl_training",
+      "code": "src/training/rl_grpo/rl_training.py",
+      "doc": "docs/modules/training/rl_grpo/rl_training.md",
+      "diagram": "spec/mermaid/workflows/training/rl_grpo/rl_training.mmd",
+      "test": "tests/unit/training/rl_grpo/test_rl_training.py",
+      "owner": "rl",
+      "pages": [
+        32,
+        33,
+        34,
+        35,
+        49,
+        50,
+        51,
+        52,
+        56,
+        57,
+        77
+      ],
+      "sections": "C.3; E.1.1–E.1.4; E.2.6; H.7",
+      "old_path": "02-training/02-rl-grpo/rl-training.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/training/rl_grpo/setup/rl_setup.py",
+        "src/training/rl_grpo/training_cycle/grpo_training_cycle.py"
+      ],
+      "requirements": [
+        "req_matrix",
+        "req_rl_snapshots"
+      ]
+    },
+    {
+      "name": "training",
+      "code": "src/training/training.py",
+      "doc": "docs/modules/training/training.md",
+      "diagram": "spec/mermaid/workflows/training/training.mmd",
+      "test": "tests/unit/training/test_training.py",
+      "owner": "coordinator",
+      "pages": [
+        2,
+        4,
+        28,
+        29,
+        30,
+        35,
+        49,
+        54,
+        77,
+        80
+      ],
+      "sections": "2; C.2–C.3; E.1.1; E.2.2; H.7,H.9",
+      "old_path": "02-training/training.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/training/sft/sft_training.py",
+        "src/training/rl_grpo/rl_training.py"
+      ],
+      "requirements": [
+        "req_models",
+        "req_matrix"
+      ]
+    },
+    {
+      "name": "condition_evaluation",
+      "code": "src/evaluation/condition_groups/condition_evaluation.py",
+      "doc": "docs/modules/evaluation/condition_groups/condition_evaluation.md",
+      "diagram": "spec/mermaid/workflows/evaluation/condition_groups/condition_evaluation.mmd",
+      "test": "tests/unit/evaluation/condition_groups/test_condition_evaluation.py",
+      "owner": "evaluation",
+      "pages": [
+        35,
+        36,
+        38,
+        41,
+        43,
+        65,
+        67,
+        73,
+        75,
+        76
+      ],
+      "sections": "C.3.6; D.1–D.2; G; H.5–H.6",
+      "old_path": "03-evaluation/01-condition-groups/condition-evaluation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/evaluation/shared_model_evaluation/model_evaluation.py",
+        "src/evaluation/shared_model_evaluation/model_evaluation.py"
+      ],
+      "requirements": [
+        "req_baseline_reuse"
+      ]
+    },
+    {
+      "name": "output_generation",
+      "code": "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_output_generation.py",
+      "owner": "evaluation",
+      "pages": [
+        5,
+        41,
+        44,
+        55,
+        57,
+        72,
+        80
+      ],
+      "sections": "D.1.2,D.2.4; E.2.3,E.2.7; H.4,H.9",
+      "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/01-native-output/output-generation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_native_eval",
+        "req_same_raw",
+        "req_mbpp_public"
+      ]
+    },
+    {
+      "name": "capability_scoring",
+      "code": "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_capability_scoring.py",
+      "owner": "evaluation",
+      "pages": [
+        5,
+        40,
+        41,
+        55,
+        57,
+        72
+      ],
+      "sections": "D.1.2; E.2.3,E.2.7; H.4",
+      "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/02-capability-scoring/capability-scoring.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_scoring",
+        "req_mbpp_extract",
+        "req_mbpp_failure"
+      ]
+    },
+    {
+      "name": "readable_solution_audit",
+      "code": "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/test_readable_solution_audit.py",
+      "owner": "evaluation",
+      "pages": [
+        72,
+        73,
+        74,
+        75,
+        76
+      ],
+      "sections": "H.4–H.6",
+      "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/03-legibility-judging/01-readable-solution-audit/readable-solution-audit.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/shared_procedures/recovery_procedure.py"
+      ],
+      "requirements": [
+        "req_judge_inputs",
+        "req_audit",
+        "req_audit_vs_reward",
+        "req_missingness"
+      ]
+    },
+    {
+      "name": "legibility_judging",
+      "code": "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/test_legibility_judging.py",
+      "owner": "evaluation",
+      "pages": [
+        43,
+        44,
+        45,
+        46,
+        73,
+        74,
+        75,
+        76
+      ],
+      "sections": "D.2; H.5–H.6",
+      "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/03-legibility-judging/legibility-judging.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py"
+      ],
+      "requirements": [
+        "req_scores",
+        "req_judge_inputs",
+        "req_option_a"
+      ]
+    },
+    {
+      "name": "item_evaluation",
+      "code": "src/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/item_evaluation/test_item_evaluation.py",
+      "owner": "evaluation",
+      "pages": [
+        41,
+        44,
+        45,
+        55,
+        57,
+        72,
+        73,
+        74,
+        75
+      ],
+      "sections": "D.1–D.2; E.2.3,E.2.7; H.4–H.6",
+      "old_path": "03-evaluation/02-shared-model-evaluation/01-item-evaluation/item-evaluation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py"
+      ],
+      "requirements": [
+        "req_same_raw"
+      ]
+    },
+    {
+      "name": "model_evaluation",
+      "code": "src/evaluation/shared_model_evaluation/model_evaluation.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/model_evaluation.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/model_evaluation.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/test_model_evaluation.py",
+      "owner": "evaluation",
+      "pages": [
+        5,
+        6,
+        41,
+        43,
+        44,
+        45,
+        57,
+        72,
+        73,
+        75,
+        76
+      ],
+      "sections": "4; D.1–D.2; E.2.7; H.4–H.6",
+      "old_path": "03-evaluation/02-shared-model-evaluation/model-evaluation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/evaluation/shared_model_evaluation/item_evaluation/item_evaluation.py"
+      ],
+      "requirements": [
+        "req_baseline_reuse"
+      ]
+    },
+    {
+      "name": "construction_success_criteria",
+      "code": "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py",
+      "doc": "docs/modules/evaluation/results_analysis/construction_criteria/construction_success_criteria.md",
+      "diagram": "spec/mermaid/workflows/evaluation/results_analysis/construction_criteria/construction_success_criteria.mmd",
+      "test": "tests/unit/evaluation/results_analysis/construction_criteria/test_construction_success_criteria.py",
+      "owner": "analysis",
+      "pages": [
+        65,
+        66,
+        67,
+        75,
+        76,
+        78,
+        79
+      ],
+      "sections": "G; H.6,H.8",
+      "old_path": "03-evaluation/03-results-analysis/01-construction-criteria/construction-success-criteria.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_option_a",
+        "req_missingness",
+        "req_denominators",
+        "req_retention",
+        "req_opacity_floors",
+        "req_transfer_pair"
+      ]
+    },
+    {
+      "name": "results_analysis",
+      "code": "src/evaluation/results_analysis/results_analysis.py",
+      "doc": "docs/modules/evaluation/results_analysis/results_analysis.md",
+      "diagram": "spec/mermaid/workflows/evaluation/results_analysis/results_analysis.mmd",
+      "test": "tests/unit/evaluation/results_analysis/test_results_analysis.py",
+      "owner": "analysis",
+      "pages": [
+        42,
+        45,
+        65,
+        66,
+        67,
+        75,
+        76,
+        78,
+        79,
+        80
+      ],
+      "sections": "D.1.2,D.2.5; G; H.6,H.8",
+      "old_path": "03-evaluation/03-results-analysis/results-analysis.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py",
+        "src/evaluation/results_analysis/construction_criteria/construction_success_criteria.py"
+      ],
+      "requirements": [
+        "req_denominators",
+        "req_reporting",
+        "req_limits"
+      ]
+    },
+    {
+      "name": "evaluation",
+      "code": "src/evaluation/evaluation.py",
+      "doc": "docs/modules/evaluation/evaluation.md",
+      "diagram": "spec/mermaid/workflows/evaluation/evaluation.mmd",
+      "test": "tests/unit/evaluation/test_evaluation.py",
+      "owner": "evaluation",
+      "pages": [
+        5,
+        6,
+        41,
+        42,
+        43,
+        44,
+        45,
+        57,
+        65,
+        67,
+        72,
+        73,
+        74,
+        75,
+        76,
+        80
+      ],
+      "sections": "4; D.1–D.2; E.2.7; G; H.4–H.6,H.9",
+      "old_path": "03-evaluation/evaluation.mmd",
+      "kind": "original_workflow",
+      "child_modules": [
+        "src/evaluation/shared_model_evaluation/model_evaluation.py",
+        "src/evaluation/condition_groups/condition_evaluation.py",
+        "src/evaluation/condition_groups/condition_evaluation.py",
+        "src/evaluation/results_analysis/results_analysis.py"
+      ],
+      "requirements": [
+        "req_matrix"
+      ]
+    },
+    {
+      "name": "recovery_procedure",
+      "code": "src/shared_procedures/recovery_procedure.py",
+      "doc": "docs/modules/shared_procedures/recovery_procedure.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/recovery_procedure.mmd",
+      "test": "tests/unit/shared_procedures/test_recovery_procedure.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        49,
+        50,
+        51,
+        52,
+        53,
+        55,
+        56,
+        57,
+        80
+      ],
+      "sections": "E.1–E.2; H.9",
+      "old_path": "04-shared-procedures/recovery-procedure.mmd",
+      "kind": "original_workflow",
+      "child_modules": [],
+      "requirements": [
+        "req_frozen_sources",
+        "req_zero_signal",
+        "req_retry",
+        "req_oom"
+      ]
+    },
+    {
+      "name": "configuration",
+      "code": "src/shared_procedures/configuration.py",
+      "doc": "docs/modules/shared_procedures/configuration.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/configuration.mmd",
+      "test": "tests/unit/shared_procedures/test_configuration.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        54,
+        55,
+        68,
+        80
+      ],
+      "sections": "E.2.3; H.1,H.9",
+      "purpose": "Load, validate, resolve and hash the scientific configuration; preserve fixed settings and stop on invalid input.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_authority",
+        "req_models",
+        "req_fixed_design",
+        "req_costs",
+        "req_credentials"
+      ]
+    },
+    {
+      "name": "records",
+      "code": "src/shared_procedures/records.py",
+      "doc": "docs/modules/shared_procedures/records.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/records.mmd",
+      "test": "tests/unit/shared_procedures/test_records.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        55,
+        73,
+        74,
+        75,
+        80
+      ],
+      "sections": "E.2.3; H.5–H.6,H.9",
+      "purpose": "Validate typed handoff records, identifiers, dependency hashes, explicit statuses and required provenance.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_clean_eligibility",
+        "req_missingness",
+        "req_provenance"
+      ]
+    },
+    {
+      "name": "identity",
+      "code": "src/shared_procedures/identity.py",
+      "doc": "docs/modules/shared_procedures/identity.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/identity.mmd",
+      "test": "tests/unit/shared_procedures/test_identity.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        25,
+        52,
+        54,
+        55
+      ],
+      "sections": "C.1.3; E.1.4; E.2.3",
+      "purpose": "Create stable cryptographic identifiers and seeds; record code, model, tokenizer, dataset and content identities.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_kazitext_runtime",
+        "req_provenance",
+        "req_cache"
+      ]
+    },
+    {
+      "name": "storage",
+      "code": "src/shared_procedures/storage.py",
+      "doc": "docs/modules/shared_procedures/storage.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/storage.mmd",
+      "test": "tests/unit/shared_procedures/test_storage.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        49,
+        50,
+        51,
+        55,
+        56
+      ],
+      "sections": "E.1.1,E.1.3; E.2.3,E.2.5",
+      "purpose": "Publish verified artifacts atomically where supported, enforce exclusive ownership and durable storage, and invalidate stale dependencies.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_durable",
+        "req_cache",
+        "req_credentials"
+      ]
+    },
+    {
+      "name": "checkpointing",
+      "code": "src/shared_procedures/checkpointing.py",
+      "doc": "docs/modules/shared_procedures/checkpointing.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/checkpointing.mmd",
+      "test": "tests/unit/shared_procedures/test_checkpointing.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        50,
+        51,
+        55,
+        56,
+        57
+      ],
+      "sections": "E.1.3; E.2.3,E.2.6",
+      "purpose": "Save, verify and restore full training state at original step identities; retain specified recovery and scientific snapshots.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_sft_save",
+        "req_rl_snapshots",
+        "req_oom"
+      ]
+    },
+    {
+      "name": "judge_client",
+      "code": "src/shared_procedures/judge_client.py",
+      "doc": "docs/modules/shared_procedures/judge_client.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/judge_client.mmd",
+      "test": "tests/unit/shared_procedures/test_judge_client.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        33,
+        34,
+        45,
+        46,
+        51,
+        52,
+        73,
+        74
+      ],
+      "sections": "C.3.3–C.3.4; D.2.4–D.2.6; E.1.4; H.5",
+      "purpose": "Separate provider transports and per-pass caches; validate schemas and returned identities; preserve outcomes without fabricated rewards or grades.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_rl_judge_settings",
+        "req_cache",
+        "req_retry",
+        "req_rl_pause"
+      ]
+    },
+    {
+      "name": "response_parsing",
+      "code": "src/shared_procedures/response_parsing.py",
+      "doc": "docs/modules/shared_procedures/response_parsing.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/response_parsing.mmd",
+      "test": "tests/unit/shared_procedures/test_response_parsing.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        3,
+        25,
+        32,
+        41,
+        44,
+        72,
+        80
+      ],
+      "sections": "3.1; C.1.3,C.3.2; D.1.2,D.2.4; H.4,H.9",
+      "purpose": "Freeze phase-specific reasoning and final-answer parsing; apply exact numeric/choice/code rules and never repair model answers.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_rl_parser",
+        "req_mbpp_extract"
+      ]
+    },
+    {
+      "name": "cost_accounting",
+      "code": "src/shared_procedures/cost_accounting.py",
+      "doc": "docs/modules/shared_procedures/cost_accounting.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/cost_accounting.mmd",
+      "test": "tests/unit/shared_procedures/test_cost_accounting.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        6,
+        19,
+        30,
+        51,
+        52,
+        56,
+        76
+      ],
+      "sections": "5; B.1.4; C.2.4; E.1.4–E.1.5,E.2.5; H.6.4",
+      "purpose": "Track GPU, API, storage and in-flight costs; enforce current authorization and block new spending when unavailable.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_costs"
+      ]
+    },
+    {
+      "name": "preflight",
+      "code": "src/shared_procedures/preflight.py",
+      "doc": "docs/modules/shared_procedures/preflight.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/preflight.mmd",
+      "test": "tests/unit/shared_procedures/test_preflight.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        6,
+        49,
+        50,
+        51,
+        57,
+        58,
+        67,
+        72,
+        77,
+        79,
+        80
+      ],
+      "sections": "5; E.1–E.2.8; G.9–G.10; H.4,H.7–H.9",
+      "purpose": "Check model/runtime identity, actual loss masks and gradients, persistence/recovery, APIs, sandbox, baseline measurement and statistical readiness before affected launches.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_sft_mask",
+        "req_preflight",
+        "req_history"
+      ]
+    },
+    {
+      "name": "execution_state",
+      "code": "src/shared_procedures/execution_state.py",
+      "doc": "docs/modules/shared_procedures/execution_state.md",
+      "diagram": "spec/mermaid/workflows/shared_procedures/execution_state.mmd",
+      "test": "tests/unit/shared_procedures/test_execution_state.py",
+      "owner": "shared_infrastructure",
+      "pages": [
+        49,
+        50,
+        52,
+        53,
+        55,
+        56,
+        57,
+        80
+      ],
+      "sections": "E.1–E.2; H.9",
+      "purpose": "Track jobs, original steps, attempts, persistent retry counts and explicit pending/running/paused/failed/complete states; prevent duplicate writers.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_durable",
+        "req_retry"
+      ]
+    },
+    {
+      "name": "candidate_manifest",
+      "code": "src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py",
+      "doc": "docs/modules/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.mmd",
+      "test": "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py",
+      "owner": "data_preparation",
+      "pages": [
+        3,
+        17,
+        18,
+        54,
+        55,
+        56,
+        71
+      ],
+      "sections": "3.1; B.1; E.2.2–E.2.4; H.3",
+      "purpose": "Construct authorized English LMSYS first-turn candidates at most 200 tokens, deduplicate, remove detectable overlap and freeze deterministic order.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_lmsys"
+      ]
+    },
+    {
+      "name": "mbpp_sandbox",
+      "code": "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py",
+      "doc": "docs/modules/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.md",
+      "diagram": "spec/mermaid/workflows/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.mmd",
+      "test": "tests/unit/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/test_mbpp_sandbox.py",
+      "owner": "evaluation",
+      "pages": [
+        41,
+        57,
+        72
+      ],
+      "sections": "D.1.2; E.2.7; H.4",
+      "purpose": "Isolate untrusted generated code; withhold hidden tests from prompts and secrets from execution; enforce one CPU, one GiB, five CPU seconds and ten wall seconds.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_mbpp_public",
+        "req_mbpp_isolate",
+        "req_mbpp_failure",
+        "req_credentials"
+      ]
+    },
+    {
+      "name": "baseline_repeatability",
+      "code": "src/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/baseline_repeatability.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_baseline_repeatability.py",
+      "owner": "analysis",
+      "pages": [
+        67,
+        76,
+        78
+      ],
+      "sections": "G.9; H.6.4,H.8.2",
+      "purpose": "Run untouched baselines at seeds 42,43,44 on the same 1233 items; check retention and common overlap without extra legibility calls.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_baseline_diagnostic"
+      ]
+    },
+    {
+      "name": "statistical_validation",
+      "code": "src/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.py",
+      "doc": "docs/modules/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.md",
+      "diagram": "spec/mermaid/workflows/data_generation_collection/evaluation_data/protocol/analysis_plan/statistical_validation.mmd",
+      "test": "tests/unit/data_generation_collection/evaluation_data/protocol/analysis_plan/test_statistical_validation.py",
+      "owner": "analysis",
+      "pages": [
+        67,
+        78,
+        79,
+        80
+      ],
+      "sections": "G.10; H.8",
+      "purpose": "Freeze and execute the design-aware simultaneous-bound simulation plan and quantitative coverage acceptance rule before trained outcome inspection.",
+      "kind": "source_derived_support",
+      "child_modules": [],
+      "requirements": [
+        "req_design_aware",
+        "req_simulation",
+        "req_failed_validation"
+      ]
+    }
+  ]
+}
