@@ -70,6 +70,9 @@ def inspect_pair(candidate):
         if (raw['producer_commit'] != GENERATION_COMMIT or raw['config_hash'] != GENERATION_HASH
                 or raw['runtime']['generation_backend'] != 'vllm_seeded_batch_v1'
                 or raw['candidate_hash'] != content_hash(candidate)
+                or raw['model_id'] != model
+                or raw['model_revision'] != PAIR_CONTEXT['generator'].models[model]['revision']
+                or raw['tokenizer_revision'] != PAIR_CONTEXT['generator'].models[model]['tokenizer_revision']
                 or raw['raw_hash'] != content_hash(raw['raw_generation'])):
             raise ValueError('Raw cache is not the matching fresh production response')
         raws[model] = raw
@@ -85,6 +88,17 @@ def inspect_pair(candidate):
     return process_clean_batch([candidate], PAIR_CONTEXT['generator'], PAIR_CONTEXT['tokenizers'],
                                kazitext=PAIR_CONTEXT['kazitext'], output_dir=data/'clean_traces',
                                config_hash=GENERATION_HASH)[0]
+
+
+def validate_production_models(source, config):
+    for pair in source['pairs']:
+        for model, trace in pair['traces'].items():
+            if (trace['producer_commit'] != GENERATION_COMMIT or trace['simulation'] is not False
+                    or trace['execution_mode'] != 'production'
+                    or trace['runtime']['generation_backend'] != 'vllm_seeded_batch_v1'
+                    or trace['model_revision'] != config['models'][model]['revision']
+                    or trace['tokenizer_revision'] != config['models'][model]['tokenizer_revision']):
+                raise ValueError('Accepted pool contains a foreign engine/model/tokenizer source')
 
 
 def main():
@@ -145,6 +159,7 @@ def main():
         with file_lock(data/'preparation.lock'):
             if a.phase == 'build':
                 source = read_json(data/'accepted/accepted_pool.json')
+                validate_production_models(source,config)
                 completed_files = []
                 def dataset_ready(path, metadata):
                     if metadata.get('kind') != 'sft_dataset':
@@ -259,6 +274,7 @@ def main():
                           'candidate_manifest_hash':full['content_hash'], 'config_hash':GENERATION_HASH,
                           'content_hash':content_hash(all_pairs), 'acceptance_source_commit':commit}
                 validate_accepted_pool(source,GENERATION_HASH)
+                validate_production_models(source,config)
                 source_path = data/'accepted/accepted_pool.json'
                 atomic_write_json(source_path,source)
                 publish([output/'summary.json',source_path])

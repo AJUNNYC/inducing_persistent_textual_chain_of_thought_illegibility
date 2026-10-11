@@ -3880,14 +3880,16 @@ otherwise valid examples to manufacture ten distinct transformations or a monoto
 curve.
 71
 CoT Illegibility - Implementation decisions
-Generate each candidate once per model, cache ordinary failures and their reasons, and accept only jointly valid IDs.
-Use the existing fixed candidate order and deficit-refill procedure until the accepted pool contains exactly 10,000 training
-IDs and 100 separate validation IDs. Ordinary unsuccessful generations are rejections. They are not opportunities to
-resample the same prompt until it passes. Infrastructure retries remain separately governed by the recovery contract.
+Generate each candidate once per model, cache ordinary failures and their reasons, and accept only jointly valid IDs. Use
+the existing fixed candidate order and deficit-refill procedure until the accepted pool contains exactly 10,000 training IDs and
+100 separate validation IDs. Ordinary unsuccessful generations are rejections. They are not opportunities to resample the
+same prompt until it passes. Infrastructure retries remain separately governed by the recovery contract.
 Both model caches must contain only matching fresh vLLM production outputs. Model-specific refill workers retain this
-backend and provenance; the engine does not load both models in one process. Refill orchestration and final pairing are
-still pending. Freeze shared accepted IDs only after all checks, then construct all forty condition datasets and verify their
-Drive copies. Monitoring reports raw generation plus Drive replication; its ETA excludes these subsequent stages.
+backend and provenance; the engine does not load both models in one process. The coordinator now runs cached
+acceptance, exact-deficit model-specific refills, and final construction. Final pairing remains pending during execution.
+Freeze shared accepted IDs only after all checks, then construct all forty condition datasets and verify each condition file
+and its Drive copy. Publish a download index mapping paths and checksums to Drive file IDs. Monitoring reports raw
+generation plus Drive replication; its ETA excludes these subsequent stages.
 ```
 
 ## page_072
