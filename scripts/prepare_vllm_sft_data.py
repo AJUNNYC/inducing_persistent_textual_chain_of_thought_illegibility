@@ -103,12 +103,14 @@ def validate_production_models(source, config):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--phase', choices=['accept', 'build'], required=True)
+    p.add_argument('--phase', choices=['accept', 'build', 'shard'], required=True)
     for key in ('config', 'candidates', 'full-candidates', 'data-root', 'artifact-root', 'cache-root'):
         p.add_argument('--'+key, required=True)
     p.add_argument('--round', type=int, default=0)
     p.add_argument('--workers', type=int, default=8)
     p.add_argument('--chunk-size', type=int, default=128)
+    p.add_argument('--start', type=int, default=0)
+    p.add_argument('--stop', type=int)
     a = p.parse_args()
     if not 1 <= a.workers <= 16 or not 1 <= a.chunk_size <= 128 or a.round < 0:
         p.error('Invalid execution chunk/worker/round limits')
@@ -198,6 +200,47 @@ def main():
             candidates = selected['candidates']
             if selected['selected_candidates_hash'] != content_hash(candidates):
                 raise ValueError('Refill candidate identities differ')
+            if a.phase == 'shard':
+                stop = len(candidates) if a.stop is None else a.stop
+                if not 0 <= a.start < stop <= len(candidates):
+                    raise ValueError('Invalid shard range')
+                generator = CachedOnly(config['models'], cache_root=a.cache_root)
+                PAIR_CONTEXT.update(experiment=experiment, generator=generator,
+                                    tokenizers=tokenizers, data=data)
+                output = data/'verification_shards'/f'round_{a.round:03d}'
+                output.mkdir(parents=True, exist_ok=True)
+                with ProcessPoolExecutor(max_workers=a.workers,
+                                         mp_context=multiprocessing.get_context('fork'),
+                                         initializer=initialize_pair_worker) as pool:
+                    for start in range(a.start, stop, a.chunk_size):
+                        current = candidates[start:min(start+a.chunk_size, stop)]
+                        records = list(pool.map(inspect_pair, current))
+                        target = output/f'chunk_{start:05d}.json'
+                        archive = output/f'transfer_{start:05d}.zip'
+                        atomic_write_json(target, {'records':records,
+                            'configuration_hash':GENERATION_HASH,
+                            'selected_candidates_hash':selected['selected_candidates_hash'],
+                            'start':start, 'stop':start+len(current),
+                            'acceptance_source_commit':commit})
+                        temporary = archive.with_suffix('.zip.tmp')
+                        with zipfile.ZipFile(temporary,'w',zipfile.ZIP_DEFLATED,compresslevel=1) as z:
+                            for record in records:
+                                folder = 'clean_traces' if record['status']=='accepted' else 'rejected_responses'
+                                path = data/'clean_traces'/folder/'production'/(content_hash(record['example_id'])+'.json')
+                                z.write(path, str(path.relative_to(data)))
+                                for model in ('7b','14b'):
+                                    for path in (data/'transform_cache'/model/content_hash(record['example_id'])).glob('*.json'):
+                                        z.write(path, str(path.relative_to(data)))
+                        temporary.replace(archive)
+                        publish([target, archive])
+                        import hashlib
+                        state = {'status':'SHARD_PROGRESS', 'start':start,
+                                 'stop':start+len(current), 'archive':str(archive),
+                                 'sha256':hashlib.sha256(archive.read_bytes()).hexdigest()}
+                        atomic_write_json(output/f'ready_{start:05d}.json',state)
+                        print(json.dumps(state),flush=True)
+                print(json.dumps({'status':'SHARD_COMPLETE','start':a.start,'stop':stop}),flush=True)
+                return
             rounds = data/'acceptance_rounds'
             previous = [read_json(rounds/f'round_{i:03d}/summary.json') for i in range(a.round)]
             cursor = sum(r['processed_count'] for r in previous)
