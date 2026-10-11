@@ -1,0 +1,10 @@
+# Separate GPU inference environment. The original training lock is unchanged.
+# Full installed package versions are recorded in each production run manifest.
+vllm==0.11.0
+transformers==4.57.3
+huggingface-hub==0.36.2
+PyYAML
+requests
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

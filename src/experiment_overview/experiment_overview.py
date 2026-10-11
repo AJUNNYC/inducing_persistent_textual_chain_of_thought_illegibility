@@ -262,7 +262,16 @@ class Experiment:
         if kind=='collect_clean':
             from data_generation_collection.sft_data.clean_trace_collection.clean_trace_collection import collect_clean_traces
             from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import NativeCleanGenerator
-            generator=NativeCleanGenerator(self.config['models'],cache_root=self.cache)
+            backend = self.config.get('runtime', {}).get('generation_backend', {})
+            if backend.get('name') == 'vllm':
+                from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.vllm_generator import VLLMCleanGenerator, BACKEND
+                if backend != BACKEND:
+                    raise ValueError('Configured vLLM backend differs from the frozen implementation')
+                generator=VLLMCleanGenerator(self.config['models'],cache_root=self.cache)
+            elif backend:
+                raise ValueError('Unsupported clean-generation backend')
+            else:
+                generator=NativeCleanGenerator(self.config['models'],cache_root=self.cache)
             backend=self.kazi()
             try:
                 result=collect_clean_traces(self.load(self.data/'candidates'/'manifest.json'),generator,self.tokenizers(),kazitext=backend,output_dir=self.data/'clean_traces',config_hash=self.hash)
