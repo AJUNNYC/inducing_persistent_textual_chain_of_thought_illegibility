@@ -67,13 +67,14 @@ flowchart TD
     ENOUGH{"Fixed quota feasible?"}
     FREEZE["Freeze same 800 ordered IDs<br/>for 7B and 14B"]
     SAVE["Save 100 batches of 8 questions"]
+    DRIVE["Upload immutable question manifest to Google Drive<br/>Verify content and recorded provenance"]
     VALID{"Manifest integrity verified?"}
     REPAIR["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Repair affected artifacts"]
-    OUT["Release verified GRPO questions"]
+    OUT["Release same verified questions to both RL runs<br/>Policy responses generated during training"]
     STOP["Stop: shortage or invalid frozen data"]
     INPUT --> ORDER --> SELECT --> ENOUGH
     ENOUGH -->|No| STOP
-    ENOUGH -->|Yes| FREEZE --> SAVE --> VALID
+    ENOUGH -->|Yes| FREEZE --> SAVE --> DRIVE --> VALID
     VALID -->|Yes| OUT
     VALID -->|No| REPAIR
     REPAIR -->|Permitted| SAVE
@@ -89,3 +90,7 @@ flowchart TD
 %% Owner: data_preparation
 %% Source sections: C.3.2,C.3.5; E.2.2; H.7
 ```
+
+## Current procedure amendment
+
+The approved vLLM corpus migration, Drive-only preservation, frozen RL selection, and remaining validation boundaries are documented in `docs/procedure_update.md` and PDF H.11.

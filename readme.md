@@ -2,7 +2,7 @@
 
 Implemented first-stage research software for paired clean-trace construction,40 independent SFT fits, two GRPO trajectories, native evaluation of62states and prospective construction analysis. No trained experimental outcomes are supplied. Mandatory live launch gates remain enforced.
 
-The controlling scientific source is [the81-page PDF](spec/experiment.pdf). AppendixH governs its explicit amendments; AppendixG retains the construction criteria. The [complete source extraction](docs/protocol_reference.md), [scientific overview](docs/overview.md), [contracts](docs/contracts.md) and [decisions](docs/decisions.md) explain the design. The original PDFs remain byte-for-byte preserved.
+The controlling scientific source is [the protocol PDF](spec/experiment.pdf). AppendixH governs its explicit amendments; AppendixG retains the construction criteria. The [complete source extraction](docs/protocol_reference.md), [scientific overview](docs/overview.md), [contracts](docs/contracts.md) and [decisions](docs/decisions.md) explain the design. The historical source PDF remains byte-for-byte preserved; the active PDF retains its original 81 pages and appends the [11 October procedure amendment](docs/procedure_update.md).
 
 ## Install and inspect
 
@@ -22,3 +22,7 @@ python3.12 scripts/setup_environment.py --profile cpu --venv .venv
 [Architecture](docs/architecture.md), [the complete repository tree](docs/repository_layout.md), [task ownership](docs/delegation.md), [module cards](docs/modules/experiment_overview/experiment_overview.md), [Mermaid index](spec/mermaid/readme.md), [requirements matrix](spec/requirements_manifest.json) and [canonical path manifest](spec/repository_manifest.json) bind implementation, interfaces and source constraints. Six subsystem owners and a coordinator implemented and reviewed this system. Scientific fixture tests are explicitly labeled; they cannot authorize production execution or confirmatory success.
 
 [Validation evidence](docs/validation_report.md) and [acceptance assessment](docs/implementation_acceptance.md) distinguish tested local behavior from unavailable GPU/provider/Drive/RunPod execution. Runtime datasets, checkpoints, model caches and secrets are excluded from Git. They are content-hashed, compatibility-checked and preserved through the canonical artifact service on authorized production runs.
+
+## Current procedure
+
+See [the procedure amendment](docs/procedure_update.md) and [standalone PDF](spec/procedure_update.pdf) for fresh two-Pod vLLM SFT generation, whole-batch Drive verification, archived native outputs, and the verified shared 800-question RL selection. Training and evaluation retain their original recipes and required gates.

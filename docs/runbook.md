@@ -73,3 +73,7 @@ On an ordinary bad model answer or rejected candidate, record the outcome and do
 On a known intentional pause, finish the current logical update if safe, save full state, flush caches/manifests, verify persistence and release the GPU. If a needed RL reward is unavailable, pause before the update; never update an incomplete group. After abrupt termination/OOM, restore only the last verified matching completed checkpoint, not a newly imagined save from a failed process. Document any replay and hardware change; exact bit-for-bit trajectories are not guaranteed across different hardware/kernels. A later policy never substitutes for a missing earlier snapshot.
 
 Keep original immutable manifests and irreplaceable checkpoints backed up separately. Report incomplete jobs/records and spending authorization requests honestly. The finished program may legitimately report inability to launch or indeterminate evidence; it must not achieve a neat report by silently changing experimental treatment.
+
+## Procedure amendment: 11 October 2026
+
+The [current procedure amendment](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

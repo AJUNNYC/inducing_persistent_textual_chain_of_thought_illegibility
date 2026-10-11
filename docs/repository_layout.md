@@ -210,6 +210,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       google_drive.md
       jupyter_consent.md
     overview.md
+    procedure_update.md
     prompts.md
     protocol_reference.md
     repository_layout.md
@@ -230,6 +231,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     rl_pass_b.txt
   pyproject.toml
   readme.md
+  requirements-vllm.txt
   requirements.lock
   requirements_cpu.lock
   schemas/
@@ -245,15 +247,20 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     sft_training_record.json
   scripts/
     authorize_google_drive.py
+    benchmark_vllm_generation.py
+    build_procedure_update_pdf.py
     create_google_consent_notebook.py
     freeze_runtime_config.py
     manage_runpod.py
+    monitor_vllm_generation.py
     prepare_batched_collection.py
     refresh_dependency_locks.py
     revalidate_collection_inputs.py
     run_collection_until.py
     run_experiment.py
+    run_model_generation_worker.py
     run_preflight.py
+    run_vllm_generation_worker.py
     setup_environment.py
     synchronize_manifest.py
     validate_repository.py
@@ -379,6 +386,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             sft_training.mmd
           training.mmd
     module_manifest.json
+    procedure_update.pdf
     repository_manifest.json
     requirements_manifest.json
     source_provenance.json
@@ -416,6 +424,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           candidate_batch/
             __init__.py
             clean_trace_batch.py
+            vllm_generator.py
           candidate_manifest.py
           clean_trace_collection.py
         kazitext/

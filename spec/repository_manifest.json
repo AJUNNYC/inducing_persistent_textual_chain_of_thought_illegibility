@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 431,
+  "files": 440,
   "directories_including_root": 201,
   "entries": [
     {
@@ -2207,6 +2207,17 @@
       "blank": false
     },
     {
+      "path": "docs/procedure_update.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/procedure_update.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_de016ee20fc087",
+      "blank": false
+    },
+    {
       "kind": "documentation",
       "owner": "coordinator",
       "source": "PDF and Mermaid source-derived documentation; repository organization as requested",
@@ -2426,6 +2437,17 @@
       "blank": false
     },
     {
+      "path": "requirements-vllm.txt",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "requirements-vllm.txt",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_cea225e9d407b6",
+      "blank": false
+    },
+    {
       "kind": "implemented_implementation",
       "owner": "shared_infrastructure",
       "source": "E.2.3; H.2.3,H.7,H.9; actual dependencies not supplied",
@@ -2589,6 +2611,28 @@
       "blank": false
     },
     {
+      "path": "scripts/benchmark_vllm_generation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/benchmark_vllm_generation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_528a8aed23a776",
+      "blank": false
+    },
+    {
+      "path": "scripts/build_procedure_update_pdf.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/build_procedure_update_pdf.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_daff3c81f69e50",
+      "blank": false
+    },
+    {
       "path": "scripts/create_google_consent_notebook.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -2619,6 +2663,17 @@
       "display_path": "scripts/manage_runpod.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_67bb645960da60",
+      "blank": false
+    },
+    {
+      "path": "scripts/monitor_vllm_generation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/monitor_vllm_generation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_8640491f23df07",
       "blank": false
     },
     {
@@ -2677,6 +2732,17 @@
       "blank": false
     },
     {
+      "path": "scripts/run_model_generation_worker.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_model_generation_worker.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_a47207fc0391be",
+      "blank": false
+    },
+    {
       "kind": "implemented_implementation",
       "owner": "shared_infrastructure",
       "source": "E.2.8; G.9\u2013G.10; H.8\u2013H.9",
@@ -2685,6 +2751,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_5db50e4653f724",
+      "blank": false
+    },
+    {
+      "path": "scripts/run_vllm_generation_worker.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_vllm_generation_worker.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_8110e6efb2a984",
       "blank": false
     },
     {
@@ -4022,6 +4099,17 @@
       "blank": false
     },
     {
+      "path": "spec/procedure_update.pdf",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "spec/procedure_update.pdf",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_12fe97960463b2",
+      "blank": false
+    },
+    {
       "kind": "structure_metadata",
       "owner": "coordinator",
       "source": "Requested repository organization, grounded in PDF and supplied Mermaid workflow contracts",
@@ -4414,6 +4502,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/src_data_generation_collection.mmd",
       "node": "p_645cc1ea7f3fe9",
+      "blank": false
+    },
+    {
+      "path": "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/vllm_generator.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/vllm_generator.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_223f3785939cc3",
       "blank": false
     },
     {

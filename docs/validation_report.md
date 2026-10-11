@@ -72,3 +72,7 @@ The wording and numbering below follow the master request. `YES` applies only to
 5. **Modular Operation and Google Drive — BLOCKED.** Local stage composition, compatible reuse, full-state recovery and graceful pause have evidence. Required real consent, verified transfers, lifetime durability and complete experimental persistence remain pending.
 
 The recorded publication evidence binds the complete implementation commit; final report-only changes are pushed and reconciled by the same path/content checks. Failed and unrun mandatory checks remain visible. No empirical success is inferred from engineering acceptance.
+
+## Procedure amendment: 11 October 2026
+
+The [current procedure amendment](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

@@ -67,18 +67,21 @@ flowchart TD
 %% No semantic correctness or quality filter. Clean means untransformed baseline output.
 %% Child: PROCESS => candidate_batch/clean_trace_batch.mmd
     INPUT["Filtered LMSYS prompts from the first user turn<br/>In fixed candidate order"]
-    INITIAL["Initial batch: 10,100 new IDs"]
+    INITIAL["Initial batch: 10,100 new IDs<br/>Fresh vLLM responses only; old results archived"]
     PROCESS["src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py<br/>One clean trace candidate batch<br/>Process every candidate in this batch"]
+    WORKERS["Separate 7B and 14B vLLM workers<br/>128 requests per chunk; 3072 new tokens per request"]
+    DRIVE["Save raw responses and provenance<br/>Verify every whole batch in Google Drive<br/>RunPod is disposable scratch"]
+    JOIN["Join both fresh caches by prompt ID<br/>Apply structural and all-transformed checks"]
     COUNT["Count cumulative accepted pairs"]
     ENOUGH{"10,100 accepted?"}
     POOL{"Enough new IDs for the deficit?"}
     REFILL["Next batch size equals<br/>10,100 minus accepted count"]
-    OUT["Return accepted IDs and both models' traces"]
+    OUT["Freeze 10,000 train and 100 validation IDs<br/>Build all ROT13 and KaziText datasets<br/>Verify final Drive copies"]
     STOP["Stop: insufficient candidate pool"]
-    INPUT --> INITIAL --> PROCESS --> COUNT --> ENOUGH
+    INPUT --> INITIAL --> WORKERS --> DRIVE --> JOIN --> PROCESS --> COUNT --> ENOUGH
     ENOUGH -->|Yes| OUT
     ENOUGH -->|No| POOL
-    POOL -->|Yes| REFILL --> PROCESS
+    POOL -->|Yes| REFILL --> WORKERS
     POOL -->|No| STOP
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class PROCESS detail
@@ -92,3 +95,7 @@ flowchart TD
 %% Owner: data_preparation
 %% Source sections: 3.1; B.1; E.2.2–E.2.4; H.2.3,H.3
 ```
+
+## Current procedure amendment
+
+The approved vLLM corpus migration, Drive-only preservation, frozen RL selection, and remaining validation boundaries are documented in `docs/procedure_update.md` and PDF H.11.

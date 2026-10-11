@@ -67,3 +67,7 @@ Do not change models, datasets, accepted counts, panel IDs/counts, training epoc
 ## Freeze and interpretation
 
 All choices were implemented before any trained experimental outcomes existed. Scientific configuration hashes retain code/dependency/model/data/prompt/parser/trainer/sandbox identities. Full operational snapshots separately retain paths, funding and quota evidence. Production runtime requires the actual committed source SHA and lock hash; an unversioned development source cannot authorize paid work. An implementation repair versions affected evidence and derivatives. Historical or wrong-population simulation evidence cannot certify the actual frozen panel. Failed mandatory coverage or reference-executor checks remain launch blockers.
+
+## Procedure amendment: 11 October 2026
+
+The [current procedure amendment](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

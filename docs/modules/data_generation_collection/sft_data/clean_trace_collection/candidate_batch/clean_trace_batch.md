@@ -95,7 +95,7 @@ flowchart TD
 %% Short valid traces and repeated adjacent masks are accepted, not regenerated to manufacture ten distinct masks.
     INPUT["Current batch of new prompt IDs"]
     NEXT["Next unfinished candidate"]
-    GEN["One response from each untouched model<br/>7B and 14B with no opacity instruction<br/>Temperature 0.6 and top_p 0.95<br/>At most 3,072 new tokens"]
+    GEN["Whole prompts decoded concurrently by vLLM<br/>Separate model workers; chunks of 128<br/>One response per untouched 7B or 14B base<br/>BF16 pinned weights; independent per-example seed<br/>No opacity instruction<br/>Temperature 0.6, top_p 0.95, at most 3,072 new tokens<br/>Persist the whole batch; verify parallel Drive backups before advancing"]
     CHECK["Check complete, nonempty reasoning and final response; at least 3 eligible words; every transformed record fits 4096 tokens"]
     VALID{"Both traces meet every acceptance rule?"}
     KEEP["Cache accepted ID and both traces<br/>data/clean_traces/"]
@@ -114,3 +114,7 @@ flowchart TD
 %% Owner: data_preparation
 %% Source sections: 3.1; C.1.3; C.2.3; E.2.4; H.2.3,H.3
 ```
+
+## Current procedure amendment
+
+The approved vLLM corpus migration, Drive-only preservation, frozen RL selection, and remaining validation boundaries are documented in `docs/procedure_update.md` and PDF H.11.

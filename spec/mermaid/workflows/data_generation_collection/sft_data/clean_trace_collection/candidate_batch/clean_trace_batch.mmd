@@ -25,7 +25,7 @@ flowchart TD
 %% Short valid traces and repeated adjacent masks are accepted, not regenerated to manufacture ten distinct masks.
     INPUT["Current batch of new prompt IDs"]
     NEXT["Next unfinished candidate"]
-    GEN["Whole prompts decoded concurrently in GPU batches<br/>One response per untouched 7B or 14B base<br/>Independent per-example seed; no opacity instruction<br/>Temperature 0.6, top_p 0.95, at most 3,072 new tokens<br/>Persist the whole batch; verify parallel Drive backups before advancing"]
+    GEN["Whole prompts decoded concurrently by vLLM<br/>Separate model workers; chunks of 128<br/>One response per untouched 7B or 14B base<br/>BF16 pinned weights; independent per-example seed<br/>No opacity instruction<br/>Temperature 0.6, top_p 0.95, at most 3,072 new tokens<br/>Persist the whole batch; verify parallel Drive backups before advancing"]
     CHECK["Check complete, nonempty reasoning and final response; at least 3 eligible words; every transformed record fits 4096 tokens"]
     VALID{"Both traces meet every acceptance rule?"}
     KEEP["Cache accepted ID and both traces<br/>data/clean_traces/"]

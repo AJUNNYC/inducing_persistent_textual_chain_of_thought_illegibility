@@ -1,6 +1,6 @@
 # protocol_reference.md
 
-Complete page-indexed text extraction from the unchanged 81-page controlling PDF. **The PDF is authoritative.** Extraction can distort equations, spacing, ligatures and table order; inspect the linked page for exact mathematical or visual meaning. Earlier contradicted passages remain here because this is a source transcript, not a silently corrected protocol. Appendix H and Appendix G precedence applies exactly as described in H.1. Sources cited by the PDF are copied as source content and have not been independently re-researched for this repository task.
+Complete page-indexed text extraction of the first 81 pages of the controlling PDF. The appended H.11 procedure update is documented separately in [procedure_update.md](procedure_update.md). **The PDF is authoritative.** Extraction can distort equations, spacing, ligatures and table order; inspect the linked page for exact mathematical or visual meaning. Earlier contradicted passages remain here because this is a source transcript, not a silently corrected protocol. Appendix H and Appendix G precedence applies exactly as described in H.1. Sources cited by the PDF are copied as source content and have not been independently re-researched for this repository task.
 
 ## page_001
 [View PDF page 1](../spec/experiment.pdf#page=1)
