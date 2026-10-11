@@ -1,12 +1,14 @@
 # simultaneous_bounds.md
 
-**Owner:** `analysis`. **Implementation status:** implemented and unit tested; actual eligible-frame coverage validation rejected this candidate; confirmatory launch is blocked.
+**Owner:** `analysis`. **Implementation status:** original candidate rejected; approved evaluation-only concentration guard implemented and tested, with full revised coverage validation underway.
 
 ## Implemented interface and frozen construction
 
 `compute_simultaneous_bounds(records_by_state, plan, draws=10000, seed=42, batch_size=128) -> dict` aligns the entire 62-state question vector and computes every scalar gate. `maximum_standardized_bounds(point, replicates, registry, unresolved=None)` implements the H.8.3 upward-deviation formula. Qualification is never inferred from this numerical computation alone.
 
-The frozen candidate is `nested_rao_wu_conservative_v1`: multinomial `n−1` Rao-Wu rescaled multipliers with first-stage factor `sqrt(1−n/N)`, followed by nested legibility `l−1` multipliers with factor `sqrt(1−l/n)` on the same question vectors. GSM strata remain fixed; MMLU capability keeps all 57 fixed subjects and legibility adds its separate 50-of-57 subject stage. Both nested variance components are retained with intended conservatism. The actual eligible-frame simulation nevertheless failed the prospectively fixed joint-coverage rule; retaining these components does not establish conservative bounds. This construction is not certified by precedent or passing unit tests.
+The original, rejected candidate was `nested_rao_wu_conservative_v1`: multinomial `n−1` Rao-Wu rescaled multipliers with first-stage factor `sqrt(1−n/N)`, followed by nested legibility `l−1` multipliers with factor `sqrt(1−l/n)` on the same question vectors. GSM strata remain fixed; MMLU capability keeps all 57 fixed subjects and legibility adds its separate 50-of-57 subject stage. Both nested variance components are retained with intended conservatism. The actual eligible-frame simulation nevertheless failed the prospectively fixed joint-coverage rule; retaining these components does not establish conservative bounds. This construction is not certified by precedent or passing unit tests.
+
+The approved version is `nested_rao_wu_with_design_concentration_guard_v2`. It returns the smaller of the bootstrap lower bound and a simultaneous bounded-variable ratio lower bound, without changing estimates, bootstrap standard errors, training inputs or optimization. The guard respects fixed strata and separates MMLU question and subject uncertainty. Its sampling argument and all numerical conventions are frozen in [the method specification](../../../../../../statistical_concentration_guard.md).
 
 Numerical conventions are float64 totals/replicates, bootstrap sample standard deviation (`ddof=1`), 128-draw batches, a distinct seed-42 namespace and empirical 95th percentile `method="higher"`. Zero/unsupported variance (32 machine epsilons), any undefined draw, empty denominator or required unresolved evidence produces an indeterminate gate with a natural-range lower bound; no such gate disappears from the family. Infrastructure-missing baseline generation remains unknown, separately from an ordinary observed unassessable trace. Resampled weighted intersection denominators are recomputed, never fixed to their observed counts.
 
@@ -125,7 +127,8 @@ flowchart TD
 %% Per draw b, M_b = max_j[(theta_star_bj - theta_hat_j)/se_j] over the full prespecified scalar family.
 %% Unresolved metrics follow prospectively frozen indeterminate handling; never drop them after viewing outcomes.
 %% Let c95 = max(0, percentile95(M_b)) using the frozen percentile convention.
-%% Simultaneous lower bounds are theta_hat_j - c95*se_j.
+%% Approved before trained outcomes: cap bootstrap bounds with the full-family SRSWOR concentration ratio guard.
+%% This conservative evaluation-only revision preserves every SFT input and optimization setting.
 %% Qualification requires the relevant lower bounds to clear their fixed floors; report crossing bounds as indeterminate.
 %% Zero variance, empty required denominators and degenerate resamples need validated frozen handling, never zero-width certainty.
 %% Validation simulations must include boundary cases, correlated checkpoints, uneven domains,
@@ -141,12 +144,13 @@ flowchart TD
     VALID{"Required metrics support validated bounds?"}
     MAXIMUM["Take each draw's maximum standardized upward deviation"]
     BOUNDS["Use the nonnegative 95th-percentile critical value for simultaneous lower bounds"]
+    GUARD["Cap bounds with simultaneous design concentration ratios; retain both bounds"]
     OUT["Return bounds, all candidate metrics and explicit limitations"]
     UNKNOWN["Return affected claims indeterminate; no fabricated certainty"]
     INPUT --> FAMILY --> CHECK
     CHECK -->|Yes| POINT --> SAMPLE --> RECOMPUTE --> SE --> VALID
     CHECK -->|No| UNKNOWN
-    VALID -->|Yes| MAXIMUM --> BOUNDS --> OUT
+    VALID -->|Yes| MAXIMUM --> BOUNDS --> GUARD --> OUT
     VALID -->|No| UNKNOWN
 
 %% Repository module: src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py

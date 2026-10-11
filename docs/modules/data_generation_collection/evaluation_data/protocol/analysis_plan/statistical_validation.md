@@ -1,6 +1,6 @@
 # statistical_validation.md
 
-**Owner:** `analysis`. **Implementation status:** implemented and unit tested; actual eligible-frame coverage validation rejected the candidate and confirmatory launch is blocked. Final-code revalidation completed with the same mandatory rejection.
+**Owner:** `analysis`. **Implementation status:** original candidate rejected; approved evaluation-only guard implemented and targeted checks passed. Full revised seven-scenario validation is underway; no passing certificate is claimed yet.
 
 ## Implemented interface and prospective acceptance rule
 

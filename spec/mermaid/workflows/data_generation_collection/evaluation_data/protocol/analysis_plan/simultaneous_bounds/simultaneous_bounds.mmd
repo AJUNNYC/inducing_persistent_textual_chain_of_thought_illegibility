@@ -26,7 +26,8 @@ flowchart TD
 %% Per draw b, M_b = max_j[(theta_star_bj - theta_hat_j)/se_j] over the full prespecified scalar family.
 %% Unresolved metrics follow prospectively frozen indeterminate handling; never drop them after viewing outcomes.
 %% Let c95 = max(0, percentile95(M_b)) using the frozen percentile convention.
-%% Simultaneous lower bounds are theta_hat_j - c95*se_j.
+%% Approved before trained outcomes: cap bootstrap bounds with the full-family SRSWOR concentration ratio guard.
+%% This conservative evaluation-only revision preserves every SFT input and optimization setting.
 %% Qualification requires the relevant lower bounds to clear their fixed floors; report crossing bounds as indeterminate.
 %% Zero variance, empty required denominators and degenerate resamples need validated frozen handling, never zero-width certainty.
 %% Validation simulations must include boundary cases, correlated checkpoints, uneven domains,
@@ -42,12 +43,13 @@ flowchart TD
     VALID{"Required metrics support validated bounds?"}
     MAXIMUM["Take each draw's maximum standardized upward deviation"]
     BOUNDS["Use the nonnegative 95th-percentile critical value for simultaneous lower bounds"]
+    GUARD["Cap bounds with simultaneous design concentration ratios; retain both bounds"]
     OUT["Return bounds, all candidate metrics and explicit limitations"]
     UNKNOWN["Return affected claims indeterminate; no fabricated certainty"]
     INPUT --> FAMILY --> CHECK
     CHECK -->|Yes| POINT --> SAMPLE --> RECOMPUTE --> SE --> VALID
     CHECK -->|No| UNKNOWN
-    VALID -->|Yes| MAXIMUM --> BOUNDS --> OUT
+    VALID -->|Yes| MAXIMUM --> BOUNDS --> GUARD --> OUT
     VALID -->|No| UNKNOWN
 
 %% Repository module: src/data_generation_collection/evaluation_data/protocol/analysis_plan/simultaneous_bounds/simultaneous_bounds.py
