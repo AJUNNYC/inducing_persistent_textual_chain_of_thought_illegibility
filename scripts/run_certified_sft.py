@@ -65,6 +65,11 @@ def main():
     parser.add_argument('--family', choices=('rot13','kazitext'), default='rot13')
     parser.add_argument('--model', choices=('7b','14b'), default='7b')
     parser.add_argument('--level', type=int, choices=range(1,11))
+    parser.add_argument('--execution-benchmark', help='Hash-verified accepted target-GPU benchmark receipt.')
+    parser.add_argument('--execution-profile', help='Accepted profile name in the benchmark plan.')
+    parser.add_argument('--migration-checkpoint', help='Verified original full-state checkpoint; preserved unchanged.')
+    parser.add_argument('--migration-receipt', help='Preserved pause receipt containing the original exact identity.')
+    parser.add_argument('--recovery-benchmark', help='Paired target-GPU continuation measurement from the original checkpoint.')
     parser.add_argument('--validate-only', action='store_true',
                         help='Validate saved launch bindings without GPU work or Drive requests.')
     args = parser.parse_args()
@@ -78,8 +83,36 @@ def main():
     certificate = read_json(args.certificate)
     tasks = certified_tasks(config,certificate,read_json(args.bundle),read_json(args.worklist),
                             family=args.family,model=args.model,level=args.level)
+    execution_profile = None
+    execution_benchmark = None
+    if bool(args.execution_benchmark) != bool(args.execution_profile):
+        raise ValueError('Execution activation requires both benchmark and profile')
+    if args.execution_benchmark:
+        from training.sft.execution_profile import SFTExecutionProfile
+        from training.sft.runtime_migration import validate_execution_benchmark
+        execution_benchmark = read_json(args.execution_benchmark)
+        settings = execution_benchmark['plan']['profiles'][args.execution_profile]
+        execution_profile = SFTExecutionProfile(**settings)
+        approval = validate_execution_benchmark(execution_benchmark,experiment.code,execution_profile,
+                                               profile_name=args.execution_profile)
+        if (approval['configuration_hash'] != experiment.hash or len(tasks) != 1
+                or approval['condition'] != {'family':args.family,'model':args.model,'level':args.level}):
+            raise ValueError('Activation evidence must match the one selected certified fit')
+    migration = None
+    if any((args.migration_checkpoint,args.migration_receipt,args.recovery_benchmark)):
+        if not all((args.migration_checkpoint,args.migration_receipt,args.recovery_benchmark,
+                    args.execution_benchmark,args.execution_profile,args.level)):
+            raise ValueError('Runtime migration requires original recovery, paired measurements and one accepted fit')
+        migration = read_json(args.migration_receipt)
+        if migration.get('receipt_hash') != content_hash({k:v for k,v in migration.items() if k != 'receipt_hash'}):
+            raise ValueError('Original pause receipt integrity differs')
     preflight = load_preflight_evidence(args.preflight,config)
     require_preflights(preflight,preflight_requirements('training'),expected_configuration_hash=experiment.hash)
+    if preflight.get('ready_scope') is not None:
+        expected_scope = {'family':args.family,'model':args.model,'level':args.level}
+        if (len(tasks) != 1 or preflight['ready_scope'] != expected_scope
+                or execution_profile is None):
+            raise ValueError('Target-condition preflight cannot authorize another condition or execution profile')
     deadline = datetime.fromisoformat(args.deadline.replace('Z','+00:00'))
     if deadline.utcoffset() is None or deadline.utcoffset().total_seconds() != 0:
         raise ValueError('Deadline must use UTC')
@@ -132,8 +165,23 @@ def main():
                 status('RUNNING',completed_steps=0,drive_status='VERIFIED')
                 train, validation = load_dataset_bundle(task['dataset'])
                 output = output_root/spec.family/spec.model_id/f'level_{spec.level:02d}'
+                if migration is not None:
+                    from training.sft.runtime_migration import migrate_checkpoint
+                    identity = {**spec.identity(),'code_revision':experiment.code,
+                                'dependency_hash':config['runtime']['dependency_lock_hash'],
+                                'execution_profile':execution_profile.to_dict()}
+                    original = migration['checkpoint_manifest']
+                    target = output/f"checkpoint_{original['progress']['completed_steps']:06d}"
+                    lineage = migrate_checkpoint(args.migration_checkpoint,target,original['identity'],identity,
+                        execution_profile,execution_benchmark,
+                        recovery_report=read_json(args.recovery_benchmark))
+                    lineage_path = output/'runtime_migration.json'
+                    atomic_write_json(lineage_path,lineage)
+                    experiment.publish_permanent(lineage_path,{'identity':identity,'kind':'sft_runtime_migration'})
+                    migration = None
                 result = run_sft_fit(spec,train,validation,output,config,preflight_report=preflight,
-                                    should_pause=should_pause,handoff_certificate=certificate)
+                                    should_pause=should_pause,handoff_certificate=certificate,
+                                    execution_profile=execution_profile,execution_benchmark=execution_benchmark)
                 # Checkpoint notifications are synchronous Drive barriers. Final
                 # adapter publication has a separate verified payload inventory.
                 adapter = output/'final_adapter'

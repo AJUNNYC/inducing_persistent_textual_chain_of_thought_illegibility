@@ -16,6 +16,7 @@ from pathlib import Path
 import random
 import shutil
 import time
+from types import MappingProxyType
 from typing import Any, Callable, Mapping, Sequence
 
 from training.sft.execution_profile import SFTExecutionProfile, resolve_execution_profile
@@ -274,6 +275,71 @@ def collate_completion(examples: Sequence[Mapping[str, Any]], pad_token_id: int,
     return batch
 
 
+@dataclass(frozen=True)
+class PreparedCompletionBatch:
+    """Private read-only input snapshot with ordinary in-place mutation guards.
+
+    Tensor storage is not security-grade immutable: callers must not bypass
+    PyTorch version tracking through ``.data`` or external storage writes.
+    """
+    tensors: Mapping[str, Any]
+    input_ids: tuple[int, ...]
+    labels: tuple[int, ...]
+    example_id: Any
+    pad_token_id: int
+    tensor_versions: tuple[tuple[str, int], ...]
+    resident_bytes: int
+
+    def batch_for(self, example: Mapping[str, Any], pad_token_id: int, device: Any) -> Mapping[str, Any]:
+        import torch
+        if (tuple(example["input_ids"]) != self.input_ids
+                or tuple(example["labels"]) != self.labels
+                or example.get("example_id") != self.example_id
+                or pad_token_id != self.pad_token_id):
+            raise SFTInputError("Cached completion batch differs from the frozen input")
+        selected_device = torch.device(device)
+        if selected_device.type == 'cuda' and selected_device.index is None:
+            selected_device = torch.device('cuda', torch.cuda.current_device())
+        if any(self.tensors[key]._version != version or self.tensors[key].device != selected_device
+               for key, version in self.tensor_versions):
+            raise SFTInputError("Cached completion tensor was mutated or belongs to another device")
+        counts = self.tensors.get("validated_completion_counts")
+        if counts is not None and (counts.labels is not self.tensors["labels"]
+                or counts.labels_version != counts.labels._version
+                or counts.counts_version != counts.counts._version):
+            raise SFTInputError("Cached supervised counts were mutated or substituted")
+        return self.tensors
+
+
+def _prepare_completion_input_cache(examples: Sequence[Mapping[str, Any]], pad_token_id: int,
+                                    device: Any, *, validate_counts: bool = False) -> tuple[PreparedCompletionBatch, ...]:
+    """Construct snapshots without RNG use; CPU calls support declared fixtures."""
+    if not examples:
+        raise SFTInputError("Cannot prepare an empty completion input cache")
+    cached = []
+    for example in examples:
+        batch = collate_completion([example], pad_token_id, device, validate_counts=validate_counts)
+        tensor_keys = ("input_ids", "attention_mask", "labels")
+        resident_bytes = sum(batch[key].numel() * batch[key].element_size() for key in tensor_keys)
+        counts = batch.get("validated_completion_counts")
+        if counts is not None:
+            resident_bytes += counts.counts.numel() * counts.counts.element_size()
+        cached.append(PreparedCompletionBatch(
+            MappingProxyType(batch), tuple(example["input_ids"]), tuple(example["labels"]),
+            example.get("example_id"), pad_token_id,
+            tuple((key, batch[key]._version) for key in tensor_keys), resident_bytes))
+    return tuple(cached)
+
+
+def prepare_cuda_input_cache(examples: Sequence[Mapping[str, Any]], pad_token_id: int,
+                             device: Any, *, validate_counts: bool = False) -> tuple[PreparedCompletionBatch, ...]:
+    """Keep this fit's exact collated int64 inputs resident on the selected GPU."""
+    import torch
+    if torch.device(device).type != 'cuda':
+        raise SFTRuntimeBlocked("Production collated-input cache requires a CUDA device")
+    return _prepare_completion_input_cache(examples, pad_token_id, device, validate_counts=validate_counts)
+
+
 def completion_loss(logits: Any, labels: Any, *, validated_counts: Any = None) -> Any:
     """Mean assistant-token CE within example, then mean across examples.
 
@@ -331,7 +397,8 @@ def restore_rng(state: Mapping[str, Any]) -> None:
         torch.cuda.set_rng_state_all(state["torch_cuda"])
 
 
-def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: int, *, require_lora: bool = True) -> dict[str, Any]:
+def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: int, *, require_lora: bool = True,
+                          prepared_batch: PreparedCompletionBatch | None = None) -> dict[str, Any]:
     """Actual backward pass; preserve RNG and clear gradients without updating."""
     import torch
     before = capture_rng()
@@ -339,7 +406,8 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
     model.zero_grad(set_to_none=True)
     try:
         device = next(model.parameters()).device
-        batch = collate_completion([example], pad_token_id, device)
+        batch = (prepared_batch.batch_for(example, pad_token_id, device) if prepared_batch is not None
+                 else collate_completion([example], pad_token_id, device))
         logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
         loss = completion_loss(logits, batch["labels"])
         if not torch.isfinite(loss):
@@ -368,7 +436,8 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
 
 def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
                          examples: Sequence[Mapping[str, Any]], pad_token_id: int,
-                         *, execution_profile: SFTExecutionProfile | None = None) -> tuple[Any, ...]:
+                         *, execution_profile: SFTExecutionProfile | None = None,
+                         prepared_batches: Sequence[PreparedCompletionBatch] | None = None) -> tuple[Any, ...]:
     """One real update, also used by the isolated hardware benchmark.
 
     The optional count metadata preserves CE and reduction operation order.
@@ -382,10 +451,23 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
     if not 1 <= len(examples) <= recipe.gradient_accumulation_steps:
         raise SFTInputError("One SFT update requires one to sixteen ordered examples")
     device = next(model.parameters()).device
+    if profile.cache_collated_inputs:
+        if prepared_batches is None or len(prepared_batches) != len(examples):
+            raise SFTInputError("Cached execution requires one prepared batch for every ordered example")
+        # Validate the entire group before accumulating any gradient.
+        batches = [batch.batch_for(example, pad_token_id, device)
+                   for batch, example in zip(prepared_batches, examples, strict=True)]
+        if any(("validated_completion_counts" in batch) != profile.validated_loss_counts for batch in batches):
+            raise SFTInputError("Cached completion counts differ from the selected execution profile")
+    elif prepared_batches is not None:
+        raise SFTInputError("Prepared input batches require the explicit cache execution profile")
+    else:
+        batches = None
     optimizer.zero_grad(set_to_none=True)
     losses = []
-    for example in examples:
-        batch = collate_completion([example], pad_token_id, device, validate_counts=profile.validated_loss_counts)
+    for position, example in enumerate(examples):
+        batch = (batches[position] if batches is not None else
+                 collate_completion([example], pad_token_id, device, validate_counts=profile.validated_loss_counts))
         counts = batch["validated_completion_counts"] if profile.validated_loss_counts else None
         loss = completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
                                batch["labels"], validated_counts=counts)
@@ -407,7 +489,8 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
                             *, progress: Mapping[str, Any] | None = None,
                             save: Callable[[dict[str, Any]], None] | None = None,
                             should_pause: Callable[[], bool] | None = None,
-                            execution_profile: SFTExecutionProfile | None = None) -> dict[str, Any]:
+                            execution_profile: SFTExecutionProfile | None = None,
+                            prepared_batches: Sequence[PreparedCompletionBatch] | None = None) -> dict[str, Any]:
     """Real optimizer loop, shared by GPU production and tiny CPU fixtures.
 
     Pause happens only after one complete logical optimizer update. Exceptions
@@ -422,16 +505,28 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
     position = int((progress or {}).get("sampler_position", 0))
     if progress and progress.get("exposure_order_hash") != order_hash:
         raise SFTInputError("Resume sampler/exposure identity mismatch")
-    if progress and progress.get("execution_profile", SFTExecutionProfile().to_dict()) != profile.to_dict():
-        raise SFTInputError("Resume execution profile differs; declare a runtime migration")
+    if progress:
+        try:
+            previous_profile = SFTExecutionProfile.from_dict(progress.get("execution_profile", {}))
+        except (TypeError, ValueError) as error:
+            raise SFTInputError("Checkpoint execution profile is invalid") from error
+        if previous_profile != profile:
+            raise SFTInputError("Resume execution profile differs; declare a runtime migration")
     if completed < 0 or completed > total_steps or position != min(completed * 16, len(order)):
         raise SFTInputError("Checkpoint is not at a completed optimizer boundary")
     processed_tokens = int((progress or {}).get("processed_tokens", 0))
+    if profile.cache_collated_inputs and prepared_batches is None:
+        prepared_batches = prepare_cuda_input_cache(examples, pad_token_id, next(model.parameters()).device,
+                                                    validate_counts=profile.validated_loss_counts)
+    if prepared_batches is not None and len(prepared_batches) != len(examples):
+        raise SFTInputError("Prepared input cache does not cover the exact frozen corpus")
     model.train()
     for step in range(completed, total_steps):
         indices = order[position:position + recipe.gradient_accumulation_steps]
         one_optimizer_update(model, optimizer, scheduler, [examples[index] for index in indices],
-                             pad_token_id, execution_profile=profile)
+                             pad_token_id, execution_profile=profile,
+                             prepared_batches=([prepared_batches[index] for index in indices]
+                                               if prepared_batches is not None else None))
         position += len(indices)
         processed_tokens += sum(len(examples[index]["input_ids"]) for index in indices)
         completed = step + 1
@@ -498,7 +593,14 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
     model = get_peft_model(model, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05,
                                            target_modules=list(TARGET_MODULES), bias="none", task_type="CAUSAL_LM"))
+    # Keep identical quantized-model preparation and PEFT hooks for every
+    # candidate, changing only whether activation recomputation is scheduled.
     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    if not profile.gradient_checkpointing:
+        model.gradient_checkpointing_disable()
+    actual_gradient_checkpointing = bool(model.is_gradient_checkpointing)
+    if actual_gradient_checkpointing != profile.gradient_checkpointing:
+        raise SFTRuntimeBlocked("Actual model gradient checkpointing differs from execution profile")
     optimizer = bnb.optim.PagedAdamW32bit([parameter for parameter in model.parameters() if parameter.requires_grad],
                                          lr=2e-4, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.0)
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=math.ceil(1250 * 0.03), num_training_steps=1250)
@@ -506,6 +608,7 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
                "vram_bytes": torch.cuda.get_device_properties(torch.device(device)).total_memory,
                "cuda_version": torch.version.cuda, "attention_implementation": profile.attention_implementation,
                "execution_profile": profile.to_dict(), "use_reentrant": False,
+               "gradient_checkpointing": actual_gradient_checkpointing,
                "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8, "warmup_steps": 38,
                "packages": {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "bitsandbytes", "numpy")}}
     return model, tokenizer, optimizer, scheduler, runtime
@@ -653,7 +756,9 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
                 config: Mapping[str, Any], *, resume: str | Path | None = None,
                 preflight_report: Mapping[str, Any] | None = None,
                 should_pause: Callable[[], bool] | None = None,
-                handoff_certificate: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                handoff_certificate: Mapping[str, Any] | None = None,
+                execution_profile: SFTExecutionProfile | None = None,
+                execution_benchmark: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Train the exact fit, or continue only its verified full recovery state.
 
     Caller must provide real preflight evidence; this function never turns unit
@@ -664,6 +769,7 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
     from shared_procedures.checkpointing import load_checkpoint, save_checkpoint, verify_checkpoint
     from shared_procedures.preflight import require_preflights
     from shared_procedures.storage import atomic_write_json
+    profile = resolve_execution_profile(execution_profile)
     if not isinstance(spec, SFTFitSpec):
         spec = SFTFitSpec.from_dict(spec)
     if config.get("sft", {}).get("loss_reduction") != LOSS_REDUCTION:
@@ -681,6 +787,21 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
                 "dependency_hash": config.get("runtime", {}).get("dependency_lock_hash")}
     if not identity["code_revision"] or not identity["dependency_hash"]:
         raise SFTInputError("Resolved code and dependency identities are required")
+    execution_approval = None
+    if profile != SFTExecutionProfile():
+        if execution_benchmark is None:
+            raise SFTRuntimeBlocked("Nonbaseline SFT execution requires selected-GPU empirical approval")
+        from training.sft.runtime_migration import validate_execution_benchmark
+        execution_approval = validate_execution_benchmark(
+            dict(execution_benchmark), identity["code_revision"], profile)
+        required_condition = {"family": spec.family, "model": spec.model_id, "level": spec.level}
+        if (execution_approval.get("accepted") is not True
+                or execution_approval.get("configuration_hash") != spec.configuration_hash
+                or execution_approval.get("handoff_certificate_hash") != spec.handoff_certificate_hash
+                or execution_approval.get("condition") != required_condition):
+            raise SFTRuntimeBlocked("Execution benchmark does not approve this exact frozen SFT fit")
+        # Published baseline identities remain byte-for-byte compatible.
+        identity["execution_profile"] = profile.to_dict()
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     import fcntl
@@ -702,7 +823,18 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
         atomic_write_json(output / "run_identity.json", identity)
         restored = load_checkpoint(resume, identity) if resume is not None else None
         _record_fit_attempt(output, identity, resume, restored['progress'] if restored else None)
-        model, tokenizer, optimizer, scheduler, runtime = _runtime(spec, config.get("runtime", {}).get("sft_device", "cuda:0"), cache_root=config.get("runtime", {}).get("cache_root"))
+        model, tokenizer, optimizer, scheduler, runtime = _runtime(
+            spec, config.get("runtime", {}).get("sft_device", "cuda:0"),
+            cache_root=config.get("runtime", {}).get("cache_root"), execution_profile=profile)
+        if execution_approval is not None:
+            measured_hardware = execution_approval.get("hardware")
+            actual_hardware = {"gpu": runtime["gpu_name"], "vram_bytes": runtime["vram_bytes"],
+                               "cuda": runtime["cuda_version"]}
+            if (not isinstance(measured_hardware, Mapping)
+                    or any(measured_hardware.get(key) != value for key, value in actual_hardware.items())
+                    or execution_approval.get("packages") != runtime["packages"]):
+                raise SFTRuntimeBlocked("Actual selected GPU or packages differ from approved execution benchmark")
+            runtime["execution_approval"] = execution_approval
         from peft import get_peft_model_state_dict, set_peft_model_state_dict
         train = [tokenize_completion(record, tokenizer) for record in train_records]
         validation = [tokenize_completion(record, tokenizer) for record in validation_records]
@@ -726,7 +858,8 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
                 shutil.rmtree(old)
         start = time.monotonic()
         progress = train_optimizer_updates(model, optimizer, scheduler, train, tokenizer.pad_token_id,
-                    progress=restored["progress"] if restored else None, save=save, should_pause=should_pause)
+                    progress=restored["progress"] if restored else None, save=save, should_pause=should_pause,
+                    execution_profile=profile)
         if progress["status"] == "paused":
             result = {"status": "paused", "run_id": spec.run_id, "identity": identity, "progress": progress}
             atomic_write_json(output / "fit_status.json", result)

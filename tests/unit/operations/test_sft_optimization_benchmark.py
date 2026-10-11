@@ -14,9 +14,11 @@ SPEC.loader.exec_module(MODULE)
 
 def static_inputs(tmp_path, monkeypatch):
     commit = "a" * 40
-    config = {"runtime": {"implementation_revision": commit}}
+    config = {"runtime": {"implementation_revision": commit, "dependency_lock_hash": "d" * 64}}
     task = {"family": "rot13", "model_id": "7b", "level": 1,
-            "spec": {"dataset_hash": "b" * 64}, "dataset": {"train_path": "/unread/corpus"}}
+            "spec": MODULE.sft_fit.SFTFitSpec("rot13", "7b", 1, "d" * 40, "e" * 40,
+                "f" * 64, "b" * 64, "a" * 64, "c" * 64).identity(),
+            "dataset": {"train_path": "/unread/corpus"}}
     values = {"config": config, "certificate": {"certificate_hash": "c" * 64},
               "bundle": {"datasets": [task["dataset"]]}, "worklist": [task]}
     argv = []
@@ -48,8 +50,9 @@ def test_plan_only_reports_stale_certificate_without_reading_corpus_or_starting_
     assert "compatibility differs" in plan["binding_errors"][0]
     assert plan["approved_for_production"] is False
     assert plan["official_training_state_modified"] is False
-    assert len(plan["selected_record_indices"]) == 48
-    assert plan["selected_record_indices"] == MODULE.sft_fit.exposure_order(10000)[:48]
+    assert len(plan["selected_record_indices"]) == 96
+    assert plan["selected_record_indices"] == MODULE.sft_fit.exposure_order(10000)[:96]
+    assert plan["paired_repetitions"] == 2
 
 
 def test_gpu_path_cannot_ignore_stale_source_certificate(tmp_path, monkeypatch):
@@ -72,9 +75,14 @@ def test_matching_certificate_cannot_authorize_dirty_executed_source(tmp_path, m
 
 def measured_fixture():
     return {"status": "MEASURED", "plan_hash": "frozen", "finite": True,
+            "profile": "baseline", "settings": dict(MODULE.PROFILE_SETTINGS["baseline"]),
+            "actual_execution_policy": {"gradient_checkpointing": True, "cache_collated_inputs": False,
+                "attention_implementation": "eager", "use_cache": False, "checkpoint_rng_preserved": True},
             "tokenized_records_hash": "exact mask and token IDs", "data": {"dataset_hash": "frozen"},
             "initial_adapter_hash": "initial", "initial_rng_hash": "rng0", "final_rng_hash": "rng1",
-            "losses": [1.0, 2.0], "median_update_seconds": 10.0, "wall_seconds_per_update": [10.0, 10.0]}
+            "initial_optimizer_state_hash": "opt0", "initial_scheduler_state_hash": "sched0",
+            "final_optimizer_state_hash": "opt1", "final_scheduler_state_hash": "sched1",
+            "losses": [1.0, 2.0], "median_update_seconds": 10.0, "wall_seconds_per_update": [10.0] * 5}
 
 
 def declared_bounds():
@@ -91,7 +99,7 @@ def state_fixture():
 
 def test_exact_numerical_match_and_measured_gain_remain_a_technical_screen():
     baseline = measured_fixture()
-    candidate = {**baseline, "median_update_seconds": 8.0, "wall_seconds_per_update": [8.0, 8.0]}
+    candidate = {**baseline, "median_update_seconds": 8.0, "wall_seconds_per_update": [8.0] * 5}
     state = state_fixture()
     result = MODULE.compare_profiles(baseline, candidate, state, state, declared_bounds())
     assert result["technical_gate"] == "PASSED"
@@ -103,13 +111,25 @@ def test_exact_numerical_match_and_measured_gain_remain_a_technical_screen():
 
 def test_noisy_median_speedup_is_not_sufficient_for_a_pass():
     baseline = measured_fixture()
-    candidate = {**baseline, "median_update_seconds": 9.0, "wall_seconds_per_update": [7.0, 11.0]}
+    candidate = {**baseline, "median_update_seconds": 9.0, "wall_seconds_per_update": [7.0, 8.0, 9.0, 10.0, 11.0]}
     state = state_fixture()
     result = MODULE.compare_profiles(baseline, candidate, state, state, declared_bounds())
     assert result["measured_speedup"] > declared_bounds()["minimum_speedup"]
     assert result["observed_minimum_speedup"] < 1.0
     assert result["technical_gate"] == "FAILED"
     assert result["full_fit_time_extrapolation_supported"] is False
+
+
+def test_speed_gate_pairs_corresponding_inputs_instead_of_mixing_sequence_lengths():
+    baseline = {**measured_fixture(), "wall_seconds_per_update": [8.0, 14.0, 10.0, 16.0, 12.0],
+                "median_update_seconds": 12.0}
+    candidate = {**baseline, "wall_seconds_per_update": [6.4, 11.2, 8.0, 12.8, 9.6],
+                 "median_update_seconds": 9.6}
+    state = state_fixture()
+    result = MODULE.compare_profiles(baseline, candidate, state, state, declared_bounds())
+    assert result["observed_minimum_speedup"] < 1.0
+    assert result["minimum_paired_update_speedup"] == pytest.approx(1.25)
+    assert result["technical_gate"] == "PASSED"
 
 
 @pytest.mark.parametrize("field,value", [
@@ -162,3 +182,71 @@ def test_exact_tensor_hash_preserves_bf16_bits():
     changed = {"lora_A": torch.tensor([1.0, 2.125], dtype=torch.bfloat16)}
     assert MODULE.tensor_digest(first) == MODULE.tensor_digest(same)
     assert MODULE.tensor_digest(first) != MODULE.tensor_digest(changed)
+
+
+def test_recursive_state_hash_supports_scalar_optimizer_tensors():
+    torch = pytest.importorskip("torch")
+    first = {"step": torch.tensor(214), "moments": torch.tensor([0.1, 0.2])}
+    same = {"moments": first["moments"].clone(), "step": torch.tensor(214)}
+    changed = {**same, "step": torch.tensor(215)}
+    assert MODULE.state_digest(first) == MODULE.state_digest(same)
+    assert MODULE.state_digest(first) != MODULE.state_digest(changed)
+
+
+def test_recovery_plan_uses_original_sampler_and_rejects_changed_checkpoint_bytes(tmp_path, monkeypatch):
+    pytest.importorskip("torch")
+    from shared_procedures.checkpointing import save_checkpoint
+    argv = static_inputs(tmp_path, monkeypatch)
+    task = json.loads((tmp_path / "worklist.json").read_text())[0]
+    config = json.loads((tmp_path / "config.json").read_text())
+    original = {**task["spec"], "code_revision": "b" * 40, "dependency_hash": config["runtime"]["dependency_lock_hash"]}
+    checkpoint = tmp_path / "original214"
+    order = MODULE.sft_fit.exposure_order(10000)
+    state = {"adapter": {}, "optimizer": {}, "scheduler": {}, "rng": MODULE.sft_fit.capture_rng(),
+             "progress": {"completed_steps": 214, "sampler_position": 3424, "exposure_order_hash": MODULE.content_hash(order)}}
+    save_checkpoint(checkpoint, original, state)
+    plan, _, _ = MODULE.build_plan(MODULE.arguments([*argv, "--recovery-checkpoint", str(checkpoint)]))
+    assert plan["selected_record_indices"] == order[3424:3520]
+    assert plan["official_training_state_read"] is True
+    assert plan["official_training_state_modified"] is False
+    assert plan["recovery_checkpoint"]["identity"] == original
+    with (checkpoint / "full_state.pt").open("ab") as handle:
+        handle.write(b"corruption")
+    with pytest.raises(ValueError, match="payload bytes changed"):
+        MODULE.recovery_binding(checkpoint, task, config)
+
+
+def test_paired_launch_order_and_all_repetition_gates_are_recorded(tmp_path, monkeypatch):
+    torch = pytest.importorskip("torch")
+    from types import SimpleNamespace
+    argv = static_inputs(tmp_path, monkeypatch)
+    worklist = json.loads((tmp_path / "worklist.json").read_text())
+    monkeypatch.setattr(MODULE, "certified_tasks", lambda *a, **k: worklist)
+    launched = []
+    def fixture_process(command, **kwargs):
+        args = MODULE.arguments(command[2:])
+        launched.append(args._profile)
+        row = measured_fixture()
+        settings = MODULE.PROFILE_SETTINGS[args._profile]
+        row.update(profile=args._profile, settings=dict(settings),
+            actual_execution_policy={"gradient_checkpointing": settings["gradient_checkpointing"],
+                "cache_collated_inputs": settings["cache_collated_inputs"],
+                "attention_implementation": settings["attention_implementation"],
+                "use_cache": False, "checkpoint_rng_preserved": True})
+        if args._profile != "baseline":
+            row.update(median_update_seconds=8.0, wall_seconds_per_update=[8.0] * 5)
+        basename = MODULE.run_basename(args._pair, args._repetition, args._profile)
+        MODULE.write_json(Path(args.output) / (basename + ".json"), row)
+        torch.save(state_fixture(), args._diagnostics)
+        return SimpleNamespace(returncode=0)
+    monkeypatch.setattr(MODULE.subprocess, "run", fixture_process)
+    assert MODULE.main(argv) == 0
+    assert launched == ["baseline", "cuda_input_cache", "cuda_input_cache", "baseline",
+                        "baseline", "no_gradient_checkpointing", "no_gradient_checkpointing", "baseline"]
+    report = json.loads((tmp_path / "benchmark" / "report.json").read_text())
+    assert report["plan"]["plan_hash"] == report["plan_hash"]
+    assert len(report["profile_runs"]) == 8
+    for row in report["comparisons"].values():
+        assert row["technical_gate"] == "PASSED"
+        assert len(row["repetitions"]) == 2
+        assert all(pair["reference_run_id"] in report["profile_runs"] for pair in row["repetitions"])

@@ -8,7 +8,8 @@ import pytest
 from training.sft.execution_profile import SFTExecutionProfile, resolve_execution_profile
 from training.sft.individual_fit.sft_fit import (
     SFTInputError, SFTRuntimeBlocked, capture_rng, one_optimizer_update,
-    restore_rng, train_optimizer_updates,
+    restore_rng, train_optimizer_updates, _prepare_completion_input_cache,
+    prepare_cuda_input_cache,
 )
 
 
@@ -77,7 +78,8 @@ def test_execution_profile_is_explicit_and_baseline_default_is_unchanged():
     assert resolve_execution_profile(None) == BASELINE
     assert BASELINE.to_dict() == {
         'attention_implementation': 'eager', 'validated_loss_counts': False,
-        'defer_finite_checks': False,
+        'defer_finite_checks': False, 'cache_collated_inputs': False,
+        'gradient_checkpointing': True,
     }
     for values in [('flash_attention_2', False, False), ('eager', 1, False), ('eager', False, 'true')]:
         with pytest.raises(ValueError):
@@ -174,3 +176,127 @@ def test_resume_rejects_profile_change_and_legacy_baseline_progress_resumes_exac
     final = train_optimizer_updates(model, optimizer, scheduler, examples, 0, progress=legacy)
     assert final['status'] == 'complete' and final['completed_steps'] == 3
     assert_bitwise_equal(uninterrupted, snapshot(model, optimizer, scheduler))
+
+
+@pytest.mark.parametrize('loss_checks', [False, True])
+def test_cached_inputs_preserve_dropout_losses_gradients_optimizer_and_rng_bitwise(loss_checks):
+    outputs = []
+    for cached in (False, True):
+        model, optimizer, scheduler, examples = fixture_runtime(16)
+        profile = SFTExecutionProfile(validated_loss_counts=loss_checks,
+            defer_finite_checks=loss_checks, cache_collated_inputs=cached)
+        prepared = None
+        if cached:
+            before = capture_rng()
+            prepared = _prepare_completion_input_cache(examples, 0, 'cpu', validate_counts=loss_checks)
+            assert_bitwise_equal(before, capture_rng())
+            for example, entry in zip(examples, prepared, strict=True):
+                tensors = entry.batch_for(example, 0, 'cpu')
+                assert tensors['input_ids'].tolist() == [example['input_ids']]
+                assert tensors['labels'].tolist() == [example['labels']]
+                expected = 3 * 8 * len(example['input_ids']) + (8 if loss_checks else 0)
+                assert entry.resident_bytes == expected
+        losses = one_optimizer_update(model, optimizer, scheduler, examples, 0,
+                                      execution_profile=profile, prepared_batches=prepared)
+        outputs.append({'losses': losses, 'state': snapshot(model, optimizer, scheduler)})
+    assert_bitwise_equal(*outputs)
+
+
+def test_input_cache_rejects_changed_source_tensor_aliases_counts_and_mapping_writes():
+    import torch
+    example = {'example_id': 'immutable', 'input_ids': [1, 2, 3], 'labels': [-100, 2, 3]}
+    cache = _prepare_completion_input_cache([example], 0, 'cpu', validate_counts=True)[0]
+    with pytest.raises(TypeError):
+        cache.tensors['labels'] = torch.tensor([[0, 0, 0]])
+    for modified in ({**example, 'input_ids': [1, 2, 4]},
+                     {**example, 'labels': [-100, 2, 4]},
+                     {**example, 'example_id': 'another'}):
+        with pytest.raises(SFTInputError, match='frozen input'):
+            cache.batch_for(modified, 0, 'cpu')
+    with pytest.raises(SFTInputError, match='frozen input'):
+        cache.batch_for(example, 1, 'cpu')
+    cache.tensors['attention_mask'].view(-1)[-1] = 0
+    with pytest.raises(SFTInputError, match='mutated'):
+        cache.batch_for(example, 0, 'cpu')
+    cache = _prepare_completion_input_cache([example], 0, 'cpu', validate_counts=True)[0]
+    cache.tensors['validated_completion_counts'].counts.fill_(0)
+    with pytest.raises(SFTInputError, match='counts were mutated'):
+        cache.batch_for(example, 0, 'cpu')
+    with pytest.raises(SFTRuntimeBlocked, match='requires a CUDA'):
+        prepare_cuda_input_cache([example], 0, 'cpu')
+
+
+def test_cache_requires_explicit_profile_matching_rows_and_count_policy_before_backward():
+    model, optimizer, scheduler, examples = fixture_runtime(16)
+    prepared = _prepare_completion_input_cache(examples, 0, 'cpu')
+    profile = SFTExecutionProfile(cache_collated_inputs=True)
+    initial = snapshot(model, optimizer, scheduler)
+    for batches in (None, prepared[:-1], tuple(reversed(prepared))):
+        with pytest.raises(SFTInputError):
+            one_optimizer_update(model, optimizer, scheduler, examples, 0,
+                                 execution_profile=profile, prepared_batches=batches)
+    with pytest.raises(SFTInputError, match='explicit cache execution profile'):
+        one_optimizer_update(model, optimizer, scheduler, examples, 0,
+                             prepared_batches=prepared)
+    with pytest.raises(SFTInputError, match='counts differ'):
+        one_optimizer_update(model, optimizer, scheduler, examples, 0,
+            execution_profile=SFTExecutionProfile(cache_collated_inputs=True, validated_loss_counts=True),
+            prepared_batches=prepared)
+    assert model.calls == 0
+    assert_bitwise_equal(initial, snapshot(model, optimizer, scheduler))
+
+
+def test_cached_full_queue_and_partial_update_match_baseline_without_recollation(monkeypatch):
+    from training.sft.individual_fit import sft_fit
+    model, optimizer, scheduler, examples = fixture_runtime(17)
+    baseline_progress = train_optimizer_updates(model, optimizer, scheduler, examples, 0)
+    baseline = snapshot(model, optimizer, scheduler)
+    model, optimizer, scheduler, examples = fixture_runtime(17)
+    prepared = _prepare_completion_input_cache(examples, 0, 'cpu')
+    def unexpected_collation(*args, **kwargs):
+        raise AssertionError('Cached training unexpectedly rebuilt collated inputs')
+    monkeypatch.setattr(sft_fit, 'collate_completion', unexpected_collation)
+    cached_progress = train_optimizer_updates(model, optimizer, scheduler, examples, 0,
+        execution_profile=SFTExecutionProfile(cache_collated_inputs=True), prepared_batches=prepared)
+    baseline_progress.pop('execution_profile')
+    cached_progress.pop('execution_profile')
+    assert baseline_progress == cached_progress
+    assert_bitwise_equal(baseline, snapshot(model, optimizer, scheduler))
+
+
+def test_earlier_three_field_profile_recovers_baseline_defaults():
+    assert SFTExecutionProfile.from_dict({'attention_implementation': 'eager',
+        'validated_loss_counts': False, 'defer_finite_checks': False}) == BASELINE
+    with pytest.raises(ValueError, match='Unknown'):
+        SFTExecutionProfile.from_dict({'unrecorded_execution_policy': True})
+
+
+def test_disabling_nonreentrant_checkpointing_after_identical_peft_setup_preserves_cpu_update():
+    import torch
+    from transformers import LlamaConfig, LlamaForCausalLM
+    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+    from training.sft.individual_fit.sft_fit import TARGET_MODULES
+    outputs = []
+    for enabled in (True, False):
+        torch.manual_seed(42)
+        base = LlamaForCausalLM(LlamaConfig(vocab_size=16, hidden_size=16, intermediate_size=32,
+            num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=4,
+            max_position_embeddings=32, attn_implementation='eager'))
+        base.config.use_cache = False
+        base = prepare_model_for_kbit_training(base, use_gradient_checkpointing=True,
+            gradient_checkpointing_kwargs={'use_reentrant': False})
+        model = get_peft_model(base, LoraConfig(r=8, lora_alpha=16, lora_dropout=.05,
+            target_modules=list(TARGET_MODULES), bias='none', task_type='CAUSAL_LM'))
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={'use_reentrant': False})
+        if not enabled:
+            model.gradient_checkpointing_disable()
+        assert model.is_gradient_checkpointing is enabled
+        model.train()
+        optimizer = torch.optim.AdamW([parameter for parameter in model.parameters() if parameter.requires_grad],
+                                     lr=2e-4, weight_decay=0.)
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: 1 - step / 10)
+        examples = [{'input_ids': [1, 2, 3, 4, 5], 'labels': [-100, -100, 3, 4, 5]}] * 4
+        losses = one_optimizer_update(model, optimizer, scheduler, examples, 0,
+            execution_profile=SFTExecutionProfile(gradient_checkpointing=enabled))
+        outputs.append({'losses': losses, 'state': snapshot(model, optimizer, scheduler)})
+    assert_bitwise_equal(*outputs)

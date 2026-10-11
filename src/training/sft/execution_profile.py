@@ -13,15 +13,26 @@ class SFTExecutionProfile:
     attention_implementation: str = "eager"
     validated_loss_counts: bool = False
     defer_finite_checks: bool = False
+    cache_collated_inputs: bool = False
+    gradient_checkpointing: bool = True
 
     def __post_init__(self) -> None:
         if self.attention_implementation not in ("eager", "sdpa"):
             raise ValueError("Supported SFT attention candidates are eager and sdpa")
-        if type(self.validated_loss_counts) is not bool or type(self.defer_finite_checks) is not bool:
+        if any(type(value) is not bool for value in (
+                self.validated_loss_counts, self.defer_finite_checks,
+                self.cache_collated_inputs, self.gradient_checkpointing)):
             raise ValueError("SFT execution flags must be actual booleans")
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> "SFTExecutionProfile":
+        """Read earlier explicit profiles with newly added baseline defaults."""
+        if not isinstance(value, dict) or set(value) - set(cls.__dataclass_fields__):
+            raise ValueError("Unknown SFT execution-profile fields")
+        return cls(**value)
 
 
 def resolve_execution_profile(profile: SFTExecutionProfile | None) -> SFTExecutionProfile:

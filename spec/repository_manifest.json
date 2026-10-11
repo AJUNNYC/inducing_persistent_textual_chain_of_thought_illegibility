@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 503,
+  "files": 506,
   "directories_including_root": 202,
   "entries": [
     {
@@ -6162,6 +6162,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/runtime_migration.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/runtime_migration.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_99a65f8a3876e4",
+      "blank": false
+    },
+    {
       "kind": "implemented_implementation",
       "owner": "sft",
       "source": "C.2; E.1.1\u2013E.1.3; E.2.2,E.2.5",
@@ -7134,6 +7145,17 @@
       "blank": false
     },
     {
+      "path": "tests/unit/operations/test_sft_reconcile_execution.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_sft_reconcile_execution.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7063c063a3bb89",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -7483,6 +7505,17 @@
       "display_path": "tests/unit/training/sft/test_execution_profile.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_6c5a258a3484b2",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_runtime_migration.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_runtime_migration.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_2c25b64929ffe3",
       "blank": false
     },
     {

@@ -577,6 +577,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         individual_fit/
           __init__.py
           sft_fit.py
+        runtime_migration.py
         sft_training.py
       training.py
   tests/
@@ -668,6 +669,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_protocol_provenance.py
         test_runpod.py
         test_sft_optimization_benchmark.py
+        test_sft_reconcile_execution.py
       shared_procedures/
         test_checkpointing.py
         test_configuration.py
@@ -701,6 +703,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             test_sft_fit.py
           test_data_handoff.py
           test_execution_profile.py
+          test_runtime_migration.py
           test_sft_training.py
         test_training.py
   tools/
