@@ -248,6 +248,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     score_response.json
     sft_training_record.json
   scripts/
+    audit_sft_drive.py
     authorize_google_drive.py
     benchmark_vllm_generation.py
     build_protocol_pdf.py

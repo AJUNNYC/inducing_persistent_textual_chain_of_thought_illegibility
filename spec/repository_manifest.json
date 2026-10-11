@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 446,
+  "files": 447,
   "directories_including_root": 202,
   "entries": [
     {
@@ -2619,6 +2619,17 @@
       "entry_type": "directory",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_8c5967fd8486f3"
+    },
+    {
+      "path": "scripts/audit_sft_drive.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/audit_sft_drive.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_8a45d762e01608",
+      "blank": false
     },
     {
       "path": "scripts/authorize_google_drive.py",
