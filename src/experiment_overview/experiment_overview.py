@@ -410,7 +410,17 @@ class Experiment:
     def publish_permanent(self, path, metadata):
         path=Path(path).resolve()
         if not (path.is_relative_to(self.data) or path.is_relative_to(self.artifacts)):
-            raise ValueError('Scientific artifact is outside configured data/artifact roots')
+            cached_provenance=(metadata.get('artifact_type')=='auxiliary_provenance'
+                and path.is_relative_to(self.cache)
+                and (path.name=='kazitext_auxiliary_manifest.json'
+                     or path.name.endswith('.udpipe.provenance.json')))
+            if not cached_provenance:
+                raise ValueError('Scientific artifact is outside configured data/artifact roots')
+            from operations.drive import file_hash
+            from shared_procedures.storage import atomic_write_bytes
+            destination=self.artifacts/'configurations'/'auxiliary_provenance'/file_hash(path)/path.name
+            atomic_write_bytes(destination,path.read_bytes())
+            path=destination
         if path.name.endswith('.lock') or path.is_relative_to(self.artifacts/'state'):
             return
         service=self.artifact_service()

@@ -229,6 +229,28 @@ def test_all_roots_are_canonical_from_config_location_and_scientific_identity_su
     relocated=program.Experiment(relative,config_path=base/'config.yaml')
     assert relocated.data==base/'real_data' and relocated.artifacts==base/'real_artifacts' and relocated.cache==base/'real_cache'
 
+@pytest.mark.parametrize('name',['kazitext_auxiliary_manifest.json','english.udpipe.provenance.json'])
+def test_external_cache_auxiliary_provenance_is_copied_and_verified_in_drive(experiment,name):
+    source=experiment.cache/'kazitext_auxiliary'/name
+    atomic_write_json(source,{'status':'verified','source':'fixture'})
+    original=source.read_bytes()
+    experiment.publish_permanent(source,{'artifact_type':'auxiliary_provenance','simulation':False})
+    destination=experiment.artifacts/'configurations'/'auxiliary_provenance'/file_hash(source)/name
+    assert source.read_bytes()==original and destination.read_bytes()==original
+    records=experiment._artifact_service.list_artifacts(local_path=str(destination))
+    assert len(records)==1 and records[0]['sync_status']=='VERIFIED'
+    assert experiment._artifact_service.drive.uploads[-1]['bytes']==original
+
+
+@pytest.mark.parametrize('cached,name',[(True,'private.json'),(False,'english.udpipe.provenance.json')])
+def test_external_artifacts_still_require_known_auxiliary_cache_provenance(experiment,tmp_path,cached,name):
+    source=(experiment.cache if cached else tmp_path/'unrelated')/name
+    atomic_write_json(source,{'fixture':True})
+    with pytest.raises(ValueError,match='outside configured'):
+        experiment.publish_permanent(source,{'artifact_type':'auxiliary_provenance'})
+    assert experiment._artifact_service.drive.uploads==[]
+
+
 def test_paused_handler_replicates_progress_and_worker_state_before_returning(experiment,monkeypatch):
     stage=Stage('clean','collect_clean',())
     experiment.runner=StageRunner({'clean':stage},experiment.artifacts/'state'/'workflow',experiment.hash,experiment.code)
