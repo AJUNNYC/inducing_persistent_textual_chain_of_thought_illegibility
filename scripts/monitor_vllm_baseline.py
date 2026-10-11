@@ -76,6 +76,7 @@ def main():
     parser.add_argument('--output-root',default='/workspace/scratch/vllm_baseline_monitor')
     parser.add_argument('--interval',type=int,default=30)
     parser.add_argument('--once',action='store_true')
+    parser.add_argument('--local-status',help='Cloud scorer status when GPU generation and CPU scoring are separated')
     args=parser.parse_args()
     if args.interval<10:parser.error('Minimum interval is ten seconds')
     output=Path(args.output_root);output.mkdir(parents=True,exist_ok=True)
@@ -84,7 +85,8 @@ def main():
     previous=None
     with file_lock(output/'monitor.lock'):
         while True:
-            try:snapshot=inspect(session,auth['base_url'].rstrip('/'),args.worker_metadata,args.source_commit)
+            try:
+                snapshot=read_json(args.local_status) if args.local_status else inspect(session,auth['base_url'].rstrip('/'),args.worker_metadata,args.source_commit)
             except Exception as error:
                 snapshot={'observed_at':datetime.now(timezone.utc).isoformat(),'status':'MONITOR_CONNECTION_ERROR',
                     'error_type':type(error).__name__,'does_not_establish_worker_failure':True}

@@ -279,6 +279,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     monitor_vllm_generation.py
     prepare_batched_collection.py
     prepare_vllm_sft_data.py
+    produce_vllm_baseline_raw.py
     refresh_dependency_locks.py
     revalidate_collection_inputs.py
     run_baseline_repeatability.py
@@ -288,6 +289,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_preflight.py
     run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
+    score_vllm_baseline_cloud.py
     setup_environment.py
     synchronize_manifest.py
     validate_repository.py
