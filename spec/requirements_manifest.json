@@ -3724,12 +3724,51 @@
           "docs/implementation_acceptance.md"
         ]
       }
+    },
+    {
+      "id": "req_ops_collection_inputs",
+      "requirement": "Preserve original CPU collection input bytes and provenance while fully revalidating pinned source rows, native tokenizer counts, panels and MBPP certificates for an explicitly identified new consumer.",
+      "origin": "User requirement for Google Drive as the sole permanent store; permitted H.9 operational conventions.",
+      "source_sections": "User request: Drive-only permanent storage and reusable original collection inputs; E.1.4,E.2.3-E.2.5; H.9",
+      "pdf_pages": [
+        52,
+        55,
+        56,
+        80
+      ],
+      "modules": [
+        "src/operations/collection_inputs.py"
+      ],
+      "tests": [
+        "tests/unit/operations/test_collection_input_revalidation.py"
+      ],
+      "module_cards": [
+        "docs/modules/operations/collection_inputs.md"
+      ],
+      "diagrams": [
+        "spec/mermaid/workflows/operations/collection_inputs.mmd"
+      ],
+      "status": "implemented_with_local_tests_live_validation_pending",
+      "implementation_status": "implemented",
+      "verification": {
+        "local_status": "targeted_negative_integrity_checks_available",
+        "local_scope": "Explicit tiny candidate fixtures and actual local immutable inventory checks; full restored-source consumer audit is separately executed after source freeze.",
+        "live_status": "pending",
+        "external_dependencies": [
+          "verified_original_licensed_source_shards_and_pinned_native_tokenizer_caches"
+        ],
+        "scientific_results": "not_executed",
+        "final_audit": "pending",
+        "evidence": [
+          "docs/operations/collection_inputs.md"
+        ]
+      }
     }
   ],
   "requirement_counts": {
     "original_scientific_and_infrastructure": 82,
-    "user_operational_extensions": 8,
-    "total": 90
+    "user_operational_extensions": 9,
+    "total": 91
   },
   "status_legend": {
     "implemented_with_local_tests": "Implementation and declared local tests exist; final consolidated audit pending; no empirical outcome claimed.",

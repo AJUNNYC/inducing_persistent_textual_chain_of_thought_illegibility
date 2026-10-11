@@ -1602,13 +1602,56 @@
       ],
       "verification_status": "local_checks_available_final_consolidated_validation_pending",
       "test_kind": "pytest"
+    },
+    {
+      "name": "collection_inputs",
+      "code": "src/operations/collection_inputs.py",
+      "doc": "docs/modules/operations/collection_inputs.md",
+      "diagram": "spec/mermaid/workflows/operations/collection_inputs.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User request for Google Drive as the sole permanent store; original CPU inputs must retain provenance under consumer revalidation.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_collection_inputs"
+      ],
+      "purpose": "Complete offline source/tokenizer/panel revalidation and immutable consumer certificate checks for truthful restored CPU input reuse.",
+      "test": "tests/unit/operations/test_collection_input_revalidation.py",
+      "tests": [
+        "tests/unit/operations/test_collection_input_revalidation.py"
+      ],
+      "dependencies": [
+        "src/operations/assets.py",
+        "src/shared_procedures/identity.py",
+        "src/shared_procedures/storage.py",
+        "src/shared_procedures/configuration.py",
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py",
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py",
+        "src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"
+      ],
+      "sections": "User request: Drive-only permanent storage and reusable original collection inputs; E.1.4,E.2.3-E.2.5; H.9",
+      "pages": [
+        52,
+        55,
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_actual_full_consumer_audit_pending",
+      "test_kind": "pytest",
+      "entrypoints": [
+        "scripts/revalidate_collection_inputs.py"
+      ],
+      "operational_docs": [
+        "docs/operations/collection_inputs.md"
+      ]
     }
   ],
   "source_module_counts": {
     "original_workflow": 35,
     "source_derived_support": 14,
-    "user_operational_extension": 8,
-    "total": 57
+    "user_operational_extension": 9,
+    "total": 58
   },
   "validation_scope": "Paths and test mappings record implementations, not passing live checks or scientific results. Original49 scientific workflow/support metadata is preserved."
 }

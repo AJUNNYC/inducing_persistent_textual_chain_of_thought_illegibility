@@ -1,0 +1,9 @@
+---
+title: "Immutable collection input consumer validation"
+---
+flowchart TD
+    OLD["Original producer inventory and unchanged input bytes"] --> AUDIT["Full source, native tokenizer and panel audit"]
+    FREEZE["Clean consumer source and pinned configuration"] --> AUDIT
+    AUDIT --> CERT["Separate consumer certificate with original provenance"]
+    CERT --> VERIFY["Recheck certificate, cache and restored file hashes"]
+    VERIFY --> REUSE["Actual CPU stage validates and reuses inputs"]

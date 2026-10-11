@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 421,
+  "files": 427,
   "directories_including_root": 201,
   "entries": [
     {
@@ -1713,6 +1713,17 @@
       "blank": false
     },
     {
+      "path": "docs/modules/operations/collection_inputs.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User requirement for Drive-only permanent storage and immutable collection input reuse; H9 operational conventions",
+      "display_path": "docs/modules/operations/collection_inputs.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_1ea082bc6c3442",
+      "blank": false
+    },
+    {
       "path": "docs/modules/operations/drive.md",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -2138,6 +2149,17 @@
       "display_path": "docs/operations/artifacts.md",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_514b3c08161786",
+      "blank": false
+    },
+    {
+      "path": "docs/operations/collection_inputs.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User requirement for Drive-only permanent storage and immutable collection input reuse; H9 operational conventions",
+      "display_path": "docs/operations/collection_inputs.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_38ec75d673d400",
       "blank": false
     },
     {
@@ -2608,6 +2630,17 @@
       "display_path": "scripts/refresh_dependency_locks.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_9e568fd84943ef",
+      "blank": false
+    },
+    {
+      "path": "scripts/revalidate_collection_inputs.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User requirement for Drive-only permanent storage and immutable collection input reuse; H9 operational conventions",
+      "display_path": "scripts/revalidate_collection_inputs.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_4da5d2a00cdc8a",
       "blank": false
     },
     {
@@ -3524,6 +3557,17 @@
       "display_path": "spec/mermaid/workflows/operations/assets.mmd",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_5a37408974c0ed",
+      "blank": false
+    },
+    {
+      "path": "spec/mermaid/workflows/operations/collection_inputs.mmd",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User requirement for Drive-only permanent storage and immutable collection input reuse; H9 operational conventions",
+      "display_path": "spec/mermaid/workflows/operations/collection_inputs.mmd",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_49a99d8c514fa7",
       "blank": false
     },
     {
@@ -4851,6 +4895,17 @@
       "display_path": "src/operations/assets.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_897180adc673ea",
+      "blank": false
+    },
+    {
+      "path": "src/operations/collection_inputs.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User requirement for Drive-only permanent storage and immutable collection input reuse; H9 operational conventions",
+      "display_path": "src/operations/collection_inputs.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_908124fbf64dc0",
       "blank": false
     },
     {
@@ -6197,6 +6252,17 @@
       "display_path": "tests/unit/operations/test_assets.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_c3f48a772aa350",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_collection_input_revalidation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User requirement for Drive-only permanent storage and immutable collection input reuse; H9 operational conventions",
+      "display_path": "tests/unit/operations/test_collection_input_revalidation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_ee44a2d5333a05",
       "blank": false
     },
     {
@@ -8251,6 +8317,49 @@
       ],
       "verification_status": "local_checks_available_final_consolidated_validation_pending",
       "test_kind": "pytest"
+    },
+    {
+      "name": "collection_inputs",
+      "code": "src/operations/collection_inputs.py",
+      "doc": "docs/modules/operations/collection_inputs.md",
+      "diagram": "spec/mermaid/workflows/operations/collection_inputs.mmd",
+      "owner": "coordinator",
+      "kind": "user_operational_extension",
+      "origin": "User request for Google Drive as the sole permanent store; original CPU inputs must retain provenance under consumer revalidation.",
+      "child_modules": [],
+      "requirements": [
+        "req_ops_collection_inputs"
+      ],
+      "purpose": "Complete offline source/tokenizer/panel revalidation and immutable consumer certificate checks for truthful restored CPU input reuse.",
+      "test": "tests/unit/operations/test_collection_input_revalidation.py",
+      "tests": [
+        "tests/unit/operations/test_collection_input_revalidation.py"
+      ],
+      "dependencies": [
+        "src/operations/assets.py",
+        "src/shared_procedures/identity.py",
+        "src/shared_procedures/storage.py",
+        "src/shared_procedures/configuration.py",
+        "src/data_generation_collection/sft_data/clean_trace_collection/candidate_manifest.py",
+        "src/data_generation_collection/evaluation_data/capability_panel/capability_panel_construction.py",
+        "src/data_generation_collection/evaluation_data/legibility_subset/legibility_subset_construction.py",
+        "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/mbpp_sandbox.py"
+      ],
+      "sections": "User request: Drive-only permanent storage and reusable original collection inputs; E.1.4,E.2.3-E.2.5; H.9",
+      "pages": [
+        52,
+        55,
+        56,
+        80
+      ],
+      "verification_status": "local_checks_available_actual_full_consumer_audit_pending",
+      "test_kind": "pytest",
+      "entrypoints": [
+        "scripts/revalidate_collection_inputs.py"
+      ],
+      "operational_docs": [
+        "docs/operations/collection_inputs.md"
+      ]
     }
   ]
 }
