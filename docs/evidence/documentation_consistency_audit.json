@@ -1,26 +1,27 @@
 {
   "status": "PASSED",
-  "checked_at": "2026-10-11T14:39:56.551003+00:00",
+  "checked_at": "2026-10-11T14:50:42.233579+00:00",
   "repository_validation": {
     "status": "VERIFIED",
-    "intended_static_files": 459,
-    "tracked_files": 459,
+    "intended_static_files": 465,
+    "tracked_files": 465,
     "inventory_source": "git",
-    "manifest_entries": 661,
+    "manifest_entries": 667,
     "modules": 58,
     "requirements": 91,
-    "local_markdown_links": 1382,
+    "local_markdown_links": 1384,
     "errors": [],
     "scope": "static integrity only; run unit/integration/live preflights and native Mermaid parser separately"
   },
   "mermaid": {
     "parser": "mermaid@11.12.1",
     "passed": 75,
-    "failed": 0
+    "failed": 0,
+    "scope": "Retained preceding 75-diagram native-parser pass; current inventory labels regenerated, parser not rerun for this handoff."
   },
   "pdf": {
     "pages": 81,
-    "active_sha256": "9ae7f8161e4c9df3fa9e1b85180cbc1d3928f76fef8212a57be9dcff52a743ee",
+    "active_sha256": "4eedf529e3d35d9da0abf0bd16041adc2fd6b31636be8994e885b48be9d8ec7b",
     "archived_original_sha256": "db5e7dcd68b7632f2c222468a02affabe8526bedc48ef2b7139c31077343a704",
     "changes_integrated_into_existing_pages": true
   },
@@ -37,7 +38,8 @@
     "scope and date of historical handoffs",
     "statistical coverage repetitions distinguished from test/scenario counts",
     "Approved concentration guard and full passing seven-scenario validation; no SFT recipe/data changes",
-    "Model identities and backend fingerprints checked per frozen judge request profile; legacy and cache drift guards retained"
+    "Model identities and backend fingerprints checked per frozen judge request profile; legacy and cache drift guards retained",
+    "Explicit immutable SFT producer-to-consumer compatibility and verified Drive certificate/worklist"
   ],
   "limits": "Active documentation/static integrity and revised statistical component verified; no current-head full-suite or trained-model-result certification.",
   "judge_profile_guard": {
@@ -46,5 +48,15 @@
     "fresh_same_profile_controls_passed": 2,
     "source_revision": "54c355a",
     "training_ready": false
+  },
+  "sft_data_handoff": {
+    "status": "PASSED",
+    "conditions": 40,
+    "records": 404000,
+    "artifacts_reverified": 122,
+    "targeted_handoff_tests": 6,
+    "existing_sft_tests": 16,
+    "consumer_commit": "a50de2c",
+    "training_started": false
   }
 }

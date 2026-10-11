@@ -101,6 +101,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       mbpp_sandbox_prior_attempt.json
       readme.md
       scaffold_validation_report.md
+      sft_data_handoff_certificate.json
+      sft_data_handoff_drive_index.json
       sft_implementation_report.json
       sft_runtime_checks_report.json
       shared_infrastructure_validation.json

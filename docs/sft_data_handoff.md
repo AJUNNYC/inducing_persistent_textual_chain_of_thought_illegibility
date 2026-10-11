@@ -25,3 +25,5 @@ Run the committed script with `--producer-config`, `--consumer-config`, `--audit
 source commit and dependency lock hash must match `requirements.lock`. Store the
 certificate and worklist in Drive. Compatibility certification does not satisfy
 baseline repeatability or authorize a scientific fit by itself.
+
+The completed certificate and worklist are in the [verified Drive handoff folder](https://drive.google.com/drive/folders/15wW4PXRzf_i4yNaN3jyOeMMFddXrLpRv). Source/configuration identities are frozen at `a50de2c`; subsequent evidence-only commits do not redefine that consumer.

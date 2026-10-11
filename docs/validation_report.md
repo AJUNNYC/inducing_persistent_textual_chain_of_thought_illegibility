@@ -1,3 +1,9 @@
+## SFT data handoff — 2026-10-11
+
+The [producer-to-consumer certificate](evidence/sft_data_handoff_certificate.json) passed for all 40 conditions and 404,000 records. All 122 current corpus artifact hashes and sizes match the completed independent Drive readback. Production worklist validation checked exact 10,000/100 splits, ordered shared IDs, model-specific clean traces, immutable revisions, whole assistant targets and exact ordered record hashes. Original producer configuration and record bytes remain unchanged. The current consumer is frozen at `a50de2c`; its source files and native lock are bound separately. Scientific settings match with only implementation/dependency identities separated.
+
+Six handoff regression checks, 16 existing SFT checks and four PDF provenance checks passed. This CPU compatibility check did not rerun generation, transforms, GPU controls or the full suite. It does not replace canonical launch preflights; untouched-baseline repeatability remains unrun and scientific training has not started. See [handoff instructions](sft_data_handoff.md).
+
 # Current implementation and validation report
 
 ## Judge request-profile guard verified (2026-10-11)
