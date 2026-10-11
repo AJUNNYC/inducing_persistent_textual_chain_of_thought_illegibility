@@ -43,7 +43,8 @@ def main():
         if name not in ('MODEL_OPENAI_API_KEY','ANTHROPIC_API_KEY'):
             raise ValueError('Unexpected provider binding')
         os.environ[name]=value
-    config=load_configuration(args.config,require_runtime=True)
+    config=(validate_configuration(read_json(args.config),runtime=True) if Path(args.config).suffix=='.json'
+            else load_configuration(args.config,require_runtime=True))
     experiment=Experiment(config,config_path=args.config)
     validate_configuration(experiment.config,runtime=True)
     if experiment.config['runtime']['implementation_revision'] != experiment.code:
