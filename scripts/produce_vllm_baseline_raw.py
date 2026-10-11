@@ -37,6 +37,8 @@ def main():
         if service.sync_artifacts(workers=8)['status']!='VERIFIED':raise RuntimeError('Drive barrier failed')
     status_path=experiment.artifacts/'raw_producer_status.json'
     if not a.model:
+        atomic_write_json(status_path,{'status':'STARTING','driver_source_commit':experiment.code,
+            'protocol_hash':protocol['protocol_hash']})
         receipt={'driver_source_commit':experiment.code,'measurement_source_commit':experiment.config['runtime']['implementation_revision'],
             'protocol_hash':protocol['protocol_hash'],'configuration_hash':experiment.hash,
             'source_binding':'all measurement module contents verified against original frozen protocol',
