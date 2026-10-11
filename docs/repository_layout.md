@@ -275,6 +275,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     diagnose_statistical_coverage.py
     freeze_runtime_config.py
     manage_runpod.py
+    monitor_vllm_baseline.py
     monitor_vllm_generation.py
     prepare_batched_collection.py
     prepare_vllm_sft_data.py

@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 472,
+  "files": 473,
   "directories_including_root": 202,
   "entries": [
     {
@@ -2915,6 +2915,17 @@
       "display_path": "scripts/manage_runpod.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_67bb645960da60",
+      "blank": false
+    },
+    {
+      "path": "scripts/monitor_vllm_baseline.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/monitor_vllm_baseline.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_03833f3eea7894",
       "blank": false
     },
     {

@@ -77,3 +77,16 @@ before reconstructing local caches. Preserve original configuration/source
 identities when resuming. Model changes release the preceding process entirely.
 Timing reports separate generation/scoring from Drive time; the first batch also
 includes engine startup, so estimate throughput from subsequent batches.
+
+## Progress monitor
+
+`scripts/monitor_vllm_baseline.py --source-commit EXECUTED_FULL_COMMIT`
+polls the existing Pod every 30 seconds through its protected Jupyter connection.
+It monitors both sequential models, all three passes, Drive barriers and the final
+repeatability report. Local `latest.json` and `history.jsonl` live under
+`/workspace/scratch/vllm_baseline_monitor`; `terminal.json` records completion,
+a failed gate, a worker failure or a pause. A connection error does not establish
+a worker failure. Completion means capability repeatability only; legibility
+judging stays deferred. The monitor does not restart workers, stop billing or
+send autonomous chat notifications. Read its progress stream while the chat turn
+is active; later turns can read the saved latest status.
