@@ -6,8 +6,9 @@ validator and builders, checks fresh raw provenance, and verifies Drive copies
 at each chunk. Model workers consume the emitted refill manifest separately.
 """
 import argparse
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 import json
+import multiprocessing
 import os
 from pathlib import Path
 import subprocess
@@ -28,6 +29,7 @@ from data_generation_collection.sft_data.sft_data_preparation import build_sft_d
 
 GENERATION_COMMIT = 'dc520cb73bf43b59a9566404dd4a7aa8358f1cc3'
 GENERATION_HASH = '3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54'
+PAIR_CONTEXT = {}
 
 
 class CachedOnly(NativeCleanGenerator):
@@ -51,6 +53,38 @@ class CachedKazi:
         value = self.backend.transform(reasoning, example_id, level, model_id=model_id)
         atomic_write_json(path, value)
         return value
+
+
+def initialize_pair_worker():
+    from multiprocessing.util import Finalize
+    backend = PAIR_CONTEXT['experiment'].kazi()
+    PAIR_CONTEXT['kazitext'] = CachedKazi(backend, PAIR_CONTEXT['data']/'transform_cache')
+    Finalize(None, backend.close, exitpriority=20)
+
+
+def inspect_pair(candidate):
+    data = PAIR_CONTEXT['data']
+    raws = {}
+    for model in ('7b','14b'):
+        raw = read_json(data/'clean_traces/raw/production'/model/(content_hash(candidate['example_id'])+'.json'))
+        if (raw['producer_commit'] != GENERATION_COMMIT or raw['config_hash'] != GENERATION_HASH
+                or raw['runtime']['generation_backend'] != 'vllm_seeded_batch_v1'
+                or raw['candidate_hash'] != content_hash(candidate)
+                or raw['raw_hash'] != content_hash(raw['raw_generation'])):
+            raise ValueError('Raw cache is not the matching fresh production response')
+        raws[model] = raw
+    for folder in ('clean_traces', 'rejected_responses'):
+        path = data/'clean_traces'/folder/'production'/(content_hash(candidate['example_id'])+'.json')
+        if path.exists():
+            record = read_json(path)
+            if (record['candidate'] != candidate or record['config_hash'] != GENERATION_HASH
+                    or set(record['traces']) != {'7b','14b'}
+                    or any(record['traces'][m]['raw_hash'] != raws[m]['raw_hash'] for m in raws)):
+                raise ValueError('Existing pair is not bound to these fresh raw responses')
+            return record
+    return process_clean_batch([candidate], PAIR_CONTEXT['generator'], PAIR_CONTEXT['tokenizers'],
+                               kazitext=PAIR_CONTEXT['kazitext'], output_dir=data/'clean_traces',
+                               config_hash=GENERATION_HASH)[0]
 
 
 def main():
@@ -136,17 +170,12 @@ def main():
             output = rounds/f'round_{a.round:03d}'
             output.mkdir(parents=True, exist_ok=True)
             generator = CachedOnly(config['models'], cache_root=a.cache_root)
-            def inspect(candidate):
-                for model in ('7b','14b'):
-                    raw = read_json(data/'clean_traces/raw/production'/model/(content_hash(candidate['example_id'])+'.json'))
-                    if (raw['producer_commit'] != GENERATION_COMMIT or raw['config_hash'] != GENERATION_HASH
-                            or raw['runtime']['generation_backend'] != 'vllm_seeded_batch_v1'
-                            or raw['candidate_hash'] != content_hash(candidate)):
-                        raise ValueError('Raw cache is not the matching fresh production response')
-                return process_clean_batch([candidate], generator, tokenizers, kazitext=kazi(),
-                                           output_dir=data/'clean_traces', config_hash=GENERATION_HASH)[0]
+            PAIR_CONTEXT.update(experiment=experiment, generator=generator,
+                                tokenizers=tokenizers, data=data)
             accepted, rejected, chunks = [], [], []
-            with ThreadPoolExecutor(max_workers=a.workers) as pool:
+            with ProcessPoolExecutor(max_workers=a.workers,
+                                     mp_context=multiprocessing.get_context('fork'),
+                                     initializer=initialize_pair_worker) as pool:
                 for start in range(0, len(candidates), a.chunk_size):
                     current = candidates[start:start+a.chunk_size]
                     target = output/f'chunk_{start:05d}.json'
@@ -156,15 +185,17 @@ def main():
                         if [r['example_id'] for r in records] != [c['example_id'] for c in current]:
                             raise ValueError('Existing acceptance chunk identity differs')
                     else:
-                        records = list(pool.map(inspect, current))
+                        records = list(pool.map(inspect_pair, current))
                         atomic_write_json(target, {'records':records, 'configuration_hash':GENERATION_HASH,
                                                   'acceptance_source_commit':commit})
                     if not archive.exists():
-                        with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=1) as z:
+                        temporary = archive.with_suffix('.zip.tmp')
+                        with zipfile.ZipFile(temporary,'w',zipfile.ZIP_DEFLATED,compresslevel=1) as z:
                             for c in current:
                                 for model in ('7b','14b'):
                                     for f in (data/'transform_cache'/model/content_hash(c['example_id'])).glob('*.json'):
                                         z.write(f, str(f.relative_to(data/'transform_cache')))
+                        temporary.replace(archive)
                     publish([target, archive])
                     accepted.extend(r for r in records if r['status']=='accepted')
                     rejected.extend(r['example_id'] for r in records if r['status']=='rejected')
