@@ -244,6 +244,31 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
                     'runtime':runtime,'generation_settings':response['generation_settings'],'seed':response['seed'],
                     'native_reasoning_prefix':prefix,'generated_token_count':len(ids),'eos_token_ids':eos_ids,
                     'eos_complete':True,'parser_status':parsed['status'],'control_hash':control_hash})
+                if generator.batch_size > 1:
+                    companions = [candidate, {**candidate, 'example_id':candidate['example_id']+'_companion',
+                        'prompt':'A notebook has three blank pages. After one additional blank page is inserted, how many blank pages does it contain?'}]
+                    batched = list(generator.generate_many(size, companions))
+                    if len(batched) != 2:
+                        raise PreflightBlocked('Actual batched native control did not return both whole prompts')
+                    controls = []
+                    for index, (item, response_) in enumerate(zip(companions, batched)):
+                        ids_ = response_.get('generation_token_ids', [])
+                        parsed_ = parse_native_output(response_.get('native_reasoning_prefix','')+response_['raw_generation'])
+                        if (response_.get('seed')!=derive_seed(42,'clean_generation',item['example_id'],size)
+                            or response_.get('generation_settings')!=clean_trace_batch.GENERATION_SETTINGS
+                            or response_.get('runtime',{}).get('generation_batch_size')!=2
+                            or response_.get('finish_reason')!='stop' or not ids_ or ids_[-1] not in eos_ids
+                            or parsed_['status']!='valid'):
+                            raise PreflightBlocked('Actual batched native control identity, EOS or parser differs')
+                        path_=root/f'native_clean_batch_control_{size}_{index}.json'
+                        value_={**response_,'example_id':item['example_id'],'prompt':item['prompt'],
+                            'execution_mode':'control_preflight','control_preflight':True,'scientific_result':False,
+                            'configuration_hash':configuration_hash(config),'runtime':{**runtime,**response_['runtime']},
+                            'raw_hash':content_hash(response_['raw_generation']),'eos_complete':True,'parser_status':parsed_['status']}
+                        atomic_write_json(path_,value_);notify_artifact(path_,value_)
+                        controls.append({'path':str(path_),'raw_hash':value_['raw_hash'],'seed':response_['seed'],
+                                         'eos_complete':True,'parser_status':parsed_['status']})
+                    records[-1]['batch_controls']=controls
                 model=None
         finally:
             generator.model=generator.tokenizer=None

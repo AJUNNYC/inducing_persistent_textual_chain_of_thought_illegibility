@@ -5,6 +5,9 @@ import os
 import re
 import sqlite3
 import tempfile
+import threading
+from copy import copy
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from shared_procedures.identity import content_hash
@@ -276,7 +279,9 @@ class ArtifactService:
             records = [json.loads(row[0]) for row in db.execute(query, values)]
         return [r for r in records if all(r.get(k) == v for k,v in filters.items())]
 
-    def sync_artifacts(self, *, verify_existing: bool = False) -> dict:
+    def sync_artifacts(self, *, verify_existing: bool = False, workers: int = 1) -> dict:
+        if type(workers) is not int or not 1 <= workers <= 8:
+            raise ValueError('Drive upload workers must be between 1 and 8')
         if self.drive is None:
             with self._connect() as db:
                 pending = db.execute("SELECT COUNT(*) FROM artifacts WHERE sync_status!='VERIFIED'").fetchone()[0]
@@ -287,7 +292,14 @@ class ArtifactService:
         # remain independent and each verified upload is committed immediately.
         with file_lock(str(self.registry) + '.sync.lock'):
             records = self.list_artifacts() if verify_existing else self.list_artifacts(sync_status='PENDING') + self.list_artifacts(sync_status='FAILED')
-            for record in records:
+            local = threading.local()
+            def publish(record):
+                owner = self
+                if workers > 1:
+                    if not hasattr(local, 'owner'):
+                        local.owner = copy(self)
+                        local.owner.drive = self.drive.fork()
+                    owner = local.owner
                 artifact_id = record['artifact_id']
                 try:
                     # Publish discovery first. If the process disappears after the
@@ -295,23 +307,31 @@ class ArtifactService:
                     # machine can still find and validate that exact remote copy.
                     if self.drive_recovery and not (record['stage']=='collect_clean'
                         and Path(record['relative_path']).name=='collection_status.json'):
-                        self._publish_recovery_descriptor(record)
+                        owner._publish_recovery_descriptor(record)
                     if record['sync_status'] == 'VERIFIED':
-                        self.drive.verify_registered_artifact(record)
+                        owner.drive.verify_registered_artifact(record)
                     else:
                         path = self._safe_path(record['local_path'])
                         if file_hash(path) != record['sha256'] or path.stat().st_size != record['size']:
                             raise RuntimeError('Local artifact changed after registration')
-                        folder = self.drive.ensure_path([record['stage'], record['branch'], record['model'], record['run_id']])
-                        remote = self.drive.upload_artifact(path, artifact_id=artifact_id, folder_id=folder, config_hash=record['configuration_hash'])
+                        folder = owner.drive.ensure_path([record['stage'], record['branch'], record['model'], record['run_id']])
+                        remote = owner.drive.upload_artifact(path, artifact_id=artifact_id, folder_id=folder, config_hash=record['configuration_hash'])
                         record.update(sync_status='VERIFIED', drive_file_id=remote['id'], drive_folder_id=folder)
                     record.pop('sync_error', None)
-                    completed.append(artifact_id)
+                    outcome = True
                 except Exception as error:
                     record.update(sync_status='FAILED', sync_error=type(error).__name__)
-                    failed.append(artifact_id)
+                    outcome = False
                 with self._connect() as db:
                     self._put(db, record)
+                return artifact_id, outcome
+            if workers == 1 or len(records) < 2:
+                outcomes = list(map(publish, records))
+            else:
+                with ThreadPoolExecutor(max_workers=workers) as pool:
+                    outcomes = list(pool.map(publish, records))
+            for artifact_id, outcome in outcomes:
+                (completed if outcome else failed).append(artifact_id)
         if verify_existing:
             self.export_manifest()
         return {"status": "FAILED" if failed else "VERIFIED", "uploaded": completed, "failed": failed,

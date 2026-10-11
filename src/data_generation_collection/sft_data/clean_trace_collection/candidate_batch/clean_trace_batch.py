@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
+import os
 
 from shared_procedures.identity import content_hash, derive_seed
 from shared_procedures.response_parsing import parse_native_output
@@ -37,7 +38,7 @@ class NativeCleanGenerator:
     ``models`` maps 7b/14b to immutable model/tokenizer specs. GPU/runtime and
     authorization preflights belong to the orchestrator before invoking this.
     """
-    def __init__(self, models: Mapping, *, device_map="auto", torch_dtype="bfloat16", cache_root=None, stop_requested=None):
+    def __init__(self, models: Mapping, *, device_map="auto", torch_dtype="bfloat16", cache_root=None, stop_requested=None, batch_size=None):
         expected = {"7b": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B", "14b": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B"}
         if set(models) != set(expected) or any(spec.get("id", spec.get("name")) != expected[key] for key, spec in models.items()):
             raise ValueError("Only the two frozen untouched construction models are supported")
@@ -45,6 +46,9 @@ class NativeCleanGenerator:
         self.device_map, self.dtype, self.cache_root = device_map, torch_dtype, cache_root
         self.active, self.model, self.tokenizer = None, None, None
         self.stop_requested = stop_requested
+        self.batch_size = int(batch_size if batch_size is not None else os.getenv("CLEAN_GENERATION_BATCH_SIZE", "1"))
+        if not 1 <= self.batch_size <= 64:
+            raise ValueError("Clean generation batch size must be between 1 and 64")
 
     def _load(self, model_id):
         if self.active == model_id:
@@ -82,6 +86,9 @@ class NativeCleanGenerator:
         import torch
         from transformers import set_seed
         spec = self.models[model_id]
+        if self.batch_size > 1:
+            yield from self._generate_batches(model_id, candidates, request_stop)
+            return
         for candidate in candidates:
             if request_stop and request_stop():
                 raise CleanDataPause({"phase": "before_generation", "model_id": model_id,
@@ -106,6 +113,77 @@ class NativeCleanGenerator:
                    "model_revision": spec["revision"], "tokenizer_revision": spec["tokenizer_revision"],
                    "model_name": spec["name"], "seed": seed, "native_reasoning_prefix": prefix,
                    "generation_settings": GENERATION_SETTINGS, "simulation": False, "execution_mode": "production", "runtime": {"torch": torch.__version__}}
+
+    def _generate_batches(self, model_id, candidates, request_stop):
+        import torch
+        from transformers import LogitsProcessorList
+        self.tokenizer.padding_side = "left"
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        spec = self.models[model_id]
+        eos = self.model.generation_config.eos_token_id
+        eos_ids = eos if isinstance(eos, list) else [eos]
+        for start in range(0, len(candidates), self.batch_size):
+            batch = candidates[start:start + self.batch_size]
+            if request_stop and request_stop():
+                raise CleanDataPause({"phase": "before_generation_batch", "model_id": model_id,
+                                      "example_id": batch[0]["example_id"]})
+            rendered = [self.tokenizer.apply_chat_template([{"role": "user", "content": c["prompt"]}],
+                tokenize=False, add_generation_prompt=True) for c in batch]
+            encoded = self.tokenizer(rendered, add_special_tokens=False, padding=True, return_tensors="pt").to(self.model.device)
+            seeds = [derive_seed(42, "clean_generation", c["example_id"], model_id) for c in batch]
+            sampler = IndependentSeedSampler(seeds, self.model.device, eos_ids, encoded.input_ids.shape[1])
+            with torch.inference_mode():
+                outputs = self.model.generate(**encoded, do_sample=True, temperature=0.6, top_p=0.95,
+                    max_new_tokens=3072, top_k=0, repetition_penalty=1.0,
+                    pad_token_id=self.tokenizer.pad_token_id, logits_processor=LogitsProcessorList([sampler]))
+            completions = outputs[:, encoded.input_ids.shape[1]:].tolist()
+            for row, (candidate, prompt, seed) in enumerate(zip(batch, rendered, seeds)):
+                ids = completions[row]
+                stop = next((index for index, token in enumerate(ids) if token in eos_ids), None)
+                if stop is not None:
+                    ids = ids[:stop + 1]
+                raw = self.tokenizer.decode(ids, skip_special_tokens=True)
+                prefix = "<think>" if prompt.rstrip().endswith("<think>") and not raw.lstrip().startswith("<think>") else ""
+                yield {"raw_generation": raw, "finish_reason": "stop" if stop is not None else "length",
+                    "generated_token_count": len(ids), "generation_token_ids": ids,
+                    "model_revision": spec["revision"], "tokenizer_revision": spec["tokenizer_revision"],
+                    "model_name": spec["name"], "seed": seed, "native_reasoning_prefix": prefix,
+                    "generation_settings": GENERATION_SETTINGS, "simulation": False, "execution_mode": "production",
+                    "runtime": {"torch": torch.__version__, "generation_backend": "transformers_seeded_batch_v1",
+                                "generation_batch_size": len(batch), "generation_batch_row": row},
+                    "generation_batch_end": row == len(batch) - 1}
+
+
+class IndependentSeedSampler:
+    """Sample each sequence with its own RNG, independent of batch companions.
+
+    Apply the frozen temperature/top-p policy, then force the selected token.
+    Transformers' subsequent warpers and sampling retain that one-token choice.
+    No global RNG state is reported as an individual sequence's seed.
+    """
+    def __init__(self, seeds, device, eos_ids, prompt_width):
+        import torch
+        self.generators = [torch.Generator(device=device).manual_seed(seed) for seed in seeds]
+        self.eos_ids = torch.tensor(eos_ids, device=device)
+        self.prompt_width = prompt_width
+        self.finished = torch.zeros(len(seeds), dtype=torch.bool, device=device)
+
+    def __call__(self, input_ids, scores):
+        import torch
+        from transformers import TemperatureLogitsWarper, TopPLogitsWarper
+        if scores.shape[0] != len(self.generators):
+            raise ValueError("Seeded clean generation requires one sequence per prompt")
+        warped = TopPLogitsWarper(0.95)(input_ids, TemperatureLogitsWarper(0.6)(input_ids, scores))
+        probabilities = torch.softmax(warped, dim=-1)
+        forced = torch.full_like(scores, -float("inf"))
+        if input_ids.shape[1] > self.prompt_width:
+            self.finished |= torch.isin(input_ids[:, -1], self.eos_ids)
+        tokens = torch.cat([torch.multinomial(probabilities[row:row + 1], 1, generator=generator)
+                            for row, generator in enumerate(self.generators)], dim=0)
+        tokens = torch.where(self.finished[:, None], self.eos_ids[0], tokens)
+        forced.scatter_(1, tokens, 0)
+        return forced
 
 
 def validate_clean_trace(candidate: Mapping, model_id: str, raw: Mapping, tokenizer,
@@ -220,8 +298,10 @@ def process_clean_batch(candidates, generator, tokenizers: Mapping, *, kazitext,
         else:
             generated = (generator(c, model, dict(GENERATION_SETTINGS)) for c in pending)
         generated = iter(generated)
+        draining_batch = False
         for c in pending:
-            check_stop("before_generation", c["example_id"], model)
+            if not draining_batch:
+                check_stop("before_generation", c["example_id"], model)
             try:
                 raw = dict(next(generated))
             except CleanDataPause as error:
@@ -242,7 +322,9 @@ def process_clean_batch(candidates, generator, tokenizers: Mapping, *, kazitext,
             atomic_write_json(path, record)  # Always persisted before parsing.
             if read_json(path) != record:
                 raise IOError("Raw generation readback mismatch")
-            notify_artifact(path, {"kind": "clean_raw", "example_id": c["example_id"], "model_id": model, "config_hash": config_hash, "raw_hash": record["raw_hash"]})
+            notify_artifact(path, {"kind": "clean_raw", "example_id": c["example_id"], "model_id": model, "config_hash": config_hash, "raw_hash": record["raw_hash"],
+                "defer_until_batch_end": "generation_batch_end" in raw and not raw["generation_batch_end"]})
+            draining_batch = "generation_batch_end" in raw and not raw["generation_batch_end"]
             raw_by_model[model][c["example_id"]] = record
         if next(generated, None) is not None:
             raise RuntimeError("Generator returned extra unrequested responses")

@@ -19,6 +19,38 @@ def provenance():
             "configuration_hash": "b" * 64, "dataset_revision": "c" * 40, "model_revision": "d" * 40, "seeds": [42]}
 
 
+def test_parallel_uploads_use_independent_transports_and_preserve_failed_records(tmp_path):
+    import threading
+    import time
+    shared={'active':0,'peak':0,'forks':set()}
+    lock=threading.Lock()
+    class ParallelDrive:
+        def create_project_folder(self): return 'folder'
+        def ensure_path(self, parts): return 'folder'
+        def fork(self):
+            with lock:shared['forks'].add(threading.get_ident())
+            return ParallelDrive()
+        def upload_artifact(self, path, **kwargs):
+            with lock:
+                shared['active']+=1
+                shared['peak']=max(shared['peak'],shared['active'])
+            try:
+                time.sleep(.02)
+                if Path(path).name=='2.json':raise TimeoutError('fixture')
+                return {'id':kwargs['artifact_id']}
+            finally:
+                with lock:shared['active']-=1
+    service=ArtifactService(tmp_path,tmp_path/'registry.json',ParallelDrive())
+    for index in range(8):
+        file=tmp_path/f'{index}.json';file.write_text(str(index));service.register(file,provenance())
+    report=service.sync_artifacts(workers=4)
+    assert report['status']=='FAILED' and len(report['failed'])==1
+    assert len(service.list_artifacts(sync_status='VERIFIED'))==7
+    failed=service.list_artifacts(sync_status='FAILED')[0]
+    assert failed['sync_error']=='TimeoutError'
+    assert shared['peak']>1 and len(shared['forks'])>1
+
+
 def test_artifact_compatibility_and_secret_rejection(tmp_path):
     service = ArtifactService(tmp_path, tmp_path / "registry.json")
     output = tmp_path / "adapter.bin"

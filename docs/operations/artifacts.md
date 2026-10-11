@@ -13,3 +13,16 @@ SFT/GRPO recovery states include adapter, optimizer, scheduler, RNG and progress
 Ordinary malformed/wrong model answers are recorded outcomes. Infrastructure retries share persistent three-per-operation/100-per-worker counters and never silently discard completed upstream records. An RL update waits for all32valid reward records. A failed step rolls back to matching full state; no failed update advances completion. OOM halts affected execution for a resource-compatible restart rather than retrying the same impossible allocation. Checkpoint compatibility guards source/configuration/data/model/seeds and the actual serialized state.
 
 [Drive operation](google_drive.md) covers automatic raw/checkpoint replication and compatibility-aware retrieval. Before deleting a local required copy, verify the permanent remote copy and preserve the registry. Before retiring a volume, perform a real remount/retrieval check. Neither a local fsync nor a transport-double test establishes cloud lifetime durability.
+# Batched clean collection
+
+Set `CLEAN_GENERATION_BATCH_SIZE=32` and `DRIVE_UPLOAD_WORKERS=8` when invoking
+the committed collection command. Native Transformers decoding groups whole
+prompts with left padding and independent per-example RNGs under the frozen
+temperature, top-p and token budget. Responses retain their individual EOS,
+token IDs and original candidate order. Each complete GPU batch is written to
+the raw cache, then published through eight independent Drive HTTP transports.
+Every raw file retains its checksum verification and recovery descriptor before
+the next GPU batch starts. Stop requests drain and publish the current batch.
+Folder lookups are cached within a publisher; upload retries still share the
+durable worker ledger and its original limits.
+

@@ -417,7 +417,9 @@ class Experiment:
         from operations.drive import file_hash
         if not service.list_artifacts(local_path=str(path),sha256=file_hash(path)):
             service.register(path,self.provenance(metadata=metadata))
-        result=service.sync_artifacts()
+        if metadata.get('defer_until_batch_end'):
+            return
+        result=service.sync_artifacts(workers=int(os.getenv('DRIVE_UPLOAD_WORKERS','1')))
         if result['status']!='VERIFIED':
             raise RuntimeError('Permanent artifact replication is incomplete; valid local state preserved')
 

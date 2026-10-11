@@ -9,6 +9,7 @@ import os
 import re
 import tempfile
 import time
+import threading
 from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import urlsplit
@@ -234,6 +235,9 @@ class DriveStore:
         self.service = service
         self.folder_id = folder_id
         self._verified_folders = set()
+        self._path_cache = {}
+        self._path_lock = threading.RLock()
+        self._project_verified = False
         root = Path(state_root or Path(os.environ.get("ARTIFACT_ROOT", "artifacts")) / "state" / "drive")
         self.recovery = RecoveryManager(root / "retries.json") if state_root is not None else RecoveryManager.for_worker()
 
@@ -272,6 +276,8 @@ class DriveStore:
         return self.service.files().create(body={"name": name, "mimeType": "application/vnd.google-apps.folder", "parents": [parent]}, fields="id").execute()["id"]
 
     def create_project_folder(self) -> str:
+        if self._project_verified:
+            return self.folder_id
         self.account_and_quota()
         if self.folder_id:
             value = self.service.files().get(fileId=self.folder_id, fields="id,name,mimeType,trashed").execute()
@@ -280,7 +286,20 @@ class DriveStore:
         else:
             self.folder_id = self.create_folder(PROJECT_TITLE, root=True)
         self._verified_folders.add(self.folder_id)
+        self._project_verified = True
         return self.folder_id
+
+    def fork(self):
+        """Independent HTTP transport; shared verified paths and retry ledger."""
+        token = os.environ.get('GOOGLE_OAUTH_TOKEN_FILE')
+        if not token:
+            raise RuntimeError('Parallel Drive publication requires the private OAuth file')
+        selected = DriveStore(drive_service(token), self.folder_id)
+        selected.recovery = self.recovery
+        selected._verified_folders = self._verified_folders
+        selected._path_cache, selected._path_lock = self._path_cache, self._path_lock
+        selected._project_verified = self._project_verified
+        return selected
 
     def verify_folder_ancestry(self, folder_id: str) -> None:
         if not self.folder_id: raise RuntimeError("Canonical project folder is not initialized")
@@ -300,7 +319,12 @@ class DriveStore:
         for part in parts:
             if not part or part in (".", "..") or "/" in part:
                 raise ValueError("Invalid canonical Drive path component")
-            parent = self.create_folder(part, parent)
+            with self._path_lock:
+                key = (parent, part)
+                if key not in self._path_cache:
+                    self._path_cache[key] = self.create_folder(part, parent)
+                    self._verified_folders.add(self._path_cache[key])
+                parent = self._path_cache[key]
         return parent
 
     def list_artifacts(self, folder_id: str | None = None) -> list[dict]:

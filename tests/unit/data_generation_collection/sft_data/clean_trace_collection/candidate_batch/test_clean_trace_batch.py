@@ -1,7 +1,72 @@
 import pytest
+import torch
 from shared_procedures.identity import content_hash
 from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import process_clean_batch,validate_clean_trace,total_sequence_tokens,native_completion
 from data_generation_collection.sft_data.clean_trace_collection.candidate_manifest import prepare_candidate_manifest
+
+
+def test_batched_sampling_keeps_each_seed_independent_of_companions_and_global_rng():
+    from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import IndependentSeedSampler
+    scores = torch.tensor([[0., 1., 2., 0., -1., 1., 0., 2.]])
+    single = IndependentSeedSampler([42], 'cpu', [7], 2)
+    batched = IndependentSeedSampler([123, 42, 456], 'cpu', [7], 2)
+    ids = torch.tensor([[1, 2]])
+    for _ in range(20):
+        torch.manual_seed(987)
+        expected = single(ids, scores).argmax(-1)
+        torch.manual_seed(654)
+        actual = batched(ids.repeat(3, 1), scores.repeat(3, 1)).argmax(-1)
+        assert actual[1] == expected[0]
+
+
+def test_batched_sampling_uses_frozen_native_temperature_and_top_p():
+    from transformers import TemperatureLogitsWarper, TopPLogitsWarper
+    from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import IndependentSeedSampler
+    ids = torch.tensor([[1, 2]])
+    scores = torch.tensor([[0., 1., 2., 3., 0., 1., 0., -1.]])
+    expected_rng = torch.Generator().manual_seed(42)
+    sampler = IndependentSeedSampler([42], 'cpu', [7], 2)
+    for _ in range(10):
+        probabilities = TopPLogitsWarper(.95)(ids, TemperatureLogitsWarper(.6)(ids, scores)).softmax(-1)
+        expected = torch.multinomial(probabilities, 1, generator=expected_rng)
+        assert sampler(ids, scores).argmax(-1).item() == expected.item()
+
+
+def test_batched_generation_keeps_whole_prompts_order_and_per_row_eos():
+    from types import SimpleNamespace
+    from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import NativeCleanGenerator
+    from shared_procedures.identity import derive_seed
+    class Encoded(dict):
+        def to(self, device): return self
+        @property
+        def input_ids(self): return self['input_ids']
+    class BatchTokenizer:
+        pad_token_id = 0
+        eos_token_id = 9
+        def apply_chat_template(self, messages, **kwargs): return messages[0]['content']+'<think>'
+        def __call__(self, prompts, **kwargs):
+            assert kwargs['padding'] and kwargs['add_special_tokens'] is False
+            return Encoded(input_ids=torch.tensor([[0, 1, 2], [1, 2, 3]]), attention_mask=torch.tensor([[0, 1, 1], [1, 1, 1]]))
+        def decode(self, ids, **kwargs): return 'one two three</think> answer'
+    class BatchModel:
+        device = 'cpu'
+        generation_config = SimpleNamespace(eos_token_id=9)
+        def generate(self, **kwargs):
+            assert kwargs['input_ids'].shape[0] == 2
+            assert kwargs['max_new_tokens'] == 3072 and kwargs['temperature'] == .6 and kwargs['top_p'] == .95
+            assert kwargs['attention_mask'][0, 0] == 0
+            return torch.tensor([[0, 1, 2, 5, 9, 0], [1, 2, 3, 5, 6, 9]])
+    models={size:{'id':name,'revision':'a'*40,'tokenizer_revision':'b'*40} for size,name in
+        [('7b','deepseek-ai/DeepSeek-R1-Distill-Qwen-7B'),('14b','deepseek-ai/DeepSeek-R1-Distill-Qwen-14B')]}
+    generator=NativeCleanGenerator(models,batch_size=32)
+    generator.model, generator.tokenizer=BatchModel(),BatchTokenizer()
+    generator._load=lambda model:None
+    candidates=[{**candidate(),'example_id':str(index)} for index in range(2)]
+    responses=list(generator.generate_many('7b',candidates))
+    assert [r['generation_token_ids'] for r in responses]==[[5,9],[5,6,9]]
+    assert [r['seed'] for r in responses]==[derive_seed(42,'clean_generation',c['example_id'],'7b') for c in candidates]
+    assert [r['generation_batch_end'] for r in responses]==[False,True]
+    assert all(r['finish_reason']=='stop' for r in responses)
 
 
 class Tokenizer:
