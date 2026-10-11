@@ -3206,14 +3206,15 @@ manufacture a stronger scientific result [41, 54, 59].
 Current execution status (11 October 2026). Licensed LMSYS source acquisition and the complete
 one-million-row audit are verified; 407,214 eligible candidates are frozen. The 1,233-item capability panel
 and nested 200-item legibility subset are prepared and backed up. The shared 800-question GSM8K RL
-manifest is selected and Drive-verified. Fresh 7B and 14B SFT raw generation uses the approved vLLM
-workers.
+manifest is selected and Drive-verified. Fresh vLLM generation and refills are complete: 11,639 candidate
+IDs yielded 10,100 accepted pairs and 1,539 rejections. All 40 transformed conditions (80 JSONLs;
+404,000 records) and the download index are Drive-verified.
 Validation evidence. The vLLM benchmark exercised generation, formatting, token limits and GPU memory.
 Matched 14B chunks of 32 took approximately 40.53 seconds versus 342.78 seconds natively; a
 128-request sample took 52.64 seconds without OOM. These generation-only measurements do not prove
 quality equivalence. Every production batch undergoes Drive integrity verification. At the user's request, the
-full suite and full launch preflights were not repeated for this migration. Final paired acceptance, refills, all
-transformations, training and actual model evaluations remain pending.
+full suite and full launch preflights were not repeated for this migration. Native final acceptance and dataset
+validators passed on the real corpus. Training and actual model evaluations remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned
 model, tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv)
 checked real reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only
@@ -3887,8 +3888,9 @@ Both caches must contain matching fresh vLLM production outputs. Separate model 
 provenance. The coordinator runs cached acceptance, refills and final construction. Pod roles, worker runtimes and disjoint
 verification ranges are configured without a fixed Pod count; the scientific recipe remains paired 7B/14B. Secondary Pods
 save later verified pair/transform caches to Drive and transfer checked copies to the primary, which preserves candidate
-order and assembly. Final pairing remains pending. Freeze shared IDs after all checks, build forty condition datasets, verify
-each file in Drive, and publish a path/checksum/file-ID download index. Raw-generation ETA excludes these later stages.
+order and assembly. Final pairing and all forty condition datasets are now Drive-verified. Freeze shared IDs after all checks,
+build forty condition datasets, verify each file in Drive, and publish a path/checksum/file-ID download index. Raw-generation
+ETA excludes these later stages.
 ```
 
 ## page_072

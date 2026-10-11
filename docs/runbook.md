@@ -76,4 +76,4 @@ Keep original immutable manifests and irreplaceable checkpoints backed up separa
 
 ## Current procedure: 11 October 2026
 
-The [current procedure](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
+The [current procedure](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance, exact-deficit refills, all 40 transformed conditions and Drive copies are complete. Training and actual evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
