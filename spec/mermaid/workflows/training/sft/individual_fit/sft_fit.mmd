@@ -6,6 +6,8 @@ flowchart TD
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
+%% CE policy defaults to spatial_ce; flat_ce and fused_ce are explicit pending candidates.
+%% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
 %% Individual SFT fit
@@ -51,7 +53,7 @@ flowchart TD
     AUDIT -->|Known artifact repair| FINAL
     RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover verified state before resuming"]
     STOP["Stop fit and preserve partial results"]
-    PROFILE["Bind explicit profile, source and condition<br/>Eager attention; baseline recomputation default"]
+    PROFILE["Bind explicit profile, source and condition<br/>Eager attention; explicit CE/recomputation policy"]
     MEASURE["Freeze prospective paired target-GPU screen<br/>Losses, gradients, updates, speed and RNG"]
     ACCEPT{"Source / GPU / condition evidence passes?"}
     MIGRATE["If continuing: preserve parent checkpoint<br/>Inherit full state and publish child lineage"]

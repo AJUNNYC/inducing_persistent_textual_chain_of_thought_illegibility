@@ -50,6 +50,8 @@ Use the common [artifact contracts](../../../../contracts.md), [frozen prompt in
 
 ## Implemented interface and evidence
 
+The new `loss_implementation` field selects `spatial_ce` (original default), `flat_ce` (same FP32 logits and targets reshaped for stock PyTorch CE), or `fused_ce` (explicit Triton token CE). `profile_completion_loss` owns the unchanged causal shift, ignored prompt/padding labels and mean-within-example then mean-across-examples reduction. The [fused loss helper](../../../../../src/training/sft/fused_loss.py) exposes `fused_token_cross_entropy(logits, targets, *, ignore_index=-100)` for unreduced FP32 token losses. It never mutates logits or consumes RNG, stores gradients separately, and rejects unsupported devices/dtypes/dependencies without fallback. It is first-order only and leaves the LM head and full vocabulary intact. GPU numerical equality and speed are not assumed. Both new profiles retain the currently accepted disabled recomputation and must pass a paired screen with `no_gradient_checkpointing` as the declared reference, plus current source/condition-bound migration controls. New focused checks and actual GPU results are pending; the existing accepted source 05f42b0 worker continues during CPU preparation.
+
 Source `05f42b0` adds `cache_collated_inputs` and `gradient_checkpointing` execution controls, defaulting to false and true respectively. The protocol describes checkpointing as a memory-saving execution setting. Identical base freezing, FP32 parameter preparation and LoRA setup precede an explicit no-recomputation override. Immutable CUDA caching retains exact IDs, masks, labels and microbatch shapes with mutation guards, but failed the speed gate and remains disabled. The actual two-repetition step-214 recovery screen accepted only no recomputation for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB: 1.2695x and 1.2806x median throughput ratios, with bitwise loss, gradient, update, final adapter/optimizer/scheduler and RNG agreement. The 3,190-token worst-case probe used 89.13 GiB reserved memory, so this approval is not portable to other conditions. Source/GPU/condition-bound launch evidence and explicit parent-preserving lineage remain required. Learning rate, exposure, dropout, loss weighting and Drive checkpoint cadence stay fixed.
 
 `runtime_migration.py` verifies immutable scientific fields and parent checkpoint bytes, creates separate child provenance and inherits full optimizer/scheduler/sampler/RNG progress. It does not relabel the original checkpoint as an exact new-source resume. The official parent is read-only during paired recovery measurements and migration.
@@ -114,6 +116,8 @@ flowchart TD
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
+%% CE policy defaults to spatial_ce; flat_ce and fused_ce are explicit pending candidates.
+%% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
 %% Individual SFT fit
@@ -159,7 +163,7 @@ flowchart TD
     AUDIT -->|Known artifact repair| FINAL
     RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover verified state before resuming"]
     STOP["Stop fit and preserve partial results"]
-    PROFILE["Bind explicit profile, source and condition<br/>Eager attention; baseline recomputation default"]
+    PROFILE["Bind explicit profile, source and condition<br/>Eager attention; explicit CE/recomputation policy"]
     MEASURE["Freeze prospective paired target-GPU screen<br/>Losses, gradients, updates, speed and RNG"]
     ACCEPT{"Source / GPU / condition evidence passes?"}
     MIGRATE["If continuing: preserve parent checkpoint<br/>Inherit full state and publish child lineage"]

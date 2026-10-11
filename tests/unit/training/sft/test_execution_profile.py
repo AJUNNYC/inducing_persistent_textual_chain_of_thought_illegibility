@@ -79,7 +79,7 @@ def test_execution_profile_is_explicit_and_baseline_default_is_unchanged():
     assert BASELINE.to_dict() == {
         'attention_implementation': 'eager', 'validated_loss_counts': False,
         'defer_finite_checks': False, 'cache_collated_inputs': False,
-        'gradient_checkpointing': True,
+        'gradient_checkpointing': True, 'loss_implementation': 'spatial_ce',
     }
     for values in [('flash_attention_2', False, False), ('eager', 1, False), ('eager', False, 'true')]:
         with pytest.raises(ValueError):

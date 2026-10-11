@@ -30,6 +30,8 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 
 ## Implemented interface and evidence
 
+New flat-layout and fused token-CE candidates remain pending. Their paired screen references the active no-recomputation profile, restores the same latest preserved full state and measures incremental gains; neither is activated by the prior source 05f42b0 approval. The condition-scoped source/profile acceptance must bind the actual new implementation and affected launch controls before continuation under new lineage. Other fits do not inherit that approval.
+
 `build_worklist(config, datasets, handoff_certificate=certificate)` reads the forty verified JSONL conditions and binds actual ordered record bytes to exact fit specifications. It requires the same ordered train/validation IDs, prompt bytes and common accepted-pool hash across every condition; model-specific clean-trace hashes and final-answer bytes remain identical across that model's families/strengths. Different model traces are never interchangeable. `load_dataset_bundle(bundle)` verifies persisted JSONL content hashes before loading.
 
 `run_family_queue(family, worklist, output_root, config, *, preflight_report=None, fit_runner=run_sft_fit, release_gpu=None, should_pause=None)` runs twenty sequential independent fits. A child failure or pause preserves verified prior fits and an explicit partial queue report. An injected runner is labeled `injected_fixture`, and cannot supply scientific results. `sft_training(..., families=('rot13','kazitext'))`, also exported as `run_sft_training`, runs selected queues with the same reusable engine. The single-process default is sequential; independent external workers may run queues on separately assigned GPUs. A failed family does not erase another family's work. A release callback runs when the queue returns.
@@ -63,6 +65,8 @@ flowchart TD
 %% Edit quoted node labels directly; this is native Mermaid source.
 %% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
+%% CE policy defaults to spatial_ce; flat_ce and fused_ce are explicit pending candidates.
+%% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
 %% Within each queue, select the next unfinished fit until all 20 are verified.
@@ -86,7 +90,7 @@ flowchart TD
     KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
-    BENCH["New source or hardware: paired candidate measurements<br/>Condition-scoped acceptance and full-state lineage"]
+    BENCH["New source or hardware: paired candidate measurements<br/>Active-profile comparison; scoped acceptance and full-state lineage"]
     INPUT --> CERT --> GATES --> PLAN
     CERT -.->|Migration| BENCH --> GATES
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT

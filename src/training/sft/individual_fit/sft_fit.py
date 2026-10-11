@@ -366,6 +366,44 @@ def completion_loss(logits: Any, labels: Any, *, validated_counts: Any = None) -
     return (token_losses.sum(dim=1) / counts).mean()
 
 
+def profile_completion_loss(logits: Any, labels: Any, *,
+                            execution_profile: SFTExecutionProfile | None = None,
+                            validated_counts: Any = None) -> Any:
+    """Dispatch token CE without changing causal masks or example weighting.
+
+    Flattening changes the kernel layout, so equality of the mathematical
+    objective does not establish bitwise equality on a selected CUDA runtime.
+    Fused execution has no fallback and requires its explicit measured profile.
+    """
+    profile = resolve_execution_profile(execution_profile)
+    if profile.loss_implementation == "spatial_ce":
+        return completion_loss(logits, labels, validated_counts=validated_counts)
+    import torch
+    import torch.nn.functional as functional
+    shifted_logits, shifted_labels = logits[:, :-1, :].float(), labels[:, 1:]
+    if validated_counts is None:
+        counts = (shifted_labels != -100).sum(dim=1)
+        if torch.any(counts == 0):
+            raise SFTInputError("An example has no supervised shifted target")
+    else:
+        if (not isinstance(validated_counts, _ValidatedCompletionCounts)
+                or validated_counts.labels is not labels
+                or validated_counts.labels_version != labels._version
+                or validated_counts.counts_version != validated_counts.counts._version):
+            raise SFTInputError("Validated completion counts do not match unchanged collated labels")
+        counts = validated_counts.counts
+    if profile.loss_implementation == "flat_ce":
+        token_losses = functional.cross_entropy(
+            shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1),
+            ignore_index=-100, reduction="none").reshape(shifted_labels.shape)
+    else:
+        from training.sft.fused_loss import fused_token_cross_entropy
+        token_losses = fused_token_cross_entropy(
+            shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1),
+            ignore_index=-100).reshape(shifted_labels.shape)
+    return (token_losses.sum(dim=1) / counts).mean()
+
+
 def exposure_order(count: int, seed: int = 42) -> list[int]:
     """Two seeded epoch permutations, accumulated continuously across boundary."""
     generator = random.Random(seed)
@@ -398,18 +436,23 @@ def restore_rng(state: Mapping[str, Any]) -> None:
 
 
 def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: int, *, require_lora: bool = True,
-                          prepared_batch: PreparedCompletionBatch | None = None) -> dict[str, Any]:
+                          prepared_batch: PreparedCompletionBatch | None = None,
+                          execution_profile: SFTExecutionProfile | None = None) -> dict[str, Any]:
     """Actual backward pass; preserve RNG and clear gradients without updating."""
     import torch
+    profile = resolve_execution_profile(execution_profile)
     before = capture_rng()
     model.train()
     model.zero_grad(set_to_none=True)
     try:
         device = next(model.parameters()).device
         batch = (prepared_batch.batch_for(example, pad_token_id, device) if prepared_batch is not None
-                 else collate_completion([example], pad_token_id, device))
+                 else collate_completion([example], pad_token_id, device,
+                                          validate_counts=profile.validated_loss_counts))
         logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
-        loss = completion_loss(logits, batch["labels"])
+        loss = profile_completion_loss(logits, batch["labels"],
+            validated_counts=(batch["validated_completion_counts"] if profile.validated_loss_counts else None),
+            execution_profile=profile)
         if not torch.isfinite(loss):
             raise SFTRuntimeBlocked("Actual completion loss is not finite")
         loss.backward()
@@ -469,8 +512,9 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
         batch = (batches[position] if batches is not None else
                  collate_completion([example], pad_token_id, device, validate_counts=profile.validated_loss_counts))
         counts = batch["validated_completion_counts"] if profile.validated_loss_counts else None
-        loss = completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
-                               batch["labels"], validated_counts=counts)
+        loss = profile_completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
+                               batch["labels"], validated_counts=counts,
+                               execution_profile=profile)
         if not profile.defer_finite_checks and not torch.isfinite(loss):
             raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
         (loss / len(examples)).backward()
@@ -545,8 +589,10 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
             "execution_profile": profile.to_dict(), "status": "complete"}
 
 
-def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token_id: int) -> float:
+def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token_id: int,
+                    *, execution_profile: SFTExecutionProfile | None = None) -> float:
     import torch
+    profile = resolve_execution_profile(execution_profile)
     if not examples:
         raise SFTInputError("Missing fixed held-out split")
     model.eval()
@@ -554,8 +600,11 @@ def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token
     device = next(model.parameters()).device
     with torch.no_grad():
         for example in examples:
-            batch = collate_completion([example], pad_token_id, device)
-            value = completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits, batch["labels"])
+            batch = collate_completion([example], pad_token_id, device,
+                                       validate_counts=profile.validated_loss_counts)
+            value = profile_completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
+                batch["labels"], validated_counts=(batch["validated_completion_counts"]
+                    if profile.validated_loss_counts else None), execution_profile=profile)
             if not torch.isfinite(value):
                 raise SFTRuntimeBlocked("Nonfinite validation loss")
             values.append(value.item())
@@ -609,6 +658,7 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
                "cuda_version": torch.version.cuda, "attention_implementation": profile.attention_implementation,
                "execution_profile": profile.to_dict(), "use_reentrant": False,
                "gradient_checkpointing": actual_gradient_checkpointing,
+               "loss_implementation": profile.loss_implementation,
                "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8, "warmup_steps": 38,
                "packages": {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "bitsandbytes", "numpy")}}
     return model, tokenizer, optimizer, scheduler, runtime
@@ -843,7 +893,7 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
             optimizer.load_state_dict(restored["optimizer"])
             scheduler.load_state_dict(restored["scheduler"])
             restore_rng(restored["rng"])
-        gradient_evidence = verify_mask_gradients(model, train[0], tokenizer.pad_token_id)
+        gradient_evidence = verify_mask_gradients(model, train[0], tokenizer.pad_token_id, execution_profile=profile)
         atomic_write_json(output / "runtime_evidence.json", {"identity": identity, "runtime": runtime,
             "mask_gradients": gradient_evidence, "data": data_evidence,
             "train_token_lengths": {"min": min(len(r["input_ids"]) for r in train), "max": max(len(r["input_ids"]) for r in train), "mean": sum(len(r["input_ids"]) for r in train) / len(train)}})
@@ -865,7 +915,7 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
             atomic_write_json(output / "fit_status.json", result)
             return result
         # Final full state already durably published by the optimizer loop.
-        loss = validation_loss(model, validation, tokenizer.pad_token_id)
+        loss = validation_loss(model, validation, tokenizer.pad_token_id, execution_profile=profile)
         from shared_procedures.recovery_procedure import RecoveryManager, RetryableFailure
         import errno
         recovery = RecoveryManager.for_worker(artifact_root=output.parent.parent)

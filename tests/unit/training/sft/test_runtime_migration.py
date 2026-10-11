@@ -81,6 +81,32 @@ def measured_fixture(identity, manifest=None):
     return rehash(report)
 
 
+def incremental_fixture(identity, manifest=None):
+    """Declared no-checkpoint parent versus one new loss-layout candidate."""
+    report = measured_fixture(identity, manifest)
+    reference = SFTExecutionProfile(gradient_checkpointing=False).to_dict()
+    candidate = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation="flat_ce").to_dict()
+    report["plan"]["reference_profile"] = "no_gradient_checkpointing"
+    report["plan"]["profiles"] = {"no_gradient_checkpointing": reference, "flat_ce": candidate}
+    for container in (report["profiles"], report["profile_runs"]):
+        for row in container.values():
+            is_reference = row["profile"] == "baseline"
+            settings = reference if is_reference else candidate
+            row["profile"] = "no_gradient_checkpointing" if is_reference else "flat_ce"
+            row["settings"] = settings
+            row["runtime"] = {"execution_profile": settings, "loss_implementation": settings["loss_implementation"]}
+            row["actual_execution_policy"] = {"loss_implementation": settings["loss_implementation"]}
+            row["longest_sequence_probe"] = {"loss_implementation": settings["loss_implementation"]}
+    report["profiles"] = {"no_gradient_checkpointing": report["profiles"]["baseline"],
+                           "flat_ce": report["profiles"]["cuda_cached"]}
+    comparison = report["comparisons"]["cuda_cached"]
+    comparison["reference_profile"] = "no_gradient_checkpointing"
+    for repeat in comparison["repetitions"]:
+        repeat["reference_profile"] = "no_gradient_checkpointing"
+    report["comparisons"] = {"flat_ce": comparison}
+    return rehash(report)
+
+
 @pytest.mark.parametrize("field", IMMUTABLE_IDENTITY_FIELDS)
 def test_scientific_checkpoint_identity_cannot_change(field):
     old, new = identities()
@@ -113,6 +139,75 @@ def test_paired_update_screen_accepts_matching_work_despite_unpaired_length_rang
     assert result["scientific_equivalence_established"] is False
 
 
+def test_declared_no_checkpoint_reference_measures_incremental_flat_ce_gain():
+    _, new = identities()
+    new["execution_profile"] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation="flat_ce").to_dict()
+    report = incremental_fixture(new)
+    result = validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
+    assert result["reference_profile"] == "no_gradient_checkpointing"
+    assert result["reference_execution_profile"]["gradient_checkpointing"] is False
+    assert result["reference_execution_profile"]["loss_implementation"] == "spatial_ce"
+    assert result["execution_profile"]["loss_implementation"] == "flat_ce"
+
+
+def test_legacy_v2_profiles_without_loss_field_keep_spatial_default():
+    _, new = identities(); report = measured_fixture(new)
+    for settings in report["plan"]["profiles"].values():
+        settings.pop("loss_implementation")
+    for row in [*report["profiles"].values(), *report["profile_runs"].values()]:
+        row["settings"].pop("loss_implementation", None)
+        row["runtime"]["execution_profile"].pop("loss_implementation", None)
+    rehash(report)
+    result = validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
+    assert result["reference_profile"] == "baseline"
+    assert result["execution_profile"]["loss_implementation"] == "spatial_ce"
+
+
+@pytest.mark.parametrize("location", ["aggregate", "repetition", "actual_run", "reference_runtime"])
+def test_reference_cannot_be_relabelled_as_the_slower_original_baseline(location):
+    _, new = identities()
+    new["execution_profile"] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation="flat_ce").to_dict()
+    report = incremental_fixture(new)
+    if location == "aggregate":
+        report["comparisons"]["flat_ce"]["reference_profile"] = "baseline"
+    elif location == "repetition":
+        report["comparisons"]["flat_ce"]["repetitions"][1]["reference_profile"] = "baseline"
+    elif location == "actual_run":
+        report["profile_runs"]["baseline_2"]["profile"] = "baseline"
+    else:
+        report["profile_runs"]["baseline_2"]["runtime"]["execution_profile"] = SFTExecutionProfile().to_dict()
+    rehash(report)
+    with pytest.raises(MigrationError, match="reference|paired repetition|Paired measurements"):
+        validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
+
+
+@pytest.mark.parametrize("field", ["runtime", "actual_execution_policy", "longest_sequence_probe"])
+def test_new_loss_mode_requires_actual_execution_and_native_probe_evidence(field):
+    _, new = identities()
+    new["execution_profile"] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation="flat_ce").to_dict()
+    report = incremental_fixture(new)
+    report["profile_runs"]["cuda_cached_2"][field].pop("loss_implementation")
+    rehash(report)
+    with pytest.raises(MigrationError, match="loss execution"):
+        validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
+
+
+def test_recovered_parent_must_match_the_declared_incremental_reference():
+    old, new = identities()
+    new["execution_profile"] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation="flat_ce").to_dict()
+    manifest = {"checkpoint_hash": "fixture-checkpoint", "identity": old,
+                "progress": {"completed_steps": 400, "sampler_position": 6400}, "files": {}}
+    report = incremental_fixture(new, manifest)
+    with pytest.raises(MigrationError, match="original checkpoint execution profile"):
+        validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
+    reference = SFTExecutionProfile(gradient_checkpointing=False).to_dict()
+    report["plan"]["recovery_checkpoint"]["identity"]["execution_profile"] = reference
+    for row in [*report["profiles"].values(), *report["profile_runs"].values()]:
+        row["recovery_checkpoint"]["identity"]["execution_profile"] = reference
+    rehash(report)
+    assert validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])["recovery_validated"] is True
+
+
 @pytest.mark.parametrize("flag", ("numerical_screen_passed", "speedup_threshold_passed", "final_rng_states_identical"))
 def test_failed_repetition_cannot_be_hidden_by_passed_aggregate(flag):
     _, new = identities(); report = measured_fixture(new)
@@ -134,7 +229,8 @@ def test_stale_source_weakened_bounds_and_lying_paired_speed_reject():
         validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
 
 
-def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(tmp_path):
+@pytest.mark.parametrize('incremental_loss', [False, True])
+def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(tmp_path, incremental_loss):
     torch.manual_seed(42)
     model = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.Dropout(0.2), torch.nn.Linear(2, 1))
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
@@ -143,6 +239,9 @@ def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(
         o.zero_grad(); m(torch.tensor([[1., 2.]])).square().mean().backward(); o.step(); s.step()
     update(model, optimizer, scheduler)
     old, new = identities()
+    if incremental_loss:
+        old['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False).to_dict()
+        new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='flat_ce').to_dict()
     original = tmp_path / "original" / "checkpoint_000001"
     saved = save_checkpoint(original, old, {"adapter": model.state_dict(), "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict(), "rng": capture_rng(),
@@ -150,7 +249,7 @@ def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(
                      "processed_tokens": 112, "total_optimizer_steps": 1250, "exposure_order_hash": "9" * 64},
         "runtime": {"gpu_name": "H100_DECLARED_FIXTURE"}})
     parent_hashes = {path.name: file_hash(path) for path in original.iterdir()}
-    report = measured_fixture(new, saved)
+    report = incremental_fixture(new, saved) if incremental_loss else measured_fixture(new, saved)
     target = tmp_path / "migrated" / "checkpoint_000001"
     receipt = migrate_checkpoint(original, target, old, new, new["execution_profile"], report,
                                  recovery_report=report)

@@ -27,12 +27,16 @@ and production migration gates pass; it is not concealed as unchanged execution.
 | 2 | Cache this fit's exact collated input IDs, attention masks and labels as immutable CUDA tensors. | Removes repeated host preparation/transfers. Tensor contents, microbatch shapes, sample order and RNG remain unchanged; ownership and tensor-version guards reject mutation or substitution. | Measured as `cuda_input_cache` in source `05f42b0`. Paired numerical/state comparisons were bitwise identical, but the minimum matched-update speed ratio was 0.9692x, failing the 1.05x requirement. Not activated. CPU preloading and compact supervised-position CE remain future investigations. |
 | 3 | Replace eager attention with built-in SDPA. | Transformers supports this for Qwen2 and recommends it for efficient training. It retains the attention definition, but fused floating-point kernels can produce different numerical results. | Implemented and measured as `sdpa`. Median speedup was 0.9937x; the numerical screen failed. No fused kernel was independently observed. Not activated. |
 | 4 | Disable activation checkpointing if worst-case examples fit in VRAM. | Removes recomputation after identical PEFT preparation, base freezing, parameter casting and LoRA setup. Original protocol page29 calls checkpointing a memory-saving execution setting, not a behavioral intervention. Compare actual losses, gradients, updates and RNG. | Accepted as `no_gradient_checkpointing` for source `05f42b0`, RTX PRO 6000 Blackwell 96GB, 7B ROT13 level 1. Two paired repetitions measured 1.2695x and 1.2806x median throughput ratios, with bitwise numerical/state/RNG agreement. Other conditions retain the original checkpointing default. |
-| 5 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
+| 5 | Flatten the token CE input from spatial `[batch, vocabulary, tokens]` to `[batch*tokens, vocabulary]`. | PyTorch supports both CE layouts. Keep the same FP32 logits, shifted labels, ignored positions and per-example reduction; a different CUDA kernel layout may still alter rounding. | Implemented as `flat_ce_no_gradient_checkpointing`; focused checks and paired GPU evidence are pending. Compare incremental gain against the accepted no-recomputation profile. Not activated. |
+| 6 | Fuse only FP32 token cross-entropy with the pinned Triton runtime. | Liger provides online softmax/CE precedent. The independent helper retains the full vocabulary and separate gradient storage, with unchanged LM head, logits, masks and per-example reduction. Online normalization changes operation order; equality must be measured. | Implemented as `fused_ce_no_gradient_checkpointing`; focused checks and paired GPU evidence are pending. Unsupported execution fails without fallback; production activation requires the source/GPU/profile-bound screen. |
+| 7 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
 
 Epoch count, training exposure, BF16 versus NF4 construction, optimizer precision,
 learning rate, LoRA rank/dropout and effective batch size are scientific recipe
-changes, not execution optimizations. Fused LM-head/CE kernels and compilation
-are later investigations because they add more numerical and dependency changes.
+changes, not execution optimizations. Fusing the LM-head projection with CE and
+compilation remain later investigations. The new token-CE candidate retains the
+existing full LM-head projection and FP32 logits; it does not introduce either
+of those additional changes.
 Published speedups from other models are not promises for this workload.
 
 The objective is **mean supervised-token loss within each example, then mean
@@ -92,6 +96,42 @@ and statistical simulations were not repeated. The benchmark itself retains
 not automatic benchmark approval. The [verified Drive index](evidence/sft_optimization_pro6000_recovery_drive_index.json)
 preserves source, inputs, reports and launch evidence in the
 [recovery folder](https://drive.google.com/drive/folders/1MPZAIU9kj53i3uzFxhXG35OCtdMXuiYj).
+
+## Incremental loss trials — pending
+
+The user authorized implementing and measuring loss optimizations. The running
+source `05f42b0` fit remains on its accepted no-recomputation profile while CPU
+implementation work proceeds; the latest supplied monitor snapshot had step 300
+verified in Drive. That observation does not activate either loss candidate.
+
+`loss_implementation` is now explicit: `spatial_ce` retains the original PyTorch
+CE path; `flat_ce` reshapes the same shifted FP32 logits and targets before
+calling unreduced PyTorch CE; `fused_ce` calls the opt-in
+[Triton helper](../src/training/sft/fused_loss.py). All paths retain the same
+supervised-token mean within each example and then mean across examples. They
+consume no additional RNG, omit no vocabulary class and change no training
+sequence, dropout assignment, optimizer or checkpoint cadence. Preserving the
+formula does not imply bitwise CUDA equality.
+
+The helper uses already locked Triton 3.5.0, lazy imports and separate gradient
+storage. It requires FP32 logits, int64 targets, `ignore_index=-100`, one CUDA
+device and the measured SM120 architecture. Invalid targets, unsupported
+hardware/dtypes/dependencies and CPU execution fail explicitly; there is no
+silent fallback. Its online maximum/exponential-sum calculation is a numerical
+candidate, not a precision change or a fused LM-head replacement.
+
+The next paired recovery screen declares
+`--reference-profile no_gradient_checkpointing`. Both candidates keep eager
+attention and disabled recomputation, and are compared separately against that
+same currently accepted profile with `spatial_ce`. Thus any accepted speed gain
+must be **additional to the earlier roughly 9.3-second update measurements**, not
+measured against the original roughly 12-second checkpointed reference. The
+latest preserved no-recomputation full checkpoint supplies the identical
+adapter, optimizer, scheduler, sampler and RNG starting state to every profile.
+The frozen speed, numerical, state and identical-RNG rules remain in force.
+Flat CE is considered before fused CE because it retains the stock PyTorch CE
+operator. Actual focused-test results, GPU timings and acceptance remain pending;
+no new speedup or final-result equivalence is claimed.
 
 ## What the empirical checks establish
 
@@ -159,9 +199,10 @@ python scripts/benchmark_sft_optimizations.py \
   --bundle CERTIFIED_BUNDLE.json \
   --worklist CURRENT_WORKLIST.json \
   --model 7b --family rot13 --level 1 \
-  --profiles baseline cuda_input_cache no_gradient_checkpointing \
+  --reference-profile no_gradient_checkpointing \
+  --profiles no_gradient_checkpointing flat_ce_no_gradient_checkpointing fused_ce_no_gradient_checkpointing \
   --warmup-updates 1 --updates 5 --repetitions 2 \
-  --recovery-checkpoint VERIFIED_ORIGINAL_CHECKPOINT_DIRECTORY \
+  --recovery-checkpoint VERIFIED_CURRENT_NO_GC_CHECKPOINT_DIRECTORY \
   --output NEW_BENCHMARK_DIRECTORY --plan-only
 ```
 
@@ -208,6 +249,7 @@ Verified reports and the integrated protocol are preserved in the central projec
 - [PyTorch performance tuning guide](https://raw.githubusercontent.com/pytorch/tutorials/main/recipes_source/recipes/tuning_guide.py): “Avoid unnecessary CPU-GPU synchronization”; examples include `cuda_tensor.item()` and CUDA-dependent Python control flow such as `if (cuda_tensor != 0).all()`. It also recommends asynchronous loading and pinned-memory transfers. These are mechanisms to measure, not workload-specific speed guarantees.
 - [Transformers v4.57.3 GPU guide](https://raw.githubusercontent.com/huggingface/transformers/v4.57.3/docs/source/en/perf_train_gpu_one.md): recommends data preloading, larger physical batches, and SDPA; describes checkpointing as trading memory for “slower training speed (~20%).”
 - [PyTorch v2.9.0 CE documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/nn/modules/loss.py): `ignore_index` “does not contribute to the input gradient.” This permits investigating omitted masked-row loss work, without discarding context or vocabulary classes.
+- [Liger v0.4.0 CE implementation](https://raw.githubusercontent.com/linkedin/Liger-Kernel/v0.4.0/src/liger_kernel/ops/cross_entropy.py): documents “Online softmax: 2 loads + 1 store” and a second pass computing gradients. This is algorithmic precedent for the independent FP32 token-CE helper; its original reduction and storage choices are not imported into this fit. [Triton's v3.5.0 fused-softmax tutorial](https://raw.githubusercontent.com/triton-lang/triton/v3.5.0/python/tutorials/02-fused-softmax.py) supplies further fusion precedent. Neither source empirically validates this candidate on the present training workload.
 - [Qwen2 v4.57.3 implementation](https://raw.githubusercontent.com/huggingface/transformers/v4.57.3/src/transformers/models/qwen2/modeling_qwen2.py): declares SDPA support and provides selected-position `logits_to_keep`. Changing LM-head projection shape remains a separate candidate requiring empirical comparison.
 - [PyTorch v2.9.0 SDPA documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/nn/functional.py): fused floating-point operations can make output differ with the selected backend. [Numerical accuracy guidance](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/docs/source/notes/numerical_accuracy.rst) likewise warns that batched and individual computations need not be bitwise identical.
 - [PyTorch v2.9.0 checkpoint documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/docs/source/checkpoint.md): RNG preservation makes dropout outputs agree with non-checkpointed passes. Keep `preserve_rng_state=True`; [non-reentrant checkpointing is recommended](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/utils/checkpoint.py) and already used.

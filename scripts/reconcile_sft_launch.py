@@ -61,7 +61,7 @@ def identical_files(commit, names):
     return result
 
 
-def compatible_sft_numerics(commit):
+def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
     """Preserve the original masking, CE and reduction beneath new guards.
 
     Execution profiles can add validated counts or input caching. Their entire
@@ -72,10 +72,16 @@ def compatible_sft_numerics(commit):
     old = ast.parse(original_file(commit, name))
     new = ast.parse((ROOT/name).read_text())
 
-    def contract(tree):
+    flat_expression = ast.parse('token_losses = functional.cross_entropy('
+        'shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1), '
+        'ignore_index=-100, reduction="none").reshape(shifted_labels.shape)').body[0]
+    flat_contract = ast.dump(flat_expression, include_attributes=False)
+
+    def contract(tree, *, permit_flat=False):
         functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
         loss = functions['completion_loss']
         selected = {}
+        ce_assignments = []
         for node in ast.walk(loss):
             if isinstance(node, ast.Assign):
                 names = {target.id for target in node.targets if isinstance(target, ast.Name)}
@@ -84,11 +90,17 @@ def compatible_sft_numerics(commit):
                        for target in node.targets):
                     selected['shift'] = ast.dump(node, include_attributes=False)
                 elif 'token_losses' in names:
-                    selected['cross_entropy'] = ast.dump(node, include_attributes=False)
+                    ce_assignments.append(ast.dump(node, include_attributes=False))
                 elif 'counts' in names and isinstance(node.value, ast.Call):
                     selected['direct_counts'] = ast.dump(node, include_attributes=False)
             elif isinstance(node, ast.Return):
                 selected['reduction'] = ast.dump(node, include_attributes=False)
+        spatial = [value for value in ce_assignments if value != flat_contract]
+        if len(spatial) != 1 or (not permit_flat and len(ce_assignments) != 1):
+            raise ValueError('Cannot establish the original SFT cross-entropy contract')
+        selected['cross_entropy'] = spatial[0]
+        if permit_flat and any(value not in (selected['cross_entropy'], flat_contract) for value in ce_assignments):
+            raise ValueError('SFT CE dispatch changes the frozen loss objective')
         collate = functions['collate_completion']
         # New guards snapshot the same labels list in a local variable.
         labels_value = ast.parse("list(example['labels'])", mode='eval').body
@@ -109,10 +121,49 @@ def compatible_sft_numerics(commit):
         if set(selected) != required:
             raise ValueError('Cannot establish the original SFT mask/loss contract')
         return selected
+    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce'):
+        raise ValueError('No accepted scientific loss contract for this execution mode')
     previous, current = contract(old), contract(new)
     if previous != current:
         raise ValueError('Passed SFT mask, cross-entropy or reduction changed')
-    return {key: content_hash(value) for key, value in current.items()}
+    bindings = {key: content_hash(value) for key, value in current.items()}
+    if loss_implementation != 'spatial_ce':
+        wrappers = [node for node in new.body if isinstance(node, ast.FunctionDef)
+                    and node.name == 'profile_completion_loss']
+        if len(wrappers) != 1:
+            raise ValueError('Measured replacement loss dispatch is absent')
+        wrapper = wrappers[0]
+        fused_expression = ast.parse('token_losses = fused_token_cross_entropy('
+            'shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1), '
+            'ignore_index=-100).reshape(shifted_labels.shape)').body[0]
+        fused_contract = ast.dump(fused_expression, include_attributes=False)
+        wrapper_contract, ce_dispatch = {}, []
+        for node in ast.walk(wrapper):
+            if isinstance(node, ast.Assign):
+                names = {target.id for target in node.targets if isinstance(target, ast.Name)}
+                if any(isinstance(target, ast.Tuple) and any(
+                        isinstance(item, ast.Name) and item.id == 'shifted_logits' for item in target.elts)
+                       for target in node.targets):
+                    wrapper_contract['shift'] = ast.dump(node, include_attributes=False)
+                elif 'counts' in names and isinstance(node.value, ast.Call):
+                    wrapper_contract['direct_counts'] = ast.dump(node, include_attributes=False)
+                elif 'token_losses' in names:
+                    ce_dispatch.append(ast.dump(node, include_attributes=False))
+        returns = [node for node in wrapper.body if isinstance(node, ast.Return)]
+        if len(returns) != 1:
+            raise ValueError('Replacement loss must retain the original per-example reduction')
+        wrapper_contract['reduction'] = ast.dump(returns[0], include_attributes=False)
+        if (set(wrapper_contract) != {'shift', 'direct_counts', 'reduction'}
+                or any(value != previous[key] for key, value in wrapper_contract.items())
+                or any(value not in (flat_contract, fused_contract) for value in ce_dispatch)
+                or (flat_contract if loss_implementation == 'flat_ce' else fused_contract) not in ce_dispatch):
+            raise ValueError('Replacement CE dispatch changed the frozen shift, mask or per-example weighting')
+        bindings.update({'replacement_'+key: content_hash(value) for key,value in wrapper_contract.items()})
+        bindings[loss_implementation+'_dispatch'] = content_hash(
+            flat_contract if loss_implementation == 'flat_ce' else fused_contract)
+        if loss_implementation == 'fused_ce':
+            bindings['fused_ce_module'] = file_hash(ROOT/'src/training/sft/fused_loss.py')
+    return bindings
 
 
 def accepted_execution_controls(report_path, profile_name, config, certificate, commit, recovery_path=None):
@@ -201,7 +252,8 @@ def main(argv=None):
             'requirements.lock','src/operations/assets.py','src/shared_procedures/identity.py',
             'src/shared_procedures/response_parsing.py','src/shared_procedures/storage.py'])}
     if accepted:
-        bindings['scientific_sft_numerics'] = compatible_sft_numerics(gpu_source)
+        bindings['scientific_sft_numerics'] = compatible_sft_numerics(gpu_source,
+            loss_implementation=accepted['execution_profile'].get('loss_implementation', 'spatial_ce'))
         bindings['accepted_execution'] = accepted
     rl_files = [str(path.relative_to(ROOT)) for path in sorted((ROOT/'src/training/rl_grpo').rglob('*.py'))]
     bindings['grpo'] = identical_files(gpu_source,rl_files)

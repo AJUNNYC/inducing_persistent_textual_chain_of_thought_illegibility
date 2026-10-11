@@ -36,6 +36,19 @@ GUARDED_NUMERICS = ORIGINAL_NUMERICS.replace(
     'for example in examples:', 'for example in examples:\n        labels = list(example["labels"])').replace(
     'append(list(example["labels"]) + [-100]', 'append(labels + [-100]')
 
+REPLACEMENT_WRAPPER = '''
+def profile_completion_loss(logits, labels, execution_profile=None):
+    if loss_implementation == 'spatial_ce':
+        return completion_loss(logits, labels)
+    shifted_logits, shifted_labels = logits[:, :-1, :].float(), labels[:, 1:]
+    counts = (shifted_labels != -100).sum(dim=1)
+    if loss_implementation == 'flat_ce':
+        token_losses = functional.cross_entropy(shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1), ignore_index=-100, reduction="none").reshape(shifted_labels.shape)
+    else:
+        token_losses = fused_token_cross_entropy(shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1), ignore_index=-100).reshape(shifted_labels.shape)
+    return (token_losses.sum(dim=1) / counts).mean()
+'''
+
 
 def set_numerics(tmp_path, monkeypatch, current):
     path = tmp_path / 'src/training/sft/individual_fit/sft_fit.py'
@@ -50,6 +63,33 @@ def test_added_count_guards_preserve_original_scientific_loss_and_mask(tmp_path,
     bindings = MODULE.compatible_sft_numerics('original-source')
     assert len(bindings) == 7
     assert all(len(value) == 64 for value in bindings.values())
+
+
+def test_flat_ce_dispatch_preserves_shift_mask_and_per_example_weighting(tmp_path, monkeypatch):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + REPLACEMENT_WRAPPER)
+    bindings = MODULE.compatible_sft_numerics('original-source', loss_implementation='flat_ce')
+    assert 'flat_ce_dispatch' in bindings
+    assert bindings['replacement_reduction'] == bindings['reduction']
+
+
+@pytest.mark.parametrize('before,after', [
+    ('/ counts', '/ (counts + 1)'),
+    ('ignore_index=-100', 'ignore_index=-1'),
+    ('labels[:, 1:]', 'labels[:, :-1]'),
+    ('shifted_labels.reshape(-1)', 'shifted_labels.transpose(0, 1).reshape(-1)'),
+])
+def test_replacement_dispatch_cannot_change_the_loss_contract(tmp_path, monkeypatch, before, after):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + REPLACEMENT_WRAPPER.replace(before, after))
+    with pytest.raises(ValueError, match='frozen shift|mask|weighting'):
+        MODULE.compatible_sft_numerics('original-source', loss_implementation='flat_ce')
+
+
+def test_fused_dispatch_requires_bound_kernel_module_source(tmp_path, monkeypatch):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + REPLACEMENT_WRAPPER)
+    kernel = tmp_path / 'src/training/sft/fused_loss.py'
+    kernel.write_text('# Declared fixture bytes; not a kernel measurement.\n')
+    bindings = MODULE.compatible_sft_numerics('original-source', loss_implementation='fused_ce')
+    assert bindings['fused_ce_module'] == MODULE.file_hash(kernel)
 
 
 @pytest.mark.parametrize('before,after', [

@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 511,
+  "files": 514,
   "directories_including_root": 202,
   "entries": [
     {
@@ -6185,6 +6185,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/fused_loss.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/fused_loss.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_80fc4cb188144a",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -7560,6 +7571,28 @@
       "display_path": "tests/unit/training/sft/test_execution_profile.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_6c5a258a3484b2",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_fused_loss.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_fused_loss.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_64c52c54ec6ee4",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_loss_layout.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_loss_layout.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_542c5d6135f7d1",
       "blank": false
     },
     {

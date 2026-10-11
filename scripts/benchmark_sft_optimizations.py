@@ -55,10 +55,17 @@ PROFILE_SETTINGS = {
     "cached_no_gradient_checkpointing": {"attention_implementation": "eager", "validated_loss_counts": False,
                                          "defer_finite_checks": False, "cache_collated_inputs": True,
                                          "gradient_checkpointing": False},
+    "flat_ce_no_gradient_checkpointing": {"attention_implementation": "eager", "validated_loss_counts": False,
+                                          "defer_finite_checks": False, "cache_collated_inputs": False,
+                                          "gradient_checkpointing": False, "loss_implementation": "flat_ce"},
+    "fused_ce_no_gradient_checkpointing": {"attention_implementation": "eager", "validated_loss_counts": False,
+                                           "defer_finite_checks": False, "cache_collated_inputs": False,
+                                           "gradient_checkpointing": False, "loss_implementation": "fused_ce"},
 }
 for settings in PROFILE_SETTINGS.values():
     settings.setdefault("cache_collated_inputs", False)
     settings.setdefault("gradient_checkpointing", True)
+    settings.setdefault("loss_implementation", "spatial_ce")
 
 
 def write_json(path, value):
@@ -80,6 +87,8 @@ def arguments(argv=None):
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--profiles", nargs="+", choices=tuple(PROFILE_SETTINGS),
                         default=["baseline", "cuda_input_cache", "no_gradient_checkpointing"])
+    parser.add_argument("--reference-profile", choices=tuple(PROFILE_SETTINGS), default="baseline",
+                        help="Declared paired reference, listed first in --profiles; baseline remains the legacy default.")
     parser.add_argument("--warmup-updates", type=int, default=1)
     parser.add_argument("--updates", type=int, default=5)
     parser.add_argument("--repetitions", type=int, default=2)
@@ -107,11 +116,12 @@ def arguments(argv=None):
             or not 0 <= args.gradient_cosine_floor <= 1 or args.minimum_speedup < 1
             or args.profile_timeout_seconds < 1):
         parser.error("Numerical tolerances and timeout must be finite valid bounds")
-    if len(args.profiles) < 2 or len(set(args.profiles)) != len(args.profiles) or args.profiles[0] != "baseline":
-        parser.error("Profiles must be unique and start with baseline")
-    if ("cached_no_gradient_checkpointing" in args.profiles
-            and not {"cuda_input_cache", "no_gradient_checkpointing"}.issubset(args.profiles)):
-        parser.error("The combined cache/checkpoint candidate requires both isolated candidates")
+    if len(args.profiles) < 2 or len(set(args.profiles)) != len(args.profiles) or args.profiles[0] != args.reference_profile:
+        parser.error("Profiles must be unique and start with the declared reference profile")
+    if (any(name in args.profiles[1:] for name in ("cached_no_gradient_checkpointing",
+            "flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"))
+            and args.reference_profile != "no_gradient_checkpointing"):
+        parser.error("Additional no-checkpoint candidates require the accepted no_gradient_checkpointing reference")
     return args
 
 
@@ -189,6 +199,10 @@ def build_plan(args):
     initialization = {"mode": "fresh_pinned_base", "progress": {"completed_steps": 0, "sampler_position": 0}}
     if args.recovery_checkpoint:
         initialization = recovery_binding(args.recovery_checkpoint, task, config)
+        from training.sft.execution_profile import SFTExecutionProfile
+        restored_profile = SFTExecutionProfile.from_dict(initialization["original_identity"].get("execution_profile", {})).to_dict()
+        if restored_profile != PROFILE_SETTINGS[args.reference_profile]:
+            errors.append("Recovery checkpoint execution profile differs from the declared paired reference")
     position = initialization["progress"]["sampler_position"]
     if position + count > len(order):
         raise ValueError("Benchmark would exceed the remaining frozen training exposure")
@@ -208,6 +222,7 @@ def build_plan(args):
         "condition": {"family": args.family, "model": args.model, "level": args.level,
                       "spec": task["spec"], "dataset": task["dataset"]},
         "profiles": {name: PROFILE_SETTINGS[name] for name in args.profiles},
+        "reference_profile": args.reference_profile,
         "warmup_updates": args.warmup_updates, "measured_updates": args.updates,
         "paired_repetitions": args.repetitions,
         "comparison_design": "Fresh reference/candidate subprocesses per repetition; reference first then candidate first on alternate repetitions",
@@ -316,6 +331,8 @@ def profile_run(args, plan, config, task):
         raise RuntimeError("Runtime did not apply the explicitly requested attention implementation")
     if bool(model.is_gradient_checkpointing) != profile.gradient_checkpointing or model.config.use_cache is not False:
         raise RuntimeError("Actual activation checkpoint/cache policy differs from the explicit candidate")
+    if runtime.get("loss_implementation", "spatial_ce") != profile.loss_implementation:
+        raise RuntimeError("Runtime did not apply the explicitly requested completion-loss implementation")
     full_tokenized_train = ([sft_fit.tokenize_completion(record, tokenizer) for record in train]
                             if profile.cache_collated_inputs else None)
     selected = ([full_tokenized_train[index] for index in plan["selected_record_indices"]]
@@ -369,10 +386,12 @@ def profile_run(args, plan, config, task):
         cache_setup_seconds = time.perf_counter() - cache_start
         cache_resident_bytes = sum(item.resident_bytes for item in full_cache) + longest_cached.resident_bytes
     torch.cuda.reset_peak_memory_stats(device)
-    longest_probe = sft_fit.verify_mask_gradients(model, longest, tokenizer.pad_token_id, prepared_batch=longest_cached)
+    longest_probe = sft_fit.verify_mask_gradients(model, longest, tokenizer.pad_token_id,
+                                               prepared_batch=longest_cached, execution_profile=profile)
     torch.cuda.synchronize(device)
     longest_probe = {**longest_probe, "example_id": longest["example_id"],
         "native_token_count": len(longest["input_ids"]), "optimizer_updates": 0,
+        "loss_implementation": profile.loss_implementation,
         "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
         "peak_reserved_bytes": torch.cuda.max_memory_reserved(device)}
     if rng_digest(sft_fit.capture_rng()) != initial_rng:
@@ -434,7 +453,8 @@ def profile_run(args, plan, config, task):
             "initial_adapter_hash": tensor_digest(initial)} if args.recovery_checkpoint else None),
         "actual_execution_policy": {"gradient_checkpointing": bool(model.is_gradient_checkpointing),
             "cache_collated_inputs": profile.cache_collated_inputs, "attention_implementation": model.config._attn_implementation,
-            "use_cache": model.config.use_cache, "checkpoint_rng_preserved": True},
+            "use_cache": model.config.use_cache, "checkpoint_rng_preserved": True,
+            "loss_implementation": profile.loss_implementation},
         "cuda_input_cache": {"enabled": profile.cache_collated_inputs, "resident_bytes": cache_resident_bytes,
                              "setup_seconds": cache_setup_seconds, "cached_records": len(full_cache) if full_cache else 0},
         "applied_attention_implementation": model.config._attn_implementation,
@@ -507,12 +527,15 @@ def compare_profiles(baseline, candidate, first, second, bounds):
     rng_equal = baseline["final_rng_hash"] == candidate["final_rng_hash"]
     policy_failures = []
     for receipt in (baseline, candidate):
-        actual = receipt.get("actual_execution_policy", {})
+        actual = dict(receipt.get("actual_execution_policy", {}))
+        # Earlier v2 receipts used the original spatial CE and omitted this field.
+        actual.setdefault("loss_implementation", "spatial_ce")
         settings = receipt.get("settings", {})
         expected = {"gradient_checkpointing": settings.get("gradient_checkpointing", True),
                     "cache_collated_inputs": settings.get("cache_collated_inputs", False),
                     "attention_implementation": settings.get("attention_implementation", "eager"),
-                    "use_cache": False, "checkpoint_rng_preserved": True}
+                    "use_cache": False, "checkpoint_rng_preserved": True,
+                    "loss_implementation": settings.get("loss_implementation", "spatial_ce")}
         if actual != expected:
             policy_failures.append(receipt.get("profile", "unknown"))
     def within(value, threshold):
@@ -645,19 +668,8 @@ def main(argv=None):
             print(json.dumps({"phase": "profile_complete", "profile": name, "repetition": repetition,
                               "comparison_candidate": pair, "status": row["status"]}), flush=True)
             return row, path
-        candidates = [name for name in args.profiles[1:] if name != "cached_no_gradient_checkpointing"]
-        if "cached_no_gradient_checkpointing" in args.profiles:
-            candidates.append("cached_no_gradient_checkpointing")
-        for name in candidates:
-            reference = "no_gradient_checkpointing" if name == "cached_no_gradient_checkpointing" else "baseline"
-            if name == "cached_no_gradient_checkpointing" and not (
-                    comparisons.get("cuda_input_cache", {}).get("numerical_screen_passed")
-                    and comparisons.get("no_gradient_checkpointing", {}).get("technical_gate") == "PASSED"):
-                comparisons[name] = {"technical_gate": "FAILED", "numerical_screen_passed": False,
-                    "reference_profile": reference, "reason": "Cache numerical match and no-checkpoint technical pass required first",
-                    "approved_for_production": False}
-                reports[name] = {"status": "SKIPPED_DEPENDENCY_FAILED", "settings": PROFILE_SETTINGS[name], "repetitions": []}
-                continue
+        for name in args.profiles[1:]:
+            reference = args.reference_profile
             paired = []
             for repetition in range(1, args.repetitions + 1):
                 order = (reference, name) if repetition % 2 else (name, reference)
@@ -672,7 +684,8 @@ def main(argv=None):
                     del first, second
                 else:
                     comparison = {"technical_gate": "FAILED", "reason": "Actual measurements unavailable", "approved_for_production": False}
-                comparison.update(repetition=repetition, reference_run_id=reference_row["run_id"], candidate_run_id=candidate_row["run_id"])
+                comparison.update(repetition=repetition, reference_profile=reference,
+                                  reference_run_id=reference_row["run_id"], candidate_run_id=candidate_row["run_id"])
                 paired.append(comparison)
                 first_path.unlink(missing_ok=True)
                 second_path.unlink(missing_ok=True)

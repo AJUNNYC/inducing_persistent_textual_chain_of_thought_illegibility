@@ -6,6 +6,8 @@ flowchart TD
 %% Edit quoted node labels directly; this is native Mermaid source.
 %% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
+%% CE policy defaults to spatial_ce; flat_ce and fused_ce are explicit pending candidates.
+%% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
 %% Within each queue, select the next unfinished fit until all 20 are verified.
@@ -29,7 +31,7 @@ flowchart TD
     KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
-    BENCH["New source or hardware: paired candidate measurements<br/>Condition-scoped acceptance and full-state lineage"]
+    BENCH["New source or hardware: paired candidate measurements<br/>Active-profile comparison; scoped acceptance and full-state lineage"]
     INPUT --> CERT --> GATES --> PLAN
     CERT -.->|Migration| BENCH --> GATES
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT

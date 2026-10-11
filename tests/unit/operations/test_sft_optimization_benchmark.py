@@ -53,6 +53,7 @@ def test_plan_only_reports_stale_certificate_without_reading_corpus_or_starting_
     assert len(plan["selected_record_indices"]) == 96
     assert plan["selected_record_indices"] == MODULE.sft_fit.exposure_order(10000)[:96]
     assert plan["paired_repetitions"] == 2
+    assert plan["reference_profile"] == "baseline"
 
 
 def test_gpu_path_cannot_ignore_stale_source_certificate(tmp_path, monkeypatch):
@@ -175,6 +176,46 @@ def test_unbounded_workload_or_infinite_tolerances_are_rejected():
         MODULE.arguments([*argv, "--gradient-relative-l2", "inf"])
 
 
+def test_loss_candidates_require_an_explicit_current_reference_first():
+    argv = [part for name in ("config", "certificate", "bundle", "worklist", "output")
+            for part in ("--" + name, "fixture")]
+    for profiles in (["baseline", "flat_ce_no_gradient_checkpointing"],
+                     ["baseline", "fused_ce_no_gradient_checkpointing"],
+                     ["baseline", "cached_no_gradient_checkpointing"]):
+        with pytest.raises(SystemExit):
+            MODULE.arguments([*argv, "--profiles", *profiles])
+    with pytest.raises(SystemExit):
+        MODULE.arguments([*argv, "--reference-profile", "no_gradient_checkpointing",
+                          "--profiles", "flat_ce_no_gradient_checkpointing", "no_gradient_checkpointing"])
+    args = MODULE.arguments([*argv, "--reference-profile", "no_gradient_checkpointing", "--profiles",
+                             "no_gradient_checkpointing", "flat_ce_no_gradient_checkpointing"])
+    assert args.reference_profile == "no_gradient_checkpointing"
+    assert args.updates == 5 and args.repetitions == 2 and args.warmup_updates == 1
+    cached = MODULE.arguments([*argv, "--reference-profile", "no_gradient_checkpointing", "--profiles",
+                               "no_gradient_checkpointing", "cached_no_gradient_checkpointing"])
+    assert cached.profiles == ["no_gradient_checkpointing", "cached_no_gradient_checkpointing"]
+
+
+@pytest.mark.parametrize("candidate_name", ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"])
+def test_loss_mode_is_an_intended_change_but_missing_actual_dispatch_evidence_fails(candidate_name):
+    reference = measured_fixture()
+    reference.update(profile="no_gradient_checkpointing", settings=dict(MODULE.PROFILE_SETTINGS["no_gradient_checkpointing"]))
+    reference["actual_execution_policy"] = {**reference["actual_execution_policy"], "gradient_checkpointing": False}
+    settings = dict(MODULE.PROFILE_SETTINGS[candidate_name])
+    candidate = {**reference, "profile": candidate_name, "settings": settings,
+        "actual_execution_policy": {**reference["actual_execution_policy"], "loss_implementation": settings["loss_implementation"]},
+        "median_update_seconds": 8.0, "wall_seconds_per_update": [8.0] * 5}
+    state = state_fixture()
+    result = MODULE.compare_profiles(reference, candidate, state, state, declared_bounds())
+    assert result["technical_gate"] == "PASSED"
+    assert result["intended_execution_policy_changes"] == {
+        "loss_implementation": {"reference": "spatial_ce", "candidate": settings["loss_implementation"]}}
+    candidate["actual_execution_policy"].pop("loss_implementation")
+    result = MODULE.compare_profiles(reference, candidate, state, state, declared_bounds())
+    assert result["technical_gate"] == "FAILED"
+    assert result["execution_policy_failures"] == [candidate_name]
+
+
 def test_exact_tensor_hash_preserves_bf16_bits():
     torch = pytest.importorskip("torch")
     first = {"lora_A": torch.tensor([1.0, 2.0], dtype=torch.bfloat16)}
@@ -210,6 +251,18 @@ def test_recovery_plan_uses_original_sampler_and_rejects_changed_checkpoint_byte
     assert plan["official_training_state_read"] is True
     assert plan["official_training_state_modified"] is False
     assert plan["recovery_checkpoint"]["identity"] == original
+    current_reference = ["--reference-profile", "no_gradient_checkpointing", "--profiles",
+                         "no_gradient_checkpointing", "flat_ce_no_gradient_checkpointing"]
+    mismatched, _, _ = MODULE.build_plan(MODULE.arguments([*argv, *current_reference,
+                                                         "--recovery-checkpoint", str(checkpoint)]))
+    assert any("declared paired reference" in error for error in mismatched["binding_errors"])
+    current_checkpoint = tmp_path / "current_no_checkpointing"
+    current_identity = {**original, "execution_profile": dict(MODULE.PROFILE_SETTINGS["no_gradient_checkpointing"])}
+    save_checkpoint(current_checkpoint, current_identity, state)
+    matched, _, _ = MODULE.build_plan(MODULE.arguments([*argv, *current_reference,
+                                                      "--recovery-checkpoint", str(current_checkpoint)]))
+    assert matched["reference_profile"] == "no_gradient_checkpointing"
+    assert not any("declared paired reference" in error for error in matched["binding_errors"])
     with (checkpoint / "full_state.pt").open("ab") as handle:
         handle.write(b"corruption")
     with pytest.raises(ValueError, match="payload bytes changed"):
@@ -232,7 +285,8 @@ def test_paired_launch_order_and_all_repetition_gates_are_recorded(tmp_path, mon
             actual_execution_policy={"gradient_checkpointing": settings["gradient_checkpointing"],
                 "cache_collated_inputs": settings["cache_collated_inputs"],
                 "attention_implementation": settings["attention_implementation"],
-                "use_cache": False, "checkpoint_rng_preserved": True})
+                "use_cache": False, "checkpoint_rng_preserved": True,
+                "loss_implementation": settings["loss_implementation"]})
         if args._profile != "baseline":
             row.update(median_update_seconds=8.0, wall_seconds_per_update=[8.0] * 5)
         basename = MODULE.run_basename(args._pair, args._repetition, args._profile)
@@ -250,3 +304,46 @@ def test_paired_launch_order_and_all_repetition_gates_are_recorded(tmp_path, mon
         assert row["technical_gate"] == "PASSED"
         assert len(row["repetitions"]) == 2
         assert all(pair["reference_run_id"] in report["profile_runs"] for pair in row["repetitions"])
+
+
+@pytest.mark.parametrize("candidate_names", [["flat_ce_no_gradient_checkpointing"],
+    ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"]])
+def test_loss_candidates_measure_incremental_gain_against_current_no_checkpointing_only(tmp_path, monkeypatch, candidate_names):
+    torch = pytest.importorskip("torch")
+    from types import SimpleNamespace
+    argv = static_inputs(tmp_path, monkeypatch)
+    worklist = json.loads((tmp_path / "worklist.json").read_text())
+    monkeypatch.setattr(MODULE, "certified_tasks", lambda *a, **k: worklist)
+    reference = "no_gradient_checkpointing"
+    argv.extend(["--reference-profile", reference, "--profiles", reference, *candidate_names])
+    launched = []
+    def fixture_process(command, **kwargs):
+        args = MODULE.arguments(command[2:])
+        assert args.reference_profile == reference
+        launched.append(args._profile)
+        settings = dict(MODULE.PROFILE_SETTINGS[args._profile])
+        row = {**measured_fixture(), "profile": args._profile, "settings": settings,
+            "actual_execution_policy": {"gradient_checkpointing": False, "cache_collated_inputs": False,
+                "attention_implementation": "eager", "use_cache": False, "checkpoint_rng_preserved": True,
+                "loss_implementation": settings["loss_implementation"]}}
+        if args._profile != reference:
+            row.update(median_update_seconds=8.0, wall_seconds_per_update=[8.0] * 5)
+        basename = MODULE.run_basename(args._pair, args._repetition, args._profile)
+        MODULE.write_json(Path(args.output) / (basename + ".json"), row)
+        torch.save(state_fixture(), args._diagnostics)
+        return SimpleNamespace(returncode=0)
+    monkeypatch.setattr(MODULE.subprocess, "run", fixture_process)
+    assert MODULE.main(argv) == 0
+    assert launched == [name for candidate in candidate_names for name in (reference, candidate, candidate, reference)]
+    assert "baseline" not in launched
+    report = json.loads((tmp_path / "benchmark" / "report.json").read_text())
+    assert report["plan"]["reference_profile"] == reference
+    assert len(report["profile_runs"]) == len(candidate_names) * 4
+    for candidate in candidate_names:
+        comparison = report["comparisons"][candidate]
+        assert comparison["reference_profile"] == reference
+        assert comparison["technical_gate"] == "PASSED"
+        assert comparison["minimum_paired_update_speedup"] == 1.25
+        assert all(pair["reference_profile"] == reference for pair in comparison["repetitions"])
+        assert comparison["intended_execution_policy_changes"] == {"loss_implementation": {
+            "reference": "spatial_ce", "candidate": MODULE.PROFILE_SETTINGS[candidate]["loss_implementation"]}}

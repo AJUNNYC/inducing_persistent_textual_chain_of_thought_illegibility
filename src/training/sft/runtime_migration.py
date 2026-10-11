@@ -75,7 +75,11 @@ def validate_identity_compatibility(original_identity: Mapping[str, Any],
 
 def _source_bindings(plan: Mapping[str, Any]) -> None:
     hashes = plan.get("source_file_hashes")
-    if not isinstance(hashes, Mapping) or set(REQUIRED_SOURCE_FILES) - hashes.keys():
+    required = set(REQUIRED_SOURCE_FILES)
+    if any(_profile(settings).to_dict().get("loss_implementation") == "fused_ce"
+           for settings in plan.get("profiles", {}).values()):
+        required.add("src/training/sft/fused_loss.py")
+    if not isinstance(hashes, Mapping) or required - hashes.keys():
         raise MigrationError("Benchmark lacks executed source-file bindings")
     for name, digest in hashes.items():
         relative = Path(name)
@@ -83,6 +87,15 @@ def _source_bindings(plan: Mapping[str, Any]) -> None:
         if (relative.is_absolute() or ".." in relative.parts or path.is_symlink()
                 or not path.is_file() or file_hash(path) != digest):
             raise MigrationError("Benchmark executed source bytes differ: " + str(name))
+
+
+def _loss_execution_binding(row: Mapping[str, Any], settings: Mapping[str, Any]) -> None:
+    """Old spatial-CE receipts need no new field; new kernels do."""
+    expected = settings.get("loss_implementation", "spatial_ce")
+    for field in ("runtime", "actual_execution_policy", "longest_sequence_probe"):
+        evidence = row.get(field, {})
+        if not isinstance(evidence, Mapping) or evidence.get("loss_implementation", "spatial_ce") != expected:
+            raise MigrationError("Actual benchmark loss execution evidence differs")
 
 
 def validate_execution_benchmark(report: Mapping[str, Any], source: str,
@@ -113,11 +126,19 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
         if len(names) != 1:
             raise MigrationError("Benchmark does not uniquely identify the requested execution profile")
         profile_name = names[0]
-    if profile_name not in names or profile_name == "baseline":
+    # Older v2 plans compared against the eager baseline implicitly. New plans
+    # can name the already accepted production profile as their reference so a
+    # candidate must demonstrate an incremental gain over the actual parent.
+    reference_name = plan.get("reference_profile", "baseline")
+    if not isinstance(reference_name, str) or reference_name not in plan.get("profiles", {}):
+        raise MigrationError("Frozen benchmark reference profile is missing")
+    reference_profile = _profile(plan["profiles"][reference_name]).to_dict()
+    if profile_name not in names or profile_name == reference_name:
         raise MigrationError("A compared measured optimization candidate is required")
     measured = report.get("profiles", {})
     comparison = report.get("comparisons", {}).get(profile_name, {})
-    reference_name = comparison.get("reference_profile", "baseline")
+    if comparison.get("reference_profile", "baseline") != reference_name:
+        raise MigrationError("Compared benchmark reference differs from the frozen plan")
     baseline, candidate = measured.get(reference_name, {}), measured.get(profile_name, {})
     if (baseline.get("status") != "MEASURED" or candidate.get("status") != "MEASURED"
             or baseline.get("finite") is not True or candidate.get("finite") is not True
@@ -125,8 +146,14 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
             or _profile(candidate.get("settings")).to_dict() != chosen
             or _profile(candidate.get("runtime", {}).get("execution_profile")).to_dict() != chosen
             or reference_name not in plan.get("profiles", {})
-            or _profile(baseline.get("settings")).to_dict() != _profile(plan["profiles"][reference_name]).to_dict()):
+            or _profile(baseline.get("settings")).to_dict() != reference_profile
+            or _profile(baseline.get("runtime", {}).get("execution_profile")).to_dict() != reference_profile
+            or baseline.get("profile") != reference_name or candidate.get("profile") != profile_name
+            or baseline.get("hardware") != candidate.get("hardware")
+            or baseline.get("packages") != candidate.get("packages")):
         raise MigrationError("Benchmark profile was not actually measured as requested")
+    _loss_execution_binding(baseline, reference_profile)
+    _loss_execution_binding(candidate, chosen)
     required_flags = ("numerical_screen_passed", "speedup_threshold_passed",
                       "final_rng_states_identical", "losses_within_declared_tolerance")
     if (comparison.get("technical_gate") != "PASSED" or comparison.get("invariant_failures") != []
@@ -164,14 +191,18 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
     paired_speedups = []
     for repeat in repetitions:
         if (repeat.get("technical_gate") != "PASSED" or repeat.get("invariant_failures") != []
-                or any(repeat.get(flag) is not True for flag in required_flags)):
+                or any(repeat.get(flag) is not True for flag in required_flags)
+                or repeat.get("reference_profile", "baseline") != reference_name):
             raise MigrationError("A paired repetition failed its numerical, speed or RNG screen")
         reference_run, candidate_run = (runs.get(repeat.get(key), {})
                                         for key in ("reference_run_id", "candidate_run_id"))
         if (reference_run.get("status") != "MEASURED" or candidate_run.get("status") != "MEASURED"
                 or reference_run.get("plan_hash") != plan_hash or candidate_run.get("plan_hash") != plan_hash
-                or _profile(reference_run.get("settings")).to_dict() != _profile(plan["profiles"][reference_name]).to_dict()
+                or reference_run.get("profile") != reference_name or candidate_run.get("profile") != profile_name
+                or _profile(reference_run.get("settings")).to_dict() != reference_profile
                 or _profile(candidate_run.get("settings")).to_dict() != chosen
+                or _profile(reference_run.get("runtime", {}).get("execution_profile")).to_dict() != reference_profile
+                or _profile(candidate_run.get("runtime", {}).get("execution_profile")).to_dict() != chosen
                 or reference_run.get("finite") is not True or candidate_run.get("finite") is not True
                 or reference_run.get("sample_ids") != candidate_run.get("sample_ids")
                 or reference_run.get("tokenized_records_hash") != candidate_run.get("tokenized_records_hash")
@@ -181,6 +212,8 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
                 or reference_run.get("hardware") != candidate_run.get("hardware")
                 or reference_run.get("packages") != candidate_run.get("packages")):
             raise MigrationError("Paired measurements changed execution inputs or hardware")
+        _loss_execution_binding(reference_run, reference_profile)
+        _loss_execution_binding(candidate_run, chosen)
         first, second = reference_run.get("wall_seconds_per_update"), candidate_run.get("wall_seconds_per_update")
         if (not isinstance(first, list) or not isinstance(second, list)
                 or len(first) != plan["measured_updates"] or len(second) != len(first)
@@ -198,6 +231,7 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
     if not all(key in condition for key in ("family", "model", "level", "spec")):
         raise MigrationError("Benchmark condition identity is missing")
     acceptance = {"accepted": True, "source_commit": source, "profile_name": profile_name,
+                  "reference_profile": reference_name, "reference_execution_profile": reference_profile,
                   "execution_profile": chosen, "configuration_hash": plan.get("configuration_hash"),
                   "handoff_certificate_hash": plan.get("handoff_certificate_hash"),
                   "condition": {key: condition[key] for key in ("family", "model", "level")},
@@ -206,6 +240,9 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
                   "packages": candidate.get("packages"), "recovery_validated": False,
                   "scientific_equivalence_established": False}
     recovery = validate_recovery_evidence(report, plan, recovery_report=recovery_report)
+    if (recovery.get("recovery_validated") is True
+            and _profile(recovery["original_checkpoint_identity"].get("execution_profile")).to_dict() != reference_profile):
+        raise MigrationError("Measured reference is not the original checkpoint execution profile")
     acceptance.update(recovery)
     acceptance["acceptance_hash"] = content_hash(acceptance)
     return acceptance

@@ -579,6 +579,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         __init__.py
         data_handoff.py
         execution_profile.py
+        fused_loss.py
         individual_fit/
           __init__.py
           sft_fit.py
@@ -708,6 +709,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             test_sft_fit.py
           test_data_handoff.py
           test_execution_profile.py
+          test_fused_loss.py
+          test_loss_layout.py
           test_runtime_migration.py
           test_sft_training.py
         test_training.py
