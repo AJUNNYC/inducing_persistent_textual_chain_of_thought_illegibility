@@ -249,6 +249,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     authorize_google_drive.py
     benchmark_vllm_generation.py
     build_protocol_pdf.py
+    coordinate_verification_shard.py
     coordinate_vllm_sft_preparation.py
     create_google_consent_notebook.py
     freeze_runtime_config.py
