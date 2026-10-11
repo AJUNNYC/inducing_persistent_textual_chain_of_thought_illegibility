@@ -90,3 +90,27 @@ a worker failure. Completion means capability repeatability only; legibility
 judging stays deferred. The monitor does not restart workers, stop billing or
 send autonomous chat notifications. Read its progress stream while the chat turn
 is active; later turns can read the saved latest status.
+
+## GPU inference / cloud scoring handoff
+
+The Pod lacks the Docker executable; the first vLLM seed-42 pass stopped at
+`mbpp_629` with a genuine infrastructure failure. Its raw output remains saved;
+this is not an incorrect-answer classification. The previously validated Docker
+sandbox is available in the Codex cloud environment. Run
+`produce_vllm_baseline_raw.py` on the existing GPU and
+`score_vllm_baseline_cloud.py` here to separate inference from capability scoring.
+The GPU producer preserves and reuses exact cached responses, verifies whole raw
+bundles in Drive, and runs remaining passes and model sizes sequentially. The
+cloud scorer verifies the frozen protocol's measurement-source hashes and exact
+raw request/record identities before running the original capability scorer and
+same digest-pinned Docker sandbox. It also verifies scored bundles and completed
+pass packages in Drive before publishing the unchanged repeatability report.
+
+Keep the original measurement configuration/source identity (`0941ce5`) distinct
+from the handoff driver commit. No measurement module, prompt, response budget,
+seed, sampled output, scorer or sandbox implementation changes in this repair.
+Never resample saved responses for a cleaner outcome. Unjudged packages still
+explicitly defer legibility. `monitor_vllm_baseline.py --local-status
+/workspace/artifacts/baseline_vllm_cloud_0941ce5/coordinator_status.json` monitors
+the cloud scorer and its raw-producer progress. Completion is reported only after
+the final report's Drive barrier; the original failed attempt remains historical.
