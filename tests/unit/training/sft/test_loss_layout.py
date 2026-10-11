@@ -201,11 +201,18 @@ def test_fused_execution_failure_propagates_without_spatial_or_flat_fallback(mon
             execution_profile=SFTExecutionProfile(loss_implementation='fused_ce'))
 
 
-def install_native_spatial_forward_stub(monkeypatch):
-    """CPU routing fixture; native Triton backward approval remains separate."""
+def spatial_helper_module(implementation):
+    from importlib import import_module
+    if implementation == 'spatial_scheduled_ce':
+        return import_module('training.sft.scheduled_spatial_loss'), 'scheduled_spatial_token_cross_entropy'
+    return import_module('training.sft.spatial_loss'), 'spatial_token_cross_entropy'
+
+
+def install_native_spatial_forward_stub(monkeypatch, implementation='spatial_fused_backward'):
+    """CPU routing fixture; native CUDA kernel approval remains separate."""
     import torch
     import torch.nn.functional as functional
-    from training.sft import spatial_loss
+    spatial_loss, function_name = spatial_helper_module(implementation)
     calls = []
     def native_forward(logits, targets, *, ignore_index=-100):
         assert logits.dtype == torch.float32 and logits.ndim == 3
@@ -215,15 +222,16 @@ def install_native_spatial_forward_stub(monkeypatch):
         calls.append((logits.detach().clone(), targets.detach().clone()))
         return functional.nll_loss(torch.log_softmax(logits, dim=1, dtype=logits.dtype),
                                    targets, ignore_index=ignore_index, reduction='none')
-    monkeypatch.setattr(spatial_loss, 'spatial_token_cross_entropy', native_forward)
+    monkeypatch.setattr(spatial_loss, function_name, native_forward)
     return calls
 
 
 @pytest.mark.parametrize('dtype_name', ['float32', 'bfloat16'])
 @pytest.mark.parametrize('bound_counts', [False, True])
-def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_weighting(monkeypatch, dtype_name, bound_counts):
+@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce'])
+def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_weighting(monkeypatch, dtype_name, bound_counts, implementation):
     import torch
-    calls = install_native_spatial_forward_stub(monkeypatch)
+    calls = install_native_spatial_forward_stub(monkeypatch, implementation)
     torch.manual_seed(782)
     examples = [
         {'input_ids': [1, 2, 3, 4, 5, 6], 'labels': [1, -100, 3, 4, 5, 6]},
@@ -236,7 +244,7 @@ def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_wei
     before = torch.get_rng_state().clone()
     reference = completion_loss(reference_logits, batch['labels'])
     candidate = profile_completion_loss(candidate_logits, batch['labels'],
-        execution_profile=SFTExecutionProfile(loss_implementation='spatial_fused_backward'),
+        execution_profile=SFTExecutionProfile(loss_implementation=implementation),
         validated_counts=(batch['validated_completion_counts'] if bound_counts else None))
     assert torch.equal(candidate, reference)
     candidate.backward(); reference.backward()
@@ -250,18 +258,19 @@ def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_wei
     assert torch.equal(before, torch.get_rng_state())
 
 
-def test_spatial_backward_update_probe_and_validation_keep_native_forward_rng_and_receipt(monkeypatch, tmp_path):
+@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce'])
+def test_spatial_backward_update_probe_and_validation_keep_native_forward_rng_and_receipt(monkeypatch, tmp_path, implementation):
     import hashlib
     import torch
-    from training.sft import spatial_loss
+    spatial_loss, _ = spatial_helper_module(implementation)
     from training.sft.individual_fit import sft_fit
-    calls = install_native_spatial_forward_stub(monkeypatch)
+    calls = install_native_spatial_forward_stub(monkeypatch, implementation)
     helper_file = tmp_path / 'actually_imported_spatial_loss.py'
     helper_file.write_bytes(b'declared loaded helper fixture\n')
     monkeypatch.setattr(spatial_loss, '__file__', str(helper_file))
     expected_hash = hashlib.sha256(helper_file.read_bytes()).hexdigest()
     candidate_profile = SFTExecutionProfile(gradient_checkpointing=False,
-                                            loss_implementation='spatial_fused_backward')
+                                            loss_implementation=implementation)
     assert sft_fit._loaded_loss_helper_hash(SFTExecutionProfile()) == {}
     assert sft_fit._loaded_loss_helper_hash(candidate_profile) == {'loss_helper_sha256': expected_hash}
     outputs, rngs = [], []
@@ -300,13 +309,14 @@ def test_spatial_backward_update_probe_and_validation_keep_native_forward_rng_an
     assert len(calls) == 20  # 16 training microbatches, one probe and three validation examples.
 
 
-def test_spatial_backward_failure_propagates_and_count_guards_precede_kernel(monkeypatch):
+@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce'])
+def test_spatial_backward_failure_propagates_and_count_guards_precede_kernel(monkeypatch, implementation):
     import torch
-    from training.sft import spatial_loss
-    profile = SFTExecutionProfile(loss_implementation='spatial_fused_backward')
+    spatial_loss, function_name = spatial_helper_module(implementation)
+    profile = SFTExecutionProfile(loss_implementation=implementation)
     def unavailable(*args, **kwargs):
         raise RuntimeError('Declared missing spatial CUDA kernel fixture')
-    monkeypatch.setattr(spatial_loss, 'spatial_token_cross_entropy', unavailable)
+    monkeypatch.setattr(spatial_loss, function_name, unavailable)
     values = torch.randn(1, 3, 7)
     with pytest.raises(RuntimeError, match='missing spatial CUDA kernel'):
         profile_completion_loss(values, torch.tensor([[-100, 2, 3]]), execution_profile=profile)

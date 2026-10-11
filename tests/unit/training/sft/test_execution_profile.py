@@ -88,6 +88,31 @@ def test_execution_profile_is_explicit_and_baseline_default_is_unchanged():
         resolve_execution_profile(EXACT_CANDIDATE.to_dict())
 
 
+@pytest.mark.parametrize('family', ['rot13', 'kazitext'])
+@pytest.mark.parametrize('model_id', ['7b', '14b'])
+@pytest.mark.parametrize('level', range(1, 11))
+def test_scheduled_spatial_profile_leaves_each_frozen_fit_recipe_and_condition_identity_unchanged(family, model_id, level):
+    from training.sft.individual_fit.sft_fit import SFTFitSpec
+    fit = SFTFitSpec(family, model_id, level, 'a' * 40, 'b' * 40, 'c' * 64, 'd' * 64)
+    before = fit.identity()
+    profile = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce')
+    assert SFTExecutionProfile.from_dict(profile.to_dict()) == profile
+    assert fit.identity() == before
+    assert fit.identity()['recipe'] == {
+        'quantization': 'nf4', 'double_quantization': True, 'compute_dtype': 'bfloat16',
+        'lora_rank': 8, 'lora_alpha': 16, 'lora_dropout': .05,
+        'target_modules': ['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'],
+        'learning_rate': 2e-4, 'optimizer': 'paged_adamw_32bit', 'scheduler': 'cosine',
+        'warmup_ratio': .03, 'weight_decay': 0., 'max_grad_norm': .3, 'epochs': 2,
+        'microbatch_size': 1, 'gradient_accumulation_steps': 16, 'effective_batch_size': 16,
+        'max_length': 4096, 'seed': 42, 'gradient_checkpointing': True,
+        'checkpoint_steps': 100, 'early_stopping': False,
+        'loss_reduction': 'mean_supervised_tokens_per_example_then_mean_examples',
+    }
+    assert (fit.family, fit.model_id, fit.level) == (family, model_id, level)
+    assert 'execution_profile' not in before
+
+
 def test_exact_candidate_one_update_preserves_losses_gradients_states_and_rng_bitwise():
     outputs = []
     for profile in (BASELINE, EXACT_CANDIDATE):

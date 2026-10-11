@@ -59,6 +59,24 @@ def backward():
     derivative = target_gradient - libdevice.exp(log_probability) * summed_gradient
 '''
 
+SCHEDULED_HELPER_FIXTURE = (SCRIPT.parents[1]/'src/training/sft/scheduled_spatial_loss.py').read_text()
+
+
+def scheduled_wrapper():
+    return REPLACEMENT_WRAPPER.replace('    else:\n        token_losses = fused_token_cross_entropy(',
+        '    elif loss_implementation == "spatial_fused_backward":\n'
+        '        token_losses = spatial_token_cross_entropy(shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)\n'
+        '    elif loss_implementation == "spatial_scheduled_ce":\n'
+        '        token_losses = scheduled_spatial_token_cross_entropy(shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)\n'
+        '    else:\n        token_losses = fused_token_cross_entropy(')
+
+
+def set_scheduled_helpers(tmp_path, source=SCHEDULED_HELPER_FIXTURE):
+    (tmp_path/'src/training/sft/spatial_loss.py').write_text(SPATIAL_HELPER_FIXTURE)
+    helper = tmp_path/'src/training/sft/scheduled_spatial_loss.py'
+    helper.write_text(source)
+    return helper
+
 
 def set_numerics(tmp_path, monkeypatch, current):
     path = tmp_path / 'src/training/sft/individual_fit/sft_fit.py'
@@ -129,6 +147,56 @@ def test_spatial_backward_source_proof_rejects_changed_native_contract(tmp_path,
     helper.write_text(SPATIAL_HELPER_FIXTURE.replace(before, after))
     with pytest.raises(ValueError, match='Spatial loss changed'):
         MODULE.spatial_native_forward_contract()
+
+
+def test_scheduled_dispatch_keeps_original_masks_shift_and_per_example_reduction(tmp_path, monkeypatch):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + scheduled_wrapper())
+    helper = set_scheduled_helpers(tmp_path)
+    bindings = MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_scheduled_ce')
+    assert bindings['replacement_reduction'] == bindings['reduction']
+    assert bindings['scheduled_spatial_loss_module'] == MODULE.file_hash(helper)
+    assert 'scheduled_spatial_class_serial_forward' in bindings
+    assert 'native_spatial_forward' in bindings
+    # The inactive new branch cannot invalidate the still accepted reference.
+    reference = MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_fused_backward')
+    assert reference['replacement_reduction'] == bindings['reduction']
+    assert reference['native_spatial_forward'] == bindings['native_spatial_forward']
+
+
+@pytest.mark.parametrize('before,after', [
+    ('maximum < values', 'maximum <= values'),
+    ('range(0, n_columns)', 'range(n_columns - 1, -1, -1)'),
+    ('normalization + libdevice.exp(values - maximum)', 'libdevice.exp(values - maximum) + normalization'),
+    ('libdevice.log(normalization)', 'tl.log(normalization)'),
+    ('-(target_value - maximum - log_sum)', '-(target_value - (maximum + log_sum))'),
+    ('log_probability = values - maximum - log_sum', 'log_probability = values - (maximum + log_sum)'),
+    ('libdevice.exp(log_probability)', 'tl.exp(log_probability)'),
+    ('ORIGINAL_FORWARD_MAX_TIME = 64', 'ORIGINAL_FORWARD_MAX_TIME = 65'),
+    ('TOKEN_BLOCK_SIZE = 64', 'TOKEN_BLOCK_SIZE = 128'),
+    ('dtype=logits.dtype', 'dtype=torch.bfloat16'),
+    ('reduction="none"', 'reduction="mean"'),
+    ('ignore_index=ignore_index', 'ignore_index=-1'),
+    ('ctx.route = forward_route(logits.shape[2])', 'ctx.route = "serial_token_blocks"'),
+])
+def test_scheduled_source_guard_rejects_changed_order_math_dtype_or_shape_route(tmp_path, monkeypatch, before, after):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + scheduled_wrapper())
+    assert before in SCHEDULED_HELPER_FIXTURE
+    set_scheduled_helpers(tmp_path, SCHEDULED_HELPER_FIXTURE.replace(before, after))
+    with pytest.raises(ValueError, match='Scheduled spatial loss changed'):
+        MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_scheduled_ce')
+
+
+@pytest.mark.parametrize('before,after', [
+    ('/ counts', '/ (counts + 1)'),
+    ('shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)',
+     'shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-1)'),
+    ('labels[:, 1:]', 'labels[:, :-1]'),
+])
+def test_scheduled_helper_cannot_override_original_completion_objective(tmp_path, monkeypatch, before, after):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + scheduled_wrapper().replace(before, after))
+    set_scheduled_helpers(tmp_path)
+    with pytest.raises(ValueError, match='frozen shift|mask|weighting'):
+        MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_scheduled_ce')
 
 
 @pytest.mark.parametrize('before,after', [

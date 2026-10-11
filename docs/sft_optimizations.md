@@ -31,7 +31,8 @@ and production migration gates pass; it is not concealed as unchanged execution.
 | 5 | Flatten the token CE input from spatial `[batch, vocabulary, tokens]` to `[batch*tokens, vocabulary]`. | PyTorch supports both CE layouts, but real GPU measurements show that their floating-point results differ beyond the frozen bound before the first update. | Source `6d21fff` completed two paired repetitions. Native/flat median seconds were 9.4263/5.8296 and 9.5075/5.6417. Faster timings did not clear the numerical screen; rejected and not activated. |
 | 6 | Fuse only FP32 token cross-entropy with the pinned Triton runtime. | Liger provides online softmax/CE precedent, but changing the forward normalization order exceeded the frozen numerical bounds on this workload. | Source `6d21fff` measured median ratios 1.6751x and 1.7008x, but maximum loss difference was 0.00595903 and gradient/update relative L2 differences were 2.169%/1.922%, above 0.1% bounds. Rejected and not activated. |
 | 7 | Retain stock spatial CE forward and tile only its backward gradient. | Keeps `torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss`; the tiled backward follows the pinned PyTorch epilogue with libdevice exponential and the one nonzero target gradient. | Source `218900d` accepted for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Two paired median ratios were 1.1564x/1.1318x, minimum matched ratio 1.1146x; losses, gradients, updates and final full state/RNG were bitwise identical. |
-| 8 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
+| 8 | Schedule the same spatial CE forward over smaller token blocks and retain only target losses/row statistics. | Follow pinned PyTorch's serial FP32 class accumulation and libdevice exp/log sequence; reconstruct log-probabilities during the already validated tiled backward. Scheduling and storage change rather than intentionally changing normalization order. Actual equality must still be checked. | `spatial_scheduled_ce` is under construction. Its paired reference is the accepted spatial-forward/tiled-backward profile, so speed gains must be incremental. Focused checks, GPU measurements and approval are pending. |
+| 9 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
 
 Epoch count, training exposure, BF16 versus NF4 construction, optimizer precision,
 learning rate, LoRA rank/dropout and effective batch size are scientific recipe
@@ -45,6 +46,36 @@ The objective is **mean supervised-token loss within each example, then mean
 across examples**. Stock model loss or token-global averaging must not silently
 replace it. A faster implementation must preserve the current weighting, causal
 shift and assistant-end supervision.
+
+## Scheduled spatial-forward candidate — pending
+
+The user authorized implementing and measuring `spatial_scheduled_ce`, selected
+only through the explicit `spatial_scheduled_ce_no_gradient_checkpointing`
+profile. Current source `218900d` training continues on its already accepted
+spatial-forward/tiled-backward profile while the new code is prepared. The new
+candidate has no measured numerical approval or speed result yet.
+
+Its design follows [pinned PyTorch's spatial kernel](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/aten/src/ATen/native/cuda/SoftMax.cu):
+preserve class-index order for serial FP32 accumulation, the same max/exp/sum/log
+and target-loss arithmetic, and libdevice exp/log operations. Use smaller token
+CTAs and save target losses plus row statistics instead of the complete
+log-probability matrix; reconstruct the same log-probabilities in tiled backward.
+Preserving these operations is the design requirement, not a substitute for
+actual numerical comparison. This avoids intentionally repeating the parallel
+forward normalization change that caused the earlier flat/fused failures.
+
+The frozen paired recovery screen will use
+`--reference-profile spatial_fused_backward_no_gradient_checkpointing` and the
+same latest preserved full checkpoint for both profiles. Thus any speed gain
+must be additional to the currently accepted roughly 8.2–8.4-second median update
+measurements, not measured against either earlier reference. The same numerical,
+state, RNG, speed and longest-example memory gates apply. A safe whole-update
+pause and Drive-verified parent preservation precede the isolated GPU trial;
+source/profile/condition-bound selection and explicit continuation lineage are
+required before production activation. Eager attention, full FP32 head/logits,
+vocabulary, masks, objective, sample order, dropout, optimizer, microbatch 1,
+logical batch 16 and checkpoint cadence stay fixed. No new result or full-fit
+ETA is claimed.
 
 ## Historical recomputation continuation screen
 
@@ -240,10 +271,10 @@ python scripts/benchmark_sft_optimizations.py \
   --bundle CERTIFIED_BUNDLE.json \
   --worklist CURRENT_WORKLIST.json \
   --model 7b --family rot13 --level 1 \
-  --reference-profile no_gradient_checkpointing \
-  --profiles no_gradient_checkpointing flat_ce_no_gradient_checkpointing fused_ce_no_gradient_checkpointing spatial_fused_backward_no_gradient_checkpointing \
+  --reference-profile spatial_fused_backward_no_gradient_checkpointing \
+  --profiles spatial_fused_backward_no_gradient_checkpointing spatial_scheduled_ce_no_gradient_checkpointing \
   --warmup-updates 1 --updates 5 --repetitions 2 \
-  --recovery-checkpoint VERIFIED_CURRENT_NO_GC_CHECKPOINT_DIRECTORY \
+  --recovery-checkpoint VERIFIED_CURRENT_SPATIAL_BACKWARD_CHECKPOINT_DIRECTORY \
   --output NEW_BENCHMARK_DIRECTORY --plan-only
 ```
 

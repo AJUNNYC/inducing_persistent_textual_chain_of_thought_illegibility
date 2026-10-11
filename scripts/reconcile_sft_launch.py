@@ -92,6 +92,110 @@ return losses
             'native_spatial_backward_expression': content_hash(ast.dump(derivative, include_attributes=False))}
 
 
+def scheduled_spatial_forward_contract():
+    """Bind the explicit serial-class recurrence and original short-time route.
+
+    This source contract protects the declared FP32 accumulation order. Actual
+    CUDA equivalence and incremental speed still require the paired benchmark.
+    """
+    path = ROOT/'src/training/sft/scheduled_spatial_loss.py'
+    tree = ast.parse(path.read_text())
+    functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+    loader = functions.get('_load_scheduled_kernels')
+    if loader is None:
+        raise ValueError('Scheduled spatial loss lacks its explicit kernel loader')
+    kernels = {node.name: node for node in loader.body if isinstance(node, ast.FunctionDef)}
+    if set(kernels) != {'forward', 'backward'}:
+        raise ValueError('Scheduled spatial loss lacks its two explicit kernels')
+    forward = ast.parse('''
+batch = tl.program_id(0).to(tl.int64)
+times = tl.program_id(1) * block_size + tl.arange(0, block_size)
+present = times < n_times
+row_offset = batch * n_columns * n_times + times
+token_offset = batch * n_times + times
+maximum = tl.full((block_size,), -3.4028234663852886e38, tl.float32)
+for class_index in range(0, n_columns):
+    values = tl.load(logits + row_offset + class_index.to(tl.int64) * n_times, present, other=-3.4028234663852886e38)
+    maximum = tl.where(maximum < values, values, maximum)
+normalization = tl.full((block_size,), 0.0, tl.float32)
+for class_index in range(0, n_columns):
+    values = tl.load(logits + row_offset + class_index.to(tl.int64) * n_times, present, other=-3.4028234663852886e38)
+    normalization = normalization + libdevice.exp(values - maximum)
+log_sum = libdevice.log(normalization)
+target = tl.load(targets + token_offset, present, other=ignore_index)
+target_value = tl.load(logits + row_offset + target * n_times, present & (target != ignore_index), other=0.0)
+loss = tl.where(target == ignore_index, 0.0, -(target_value - maximum - log_sum))
+tl.store(losses + token_offset, loss, present)
+tl.store(maxima + token_offset, maximum, present)
+tl.store(log_sums + token_offset, log_sum, present)
+''').body
+    backward = ast.parse('''
+offsets = tl.program_id(0).to(tl.int64) * block_size + tl.arange(0, block_size)
+present = offsets < n_elements
+times = offsets % n_times
+class_index = (offsets // n_times) % n_columns
+batch = offsets // (n_times * n_columns)
+token_offset = batch * n_times + times
+values = tl.load(logits + offsets, present, other=0.0)
+maximum = tl.load(maxima + token_offset, present, other=0.0)
+log_sum = tl.load(log_sums + token_offset, present, other=0.0)
+log_probability = values - maximum - log_sum
+target = tl.load(targets + token_offset, present, other=ignore_index)
+row_scale = tl.load(row_scales + token_offset, present, other=0.0)
+summed_gradient = tl.where(target == ignore_index, 0.0, -row_scale)
+target_gradient = tl.where(class_index == target, summed_gradient, 0.0)
+derivative = target_gradient - libdevice.exp(log_probability) * summed_gradient
+tl.store(output + offsets, derivative, present)
+''').body
+    dumps = lambda nodes: [ast.dump(node, include_attributes=False) for node in nodes]
+    if dumps(kernels['forward'].body) != dumps(forward):
+        raise ValueError('Scheduled spatial loss changed the FP32 serial-class forward recurrence')
+    if dumps(kernels['backward'].body) != dumps(backward):
+        raise ValueError('Scheduled spatial loss changed the source-bound reconstructed backward')
+    wanted_route = ast.parse('''
+if type(n_times) is not int or n_times < 1:
+    raise ValueError("Spatial CE time must be a positive integer")
+return "original_spatial" if n_times <= ORIGINAL_FORWARD_MAX_TIME else "serial_token_blocks"
+''').body
+    route = functions.get('forward_route')
+    route_body = [] if route is None else [node for node in route.body
+        if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
+                and isinstance(node.value.value, str))]
+    constants = {target.id: node.value.value for node in tree.body if isinstance(node, ast.Assign)
+        and isinstance(node.value, ast.Constant) for target in node.targets if isinstance(target, ast.Name)}
+    if (dumps(route_body) != dumps(wanted_route) or constants.get('ORIGINAL_FORWARD_MAX_TIME') != 64
+            or constants.get('TOKEN_BLOCK_SIZE') != 64):
+        raise ValueError('Scheduled spatial loss changed its declared shape route')
+    autograd = functions.get('_autograd_function')
+    classes = [] if autograd is None else [node for node in autograd.body if isinstance(node, ast.ClassDef)]
+    methods = [] if len(classes) != 1 else [node for node in classes[0].body
+        if isinstance(node, ast.FunctionDef) and node.name == 'forward']
+    route_assignment = ast.parse('ctx.route = forward_route(logits.shape[2])').body[0]
+    native_test = ast.parse('ctx.route == "original_spatial"', mode='eval').body
+    branches = [] if len(methods) != 1 else [node for node in methods[0].body if isinstance(node, ast.If)]
+    if (len(methods) != 1 or not methods[0].body
+            or ast.dump(methods[0].body[0], include_attributes=False) != ast.dump(route_assignment, include_attributes=False)
+            or len(branches) != 1 or ast.dump(branches[0].test, include_attributes=False)
+                != ast.dump(native_test, include_attributes=False) or branches[0].orelse):
+        raise ValueError('Scheduled spatial loss changed its explicit native-forward route')
+    native = [node for node in branches[0].body if isinstance(node, ast.Return)
+        or isinstance(node, ast.Assign) and any(isinstance(target, ast.Name)
+            and target.id in ('log_probabilities', 'losses') for target in node.targets)]
+    wanted_native = ast.parse('''
+log_probabilities = torch.log_softmax(logits, dim=1, dtype=logits.dtype)
+losses = functional.nll_loss(log_probabilities, targets, ignore_index=ignore_index, reduction="none")
+return losses
+''').body
+    if dumps(native) != dumps(wanted_native):
+        raise ValueError('Scheduled spatial loss changed the original short-time native spatial forward')
+    bindings = spatial_native_forward_contract()
+    bindings.update({'scheduled_spatial_loss_module': file_hash(path),
+        'scheduled_spatial_class_serial_forward': content_hash(dumps(forward)),
+        'scheduled_spatial_reconstructed_backward': content_hash(dumps(backward)),
+        'scheduled_spatial_shape_route': content_hash(dumps(wanted_route))})
+    return bindings
+
+
 def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
     """Preserve the original masking, CE and reduction beneath new guards.
 
@@ -152,7 +256,7 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
         if set(selected) != required:
             raise ValueError('Cannot establish the original SFT mask/loss contract')
         return selected
-    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce', 'spatial_fused_backward'):
+    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce', 'spatial_fused_backward', 'spatial_scheduled_ce'):
         raise ValueError('No accepted scientific loss contract for this execution mode')
     previous, current = contract(old), contract(new)
     if previous != current:
@@ -171,8 +275,12 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
         spatial_expression = ast.parse('token_losses = spatial_token_cross_entropy('
             'shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)').body[0]
         spatial_contract = ast.dump(spatial_expression, include_attributes=False)
+        scheduled_expression = ast.parse('token_losses = scheduled_spatial_token_cross_entropy('
+            'shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)').body[0]
+        scheduled_contract = ast.dump(scheduled_expression, include_attributes=False)
         dispatches = {'flat_ce': flat_contract, 'fused_ce': fused_contract,
-                      'spatial_fused_backward': spatial_contract}
+                      'spatial_fused_backward': spatial_contract,
+                      'spatial_scheduled_ce': scheduled_contract}
         wrapper_contract, ce_dispatch = {}, []
         for node in ast.walk(wrapper):
             if isinstance(node, ast.Assign):
@@ -200,6 +308,8 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
             bindings['fused_ce_module'] = file_hash(ROOT/'src/training/sft/fused_loss.py')
         elif loss_implementation == 'spatial_fused_backward':
             bindings.update(spatial_native_forward_contract())
+        elif loss_implementation == 'spatial_scheduled_ce':
+            bindings.update(scheduled_spatial_forward_contract())
     return bindings
 
 

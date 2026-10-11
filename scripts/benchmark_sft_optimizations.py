@@ -65,11 +65,19 @@ PROFILE_SETTINGS = {
         "attention_implementation": "eager", "validated_loss_counts": False,
         "defer_finite_checks": False, "cache_collated_inputs": False,
         "gradient_checkpointing": False, "loss_implementation": "spatial_fused_backward"},
+    "spatial_scheduled_ce_no_gradient_checkpointing": {
+        "attention_implementation": "eager", "validated_loss_counts": False,
+        "defer_finite_checks": False, "cache_collated_inputs": False,
+        "gradient_checkpointing": False, "loss_implementation": "spatial_scheduled_ce"},
 }
 for settings in PROFILE_SETTINGS.values():
     settings.setdefault("cache_collated_inputs", False)
     settings.setdefault("gradient_checkpointing", True)
     settings.setdefault("loss_implementation", "spatial_ce")
+LOSS_HELPER_FILES = {
+    "spatial_fused_backward": "src/training/sft/spatial_loss.py",
+    "spatial_scheduled_ce": "src/training/sft/scheduled_spatial_loss.py",
+}
 
 
 def write_json(path, value):
@@ -127,6 +135,9 @@ def arguments(argv=None):
             "spatial_fused_backward_no_gradient_checkpointing"))
             and args.reference_profile != "no_gradient_checkpointing"):
         parser.error("Additional no-checkpoint candidates require the accepted no_gradient_checkpointing reference")
+    if ("spatial_scheduled_ce_no_gradient_checkpointing" in args.profiles[1:]
+            and args.reference_profile != "spatial_fused_backward_no_gradient_checkpointing"):
+        parser.error("Scheduled spatial CE requires the accepted spatial_fused_backward_no_gradient_checkpointing reference")
     return args
 
 
@@ -213,16 +224,21 @@ def build_plan(args):
         raise ValueError("Benchmark would exceed the remaining frozen training exposure")
     paths = ["scripts/benchmark_sft_optimizations.py", "scripts/run_certified_sft.py",
              "src/training/sft/individual_fit/sft_fit.py", "src/training/sft/execution_profile.py",
-             "src/training/sft/spatial_loss.py",
+             *LOSS_HELPER_FILES.values(),
              "requirements.lock"]
     paths = sorted(set(paths) | {str(path.relative_to(ROOT)) for path in (ROOT / "src").rglob("*.py")})
+    source_hashes = {path: file_hash(ROOT / path) for path in paths if (ROOT / path).is_file()}
+    for name in args.profiles:
+        helper = LOSS_HELPER_FILES.get(PROFILE_SETTINGS[name]["loss_implementation"])
+        if helper and helper not in source_hashes:
+            errors.append("Selected loss helper source is missing: " + helper)
     plan = {
         "schema_version": SCHEMA, "status": "PLANNED_PENDING_GPU",
         "source_code_commit": source, "configuration_hash": configuration_hash(config),
         "source_tree_validation": source_state,
         "input_file_hashes": {name: file_hash(getattr(args, name))
                               for name in ("config", "certificate", "bundle", "worklist")},
-        "source_file_hashes": {path: file_hash(ROOT / path) for path in paths if (ROOT / path).is_file()},
+        "source_file_hashes": source_hashes,
         "handoff_certificate_hash": certificate.get("certificate_hash"),
         "consumer_bindings_valid": not errors, "binding_errors": errors,
         "condition": {"family": args.family, "model": args.model, "level": args.level,
@@ -331,9 +347,10 @@ def profile_run(args, plan, config, task):
         raise ValueError("Frozen corpus must declare positive, untruncated native token lengths")
     longest_record = max([*train, *validation], key=lambda record: record["transformed_token_count"])
     profile = SFTExecutionProfile(**PROFILE_SETTINGS[args._profile])
-    spatial_helper_hash = plan["source_file_hashes"].get("src/training/sft/spatial_loss.py")
-    if profile.loss_implementation == "spatial_fused_backward" and not spatial_helper_hash:
-        raise RuntimeError("Spatial fused-backward helper bytes are missing from the frozen plan")
+    helper_file = LOSS_HELPER_FILES.get(profile.loss_implementation)
+    loss_helper_hash = plan["source_file_hashes"].get(helper_file) if helper_file else None
+    if helper_file and not loss_helper_hash:
+        raise RuntimeError("Selected loss helper bytes are missing from the frozen plan")
     model, tokenizer, optimizer, scheduler, runtime = sft_fit._runtime(
         spec, str(device), cache_root=config["runtime"].get("cache_root"), execution_profile=profile)
     if model.config._attn_implementation != profile.attention_implementation:
@@ -342,8 +359,8 @@ def profile_run(args, plan, config, task):
         raise RuntimeError("Actual activation checkpoint/cache policy differs from the explicit candidate")
     if runtime.get("loss_implementation", "spatial_ce") != profile.loss_implementation:
         raise RuntimeError("Runtime did not apply the explicitly requested completion-loss implementation")
-    if profile.loss_implementation == "spatial_fused_backward" and runtime.get("loss_helper_sha256") != spatial_helper_hash:
-        raise RuntimeError("Loaded spatial fused-backward helper differs from the frozen source bytes")
+    if helper_file and runtime.get("loss_helper_sha256") != loss_helper_hash:
+        raise RuntimeError("Loaded loss helper differs from the frozen source bytes")
     full_tokenized_train = ([sft_fit.tokenize_completion(record, tokenizer) for record in train]
                             if profile.cache_collated_inputs else None)
     selected = ([full_tokenized_train[index] for index in plan["selected_record_indices"]]
@@ -399,8 +416,8 @@ def profile_run(args, plan, config, task):
     torch.cuda.reset_peak_memory_stats(device)
     longest_probe = sft_fit.verify_mask_gradients(model, longest, tokenizer.pad_token_id,
                                                prepared_batch=longest_cached, execution_profile=profile)
-    if profile.loss_implementation == "spatial_fused_backward" and longest_probe.get("loss_helper_sha256") != spatial_helper_hash:
-        raise RuntimeError("Longest-sequence probe did not execute the frozen spatial fused-backward helper")
+    if helper_file and longest_probe.get("loss_helper_sha256") != loss_helper_hash:
+        raise RuntimeError("Longest-sequence probe did not execute the frozen loss helper")
     torch.cuda.synchronize(device)
     longest_probe = {**longest_probe, "example_id": longest["example_id"],
         "native_token_count": len(longest["input_ids"]), "optimizer_updates": 0,
@@ -469,7 +486,7 @@ def profile_run(args, plan, config, task):
             "use_cache": model.config.use_cache, "checkpoint_rng_preserved": True,
             "loss_implementation": profile.loss_implementation,
             **({"loss_helper_sha256": runtime["loss_helper_sha256"]}
-               if profile.loss_implementation == "spatial_fused_backward" else {})},
+               if helper_file else {})},
         "cuda_input_cache": {"enabled": profile.cache_collated_inputs, "resident_bytes": cache_resident_bytes,
                              "setup_seconds": cache_setup_seconds, "cached_records": len(full_cache) if full_cache else 0},
         "applied_attention_implementation": model.config._attn_implementation,
@@ -552,7 +569,7 @@ def compare_profiles(baseline, candidate, first, second, bounds):
                     "attention_implementation": settings.get("attention_implementation", "eager"),
                     "use_cache": False, "checkpoint_rng_preserved": True,
                     "loss_implementation": settings.get("loss_implementation", "spatial_ce")}
-        if expected["loss_implementation"] == "spatial_fused_backward":
+        if expected["loss_implementation"] in LOSS_HELPER_FILES:
             helper_hash = receipt.get("runtime", {}).get("loss_helper_sha256")
             expected["loss_helper_sha256"] = helper_hash
             helper_metadata_valid = isinstance(helper_hash, str) and re.fullmatch(r"[0-9a-f]{64}", helper_hash) is not None

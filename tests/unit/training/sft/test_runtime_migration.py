@@ -130,6 +130,39 @@ def spatial_backward_fixture(identity):
     return rehash(report)
 
 
+def scheduled_spatial_fixture(identity, manifest=None):
+    """Declared accepted spatial-backward parent versus scheduling only."""
+    report = incremental_fixture(identity, manifest)
+    reference_name = 'spatial_fused_backward_no_gradient_checkpointing'
+    candidate_name = 'spatial_scheduled_ce_no_gradient_checkpointing'
+    reference = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_fused_backward').to_dict()
+    candidate = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce').to_dict()
+    helpers = {'spatial_fused_backward': 'src/training/sft/spatial_loss.py',
+               'spatial_scheduled_ce': 'src/training/sft/scheduled_spatial_loss.py'}
+    report['plan']['reference_profile'] = reference_name
+    report['plan']['profiles'] = {reference_name: reference, candidate_name: candidate}
+    for path in helpers.values():
+        report['plan']['source_file_hashes'][path] = file_hash(ROOT/path)
+    for container in (report['profiles'], report['profile_runs']):
+        for row in container.values():
+            is_reference = row['profile'] == 'no_gradient_checkpointing'
+            settings = reference if is_reference else candidate
+            row['profile'] = reference_name if is_reference else candidate_name
+            row['settings'] = settings
+            row['runtime']['execution_profile'] = settings
+            for field in ('runtime', 'actual_execution_policy', 'longest_sequence_probe'):
+                row[field]['loss_implementation'] = settings['loss_implementation']
+                row[field]['loss_helper_sha256'] = report['plan']['source_file_hashes'][helpers[settings['loss_implementation']]]
+    report['profiles'] = {reference_name: report['profiles']['no_gradient_checkpointing'],
+                          candidate_name: report['profiles']['flat_ce']}
+    comparison = report['comparisons'].pop('flat_ce')
+    comparison['reference_profile'] = reference_name
+    for repetition in comparison['repetitions']:
+        repetition['reference_profile'] = reference_name
+    report['comparisons'][candidate_name] = comparison
+    return rehash(report)
+
+
 @pytest.mark.parametrize("field", IMMUTABLE_IDENTITY_FIELDS)
 def test_scientific_checkpoint_identity_cannot_change(field):
     old, new = identities()
@@ -201,6 +234,58 @@ def test_spatial_backward_helper_cannot_be_omitted_from_executed_source_bindings
     del report['plan']['source_file_hashes']['src/training/sft/spatial_loss.py']
     rehash(report)
     with pytest.raises(MigrationError, match='source-file bindings'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+def test_scheduled_ce_binds_both_loaded_helpers_and_incremental_accepted_reference():
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce').to_dict()
+    result = validate_execution_benchmark(scheduled_spatial_fixture(new), new['code_revision'], new['execution_profile'])
+    assert result['reference_profile'] == 'spatial_fused_backward_no_gradient_checkpointing'
+    assert result['reference_execution_profile']['loss_implementation'] == 'spatial_fused_backward'
+    assert result['execution_profile']['loss_implementation'] == 'spatial_scheduled_ce'
+    assert result['scientific_equivalence_established'] is False
+
+
+@pytest.mark.parametrize('run', ('baseline_2', 'cuda_cached_2'))
+@pytest.mark.parametrize('field', ('runtime', 'actual_execution_policy', 'longest_sequence_probe'))
+def test_scheduled_ce_cannot_relabel_the_actual_reference_or_candidate_helper(run, field):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce').to_dict()
+    report = scheduled_spatial_fixture(new)
+    report['profile_runs'][run][field]['loss_helper_sha256'] = 'unmeasured-loaded-module'
+    rehash(report)
+    with pytest.raises(MigrationError, match='loaded spatial-loss helper'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+@pytest.mark.parametrize('helper', ('spatial_loss.py', 'scheduled_spatial_loss.py'))
+def test_scheduled_ce_requires_both_helper_source_dependencies(helper):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce').to_dict()
+    report = scheduled_spatial_fixture(new)
+    del report['plan']['source_file_hashes']['src/training/sft/'+helper]
+    rehash(report)
+    with pytest.raises(MigrationError, match='source-file bindings'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+@pytest.mark.parametrize('change', ('older_reference', 'attention', 'counts', 'checkpointing'))
+def test_scheduled_ce_must_compare_only_scheduling_against_the_accepted_profile(change):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce').to_dict()
+    report = scheduled_spatial_fixture(new)
+    reference = report['plan']['profiles']['spatial_fused_backward_no_gradient_checkpointing']
+    if change == 'older_reference':
+        reference['loss_implementation'] = 'spatial_ce'
+    elif change == 'attention':
+        reference['attention_implementation'] = 'sdpa'
+    elif change == 'counts':
+        reference['validated_loss_counts'] = True
+    else:
+        reference['gradient_checkpointing'] = True
+    rehash(report)
+    with pytest.raises(MigrationError, match='unchanged accepted spatial-backward reference'):
         validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
 
 
@@ -283,7 +368,7 @@ def test_stale_source_weakened_bounds_and_lying_paired_speed_reject():
         validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
 
 
-@pytest.mark.parametrize('incremental_loss', [False, True])
+@pytest.mark.parametrize('incremental_loss', [None, 'flat_ce', 'spatial_scheduled_ce'])
 def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(tmp_path, incremental_loss):
     torch.manual_seed(42)
     model = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.Dropout(0.2), torch.nn.Linear(2, 1))
@@ -294,8 +379,9 @@ def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(
     update(model, optimizer, scheduler)
     old, new = identities()
     if incremental_loss:
-        old['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False).to_dict()
-        new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='flat_ce').to_dict()
+        reference_loss = 'spatial_fused_backward' if incremental_loss == 'spatial_scheduled_ce' else 'spatial_ce'
+        old['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation=reference_loss).to_dict()
+        new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation=incremental_loss).to_dict()
     original = tmp_path / "original" / "checkpoint_000001"
     saved = save_checkpoint(original, old, {"adapter": model.state_dict(), "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict(), "rng": capture_rng(),
@@ -303,7 +389,8 @@ def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(
                      "processed_tokens": 112, "total_optimizer_steps": 1250, "exposure_order_hash": "9" * 64},
         "runtime": {"gpu_name": "H100_DECLARED_FIXTURE"}})
     parent_hashes = {path.name: file_hash(path) for path in original.iterdir()}
-    report = incremental_fixture(new, saved) if incremental_loss else measured_fixture(new, saved)
+    report = (scheduled_spatial_fixture(new, saved) if incremental_loss == 'spatial_scheduled_ce'
+              else incremental_fixture(new, saved) if incremental_loss else measured_fixture(new, saved))
     target = tmp_path / "migrated" / "checkpoint_000001"
     receipt = migrate_checkpoint(original, target, old, new, new["execution_profile"], report,
                                  recovery_report=report)

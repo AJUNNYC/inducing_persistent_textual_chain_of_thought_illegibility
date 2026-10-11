@@ -403,15 +403,22 @@ def profile_completion_loss(logits: Any, labels: Any, *,
         token_losses = fused_token_cross_entropy(
             shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1),
             ignore_index=-100).reshape(shifted_labels.shape)
-    else:
+    elif profile.loss_implementation == "spatial_fused_backward":
         from training.sft.spatial_loss import spatial_token_cross_entropy
         token_losses = spatial_token_cross_entropy(
+            shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)
+    else:
+        from training.sft.scheduled_spatial_loss import scheduled_spatial_token_cross_entropy
+        token_losses = scheduled_spatial_token_cross_entropy(
             shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)
     return (token_losses.sum(dim=1) / counts).mean()
 
 
 def _loaded_loss_helper_hash(profile: SFTExecutionProfile) -> dict[str, str]:
     """Bind the spatial candidate receipt to the actual imported helper bytes."""
+    if profile.loss_implementation == "spatial_scheduled_ce":
+        from training.sft import scheduled_spatial_loss
+        return {"loss_helper_sha256": hashlib.sha256(Path(scheduled_spatial_loss.__file__).read_bytes()).hexdigest()}
     if profile.loss_implementation != "spatial_fused_backward":
         return {}
     from training.sft import spatial_loss

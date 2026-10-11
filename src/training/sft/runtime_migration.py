@@ -31,6 +31,7 @@ REQUIRED_SOURCE_FILES = (
 LOSS_HELPER_FILES = {
     "fused_ce": "src/training/sft/fused_loss.py",
     "spatial_fused_backward": "src/training/sft/spatial_loss.py",
+    "spatial_scheduled_ce": "src/training/sft/scheduled_spatial_loss.py",
 }
 
 
@@ -81,9 +82,12 @@ def _source_bindings(plan: Mapping[str, Any]) -> None:
     hashes = plan.get("source_file_hashes")
     required = set(REQUIRED_SOURCE_FILES)
     for settings in plan.get("profiles", {}).values():
-        helper = LOSS_HELPER_FILES.get(_profile(settings).to_dict().get("loss_implementation"))
+        loss_implementation = _profile(settings).to_dict().get("loss_implementation")
+        helper = LOSS_HELPER_FILES.get(loss_implementation)
         if helper is not None:
             required.add(helper)
+        if loss_implementation == "spatial_scheduled_ce":
+            required.add(LOSS_HELPER_FILES["spatial_fused_backward"])
     if not isinstance(hashes, Mapping) or required - hashes.keys():
         raise MigrationError("Benchmark lacks executed source-file bindings")
     for name, digest in hashes.items():
@@ -102,7 +106,7 @@ def _loss_execution_binding(row: Mapping[str, Any], settings: Mapping[str, Any],
         evidence = row.get(field, {})
         if not isinstance(evidence, Mapping) or evidence.get("loss_implementation", "spatial_ce") != expected:
             raise MigrationError("Actual benchmark loss execution evidence differs")
-        if expected == "spatial_fused_backward":
+        if expected in ("spatial_fused_backward", "spatial_scheduled_ce"):
             digest = (source_hashes or {}).get(LOSS_HELPER_FILES[expected])
             if not digest or evidence.get("loss_helper_sha256") != digest:
                 raise MigrationError("Actual loaded spatial-loss helper differs from frozen source")
@@ -145,6 +149,12 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
     reference_profile = _profile(plan["profiles"][reference_name]).to_dict()
     if profile_name not in names or profile_name == reference_name:
         raise MigrationError("A compared measured optimization candidate is required")
+    if chosen["loss_implementation"] == "spatial_scheduled_ce" and (
+            reference_profile["loss_implementation"] != "spatial_fused_backward"
+            or reference_profile["gradient_checkpointing"] is not False
+            or any(chosen[key] != value for key, value in reference_profile.items()
+                   if key != "loss_implementation")):
+        raise MigrationError("Scheduled spatial CE requires the unchanged accepted spatial-backward reference")
     measured = report.get("profiles", {})
     comparison = report.get("comparisons", {}).get(profile_name, {})
     if comparison.get("reference_profile", "baseline") != reference_name:

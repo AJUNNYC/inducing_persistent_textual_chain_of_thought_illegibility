@@ -9,6 +9,8 @@ flowchart TD
 %% CE defaults to spatial_ce; source 6d21fff flat/fused forward candidates failed numerical bounds.
 %% Source 218900d accepted stock spatial forward/tiled backward only for 7B ROT13 level 1 on Blackwell96GB.
 %% Current continuation inherits step 401, preserves parent checkpoints and verifies child state in Drive.
+%% Pending spatial_scheduled_ce changes token scheduling/storage; preserve serial FP32 forward order.
+%% Compare to accepted spatial-forward/tiled-backward; no new numerical or speed approval yet.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.

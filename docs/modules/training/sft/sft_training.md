@@ -30,6 +30,8 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 
 ## Implemented interface and evidence
 
+The scheduled spatial-CE candidate is under construction and has no accepted result. Its declared reference is the currently accepted spatial-forward/tiled-backward profile, with unchanged recomputation, science and latest full state. Existing source 218900d training continues during preparation. Only passed source/GPU/condition-bound recovery evidence and explicit parent-preserving lineage may activate the new profile; remaining fits do not inherit that approval.
+
 Both flat-layout and fully fused forward CE failed the frozen numerical screen despite faster timing and remain rejected. Source `218900d` passed two paired recoveries for stock spatial forward plus tiled backward, with bitwise numerical/state/RNG agreement and 11.65–13.52% less median update time versus the already accepted no-recomputation profile. The new source/profile/condition-bound READY controls and explicit step-401 child lineage authorize only this 7B ROT13 level-1 continuation. The original science and latest full state are preserved; remaining fits require their own affected evidence. A total of 165 affected CPU checks passed without repeating unrelated suites or simulations.
 
 `build_worklist(config, datasets, handoff_certificate=certificate)` reads the forty verified JSONL conditions and binds actual ordered record bytes to exact fit specifications. It requires the same ordered train/validation IDs, prompt bytes and common accepted-pool hash across every condition; model-specific clean-trace hashes and final-answer bytes remain identical across that model's families/strengths. Different model traces are never interchangeable. `load_dataset_bundle(bundle)` verifies persisted JSONL content hashes before loading.
@@ -68,6 +70,8 @@ flowchart TD
 %% CE defaults to spatial_ce; source 6d21fff flat/fused forward candidates failed numerical bounds.
 %% Source 218900d accepted stock spatial forward/tiled backward only for 7B ROT13 level 1 on Blackwell96GB.
 %% Current continuation inherits step 401, preserves parent checkpoints and verifies child state in Drive.
+%% Pending spatial_scheduled_ce changes token scheduling/storage; preserve serial FP32 forward order.
+%% Compare to accepted spatial-forward/tiled-backward; no new numerical or speed approval yet.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
