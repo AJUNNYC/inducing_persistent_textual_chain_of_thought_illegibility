@@ -330,8 +330,7 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
                             examples: Sequence[Mapping[str, Any]], pad_token_id: int,
                             *, progress: Mapping[str, Any] | None = None,
                             save: Callable[[dict[str, Any]], None] | None = None,
-                            should_pause: Callable[[], bool] | None = None,
-                handoff_certificate: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                            should_pause: Callable[[], bool] | None = None) -> dict[str, Any]:
     """Real optimizer loop, shared by GPU production and tiny CPU fixtures.
 
     Pause happens only after one complete logical optimizer update. Exceptions
@@ -579,7 +578,8 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
                 validation_records: Sequence[Mapping[str, Any]], output_dir: str | Path,
                 config: Mapping[str, Any], *, resume: str | Path | None = None,
                 preflight_report: Mapping[str, Any] | None = None,
-                should_pause: Callable[[], bool] | None = None) -> dict[str, Any]:
+                should_pause: Callable[[], bool] | None = None,
+                handoff_certificate: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Train the exact fit, or continue only its verified full recovery state.
 
     Caller must provide real preflight evidence; this function never turns unit

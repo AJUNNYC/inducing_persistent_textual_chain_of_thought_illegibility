@@ -3920,10 +3920,6 @@ This specifies what function the evaluator will call without revealing what answ
 expect. The same literal prompt template and interface policy apply to the two baselines and all trained
 states. Request native reasoning followed by a clearly separated final Python solution, with no opacity
 instruction.
-Answer extraction. Use the designated final code field. Remove at most one surrounding Python
-Markdown code fence if present; otherwise preserve the code contents. Do not repair indentation, rename
-functions, insert missing code, or use reasoning text as an alternative answer. Freeze the exact parser
-and its handling of malformed or ambiguous final fields before inspecting trained outcomes.
 Scoring. Generate once per task, execute exactly the extracted solution against the original scoring
 tests, and report pass@1. Provide no test feedback or repair loop. Syntax errors, incorrect results, test
 failures, and task-defined resource-limit violations are unsuccessful model outcomes. A broken executor
@@ -3943,6 +3939,16 @@ Hidden tests, reference implementation bodies, and the final generated solution 
 the audit request.
 72
 CoT Illegibility - Implementation decisions
+Answer extraction (designated_final_fields_v2). Within the native final response, exactly one Python or unlabelled
+Markdown fence designates the solution; preserve its interior bytes. Without a fence, the entire final response is
+code. Reject multiple/malformed fences. Never repair code or use reasoning as an alternative. Freeze the parser
+before trained outcomes. This replaces whole-response matching; original failed baseline evidence is retained.
+Scalar answer fields (H.9 implementation convention). For GSM8K/MMLU/ARC read only a unique terminal
+Final answer: field, unique terminal boxed scalar, or an entire scalar in the native final response. Accept marker
+case and paired bold/math wrappers; reject multiple markers/boxes, units, non-scalar suffixes and prose
+inference. Exact numeric normalization/public-label matching remain unchanged. Rescore preserved responses
+under a new protocol identity before training; retain the original failed report. No new sampling, reasoning
+fallback, threshold changes or SFT data/recipe changes.
 ```
 
 ## page_073

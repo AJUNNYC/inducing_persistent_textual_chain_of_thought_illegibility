@@ -13,7 +13,7 @@
 
 ## Implemented public interface and validation
 
-`score_capability(item, parsed, *, sandbox=None, raw_hash=None)` applies exact numeric/choice rules to the separated final answer and extracts at most one explicit Python code fence for MBPP. It does not infer answers from reasoning or repair code. MBPP receives approved public entrypoint names and unchanged hidden setup/tests only after generation. Resource/task failures are observed incorrect outputs; broken or unsupported executor operations produce `correct=None` with an infrastructure status. Raw/parser/scorer/reference dependencies remain recorded.
+`score_capability(item, parsed, *, sandbox=None, raw_hash=None)` applies versioned exact numeric/choice rules to a unique explicit final field and reads one designated Python code fence or the entire unfenced final response for MBPP. The [final-field repair](../../../../../final_field_scoring.md) retains the original failed report and original generation identities; it accepts preceding scalar explanation and prose outside a single code fence while rejecting ambiguous fields. It does not infer answers from reasoning or repair code. MBPP receives approved public entrypoint names and unchanged hidden setup/tests only after generation. Resource/task failures are observed incorrect outputs; broken or unsupported executor operations produce `correct=None` with an infrastructure status. Raw/parser/scorer/reference dependencies remain recorded.
 
 Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
@@ -66,7 +66,9 @@ flowchart TD
 %% Score dependency identity includes raw hash, parser/scorer and reference/test versions.
 %% Known infrastructure failures use bounded recovery; exhausted failures return incomplete, not incorrect.
 %% MBPP uses task plus the frozen public interface, with scoring tests and reference implementations withheld from generation.
-%% Extract the designated final code field; optionally remove one surrounding Python code fence only.
+%% Version designated_final_fields_v2: one explicit final code fence or entire plain code; ignore surrounding prose, preserve code bytes.
+%% Scalar extraction accepts one terminal answer marker or box; no answers inferred from prose/reasoning.
+%% Retain old failed reports; revised scorer/protocol invalidate only scoring derivatives, never raw requests.
 %% Execute exactly that code. Never repair indentation, rename functions or insert missing code.
 %% Syntax errors, failing tests and task-defined timeouts are unsuccessful model outcomes; broken executor is infrastructure failure.
 %% No test feedback or repair loop. Report this project-specific withheld-test MBPP variant explicitly.
@@ -74,9 +76,9 @@ flowchart TD
     CACHE["Check exact score dependency identity"]
     HIT{"Valid score cached?"}
     DOMAIN{"Which task type?"}
-    NUM["GSM8K<br/>Numeric exact match"]
-    CHOICE["MMLU / ARC<br/>Fixed parsing of choice labels"]
-    PARSECODE["Extract final code; remove at most one Python fence; make no repairs"]
+    NUM["GSM8K<br/>Unique explicit final scalar and numeric exact match"]
+    CHOICE["MMLU / ARC<br/>Unique explicit final field and exact public label"]
+    PARSECODE["Read one designated final code fence or entire plain code; preserve bytes"]
     CODE["MBPP<br/>Isolated tests with no network or host access<br/>1 CPU and 1 GiB memory<br/>5 CPU seconds and 10 wall seconds"]
     SAVE["Save score and output status"]
     OUT["Return verified capability outcome"]

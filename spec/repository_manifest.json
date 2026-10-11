@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 477,
+  "files": 481,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1284,6 +1284,17 @@
       "display_path": "docs/evidence/vllm_sft_drive_readback_audit.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_a6e8bf75dfff55",
+      "blank": false
+    },
+    {
+      "path": "docs/final_field_scoring.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/final_field_scoring.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_efc352c8c290c1",
       "blank": false
     },
     {
@@ -3006,6 +3017,17 @@
       "blank": false
     },
     {
+      "path": "scripts/rescore_vllm_baselines.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/rescore_vllm_baselines.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_05a1825d9110e8",
+      "blank": false
+    },
+    {
       "path": "scripts/revalidate_collection_inputs.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -3025,6 +3047,17 @@
       "display_path": "scripts/run_baseline_repeatability.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_766c706bda3f71",
+      "blank": false
+    },
+    {
+      "path": "scripts/run_certified_sft.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_certified_sft.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_80c27bbd543ae6",
       "blank": false
     },
     {
@@ -6757,6 +6790,17 @@
       "display_path": "tests/unit/operations/test_assets.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_c3f48a772aa350",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_baseline_rescoring.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_baseline_rescoring.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_e1421003124fdb",
       "blank": false
     },
     {

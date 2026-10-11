@@ -101,6 +101,8 @@ flowchart TD
     EXT --> p_4922617bb3d146
     p_a6e8bf75dfff55["docs/evidence/vllm_sft_drive_readback_audit.json"]
     EXT --> p_a6e8bf75dfff55
+    p_efc352c8c290c1["docs/final_field_scoring.md"]
+    EXT --> p_efc352c8c290c1
     p_dd5026d54adf97["docs/implementation_acceptance.md"]
     EXT --> p_dd5026d54adf97
     p_95257a56b10fc2["docs/modules/operations/"]
@@ -181,10 +183,14 @@ flowchart TD
     EXT --> p_21a022ced4ee2f
     p_9e568fd84943ef["scripts/refresh_dependency_locks.py"]
     EXT --> p_9e568fd84943ef
+    p_05a1825d9110e8["scripts/rescore_vllm_baselines.py"]
+    EXT --> p_05a1825d9110e8
     p_4da5d2a00cdc8a["scripts/revalidate_collection_inputs.py"]
     EXT --> p_4da5d2a00cdc8a
     p_766c706bda3f71["scripts/run_baseline_repeatability.py"]
     EXT --> p_766c706bda3f71
+    p_80c27bbd543ae6["scripts/run_certified_sft.py"]
+    EXT --> p_80c27bbd543ae6
     p_4af6351440d90c["scripts/run_collection_until.py"]
     EXT --> p_4af6351440d90c
     p_a47207fc0391be["scripts/run_model_generation_worker.py"]
@@ -261,6 +267,8 @@ flowchart TD
     EXT --> p_10e350a8a391f4
     p_c3f48a772aa350["tests/unit/operations/test_assets.py"]
     EXT --> p_c3f48a772aa350
+    p_e1421003124fdb["tests/unit/operations/test_baseline_rescoring.py"]
+    EXT --> p_e1421003124fdb
     p_0d16c9a7e127cd["tests/unit/operations/test_batched_restart.py"]
     EXT --> p_0d16c9a7e127cd
     p_6ff307aafdc7f3["tests/unit/operations/test_collection_deadline.py"]

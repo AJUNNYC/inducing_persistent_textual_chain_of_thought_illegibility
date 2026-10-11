@@ -123,6 +123,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       vllm_baseline_launch.json
       vllm_baseline_repeatability.json
       vllm_sft_drive_readback_audit.json
+    final_field_scoring.md
     implementation_acceptance.md
     implementation_prompt.md
     modules/
@@ -283,8 +284,10 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     prepare_vllm_sft_data.py
     produce_vllm_baseline_raw.py
     refresh_dependency_locks.py
+    rescore_vllm_baselines.py
     revalidate_collection_inputs.py
     run_baseline_repeatability.py
+    run_certified_sft.py
     run_collection_until.py
     run_experiment.py
     run_model_generation_worker.py
@@ -634,6 +637,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_experiment_overview.py
       operations/
         test_assets.py
+        test_baseline_rescoring.py
         test_batched_restart.py
         test_collection_deadline.py
         test_collection_input_revalidation.py

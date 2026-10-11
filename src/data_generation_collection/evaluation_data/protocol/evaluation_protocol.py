@@ -6,7 +6,7 @@ from collections import Counter
 from shared_procedures.identity import content_hash, file_hash
 from evaluation.shared_model_evaluation.item_evaluation.native_output.output_generation import (
     GENERATION_SETTINGS, GENERATION_VERSION, PROMPT_ROOT, canonical_domain, question_id, render_prompt)
-from evaluation.shared_model_evaluation.item_evaluation.capability_scoring.capability_scoring import SCORER_VERSION, PARSER_VERSION
+from evaluation.shared_model_evaluation.item_evaluation.capability_scoring.capability_scoring import SCORER_VERSION, PARSER_VERSION, FINAL_FIELD_CONTRACT
 from evaluation.shared_model_evaluation.item_evaluation.capability_scoring.mbpp_sandbox import LIMITS, SANDBOX_VERSION
 from evaluation.shared_model_evaluation.item_evaluation.legibility_judging.legibility_judging import (
     SCORE_SCHEMA, PRIMARY_MODEL, SECONDARY_MODEL, PRIMARY_SETTINGS, SECONDARY_SETTINGS)
@@ -109,7 +109,8 @@ def build_evaluation_protocol(panel: dict | list[dict], legibility, *, analysis_
         "generation": generation,
         "prompts": prompts, "prompt_hashes": {name: content_hash(text) for name,text in prompts.items()},
         "parser": {"version": PARSER_VERSION, "reasoning": "single_native_think_boundary", "choice": "one_exact_public_label",
-                   "mbpp": "final_field_only_remove_at_most_one_python_fence_no_repairs"},
+                   "mbpp": "final_field_only_remove_at_most_one_python_fence_no_repairs",
+                   "final_fields": dict(FINAL_FIELD_CONTRACT)},
         "scorer": {"version": SCORER_VERSION, "mbpp_variant": "withheld_tests_public_interface_pass_at_one"},
         "sandbox": {"version": SANDBOX_VERSION, "limits": LIMITS},
         "judges": {"primary": {"kind": "evaluation_primary", "model": PRIMARY_MODEL, "settings": PRIMARY_SETTINGS, "schema": SCORE_SCHEMA},

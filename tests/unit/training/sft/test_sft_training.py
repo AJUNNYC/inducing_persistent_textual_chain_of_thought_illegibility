@@ -110,3 +110,60 @@ def test_pause_and_invalid_queue_cannot_release_incomplete_adapters(fixtures,tmp
     assert report['status'] == 'paused' and report['completed_fits'] == 0
     with pytest.raises(SFTInputError,match='twenty'):
         scheduling.run_family_queue('rot13',worklist[:-1][1:],tmp_path,config,fit_runner=runner)
+
+
+def test_production_queue_passes_certificate_to_real_fit_before_model_loading(fixtures,tmp_path,monkeypatch):
+    """Exercise the real queue-to-fit call; a bad certificate cannot reach CUDA."""
+    from training.sft.individual_fit.sft_fit import SFTRuntimeBlocked
+    import training.sft.data_handoff as handoff
+    config,_,original = fixtures
+    worklist = deepcopy(original)
+    worklist[0]['spec'].update(producer_configuration_hash='1'*64,
+                              handoff_certificate_hash='2'*64)
+    certificate = {'declared_fixture':True}
+    calls = []
+    def reject(supplied, supplied_config, supplied_spec):
+        calls.append((supplied,supplied_config,supplied_spec.run_id))
+        raise SFTRuntimeBlocked('declared certificate rejection')
+    monkeypatch.setattr(handoff,'validate_handoff',reject)
+    names = ('model_runtime','clean_data','loss_mask_gradients','full_checkpoint_resume',
+             'durable_storage','spending_authorization','baseline_repeatability','statistical_validation')
+    report = scheduling.run_family_queue('rot13',worklist,tmp_path,config,
+        handoff_certificate=certificate,
+        preflight_report={'configuration_hash':configuration_hash(config),
+            'checks':[{'name':name,'status':'passed','evidence':{'live':True,'simulation':False}}
+                      for name in names]})
+    assert report['status'] == 'failed' and report['completed_fits'] == 0
+    assert report['failure']['error_type'] == 'SFTRuntimeBlocked'
+    assert report['failure']['detail'] == 'declared certificate rejection'
+    assert calls == [(certificate,config,'rot13_7b_level_01')]
+
+
+def test_certified_launcher_selects_one_model_and_rejects_changed_worklist(fixtures,monkeypatch):
+    import importlib.util
+    from pathlib import Path
+    from shared_procedures.identity import content_hash
+    path = Path(__file__).resolve().parents[4]/'scripts'/'run_certified_sft.py'
+    module_spec = importlib.util.spec_from_file_location('certified_sft_launcher',path)
+    launcher = importlib.util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(launcher)
+    # Handoff provenance is covered independently; this declared fixture tests
+    # launch selection and manifest/worklist agreement without reading a corpus.
+    monkeypatch.setattr(launcher,'validate_handoff',lambda *args:None)
+    config,bundles,worklist = fixtures
+    bundle = {'status':'verified','simulation':False,'config_hash':configuration_hash(config),
+              'datasets':bundles,'content_hash':content_hash(bundles)}
+    certificate = {'producer_configuration_hash':configuration_hash(config),
+                   'bundle_hash':bundle['content_hash']}
+    selected = launcher.certified_tasks(config,certificate,bundle,worklist,family='rot13',model='7b')
+    assert [(task['family'],task['model_id'],task['level']) for task in selected] == [
+        ('rot13','7b',level) for level in range(1,11)]
+    assert len(launcher.certified_tasks(config,certificate,bundle,worklist,
+                                       family='rot13',model='7b',level=1)) == 1
+    changed = deepcopy(worklist)
+    changed[0]['dataset']['validation_path'] = 'uncertified.jsonl'
+    with pytest.raises(ValueError,match='Worklist differs'):
+        launcher.certified_tasks(config,certificate,bundle,changed,family='rot13',model='7b')
+    with pytest.raises(ValueError,match='Production manifest differs'):
+        launcher.certified_tasks(config,certificate,{**bundle,'content_hash':'0'*64},worklist,
+                                 family='rot13',model='7b')
