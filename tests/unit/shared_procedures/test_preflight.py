@@ -33,7 +33,8 @@ def test_execute_live_without_cuda_or_authorization_is_honestly_blocked(tmp_path
     assert rows['durable_storage']['status']=='blocked' and rows['durable_storage']['evidence']['local_flush_verified'] is True
     assert report['ready'] is False
 
-def test_actual_dictionary_mismatch_fails_clean_gate_before_tokenizer_recompute(tmp_path,monkeypatch):
+@pytest.mark.parametrize('bundle_name',['manifest.json','sft_manifest.json'])
+def test_actual_dictionary_mismatch_fails_clean_gate_before_tokenizer_recompute(tmp_path,monkeypatch,bundle_name):
     import sys,types
     import data_generation_collection.sft_data.sft_data_preparation as data
     import data_generation_collection.sft_data.kazitext.kazitext_data_construction as kazitext
@@ -41,7 +42,7 @@ def test_actual_dictionary_mismatch_fails_clean_gate_before_tokenizer_recompute(
     from shared_procedures.storage import atomic_write_json
     config=load_configuration(CONFIG)
     config['runtime'].update(data_root=str(tmp_path/'data'),cache_root=str(tmp_path/'cache'))
-    for path in (tmp_path/'data'/'accepted'/'accepted_pool.json',tmp_path/'data'/'transformed'/'sft_manifest.json'):
+    for path in (tmp_path/'data'/'accepted'/'accepted_pool.json',tmp_path/'data'/'transformed'/bundle_name):
         atomic_write_json(path,{})
     (tmp_path/'cache'/'kazitext').mkdir(parents=True)
     monkeypatch.setattr(data,'validate_accepted_pool',lambda *_:{'pairs':[{'traces':{'7b':{'simulation':False},'14b':{'simulation':False}}}]})

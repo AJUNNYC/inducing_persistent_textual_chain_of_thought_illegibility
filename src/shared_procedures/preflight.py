@@ -487,7 +487,9 @@ def _run_clean_checks(config: dict) -> CheckResult:
     from data_generation_collection.sft_data.sft_data_preparation import validate_accepted_pool,validate_sft_bundle
     from data_generation_collection.sft_data.kazitext.kazitext_data_construction import OfficialKaziText
     root=Path(config['runtime'].get('data_root','data'))
-    pool_path=root/'accepted'/'accepted_pool.json';bundle_path=root/'transformed'/'sft_manifest.json'
+    pool_path=root/'accepted'/'accepted_pool.json';bundle_path=root/'transformed'/'manifest.json'
+    # Current preparation writes manifest.json; retain the older bundle location.
+    if not bundle_path.is_file():bundle_path=root/'transformed'/'sft_manifest.json'
     if not pool_path.is_file() or not bundle_path.is_file():
         return CheckResult('clean_data','blocked','Actual frozen joint corpus and all forty SFT datasets are required.',{'live':False})
     pool=validate_accepted_pool(read_json(pool_path),configuration_hash(config))

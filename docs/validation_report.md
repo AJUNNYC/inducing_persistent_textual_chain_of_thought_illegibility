@@ -1,5 +1,13 @@
 # Current implementation and validation report
 
+## SFT handoff follow-up (2026-10-11)
+
+The completed corpus contains ROT13 encoding and official KaziText degradation at all ten levels for both models. Construction evidence and independent full Drive readback cover forty conditions and 404,000 records; no regeneration was performed for this handoff. The clean-data preflight now reads the preparation worker's `transformed/manifest.json`, with compatibility for the older `sft_manifest.json` location. Both manifest-location regression cases passed.
+
+The existing 7B Pod is reachable with an idle H100 80 GB. Its native training environment successfully imported Torch 2.9.0+cu128, Transformers 4.57.3, PEFT 0.18.0 and bitsandbytes 0.48.2, with CUDA available. This verifies dependency availability, not loss-mask gradients or optimizer-resume behavior.
+
+The mandatory statistical report still matches the current analysis implementation and remains **failed**: the decision-boundary scenario covered 34 of 36 completed repetitions. Even if all 64 remaining repetitions covered, its one-sided Wilson lower bound would be 0.9413516316, below the fixed 0.95 acceptance requirement. The early stop follows the frozen futility rule. This is a statistical method-validation failure, not evidence of corrupt generated data. No acceptance threshold, seed, bootstrap method or scientific rule was changed to force a pass. Repeating the unchanged deterministic simulation cannot resolve it. SFT remains unlaunched; expensive GPU training controls were not repeated while this mandatory gate is failed.
+
 This report replaces the initial blank-scaffold audit. That historical audit is preserved in [evidence/scaffold_validation_report.md](evidence/scaffold_validation_report.md). The repository now contains concrete scientific and operational implementations, executed engineering tests, public-source manifests and actual runtime-control evidence. It does not contain a completed scientific experiment.
 
 The controlling source is [spec/experiment.pdf](../spec/experiment.pdf), with Appendix H taking its stated precedence. The models, accepted counts, intervention levels, training recipes, evaluation panels, reward rules and empirical construction thresholds remain fixed. The [requirements register](requirements.md), [machine-readable requirements](../spec/requirements_manifest.json), [module manifest](../spec/module_manifest.json), [contracts](contracts.md) and [decisions](decisions.md) identify implementation responsibilities and prospectively selected engineering conventions.
