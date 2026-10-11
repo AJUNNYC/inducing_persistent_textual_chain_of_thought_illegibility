@@ -1,0 +1,102 @@
+{
+  "observed_at": "2026-10-11T15:45:02.928953+00:00",
+  "evidence_type": "live_batched_vllm_baseline_launch",
+  "simulation": false,
+  "worker": {
+    "pid": 27990,
+    "source_commit": "0941ce5f3c8d00d03b27a480f21d14b8beab5452",
+    "log": "/workspace/bootstrap/baseline_vllm_0941ce5.log",
+    "artifact_root": "/workspace/artifacts/baseline_vllm_0941ce5",
+    "deadline": "2026-10-11T20:20:00Z",
+    "repo": "/workspace/baseline_vllm_worker_0941ce5"
+  },
+  "status_snapshot": {
+    "at": "2026-10-11T15:44:40.086280+00:00",
+    "completed_items_in_pass": 384,
+    "drive_replication": "VERIFIED",
+    "expected_items_in_pass": 1233,
+    "judging": "deferred",
+    "model": "7b",
+    "protocol_hash": "fa1ac79e167a982fd23ee8af4cbdc83da94c7ffe4ecae99ee37340bff106efcf",
+    "seed": 42,
+    "source_commit": "0941ce5f3c8d00d03b27a480f21d14b8beab5452",
+    "status": "RUNNING",
+    "timings": [
+      {
+        "drive_seconds": 13.054880645009689,
+        "generated_tokens": 52917,
+        "generation_and_scoring_seconds": 105.35615376906935,
+        "items": 128
+      },
+      {
+        "drive_seconds": 8.5252389900852,
+        "generated_tokens": 53276,
+        "generation_and_scoring_seconds": 14.128631104948,
+        "items": 128
+      },
+      {
+        "drive_seconds": 8.404760444071144,
+        "generated_tokens": 114838,
+        "generation_and_scoring_seconds": 30.92858025606256,
+        "items": 128
+      }
+    ]
+  },
+  "drive_artifacts": [
+    {
+      "name": "evaluation_runtime.json",
+      "status": "VERIFIED",
+      "id": "10uxe5mroooooVsKl8ecNSbTsIUEox3XQ",
+      "folder_id": "1ruy6fVcaVAmfIkZ3asQaGDxljhuMyA-2",
+      "sha256": "b20b27526aad1067fb291495ebc794af07392d5d299eba79d85e413561860333",
+      "size": 4594
+    },
+    {
+      "name": "measurement_protocol.json",
+      "status": "VERIFIED",
+      "id": "190PrdXMqG2D1eQekexHY7jFh-yVM4g2f",
+      "folder_id": "1ruy6fVcaVAmfIkZ3asQaGDxljhuMyA-2",
+      "sha256": "72b5c10ab139ff6da6bd0292d57b8ff3c5438e4357e22d0a33b14c6f390dd2ff",
+      "size": 1269521
+    },
+    {
+      "name": "configuration.json",
+      "status": "VERIFIED",
+      "id": "12J6BnHG8BqtSPyqPAbrpcno5UrYxOqGL",
+      "folder_id": "1ruy6fVcaVAmfIkZ3asQaGDxljhuMyA-2",
+      "sha256": "2fb709cbd0a538ff86b62a97879b202b91cd6b0b1bf66234865d36aa0e7658cf",
+      "size": 12142
+    },
+    {
+      "name": "7b_seed_42_0128.json",
+      "status": "VERIFIED",
+      "id": "1eVb63EenoCzcef2iEtPXYR4sfZiWo8tH",
+      "folder_id": "1VMlgEXcgukODZTw9TveRNqGcRbPXj71y",
+      "sha256": "04feb9a5c64bf245830ba424cddbfc9f30216179ba1246f9307686f41cf660d1",
+      "size": 1807300
+    },
+    {
+      "name": "7b_seed_42_0256.json",
+      "status": "VERIFIED",
+      "id": "1YBdC980Sa5x1Q0Aa3Wh5uat-JtBjK5D7",
+      "folder_id": "1VMlgEXcgukODZTw9TveRNqGcRbPXj71y",
+      "sha256": "3e668c7fcc7261e57d200589199188991fce65597ebd127f9615966d936fdfc0",
+      "size": 1826596
+    },
+    {
+      "name": "7b_seed_42_0384.json",
+      "status": "VERIFIED",
+      "id": "1SVLOHZH0yLHoNHnkomvos46MkQV3P25v",
+      "folder_id": "1VMlgEXcgukODZTw9TveRNqGcRbPXj71y",
+      "sha256": "48136f747964131959b97c72808d9f2f3f2153d3d85d71e67a4a64bc4bb86c0c",
+      "size": 3019468
+    }
+  ],
+  "targeted_validation": {
+    "passed": 21,
+    "full_suite_rerun": false,
+    "static_repository_integrity": "VERIFIED"
+  },
+  "scope": "7B capability diagnostics running; 14B sequentially queued; no completed repeatability gate, full legibility evaluation or SFT claimed",
+  "backend_contract_source": "src/evaluation/shared_model_evaluation/item_evaluation/native_output/vllm_generation.py"
+}

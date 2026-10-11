@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 471,
+  "files": 472,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1240,6 +1240,17 @@
       "display_path": "docs/evidence/transformation_runtime.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_75b1ef4740fdf4",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/vllm_baseline_launch.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/vllm_baseline_launch.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_c03bce4b75ae81",
       "blank": false
     },
     {

@@ -119,6 +119,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       statistical_validation_rejected_report.json
       statistical_validation_report.json
       transformation_runtime.json
+      vllm_baseline_launch.json
       vllm_sft_drive_readback_audit.json
     implementation_acceptance.md
     implementation_prompt.md
