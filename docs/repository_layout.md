@@ -248,6 +248,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     create_google_consent_notebook.py
     freeze_runtime_config.py
     manage_runpod.py
+    prepare_batched_collection.py
     refresh_dependency_locks.py
     revalidate_collection_inputs.py
     run_collection_until.py
@@ -589,6 +590,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_experiment_overview.py
       operations/
         test_assets.py
+        test_batched_restart.py
         test_collection_deadline.py
         test_collection_input_revalidation.py
         test_consent_notebook.py

@@ -26,3 +26,12 @@ the next GPU batch starts. Stop requests drain and publish the current batch.
 Folder lookups are cached within a publisher; upload retries still share the
 durable worker ledger and its original limits.
 
+For an implementation-only restart, `scripts/prepare_batched_collection.py`
+validates the prior complete input certificate against unchanged scientific
+modules, input bytes, native tokenizer manifests and settings. It explicitly
+derives a new consumer binding to that same audit. Previously Drive-verified
+whole raw responses, including ordinary length-limit outcomes, are copied to
+the new consumer cache with their original producer commit, configuration,
+file hash and Drive artifact ID retained. Original files stay unchanged. The
+collector skips those completed responses and generates the next missing IDs.
+

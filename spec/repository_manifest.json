@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 429,
+  "files": 431,
   "directories_including_root": 201,
   "entries": [
     {
@@ -2619,6 +2619,17 @@
       "display_path": "scripts/manage_runpod.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_67bb645960da60",
+      "blank": false
+    },
+    {
+      "path": "scripts/prepare_batched_collection.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/prepare_batched_collection.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_bc42354649aee6",
       "blank": false
     },
     {
@@ -6263,6 +6274,17 @@
       "display_path": "tests/unit/operations/test_assets.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_c3f48a772aa350",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_batched_restart.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_batched_restart.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_0d16c9a7e127cd",
       "blank": false
     },
     {
