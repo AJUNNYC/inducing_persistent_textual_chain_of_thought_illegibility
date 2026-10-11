@@ -65,6 +65,7 @@ def main():
     with file_lock(experiment.artifacts/'raw_producer.lock'),artifact_hook(lambda *_:None):
         try:
             for current_seed in (42,43,44):
+                completed=0
                 for start in range(0,len(protocol['items']),BACKEND['batch_size']):
                     if stop or datetime.now(timezone.utc)>=deadline:
                         atomic_write_json(status_path,{'status':'PAUSED','model':model,'seed':current_seed,'completed_in_pass':completed})
@@ -95,5 +96,8 @@ def main():
         except Exception as error:
             atomic_write_json(status_path,{'status':'FAILED','model':model,'seed':current_seed,'completed_in_pass':completed,'error_type':type(error).__name__})
             publish(status_path,'raw_producer_status');raise
+        finally:
+            if generator.engine is not None:
+                generator.engine.llm_engine.engine_core.shutdown()
 
 if __name__=='__main__':raise SystemExit(main())

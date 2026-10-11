@@ -65,6 +65,19 @@ def main():
             for current_model in ('7b','14b'):
                 experiment._current_stage=Stage('baseline_'+current_model,'baseline',(),model=current_model)
                 for current_seed in (42,43,44):
+                    previous_path=output/f'base_{current_model}_seed_{current_seed}.json'
+                    if previous_path.exists():
+                        previous=read_json(previous_path)
+                        if (previous.get('package_hash')!=content_hash({k:v for k,v in previous.items() if k!='package_hash'})
+                            or previous['protocol_hash']!=protocol['protocol_hash'] or previous['seed']!=current_seed
+                            or previous['state']['state_id']!='base_'+current_model
+                            or previous['state']['configuration_hash']!=experiment.hash):
+                            raise ValueError('Completed pass identity/integrity differs')
+                        if previous['status']=='complete':
+                            publish(previous_path,'baseline_capability_package')
+                            completed_passes+=1
+                            status('PASS_COMPLETE',drive_replication='VERIFIED')
+                            continue
                     status('WAITING_FOR_RAW')
                     state=None
                     for start in range(0,len(protocol['items']),BACKEND['batch_size']):
