@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 457,
+  "files": 458,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1042,6 +1042,17 @@
       "display_path": "docs/evidence/sft_implementation_report.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_a82a2202c321ff",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_runtime_checks_report.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_runtime_checks_report.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_91473f1dafff64",
       "blank": false
     },
     {

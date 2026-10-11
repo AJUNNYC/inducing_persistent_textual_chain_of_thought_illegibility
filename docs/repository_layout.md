@@ -101,6 +101,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       readme.md
       scaffold_validation_report.md
       sft_implementation_report.json
+      sft_runtime_checks_report.json
       shared_infrastructure_validation.json
       statistical_failure_diagnosis.json
       statistical_guard_v2_analysis_plan.json

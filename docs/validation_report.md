@@ -1,5 +1,11 @@
 # Current implementation and validation report
 
+## Live training controls completed (2026-10-11)
+
+Both pinned models passed actual CUDA runtime, completion-only loss masking/nonzero LoRA gradients, full SFT optimizer/scheduler/RNG restoration, and controlled eight-by-four GRPO updates with exact full-state restoration. A fresh registered Drive download and the restricted MBPP executor also passed. The [execution report](evidence/sft_runtime_checks_report.json) preserves actual source identities and receipts. Completed SFT corpus and statistical validation were retained.
+
+Four of five judge calls succeeded after an equivalent Anthropic wire-schema repair (integer enumeration 1–9; unchanged local range validation; 14 targeted tests passed). The final OpenAI audit returned the requested model but a different backend fingerprint and was blocked by the existing version guard. Full-panel baseline repeatability remains unrun (7,398 responses), and the prepared producer corpus has not been certified against the new consumer training identity. SFT has not started; complete training launch readiness is not claimed.
+
 ## Revised statistical validation completed (2026-10-11)
 
 The approved evaluation-only guard passed all seven actual-frame scenarios: 700/700 jointly covered repetitions, 10,000 bootstrap draws each, zero structural failures and a one-sided Wilson lower bound of 0.9736572792 in every scenario, above the unchanged 0.95 requirement. The canonical statistical preflight and its existing evidence test passed. [Report](evidence/statistical_guard_v2_report.json), [simulation plan](evidence/statistical_guard_v2_plan.json) and [analysis plan](evidence/statistical_guard_v2_analysis_plan.json) preserve source and plan identities. The [full coverage report in Google Drive](https://drive.google.com/file/d/1l666KoPEGYfyUjeSIRHFMEsDEs9Se2UU/view) and both frozen plans were uploaded and integrity-verified in the central project folder. Historical failed evidence remains retained. SFT code, configuration and datasets were not changed; full training readiness is not claimed.
