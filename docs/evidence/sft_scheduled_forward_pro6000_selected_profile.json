@@ -1,0 +1,299 @@
+{
+  "profile_name": "spatial_scheduled_ce_no_gradient_checkpointing",
+  "acceptance": {
+    "accepted": true,
+    "source_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+    "profile_name": "spatial_scheduled_ce_no_gradient_checkpointing",
+    "reference_profile": "spatial_fused_backward_no_gradient_checkpointing",
+    "reference_execution_profile": {
+      "attention_implementation": "eager",
+      "validated_loss_counts": false,
+      "defer_finite_checks": false,
+      "cache_collated_inputs": false,
+      "gradient_checkpointing": false,
+      "loss_implementation": "spatial_fused_backward"
+    },
+    "execution_profile": {
+      "attention_implementation": "eager",
+      "validated_loss_counts": false,
+      "defer_finite_checks": false,
+      "cache_collated_inputs": false,
+      "gradient_checkpointing": false,
+      "loss_implementation": "spatial_scheduled_ce"
+    },
+    "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+    "handoff_certificate_hash": "c0deed5fb6663e3898ecb64a5d216979c8fc2eb87decc4f93b92afe43faa2514",
+    "condition": {
+      "family": "rot13",
+      "model": "7b",
+      "level": 1
+    },
+    "benchmark_report_hash": "63711f97c0d29bd9d3672e961399f62112ecce60064244f9dab7b4e51ed7d162",
+    "benchmark_plan_hash": "ef0c8c0e1ad8585a3ebea5bbad19430a15310c4249526347432ba44599955902",
+    "target_hardware": {
+      "compute_capability": [
+        12,
+        0
+      ],
+      "cuda": "12.8",
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "vram_bytes": 101975851008
+    },
+    "hardware": {
+      "compute_capability": [
+        12,
+        0
+      ],
+      "cuda": "12.8",
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "vram_bytes": 101975851008
+    },
+    "packages": {
+      "bitsandbytes": "0.48.2",
+      "numpy": "2.3.5",
+      "peft": "0.18.0",
+      "torch": "2.9.0",
+      "transformers": "4.57.3"
+    },
+    "recovery_validated": true,
+    "scientific_equivalence_established": false,
+    "original_checkpoint_hash": "c1b90cc8e854a9971078d6549d81ea5858965be46cc8ef3f4f2e3b0a3e737270",
+    "original_checkpoint_identity": {
+      "code_revision": "218900dc3cfd1a78b895347947d8b787c3439a68",
+      "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "dataset_hash": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "dependency_hash": "105fdef0f204ddf5b4a5570f86c91fce03164b5746e14835f1b569e5b3af29e2",
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "loss_implementation": "spatial_fused_backward",
+        "validated_loss_counts": false
+      },
+      "family": "rot13",
+      "handoff_certificate_hash": "ebd1e1a87a8e13abbb2fec914468c502802e460559881c941d4c52f37c53f3f9",
+      "implementation_version": "completion_sft_v1",
+      "level": 1,
+      "model_id": "7b",
+      "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer_configuration_hash": "3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54",
+      "recipe": {
+        "checkpoint_steps": 100,
+        "compute_dtype": "bfloat16",
+        "double_quantization": true,
+        "early_stopping": false,
+        "effective_batch_size": 16,
+        "epochs": 2,
+        "gradient_accumulation_steps": 16,
+        "gradient_checkpointing": true,
+        "learning_rate": 0.0002,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_rank": 8,
+        "loss_reduction": "mean_supervised_tokens_per_example_then_mean_examples",
+        "max_grad_norm": 0.3,
+        "max_length": 4096,
+        "microbatch_size": 1,
+        "optimizer": "paged_adamw_32bit",
+        "quantization": "nf4",
+        "scheduler": "cosine",
+        "seed": 42,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "warmup_ratio": 0.03,
+        "weight_decay": 0.0
+      },
+      "run_id": "rot13_7b_level_01",
+      "strength": 0.1,
+      "tokenizer_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
+    },
+    "original_checkpoint_progress": {
+      "completed_steps": 509,
+      "example_presentations": 8144,
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "loss_implementation": "spatial_fused_backward",
+        "validated_loss_counts": false
+      },
+      "exposure_order_hash": "fd2c10e50de28407a0a8280962668c2862edddde801156189d14d516b4095c22",
+      "processed_tokens": 8835279,
+      "sampler_position": 8144,
+      "total_optimizer_steps": 1250
+    },
+    "original_checkpoint_files": {
+      "full_state.pt": {
+        "sha256": "b95d15707b890cfa77689b45a59ed540161f60de5a14a6f53374dd07160b00c1",
+        "size_bytes": 242617757
+      }
+    },
+    "recovery_report_hash": "63711f97c0d29bd9d3672e961399f62112ecce60064244f9dab7b4e51ed7d162",
+    "acceptance_hash": "d4c8aa552c2e67ea989d63ecff85b7f7866468caef4aac494aa864b42f85877e"
+  },
+  "technical_comparison": {
+    "adapter_updates": {
+      "bitwise_equal": true,
+      "compatible": true,
+      "cosine": 1.0,
+      "maximum_absolute_difference": 0.0,
+      "relative_l2": 0.0
+    },
+    "approved_for_production": false,
+    "candidate_run_id": "spatial_scheduled_ce_no_gradient_checkpointing_repeat_01_spatial_scheduled_ce_no_gradient_checkpointing",
+    "exact_state_comparison_passed": true,
+    "execution_policy_failures": [],
+    "final_optimizer_states_identical": true,
+    "final_rng_states_identical": true,
+    "final_scheduler_states_identical": true,
+    "full_fit_time_extrapolation_supported": false,
+    "gradients": {
+      "bitwise_equal": true,
+      "compatible": true,
+      "cosine": 1.0,
+      "maximum_absolute_difference": 0.0,
+      "relative_l2": 0.0
+    },
+    "intended_execution_policy_changes": {
+      "loss_implementation": {
+        "candidate": "spatial_scheduled_ce",
+        "reference": "spatial_fused_backward"
+      }
+    },
+    "invariant_failures": [],
+    "limitation": "Short fresh-state timing samples are noisy; this screen cannot establish full-fit throughput, equal full training results, or exact checkpoint migration.",
+    "losses_within_declared_tolerance": true,
+    "maximum_loss_absolute_difference": 0.0,
+    "measured_speedup": 1.3280299752845266,
+    "minimum_paired_update_speedup": 1.3199505316935454,
+    "numerical_screen_passed": true,
+    "observed_minimum_speedup": 0.9980186250892892,
+    "paired_update_speedups": [
+      1.3313705266449,
+      1.3227301419921997,
+      1.3280299752845266,
+      1.427227669303917,
+      1.4226343827410326
+    ],
+    "reference_profile": "spatial_fused_backward_no_gradient_checkpointing",
+    "reference_run_id": "spatial_scheduled_ce_no_gradient_checkpointing_repeat_01_spatial_fused_backward_no_gradient_checkpointing",
+    "repetition": 1,
+    "repetitions": [
+      {
+        "adapter_updates": {
+          "bitwise_equal": true,
+          "compatible": true,
+          "cosine": 1.0,
+          "maximum_absolute_difference": 0.0,
+          "relative_l2": 0.0
+        },
+        "approved_for_production": false,
+        "candidate_run_id": "spatial_scheduled_ce_no_gradient_checkpointing_repeat_01_spatial_scheduled_ce_no_gradient_checkpointing",
+        "exact_state_comparison_passed": true,
+        "execution_policy_failures": [],
+        "final_optimizer_states_identical": true,
+        "final_rng_states_identical": true,
+        "final_scheduler_states_identical": true,
+        "full_fit_time_extrapolation_supported": false,
+        "gradients": {
+          "bitwise_equal": true,
+          "compatible": true,
+          "cosine": 1.0,
+          "maximum_absolute_difference": 0.0,
+          "relative_l2": 0.0
+        },
+        "intended_execution_policy_changes": {
+          "loss_implementation": {
+            "candidate": "spatial_scheduled_ce",
+            "reference": "spatial_fused_backward"
+          }
+        },
+        "invariant_failures": [],
+        "limitation": "Short fresh-state timing samples are noisy; this screen cannot establish full-fit throughput, equal full training results, or exact checkpoint migration.",
+        "losses_within_declared_tolerance": true,
+        "maximum_loss_absolute_difference": 0.0,
+        "measured_speedup": 1.3280299752845266,
+        "minimum_paired_update_speedup": 1.3227301419921997,
+        "numerical_screen_passed": true,
+        "observed_minimum_speedup": 1.000635395646875,
+        "paired_update_speedups": [
+          1.3313705266449,
+          1.3227301419921997,
+          1.3280299752845266,
+          1.427227669303917,
+          1.4226343827410326
+        ],
+        "reference_profile": "spatial_fused_backward_no_gradient_checkpointing",
+        "reference_run_id": "spatial_scheduled_ce_no_gradient_checkpointing_repeat_01_spatial_fused_backward_no_gradient_checkpointing",
+        "repetition": 1,
+        "scientific_equivalence_established": false,
+        "speedup_threshold_passed": true,
+        "technical_gate": "PASSED"
+      },
+      {
+        "adapter_updates": {
+          "bitwise_equal": true,
+          "compatible": true,
+          "cosine": 1.0,
+          "maximum_absolute_difference": 0.0,
+          "relative_l2": 0.0
+        },
+        "approved_for_production": false,
+        "candidate_run_id": "spatial_scheduled_ce_no_gradient_checkpointing_repeat_02_spatial_scheduled_ce_no_gradient_checkpointing",
+        "exact_state_comparison_passed": true,
+        "execution_policy_failures": [],
+        "final_optimizer_states_identical": true,
+        "final_rng_states_identical": true,
+        "final_scheduler_states_identical": true,
+        "full_fit_time_extrapolation_supported": false,
+        "gradients": {
+          "bitwise_equal": true,
+          "compatible": true,
+          "cosine": 1.0,
+          "maximum_absolute_difference": 0.0,
+          "relative_l2": 0.0
+        },
+        "intended_execution_policy_changes": {
+          "loss_implementation": {
+            "candidate": "spatial_scheduled_ce",
+            "reference": "spatial_fused_backward"
+          }
+        },
+        "invariant_failures": [],
+        "limitation": "Short fresh-state timing samples are noisy; this screen cannot establish full-fit throughput, equal full training results, or exact checkpoint migration.",
+        "losses_within_declared_tolerance": true,
+        "maximum_loss_absolute_difference": 0.0,
+        "measured_speedup": 1.333038569275478,
+        "minimum_paired_update_speedup": 1.3199505316935454,
+        "numerical_screen_passed": true,
+        "observed_minimum_speedup": 0.9980186250892892,
+        "paired_update_speedups": [
+          1.3467621208354201,
+          1.3199505316935454,
+          1.333038569275478,
+          1.417010226995089,
+          1.4203812382445609
+        ],
+        "reference_profile": "spatial_fused_backward_no_gradient_checkpointing",
+        "reference_run_id": "spatial_scheduled_ce_no_gradient_checkpointing_repeat_02_spatial_fused_backward_no_gradient_checkpointing",
+        "repetition": 2,
+        "scientific_equivalence_established": false,
+        "speedup_threshold_passed": true,
+        "technical_gate": "PASSED"
+      }
+    ],
+    "scientific_equivalence_established": false,
+    "speedup_threshold_passed": true,
+    "technical_gate": "PASSED"
+  }
+}

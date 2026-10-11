@@ -1,0 +1,233 @@
+{
+  "schema_version": "sft_safe_pause_frozen_recovery_v1",
+  "status": "PAUSED",
+  "observed_at": "2026-10-11T21:49:28.473217+00:00",
+  "worker_status": {
+    "at": "2026-10-11T21:49:06.215544+00:00",
+    "completed_fits": 0,
+    "completed_run_ids": [],
+    "completed_steps": 509,
+    "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+    "current_run_id": "rot13_7b_level_01",
+    "deadline": "2026-10-12T02:24:01.558671+00:00",
+    "drive_status": "VERIFIED",
+    "family": "rot13",
+    "handoff_certificate_hash": "ebd1e1a87a8e13abbb2fec914468c502802e460559881c941d4c52f37c53f3f9",
+    "model": "7b",
+    "required_fits": 1,
+    "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+    "status": "PAUSED"
+  },
+  "checkpoint_manifest": {
+    "checkpoint_hash": "c1b90cc8e854a9971078d6549d81ea5858965be46cc8ef3f4f2e3b0a3e737270",
+    "files": {
+      "full_state.pt": {
+        "sha256": "b95d15707b890cfa77689b45a59ed540161f60de5a14a6f53374dd07160b00c1",
+        "size_bytes": 242617757
+      }
+    },
+    "identity": {
+      "code_revision": "218900dc3cfd1a78b895347947d8b787c3439a68",
+      "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "dataset_hash": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "dependency_hash": "105fdef0f204ddf5b4a5570f86c91fce03164b5746e14835f1b569e5b3af29e2",
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "loss_implementation": "spatial_fused_backward",
+        "validated_loss_counts": false
+      },
+      "family": "rot13",
+      "handoff_certificate_hash": "ebd1e1a87a8e13abbb2fec914468c502802e460559881c941d4c52f37c53f3f9",
+      "implementation_version": "completion_sft_v1",
+      "level": 1,
+      "model_id": "7b",
+      "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer_configuration_hash": "3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54",
+      "recipe": {
+        "checkpoint_steps": 100,
+        "compute_dtype": "bfloat16",
+        "double_quantization": true,
+        "early_stopping": false,
+        "effective_batch_size": 16,
+        "epochs": 2,
+        "gradient_accumulation_steps": 16,
+        "gradient_checkpointing": true,
+        "learning_rate": 0.0002,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_rank": 8,
+        "loss_reduction": "mean_supervised_tokens_per_example_then_mean_examples",
+        "max_grad_norm": 0.3,
+        "max_length": 4096,
+        "microbatch_size": 1,
+        "optimizer": "paged_adamw_32bit",
+        "quantization": "nf4",
+        "scheduler": "cosine",
+        "seed": 42,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "warmup_ratio": 0.03,
+        "weight_decay": 0.0
+      },
+      "run_id": "rot13_7b_level_01",
+      "strength": 0.1,
+      "tokenizer_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
+    },
+    "progress": {
+      "completed_steps": 509,
+      "example_presentations": 8144,
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "loss_implementation": "spatial_fused_backward",
+        "validated_loss_counts": false
+      },
+      "exposure_order_hash": "fd2c10e50de28407a0a8280962668c2862edddde801156189d14d516b4095c22",
+      "processed_tokens": 8835279,
+      "sampler_position": 8144,
+      "total_optimizer_steps": 1250
+    },
+    "state_keys": [
+      "adapter",
+      "optimizer",
+      "progress",
+      "rng",
+      "runtime",
+      "scheduler"
+    ],
+    "status": "complete",
+    "version": "full_state_v1"
+  },
+  "checkpoint_records": [
+    {
+      "artifact_id": "bc7f9c268c163a9ac583c7faeb66d971f4719069e2e26f87d9c3a77b0121a37c",
+      "branch": "rot13",
+      "completion_status": "COMPLETED",
+      "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "created_at": "2026-10-11T21:48:41.640039+00:00",
+      "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "drive_file_id": "1pN0-8RAZ1pZ-6rlg3bUn0bUjBXYA70Yv",
+      "drive_folder_id": "142UamKwaFNprt3DbsXP1F0YNR3iizBU5",
+      "experiment_id": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "local_path": "/workspace/artifacts/sft_execution_218900d/training/sft/rot13/7b/level_01/checkpoint_000509/full_state.pt",
+      "md5": "1b369b9466e633d5d8022360e6e11876",
+      "model": "7b",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer": "experiment_overview",
+      "provenance": {
+        "branch": "rot13",
+        "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+        "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+        "experiment_id": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+        "model": "7b",
+        "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+        "producer": "experiment_overview",
+        "run_id": "rot13_7b_level_01",
+        "seeds": [
+          42
+        ],
+        "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+        "stage": "sft"
+      },
+      "recovery_descriptor_id": "a014b1f41df2b9027ccd2bccc69c8d342cd9780fac9abd5fa3685461901741a6",
+      "relative_path": "artifacts/sft_execution_218900d/training/sft/rot13/7b/level_01/checkpoint_000509/full_state.pt",
+      "retention": "required",
+      "run_id": "rot13_7b_level_01",
+      "seeds": [
+        42
+      ],
+      "sha256": "b95d15707b890cfa77689b45a59ed540161f60de5a14a6f53374dd07160b00c1",
+      "size": 242617757,
+      "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+      "stage": "sft",
+      "sync_status": "VERIFIED",
+      "validation_status": "content_hashed"
+    },
+    {
+      "artifact_id": "80a94e1eeca2d57f463d39a77fa1fc68021614acac0fb5125441218f193943c6",
+      "branch": "rot13",
+      "completion_status": "COMPLETED",
+      "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "created_at": "2026-10-11T21:48:54.763906+00:00",
+      "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "drive_file_id": "1ZwwTUIcWAXZpcQgc-TV7nU38iXg4GXO5",
+      "drive_folder_id": "142UamKwaFNprt3DbsXP1F0YNR3iizBU5",
+      "experiment_id": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "local_path": "/workspace/artifacts/sft_execution_218900d/training/sft/rot13/7b/level_01/checkpoint_000509/manifest.json",
+      "md5": "50a6380929baa144b4c13b7c8a97db39",
+      "model": "7b",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer": "experiment_overview",
+      "provenance": {
+        "branch": "rot13",
+        "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+        "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+        "experiment_id": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+        "model": "7b",
+        "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+        "producer": "experiment_overview",
+        "run_id": "rot13_7b_level_01",
+        "seeds": [
+          42
+        ],
+        "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+        "stage": "sft"
+      },
+      "recovery_descriptor_id": "e8119bea263ca1bea09a480e48863ee6060db0dbd19dbc1b6b7a87cab0d831af",
+      "relative_path": "artifacts/sft_execution_218900d/training/sft/rot13/7b/level_01/checkpoint_000509/manifest.json",
+      "retention": "required",
+      "run_id": "rot13_7b_level_01",
+      "seeds": [
+        42
+      ],
+      "sha256": "542456c76d26c6f71e059a978fb0dd603a2f66026401ed472b41a5eb5a82db2a",
+      "size": 2471,
+      "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+      "stage": "sft",
+      "sync_status": "VERIFIED",
+      "validation_status": "content_hashed"
+    }
+  ],
+  "native_frozen_parent": "/workspace/artifacts/sft_optimization_recovery/scheduled_forward_parent/checkpoint_000509",
+  "original_checkpoint": "/workspace/artifacts/sft_execution_218900d/training/sft/rot13/7b/level_01/checkpoint_000509",
+  "full_checkpoint_verified": true,
+  "frozen_full_checkpoint_verified": true,
+  "byte_identical_frozen_copy": true,
+  "original_checkpoint_modified": false,
+  "frozen_directory_mode": "0700",
+  "frozen_files": {
+    "full_state.pt": {
+      "sha256": "b95d15707b890cfa77689b45a59ed540161f60de5a14a6f53374dd07160b00c1",
+      "size_bytes": 242617757,
+      "mode": "0400"
+    },
+    "manifest.json": {
+      "sha256": "542456c76d26c6f71e059a978fb0dd603a2f66026401ed472b41a5eb5a82db2a",
+      "size_bytes": 2471,
+      "mode": "0400"
+    }
+  },
+  "wrapper_state": {
+    "status": "EXITED",
+    "exit_code": 3,
+    "at": 1791755347.4934316
+  },
+  "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+  "reference_profile": "spatial_fused_backward_no_gradient_checkpointing",
+  "training_deadline": "2026-10-12T02:24:01.558671+00:00",
+  "drive_verification_basis": "Published worker synchronous Drive barrier and completed permanent registry records; no new Drive calls.",
+  "receipt_hash": "da1a51d0c5f0d34c7bdb753bfd8c473efcbd48ebcd1dd738a1c0593e2fab5d7c"
+}

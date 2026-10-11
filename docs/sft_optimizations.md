@@ -2,14 +2,15 @@
 
 The decision rule is to change execution in order of least expected effect on the
 trained result, require established precedent, and measure correctness and speed
-on the intended GPU before enabling a candidate. Source `218900d` now selects
-`spatial_fused_backward_no_gradient_checkpointing` only for **7B ROT13 level 1**
-on RTX PRO 6000 Blackwell Server Edition 96GB. It retains the stock spatial CE
-forward and tiles only backward, with an additional 11.65–13.52% reduction in
-measured median update time versus the already accepted no-recomputation profile.
-All measured numerical/state/RNG comparisons were bitwise identical. The faster
-flat and fully fused forward candidates failed the numerical screen and remain
-rejected. This approval does not extend to other levels, 14B or final outcomes.
+on the intended GPU before enabling a candidate. Source `a6e3295` now selects
+`spatial_scheduled_ce_no_gradient_checkpointing` only for **7B ROT13 level 1**
+on RTX PRO 6000 Blackwell Server Edition 96GB. It preserves native spatial FP32
+forward arithmetic while changing token scheduling and stored row statistics.
+Two paired repetitions measured an additional **24.70–24.98% less median update
+time** versus the previously accepted spatial-forward/tiled-backward profile,
+with bitwise losses, gradients, updates and final adapter/optimizer/scheduler/RNG agreement.
+Earlier faster flat/fused forward candidates remain rejected. This short screen
+does not approve other levels, 14B, final-result equivalence or a full-fit ETA.
 
 The frozen recipe remains two epochs over the same 10,000 examples, logical batch
 16, NF4 with double quantization, BF16 computation, FP32 cross-entropy, the same
@@ -31,7 +32,7 @@ and production migration gates pass; it is not concealed as unchanged execution.
 | 5 | Flatten the token CE input from spatial `[batch, vocabulary, tokens]` to `[batch*tokens, vocabulary]`. | PyTorch supports both CE layouts, but real GPU measurements show that their floating-point results differ beyond the frozen bound before the first update. | Source `6d21fff` completed two paired repetitions. Native/flat median seconds were 9.4263/5.8296 and 9.5075/5.6417. Faster timings did not clear the numerical screen; rejected and not activated. |
 | 6 | Fuse only FP32 token cross-entropy with the pinned Triton runtime. | Liger provides online softmax/CE precedent, but changing the forward normalization order exceeded the frozen numerical bounds on this workload. | Source `6d21fff` measured median ratios 1.6751x and 1.7008x, but maximum loss difference was 0.00595903 and gradient/update relative L2 differences were 2.169%/1.922%, above 0.1% bounds. Rejected and not activated. |
 | 7 | Retain stock spatial CE forward and tile only its backward gradient. | Keeps `torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss`; the tiled backward follows the pinned PyTorch epilogue with libdevice exponential and the one nonzero target gradient. | Source `218900d` accepted for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Two paired median ratios were 1.1564x/1.1318x, minimum matched ratio 1.1146x; losses, gradients, updates and final full state/RNG were bitwise identical. |
-| 8 | Schedule the same spatial CE forward over smaller token blocks and retain only target losses/row statistics. | Follow pinned PyTorch's serial FP32 class accumulation and libdevice exp/log sequence; reconstruct log-probabilities during the already validated tiled backward. Scheduling and storage change rather than intentionally changing normalization order. Actual equality must still be checked. | `spatial_scheduled_ce` is under construction. Its paired reference is the accepted spatial-forward/tiled-backward profile, so speed gains must be incremental. Focused checks, GPU measurements and approval are pending. |
+| 8 | Schedule the same spatial CE forward over smaller token blocks and retain only target losses/row statistics. | Follow pinned PyTorch's serial FP32 class accumulation and libdevice exp/log sequence; reconstruct log-probabilities during the already validated tiled backward. Scheduling and storage change rather than intentionally changing normalization order. Actual equality must still be checked. | Source `a6e3295` accepted for the selected Blackwell 7B ROT13 level-1 condition. Direct median times fell 8.9243→6.7200 and 8.8950→6.6727 seconds; bitwise numerical/state/RNG agreement, minimum matched ratio 1.31995x. |
 | 9 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
 
 Epoch count, training exposure, BF16 versus NF4 construction, optimizer precision,
@@ -47,35 +48,66 @@ across examples**. Stock model loss or token-global averaging must not silently
 replace it. A faster implementation must preserve the current weighting, causal
 shift and assistant-end supervision.
 
-## Scheduled spatial-forward candidate — pending
+## Current scheduled spatial-forward profile
 
-The user authorized implementing and measuring `spatial_scheduled_ce`, selected
-only through the explicit `spatial_scheduled_ce_no_gradient_checkpointing`
-profile. Current source `218900d` training continues on its already accepted
-spatial-forward/tiled-backward profile while the new code is prepared. The new
-candidate has no measured numerical approval or speed result yet.
+The [step-509 pause](evidence/sft_scheduled_forward_pro6000_pause_509.json)
+preserves the previously accepted source `218900d` fit's full state in Drive.
+The [new benchmark](evidence/sft_scheduled_forward_pro6000_benchmark.json)
+restored that same adapter, optimizer, scheduler, sampler and RNG into every
+isolated run. It used counterbalanced reference/candidate/candidate/reference
+order, forming two paired repetitions, each one warmup plus five measured
+logical updates and 96 ordered examples. The declared reference was
+`spatial_fused_backward_no_gradient_checkpointing`: the gain below is additional
+to that profile, not a fresh comparison against the original checkpointed fit.
 
-Its design follows [pinned PyTorch's spatial kernel](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/aten/src/ATen/native/cuda/SoftMax.cu):
-preserve class-index order for serial FP32 accumulation, the same max/exp/sum/log
-and target-loss arithmetic, and libdevice exp/log operations. Use smaller token
-CTAs and save target losses plus row statistics instead of the complete
-log-probability matrix; reconstruct the same log-probabilities in tiled backward.
-Preserving these operations is the design requirement, not a substitute for
-actual numerical comparison. This avoids intentionally repeating the parallel
-forward normalization change that caused the earlier flat/fused failures.
+| Repetition | Reference median seconds | Scheduled CE median seconds | Throughput ratio | Less median update time |
+|---|---:|---:|---:|---:|
+| 1 | 8.92434 | 6.71998 | 1.32803x | 24.70% |
+| 2 | 8.89501 | 6.67273 | 1.33304x | 24.98% |
 
-The frozen paired recovery screen will use
-`--reference-profile spatial_fused_backward_no_gradient_checkpointing` and the
-same latest preserved full checkpoint for both profiles. Thus any speed gain
-must be additional to the currently accepted roughly 8.2–8.4-second median update
-measurements, not measured against either earlier reference. The same numerical,
-state, RNG, speed and longest-example memory gates apply. A safe whole-update
-pause and Drive-verified parent preservation precede the isolated GPU trial;
-source/profile/condition-bound selection and explicit continuation lineage are
-required before production activation. Eager attention, full FP32 head/logits,
-vocabulary, masks, objective, sample order, dropout, optimizer, microbatch 1,
-logical batch 16 and checkpoint cadence stay fixed. No new result or full-fit
-ETA is claimed.
+Every matched update passed the frozen 5% improvement requirement; the minimum
+ratio was 1.31995x. All 96 losses in each repetition were bitwise identical,
+as were clipped-gradient and adapter-delta hashes, final adapter, optimizer,
+scheduler and RNG states. The longest 3,190-token probe passed with the same
+loss, 0.38299718499, and the same 84.28 GiB allocated/87.32 GiB reserved peak as
+its reference. This is direct measured evidence for the selected continuation;
+no memory improvement or final-result identity is inferred. Comparisons against
+earlier screens use different checkpoint states and sampled update sequences,
+so combined historical speed estimates are extrapolations rather than a direct
+fresh paired measurement.
+
+The [scheduled helper](../src/training/sft/scheduled_spatial_loss.py) preserves
+pinned PyTorch's class-index order for serial FP32 accumulation, the same
+max/exp/sum/log and target-loss arithmetic, and libdevice exp/log operations.
+It schedules 64 tokens per CUDA thread block, saves target losses plus row statistics, and
+reconstructs `input - max_input - logsum` in the validated tiled backward.
+For shifted sequences of at most 64 tokens, it explicitly uses original
+spatial forward, whose class reduction can use multiple threads. This is a
+prospective shape route, not exception-driven fallback. Unsupported execution
+fails rather than silently choosing another kernel. Full FP32 head/logits,
+vocabulary, causal masks, per-example weighting and RNG behavior stay fixed.
+The [pinned PyTorch spatial kernel](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/aten/src/ATen/native/cuda/SoftMax.cu)
+is algorithmic precedent; the actual paired report separately validates this
+implementation on the selected workload and GPU.
+
+The [accepted profile](evidence/sft_scheduled_forward_pro6000_selected_profile.json)
+and [READY affected controls](evidence/sft_scheduled_forward_pro6000_readiness.json)
+bind source `a6e3295`, the exact GPU and this one condition. A total of 236
+focused CPU checks passed; unrelated suites, provider and statistical checks
+were not repeated. Report hash
+`63711f97c0d29bd9d3672e961399f62112ecce60064244f9dab7b4e51ed7d162`
+and selection hash
+`d4c8aa552c2e67ea989d63ecff85b7f7866468caef4aac494aa864b42f85877e`
+remain bound separately from documentation commits. The benchmark itself
+retains `approved_for_production=false` and
+`scientific_equivalence_established=false`; the shared validator performs
+condition-scoped selection rather than automatic benchmark activation.
+The [actual startup](evidence/sft_scheduled_forward_pro6000_training_resume.json)
+records source a6e3295 training RUNNING from restored step 509. Native completion
+mask/adapter-gradient checks passed, the selected helper hash agrees, and child
+state is verified in Drive. The observation does not claim a later completed
+optimizer step; the existing deadline remains unchanged. Parent checkpoints at steps 214, 401 and 509
+remain unchanged. Science, exposure order and Drive-save cadence are unchanged.
 
 ## Historical recomputation continuation screen
 
@@ -130,7 +162,7 @@ not automatic benchmark approval. The [verified Drive index](evidence/sft_optimi
 preserves source, inputs, reports and launch evidence in the
 [recovery folder](https://drive.google.com/drive/folders/1MPZAIU9kj53i3uzFxhXG35OCtdMXuiYj).
 
-## Incremental loss trials and selected profile
+## Historical forward and backward trials
 
 The [step-401 pause](evidence/sft_loss_optimization_pro6000_pause_401.json)
 preserves the source `05f42b0` fit's full state in Drive. All loss trials restore
@@ -189,7 +221,7 @@ forward plus using that backward formula supplies precedent; the actual paired
 GPU report separately supplies workload evidence.
 
 The shared validator [selected this profile](evidence/sft_loss_optimization_pro6000_selected_profile.json)
-with source/GPU/condition bindings; [current affected launch controls](evidence/sft_loss_optimization_pro6000_readiness.json)
+with source/GPU/condition bindings; [historical affected launch controls](evidence/sft_loss_optimization_pro6000_readiness.json)
 are READY. A total of 165 affected CPU checks
 passed in 4.08 seconds; the full unrelated suite, matrix and statistical
 simulations were not repeated. Benchmark report flags remain
@@ -336,5 +368,5 @@ evidence: the earlier two candidates failed, while the paired step-214 recovery
 screen accepted disabling recomputation, and the later step-401 screen accepted
 only stock spatial forward with tiled backward for the same selected condition. They
 do not certify the full 7B/14B matrix, final-result equivalence or an
-H100-versus-Blackwell training-time ratio. The current source 218900d readiness receipt separately
+H100-versus-Blackwell training-time ratio. The current source a6e3295 readiness receipt separately
 binds the declared continuation; it does not change the parent's identity.

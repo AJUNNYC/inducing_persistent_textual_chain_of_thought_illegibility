@@ -1643,11 +1643,12 @@ requires measured evidence.
 Fixed physical-batch policy;
 capacity evidence required
 for each condition.
-The displayed sum fixes trained-token positions. The frozen reduction is supervised-token mean within each example,
-then mean across examples. Both arms supervise the whole assistant target; prompt/padding tokens receive no loss
-[44]. Original spatial CE is default. Flat/fused forward candidates failed numerical bounds. The source 218900d profile
-retains stock log-softmax/NLL forward and tiles only backward; approval is limited to 7B ROT13 level 1 on the
-measured Blackwell96GB GPU. Keep data, precision, epochs and optimizer fixed with explicit source/profile lineage.
+The displayed sum fixes trained-token positions. Reduction is supervised-token mean within each example, then mean across
+examples. Both arms supervise the whole assistant target; prompt/padding tokens receive no loss [44]. Original spatial CE is
+default. Flat/fused forward candidates failed numerical bounds. Measured source a6e3295 preserves serial FP32 spatial
+arithmetic, changes token scheduling and stores row statistics for tiled backward. For shifted sequences of at most 64 tokens,
+original spatial forward remains explicit. Approval covers only 7B ROT13 level 1 on Blackwell 96GB; keep scientific settings
+and source/profile lineage fixed.
 ```
 
 ## page_030
@@ -3007,12 +3008,13 @@ E.2.3 Machine-readable configuration and exact artifact contracts
 Freeze model, tokenizer, dataset, intervention, source and dependency identities. SHA-256 checks agreement with recorded bytes,
 not scientific correctness. The forty-condition SFT handoff retains producer hashes and verifies ordered records against Drive. Paused
 consumer 773cfd3 passed thirteen launch gates and actual H100 validation; those receipts keep their original scope.
-Execution changes require precedent and paired evidence. Earlier checks, SDPA and cache candidates failed; source 05f42b0
-accepted no recomputation. Source 6d21fff flat/fused forward CE were faster but failed numerical bounds and remain rejected. Source
-218900d retains stock spatial forward and tiles backward only. Two paired step-401 recoveries passed bitwise loss, gradient, adapter,
-optimizer, scheduler and RNG comparisons; median update time fell 13.52%/11.65% versus no recomputation. READY controls
-approve only 7B ROT13 level 1 on Blackwell 96GB. The worker resumed step 401 with verified Drive child state; both parents stay
-unchanged. Data and scientific settings remain fixed; no full-fit ETA or final-result guarantee follows.
+Execution changes require precedent and paired evidence. Older checks, SDPA, cache and flat/fused CE candidates failed. Sources
+05f42b0 and 218900d accepted no recomputation and spatial forward/tiled backward. Source a6e3295 retains spatial FP32 arithmetic
+with smaller token blocks and row statistics. Two counterbalanced step-509 recoveries passed bitwise losses, gradients, updates,
+adapter, optimizer, scheduler and RNG; median seconds fell 8.9243 to 6.7200 and 8.8950 to 6.6727 (24.70-24.98%) versus the
+accepted reference. READY controls and 236 focused CPU checks approve only 7B ROT13 level 1 on Blackwell 96GB. The worker
+resumed step 509 with passed native gradients and verified Drive child state; parents stay unchanged. Science is fixed; no full-fit ETA
+or final-result guarantee follows.
 Generation uses vLLM 0.11.0, Transformers 4.57.3, Torch 2.8+cu128 separately from native Torch 2.9 training. Save actual
 inventories. BF16 context 4096, sequences 128, scheduler 8192, GPU fraction 0.9, no prefix caching; every response keeps 3072
 new tokens. Producer dc520cb and configuration 3757493e stay frozen.
@@ -3215,17 +3217,17 @@ are frozen. Evaluation panels and the shared 800-question RL manifest are backed
 accepted pairs and 1539 rejections from 11,639 IDs. All 40 transformed conditions (404,000 records) and their download index are
 Drive-verified.
 Completed controls. CPU-only readback verified all 122 corpus artifacts. Both models passed all four repeatability gates after
-rescoring 7398 saved outputs; no regeneration. Original consumer 773cfd3 passed thirteen launch gates and H100 validation. Its
-step-214 parent and the later source 05f42b0 step-401 state are preserved in Drive.
-Optimization evidence. Source 6d21fff flat/fused forward CE were faster but rejected: max loss differences 0.004354/0.005959,
-gradient L2 differences 2.360%/2.169% and update differences 1.804%/1.922%, above frozen 0.1% bounds. Source 218900d retains
-stock spatial forward and tiles only backward; two paired recoveries (one warmup plus five measured updates) passed bitwise loss,
-gradient, adapter, optimizer, scheduler and RNG comparisons. Median update time fell 13.52%/11.65% versus accepted no
-recomputation; minimum matched ratio 1.11456x. The 3190-token probe allocated 84.28 GiB/reserved 87.32 GiB. Selected-profile and
-READY controls authorize only 7B ROT13 level 1 on Blackwell 96GB. The worker resumed step 401 with passed native gradients and
-verified Drive child state; parents remain unchanged. A total of 165 affected CPU checks passed; unrelated suites, matrix and
-statistics were not repeated. Data, objective, precision, epochs, batch and optimizer remain fixed; final training and evaluation are
-pending.
+rescoring 7398 saved outputs; no regeneration. Original consumer 773cfd3 passed thirteen launch gates and H100 validation. Full
+parent checkpoints at steps 214, 401 and 509 are preserved in Drive.
+Optimization evidence. Source 6d21fff flat/fused forward CE failed numerical bounds despite faster timing: loss differences
+0.004354/0.005959, gradient L2 2.360%/2.169%, update L2 1.804%/1.922% versus 0.1% bounds. Source 218900d
+spatial-forward/tiled-backward approval is historical. Source a6e3295 retains serial FP32 forward arithmetic, schedules 64-token
+blocks and stores row statistics. Two counterbalanced step-509 pairs (one warmup plus five measured updates) passed bitwise
+losses, gradients, adapter, optimizer, scheduler and RNG. Median update time fell 24.70-24.98% versus that accepted reference;
+minimum matched ratio 1.31995x. The 3190-token probe passed with the same loss and 84.28-GiB allocated peak. READY controls
+and 236 focused CPU checks authorize only 7B ROT13 level 1 on Blackwell 96GB. The worker resumed step 509 with passed native
+gradients and verified Drive child state; parent bytes remain unchanged. Unrelated suites, providers, matrix and statistics were not
+repeated. Scientific settings remain fixed; full training and evaluation are pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3717,12 +3719,12 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status (11 October 2026). Corpus and 40 conditions are Drive-verified; both models passed baseline gates. Source
-6d21fff flat/fused forward CE were faster but failed numerical bounds and remain rejected. Source 218900d accepted
-stock spatial forward/tiled backward only for 7B ROT13 level 1 on Blackwell 96GB: 13.52%/11.65% less median
-update time versus no recomputation, bitwise numerical/state/RNG agreement. READY controls and 165 affected
-CPU checks bind that scope. Training resumed step 401 with verified Drive child state; step-214/401 parents stay
-unchanged. Scientific settings are fixed; full training/evaluation remain pending.
+Status (11 October 2026). Corpus and 40 conditions are Drive-verified; both models passed baseline gates.
+Flat/fused forward CE stay rejected. Source a6e3295 accepted spatial CE scheduling only for 7B ROT13 level
+1 on Blackwell 96GB: 24.70-24.98% less median update time versus accepted spatial-forward/tiled-backward,
+bitwise numerical/state/RNG agreement. READY controls and 236 focused CPU checks bind that scope.
+Training resumed step 509 with verified Drive child state; step-214/401/509 parents stay unchanged. Scientific
+settings are fixed; full training/evaluation remain pending.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in

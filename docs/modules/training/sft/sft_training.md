@@ -1,6 +1,6 @@
 # sft_training.md
 
-**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass. Source `218900d` resumes only 7B ROT13 level 1 from inherited step 401 on RTX PRO 6000 Blackwell 96GB, with accepted spatial-forward/tiled-backward plus disabled recomputation. Both parent checkpoints and verified Drive state are preserved; the forty-fit study remains incomplete.
+**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass. Source `a6e3295` accepted scheduled spatial CE for only 7B ROT13 level 1; its [worker](../../../evidence/sft_scheduled_forward_pro6000_training_resume.json) is running from restored step 509, with passed native mask/gradient checks and verified Drive child state. Both earlier optimizations remain historical and all parent checkpoints are preserved; the forty-fit study is incomplete.
 
 Source `05f42b0` has accepted no-recomputation evidence and READY affected-runtime controls for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB; the production continuation is now safely paused at step 401 with verified Drive state. CUDA input caching failed the speed gate and remains disabled. Activation evidence is scoped to this model/family/level. Explicit continuation lineage inherits full step-214 state while preserving parent bytes; a passing first-fit screen does not authorize the entire forty-fit matrix.
 
@@ -17,7 +17,7 @@ Source `05f42b0` has accepted no-recomputation evidence and READY affected-runti
 
 Create two independent family queues, one for ROT13 and one for KaziText, each covering both models at ten fixed levels: twenty independent fits per queue and forty total. Both call the same `sft_fit` implementation. Every level initializes from its untouched base; a previous level is not a warm start. Only an exact-fit matching full checkpoint may resume a fit.
 
-Each queue runs its fits sequentially on its assigned GPU. The launcher can serialize selected levels on one GPU. The current source 218900d acceptance selects only 7B ROT13 level 1; remaining levels require their condition-specific affected evidence before activation. The full forty-fit scientific matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
+Each queue runs its fits sequentially on its assigned GPU. The launcher can serialize selected levels on one GPU. The current source a6e3295 acceptance selects only 7B ROT13 level 1; remaining levels require their condition-specific affected evidence before activation. The full forty-fit scientific matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
 
 ## Interfaces and dependent procedures
 
@@ -30,7 +30,7 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 
 ## Implemented interface and evidence
 
-The scheduled spatial-CE candidate is under construction and has no accepted result. Its declared reference is the currently accepted spatial-forward/tiled-backward profile, with unchanged recomputation, science and latest full state. Existing source 218900d training continues during preparation. Only passed source/GPU/condition-bound recovery evidence and explicit parent-preserving lineage may activate the new profile; remaining fits do not inherit that approval.
+Source `a6e3295` passed the counterbalanced scheduled spatial-CE screen: two step-509 recovery pairs measured 24.70–24.98% less median update time versus accepted spatial-forward/tiled-backward, with bitwise numerical/state/RNG agreement and minimum matched ratio 1.31995x. Source/GPU/condition-bound READY controls and 236 focused CPU checks approve only 7B ROT13 level 1 on Blackwell96GB. Parent-preserving full-state migration and the unchanged science remain mandatory; unrelated suites, provider/statistical controls and the remaining matrix were not repeated. Prior flat/fused forward failures remain rejected.
 
 Both flat-layout and fully fused forward CE failed the frozen numerical screen despite faster timing and remain rejected. Source `218900d` passed two paired recoveries for stock spatial forward plus tiled backward, with bitwise numerical/state/RNG agreement and 11.65–13.52% less median update time versus the already accepted no-recomputation profile. The new source/profile/condition-bound READY controls and explicit step-401 child lineage authorize only this 7B ROT13 level-1 continuation. The original science and latest full state are preserved; remaining fits require their own affected evidence. A total of 165 affected CPU checks passed without repeating unrelated suites or simulations.
 
@@ -69,9 +69,10 @@ flowchart TD
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
 %% CE defaults to spatial_ce; source 6d21fff flat/fused forward candidates failed numerical bounds.
 %% Source 218900d accepted stock spatial forward/tiled backward only for 7B ROT13 level 1 on Blackwell96GB.
-%% Current continuation inherits step 401, preserves parent checkpoints and verifies child state in Drive.
-%% Pending spatial_scheduled_ce changes token scheduling/storage; preserve serial FP32 forward order.
-%% Compare to accepted spatial-forward/tiled-backward; no new numerical or speed approval yet.
+%% Historical source 218900d inherited step 401 with preserved parent checkpoints and verified Drive state.
+%% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
+%% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
+%% New source a6e3295 continuation runs from restored step 509; parent bytes remain unchanged.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
