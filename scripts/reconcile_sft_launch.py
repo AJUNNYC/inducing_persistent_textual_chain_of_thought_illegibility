@@ -61,6 +61,37 @@ def identical_files(commit, names):
     return result
 
 
+def spatial_native_forward_contract():
+    """Bind the original spatial native forward and explicit backward source."""
+    path = ROOT/'src/training/sft/spatial_loss.py'
+    tree = ast.parse(path.read_text())
+    forwards = [node for node in ast.walk(tree)
+                if isinstance(node, ast.FunctionDef) and node.name == 'forward']
+    if len(forwards) != 1:
+        raise ValueError('Spatial loss lacks one explicit native forward')
+    wanted = ast.parse('''
+log_probabilities = torch.log_softmax(logits, dim=1, dtype=logits.dtype)
+losses = functional.nll_loss(log_probabilities, targets, ignore_index=ignore_index, reduction="none")
+return losses
+''').body
+    selected = [node for node in forwards[0].body if isinstance(node, ast.Return)
+                or isinstance(node, ast.Assign) and any(isinstance(target, ast.Name)
+                    and target.id in ('log_probabilities', 'losses') for target in node.targets)]
+    expected = [ast.dump(node, include_attributes=False) for node in wanted]
+    current = [ast.dump(node, include_attributes=False) for node in selected]
+    if current != expected:
+        raise ValueError('Spatial loss changed the original FP32 spatial log-softmax/NLL forward')
+    derivative = ast.parse('derivative = target_gradient - libdevice.exp(log_probability) * summed_gradient').body[0]
+    matches = [node for node in ast.walk(tree) if isinstance(node, ast.Assign)
+               and any(isinstance(target, ast.Name) and target.id == 'derivative' for target in node.targets)]
+    if (len(matches) != 1 or ast.dump(matches[0], include_attributes=False)
+            != ast.dump(derivative, include_attributes=False)):
+        raise ValueError('Spatial loss changed the source-bound backward expression')
+    return {'spatial_loss_module': file_hash(path),
+            'native_spatial_forward': content_hash(current),
+            'native_spatial_backward_expression': content_hash(ast.dump(derivative, include_attributes=False))}
+
+
 def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
     """Preserve the original masking, CE and reduction beneath new guards.
 
@@ -121,7 +152,7 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
         if set(selected) != required:
             raise ValueError('Cannot establish the original SFT mask/loss contract')
         return selected
-    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce'):
+    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce', 'spatial_fused_backward'):
         raise ValueError('No accepted scientific loss contract for this execution mode')
     previous, current = contract(old), contract(new)
     if previous != current:
@@ -137,6 +168,11 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
             'shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1), '
             'ignore_index=-100).reshape(shifted_labels.shape)').body[0]
         fused_contract = ast.dump(fused_expression, include_attributes=False)
+        spatial_expression = ast.parse('token_losses = spatial_token_cross_entropy('
+            'shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)').body[0]
+        spatial_contract = ast.dump(spatial_expression, include_attributes=False)
+        dispatches = {'flat_ce': flat_contract, 'fused_ce': fused_contract,
+                      'spatial_fused_backward': spatial_contract}
         wrapper_contract, ce_dispatch = {}, []
         for node in ast.walk(wrapper):
             if isinstance(node, ast.Assign):
@@ -155,14 +191,15 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
         wrapper_contract['reduction'] = ast.dump(returns[0], include_attributes=False)
         if (set(wrapper_contract) != {'shift', 'direct_counts', 'reduction'}
                 or any(value != previous[key] for key, value in wrapper_contract.items())
-                or any(value not in (flat_contract, fused_contract) for value in ce_dispatch)
-                or (flat_contract if loss_implementation == 'flat_ce' else fused_contract) not in ce_dispatch):
+                or any(value not in dispatches.values() for value in ce_dispatch)
+                or dispatches[loss_implementation] not in ce_dispatch):
             raise ValueError('Replacement CE dispatch changed the frozen shift, mask or per-example weighting')
         bindings.update({'replacement_'+key: content_hash(value) for key,value in wrapper_contract.items()})
-        bindings[loss_implementation+'_dispatch'] = content_hash(
-            flat_contract if loss_implementation == 'flat_ce' else fused_contract)
+        bindings[loss_implementation+'_dispatch'] = content_hash(dispatches[loss_implementation])
         if loss_implementation == 'fused_ce':
             bindings['fused_ce_module'] = file_hash(ROOT/'src/training/sft/fused_loss.py')
+        elif loss_implementation == 'spatial_fused_backward':
+            bindings.update(spatial_native_forward_contract())
     return bindings
 
 

@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 514,
+  "files": 516,
   "directories_including_root": 202,
   "entries": [
     {
@@ -6250,6 +6250,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/spatial_loss.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/spatial_loss.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_383bd21fdc964a",
+      "blank": false
+    },
+    {
       "kind": "implemented_implementation",
       "owner": "coordinator",
       "source": "2; C.2\u2013C.3; E.1.1; E.2.2; H.7,H.9",
@@ -7615,6 +7626,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/unit_tests_layout.mmd",
       "node": "p_31423b345f4839",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_spatial_loss.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_spatial_loss.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_96a5ca6e412808",
       "blank": false
     },
     {

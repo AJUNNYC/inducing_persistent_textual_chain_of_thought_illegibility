@@ -373,7 +373,9 @@ def profile_completion_loss(logits: Any, labels: Any, *,
 
     Flattening changes the kernel layout, so equality of the mathematical
     objective does not establish bitwise equality on a selected CUDA runtime.
-    Fused execution has no fallback and requires its explicit measured profile.
+    The spatial backward candidate retains the original forward layout and
+    accumulation. Fused execution has no fallback and requires its explicit
+    measured profile.
     """
     profile = resolve_execution_profile(execution_profile)
     if profile.loss_implementation == "spatial_ce":
@@ -396,12 +398,24 @@ def profile_completion_loss(logits: Any, labels: Any, *,
         token_losses = functional.cross_entropy(
             shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1),
             ignore_index=-100, reduction="none").reshape(shifted_labels.shape)
-    else:
+    elif profile.loss_implementation == "fused_ce":
         from training.sft.fused_loss import fused_token_cross_entropy
         token_losses = fused_token_cross_entropy(
             shifted_logits.reshape(-1, shifted_logits.shape[-1]), shifted_labels.reshape(-1),
             ignore_index=-100).reshape(shifted_labels.shape)
+    else:
+        from training.sft.spatial_loss import spatial_token_cross_entropy
+        token_losses = spatial_token_cross_entropy(
+            shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)
     return (token_losses.sum(dim=1) / counts).mean()
+
+
+def _loaded_loss_helper_hash(profile: SFTExecutionProfile) -> dict[str, str]:
+    """Bind the spatial candidate receipt to the actual imported helper bytes."""
+    if profile.loss_implementation != "spatial_fused_backward":
+        return {}
+    from training.sft import spatial_loss
+    return {"loss_helper_sha256": hashlib.sha256(Path(spatial_loss.__file__).read_bytes()).hexdigest()}
 
 
 def exposure_order(count: int, seed: int = 42) -> list[int]:
@@ -471,7 +485,7 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
                 raise SFTRuntimeBlocked(f"LoRA projection families missing: {absent}")
         return {"status": "passed", "loss": loss.item(), "nonzero_gradient_parameters": names,
                 "prompt_token_count": example["prompt_token_count"], "supervised_token_count": example["supervised_token_count"],
-                "loss_reduction": LOSS_REDUCTION}
+                "loss_reduction": LOSS_REDUCTION, **_loaded_loss_helper_hash(profile)}
     finally:
         model.zero_grad(set_to_none=True)
         restore_rng(before)
@@ -660,7 +674,8 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
                "gradient_checkpointing": actual_gradient_checkpointing,
                "loss_implementation": profile.loss_implementation,
                "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8, "warmup_steps": 38,
-               "packages": {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "bitsandbytes", "numpy")}}
+               "packages": {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "bitsandbytes", "numpy")},
+               **_loaded_loss_helper_hash(profile)}
     return model, tokenizer, optimizer, scheduler, runtime
 
 

@@ -585,6 +585,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           sft_fit.py
         runtime_migration.py
         sft_training.py
+        spatial_loss.py
       training.py
   tests/
     integration/
@@ -713,6 +714,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           test_loss_layout.py
           test_runtime_migration.py
           test_sft_training.py
+          test_spatial_loss.py
         test_training.py
   tools/
     mermaid/

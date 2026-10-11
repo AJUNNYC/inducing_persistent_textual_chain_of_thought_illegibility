@@ -107,6 +107,29 @@ def incremental_fixture(identity, manifest=None):
     return rehash(report)
 
 
+def spatial_backward_fixture(identity):
+    report = incremental_fixture(identity)
+    settings = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_fused_backward').to_dict()
+    name = 'spatial_fused_backward'
+    report['plan']['profiles'][name] = settings
+    del report['plan']['profiles']['flat_ce']
+    helper = 'src/training/sft/spatial_loss.py'
+    digest = file_hash(ROOT/helper)
+    report['plan']['source_file_hashes'][helper] = digest
+    for container in (report['profiles'], report['profile_runs']):
+        for row in container.values():
+            if row['profile'] == 'flat_ce':
+                row['profile'] = name
+                row['settings'] = settings
+                row['runtime']['execution_profile'] = settings
+                for field in ('runtime', 'actual_execution_policy', 'longest_sequence_probe'):
+                    row[field]['loss_implementation'] = 'spatial_fused_backward'
+                    row[field]['loss_helper_sha256'] = digest
+    report['profiles'][name] = report['profiles'].pop('flat_ce')
+    report['comparisons'][name] = report['comparisons'].pop('flat_ce')
+    return rehash(report)
+
+
 @pytest.mark.parametrize("field", IMMUTABLE_IDENTITY_FIELDS)
 def test_scientific_checkpoint_identity_cannot_change(field):
     old, new = identities()
@@ -148,6 +171,37 @@ def test_declared_no_checkpoint_reference_measures_incremental_flat_ce_gain():
     assert result["reference_execution_profile"]["gradient_checkpointing"] is False
     assert result["reference_execution_profile"]["loss_implementation"] == "spatial_ce"
     assert result["execution_profile"]["loss_implementation"] == "flat_ce"
+
+
+def test_spatial_backward_candidate_binds_actual_loaded_helper_and_original_reference():
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_fused_backward').to_dict()
+    report = spatial_backward_fixture(new)
+    result = validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+    assert result['reference_execution_profile']['loss_implementation'] == 'spatial_ce'
+    assert result['execution_profile']['loss_implementation'] == 'spatial_fused_backward'
+    assert result['scientific_equivalence_established'] is False
+
+
+@pytest.mark.parametrize('field', ('runtime', 'actual_execution_policy', 'longest_sequence_probe'))
+def test_spatial_backward_candidate_rejects_missing_or_replaced_loaded_helper(field):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_fused_backward').to_dict()
+    report = spatial_backward_fixture(new)
+    report['profile_runs']['cuda_cached_2'][field]['loss_helper_sha256'] = 'another-loaded-module'
+    rehash(report)
+    with pytest.raises(MigrationError, match='loaded spatial-loss helper'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+def test_spatial_backward_helper_cannot_be_omitted_from_executed_source_bindings():
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_fused_backward').to_dict()
+    report = spatial_backward_fixture(new)
+    del report['plan']['source_file_hashes']['src/training/sft/spatial_loss.py']
+    rehash(report)
+    with pytest.raises(MigrationError, match='source-file bindings'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
 
 
 def test_legacy_v2_profiles_without_loss_field_keep_spatial_default():

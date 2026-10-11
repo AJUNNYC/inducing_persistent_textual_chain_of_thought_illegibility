@@ -181,6 +181,7 @@ def test_loss_candidates_require_an_explicit_current_reference_first():
             for part in ("--" + name, "fixture")]
     for profiles in (["baseline", "flat_ce_no_gradient_checkpointing"],
                      ["baseline", "fused_ce_no_gradient_checkpointing"],
+                     ["baseline", "spatial_fused_backward_no_gradient_checkpointing"],
                      ["baseline", "cached_no_gradient_checkpointing"]):
         with pytest.raises(SystemExit):
             MODULE.arguments([*argv, "--profiles", *profiles])
@@ -196,7 +197,8 @@ def test_loss_candidates_require_an_explicit_current_reference_first():
     assert cached.profiles == ["no_gradient_checkpointing", "cached_no_gradient_checkpointing"]
 
 
-@pytest.mark.parametrize("candidate_name", ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"])
+@pytest.mark.parametrize("candidate_name", ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing",
+    "spatial_fused_backward_no_gradient_checkpointing"])
 def test_loss_mode_is_an_intended_change_but_missing_actual_dispatch_evidence_fails(candidate_name):
     reference = measured_fixture()
     reference.update(profile="no_gradient_checkpointing", settings=dict(MODULE.PROFILE_SETTINGS["no_gradient_checkpointing"]))
@@ -205,6 +207,9 @@ def test_loss_mode_is_an_intended_change_but_missing_actual_dispatch_evidence_fa
     candidate = {**reference, "profile": candidate_name, "settings": settings,
         "actual_execution_policy": {**reference["actual_execution_policy"], "loss_implementation": settings["loss_implementation"]},
         "median_update_seconds": 8.0, "wall_seconds_per_update": [8.0] * 5}
+    if settings["loss_implementation"] == "spatial_fused_backward":
+        candidate["runtime"] = {"loss_helper_sha256": "f" * 64}
+        candidate["actual_execution_policy"]["loss_helper_sha256"] = "f" * 64
     state = state_fixture()
     result = MODULE.compare_profiles(reference, candidate, state, state, declared_bounds())
     assert result["technical_gate"] == "PASSED"
@@ -214,6 +219,23 @@ def test_loss_mode_is_an_intended_change_but_missing_actual_dispatch_evidence_fa
     result = MODULE.compare_profiles(reference, candidate, state, state, declared_bounds())
     assert result["technical_gate"] == "FAILED"
     assert result["execution_policy_failures"] == [candidate_name]
+
+
+@pytest.mark.parametrize("helper_hash", [None, "invalid", "e" * 64])
+def test_spatial_backward_policy_cannot_omit_or_misrepresent_loaded_helper(helper_hash):
+    reference = measured_fixture()
+    reference.update(profile="no_gradient_checkpointing", settings=dict(MODULE.PROFILE_SETTINGS["no_gradient_checkpointing"]))
+    reference["actual_execution_policy"] = {**reference["actual_execution_policy"], "gradient_checkpointing": False}
+    name = "spatial_fused_backward_no_gradient_checkpointing"
+    candidate = {**reference, "profile": name, "settings": dict(MODULE.PROFILE_SETTINGS[name]),
+        "runtime": {"loss_helper_sha256": "f" * 64},
+        "actual_execution_policy": {**reference["actual_execution_policy"],
+            "loss_implementation": "spatial_fused_backward", "loss_helper_sha256": helper_hash},
+        "median_update_seconds": 8.0, "wall_seconds_per_update": [8.0] * 5}
+    state = state_fixture()
+    result = MODULE.compare_profiles(reference, candidate, state, state, declared_bounds())
+    assert result["technical_gate"] == "FAILED"
+    assert result["execution_policy_failures"] == [name]
 
 
 def test_exact_tensor_hash_preserves_bf16_bits():
@@ -307,7 +329,8 @@ def test_paired_launch_order_and_all_repetition_gates_are_recorded(tmp_path, mon
 
 
 @pytest.mark.parametrize("candidate_names", [["flat_ce_no_gradient_checkpointing"],
-    ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"]])
+    ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"],
+    ["spatial_fused_backward_no_gradient_checkpointing"]])
 def test_loss_candidates_measure_incremental_gain_against_current_no_checkpointing_only(tmp_path, monkeypatch, candidate_names):
     torch = pytest.importorskip("torch")
     from types import SimpleNamespace
@@ -326,6 +349,9 @@ def test_loss_candidates_measure_incremental_gain_against_current_no_checkpointi
             "actual_execution_policy": {"gradient_checkpointing": False, "cache_collated_inputs": False,
                 "attention_implementation": "eager", "use_cache": False, "checkpoint_rng_preserved": True,
                 "loss_implementation": settings["loss_implementation"]}}
+        if settings["loss_implementation"] == "spatial_fused_backward":
+            row["runtime"] = {"loss_helper_sha256": "f" * 64}
+            row["actual_execution_policy"]["loss_helper_sha256"] = "f" * 64
         if args._profile != reference:
             row.update(median_update_seconds=8.0, wall_seconds_per_update=[8.0] * 5)
         basename = MODULE.run_basename(args._pair, args._repetition, args._profile)

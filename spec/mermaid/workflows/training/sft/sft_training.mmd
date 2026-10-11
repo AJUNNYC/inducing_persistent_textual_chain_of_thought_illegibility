@@ -6,7 +6,9 @@ flowchart TD
 %% Edit quoted node labels directly; this is native Mermaid source.
 %% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
-%% CE policy defaults to spatial_ce; flat_ce and fused_ce are explicit pending candidates.
+%% CE policy defaults to spatial_ce; measured flat_ce failed numerical bounds and is rejected.
+%% Fused CE and spatial-forward/fused-backward remain pending; no loss candidate is approved.
+%% Production source 05f42b0 safely paused at step 401; full state is verified in Drive.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.

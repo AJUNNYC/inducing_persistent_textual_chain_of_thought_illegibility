@@ -49,6 +49,16 @@ def profile_completion_loss(logits, labels, execution_profile=None):
     return (token_losses.sum(dim=1) / counts).mean()
 '''
 
+SPATIAL_HELPER_FIXTURE = '''
+def forward(ctx, logits, targets, ignore_index):
+    log_probabilities = torch.log_softmax(logits, dim=1, dtype=logits.dtype)
+    losses = functional.nll_loss(log_probabilities, targets, ignore_index=ignore_index, reduction="none")
+    return losses
+
+def backward():
+    derivative = target_gradient - libdevice.exp(log_probability) * summed_gradient
+'''
+
 
 def set_numerics(tmp_path, monkeypatch, current):
     path = tmp_path / 'src/training/sft/individual_fit/sft_fit.py'
@@ -90,6 +100,35 @@ def test_fused_dispatch_requires_bound_kernel_module_source(tmp_path, monkeypatc
     kernel.write_text('# Declared fixture bytes; not a kernel measurement.\n')
     bindings = MODULE.compatible_sft_numerics('original-source', loss_implementation='fused_ce')
     assert bindings['fused_ce_module'] == MODULE.file_hash(kernel)
+
+
+def test_original_spatial_forward_with_new_backward_retains_source_proof(tmp_path, monkeypatch):
+    wrapper = REPLACEMENT_WRAPPER.replace('    else:\n        token_losses = fused_token_cross_entropy(',
+        '    elif loss_implementation == "spatial_fused_backward":\n'
+        '        token_losses = spatial_token_cross_entropy(shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)\n'
+        '    else:\n        token_losses = fused_token_cross_entropy(')
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + wrapper)
+    helper = tmp_path/'src/training/sft/spatial_loss.py'
+    helper.write_text(SPATIAL_HELPER_FIXTURE)
+    bindings = MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_fused_backward')
+    assert bindings['replacement_reduction'] == bindings['reduction']
+    assert bindings['spatial_loss_module'] == MODULE.file_hash(helper)
+    assert 'native_spatial_forward' in bindings
+
+
+@pytest.mark.parametrize('before,after', [
+    ('dim=1', 'dim=-1'),
+    ('dtype=logits.dtype', 'dtype=torch.bfloat16'),
+    ('reduction="none"', 'reduction="mean"'),
+    ('ignore_index=ignore_index', 'ignore_index=-1'),
+    ('libdevice.exp(log_probability)', 'tl.exp(log_probability)'),
+])
+def test_spatial_backward_source_proof_rejects_changed_native_contract(tmp_path, monkeypatch, before, after):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS)
+    helper = tmp_path/'src/training/sft/spatial_loss.py'
+    helper.write_text(SPATIAL_HELPER_FIXTURE.replace(before, after))
+    with pytest.raises(ValueError, match='Spatial loss changed'):
+        MODULE.spatial_native_forward_contract()
 
 
 @pytest.mark.parametrize('before,after', [

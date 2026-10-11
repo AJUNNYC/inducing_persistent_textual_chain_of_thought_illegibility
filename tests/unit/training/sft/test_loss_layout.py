@@ -199,3 +199,121 @@ def test_fused_execution_failure_propagates_without_spatial_or_flat_fallback(mon
     with pytest.raises(RuntimeError, match='missing CUDA kernel'):
         profile_completion_loss(torch.randn(1, 3, 7), torch.tensor([[-100, 2, 3]]),
             execution_profile=SFTExecutionProfile(loss_implementation='fused_ce'))
+
+
+def install_native_spatial_forward_stub(monkeypatch):
+    """CPU routing fixture; native Triton backward approval remains separate."""
+    import torch
+    import torch.nn.functional as functional
+    from training.sft import spatial_loss
+    calls = []
+    def native_forward(logits, targets, *, ignore_index=-100):
+        assert logits.dtype == torch.float32 and logits.ndim == 3
+        assert targets.dtype == torch.long and targets.ndim == 2
+        assert targets.shape == (logits.shape[0], logits.shape[2])
+        assert ignore_index == -100
+        calls.append((logits.detach().clone(), targets.detach().clone()))
+        return functional.nll_loss(torch.log_softmax(logits, dim=1, dtype=logits.dtype),
+                                   targets, ignore_index=ignore_index, reduction='none')
+    monkeypatch.setattr(spatial_loss, 'spatial_token_cross_entropy', native_forward)
+    return calls
+
+
+@pytest.mark.parametrize('dtype_name', ['float32', 'bfloat16'])
+@pytest.mark.parametrize('bound_counts', [False, True])
+def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_weighting(monkeypatch, dtype_name, bound_counts):
+    import torch
+    calls = install_native_spatial_forward_stub(monkeypatch)
+    torch.manual_seed(782)
+    examples = [
+        {'input_ids': [1, 2, 3, 4, 5, 6], 'labels': [1, -100, 3, 4, 5, 6]},
+        {'input_ids': [7, 8, 9, 10], 'labels': [-100, -100, -100, 10]},
+        {'input_ids': [2, 3, 4, 5, 6], 'labels': [-100, -100, 4, 5, 6]},
+    ]
+    batch = collate_completion(examples, 0)
+    values = torch.randn(3, 13, 6, dtype=getattr(torch, dtype_name)).transpose(1, 2)
+    reference_logits, candidate_logits = [values.detach().requires_grad_() for _ in range(2)]
+    before = torch.get_rng_state().clone()
+    reference = completion_loss(reference_logits, batch['labels'])
+    candidate = profile_completion_loss(candidate_logits, batch['labels'],
+        execution_profile=SFTExecutionProfile(loss_implementation='spatial_fused_backward'),
+        validated_counts=(batch['validated_completion_counts'] if bound_counts else None))
+    assert torch.equal(candidate, reference)
+    candidate.backward(); reference.backward()
+    assert torch.equal(candidate_logits.grad, reference_logits.grad)
+    assert not torch.count_nonzero(candidate_logits.grad[:, -1])
+    for row in range(3):
+        assert not torch.count_nonzero(candidate_logits.grad[row, :-1][batch['labels'][row, 1:] == -100])
+    assert len(calls) == 1 and calls[0][0].shape == (3, 13, 5)
+    assert torch.equal(calls[0][0], values[:, :-1].float().transpose(1, 2))
+    assert torch.equal(calls[0][1], batch['labels'][:, 1:])
+    assert torch.equal(before, torch.get_rng_state())
+
+
+def test_spatial_backward_update_probe_and_validation_keep_native_forward_rng_and_receipt(monkeypatch, tmp_path):
+    import hashlib
+    import torch
+    from training.sft import spatial_loss
+    from training.sft.individual_fit import sft_fit
+    calls = install_native_spatial_forward_stub(monkeypatch)
+    helper_file = tmp_path / 'actually_imported_spatial_loss.py'
+    helper_file.write_bytes(b'declared loaded helper fixture\n')
+    monkeypatch.setattr(spatial_loss, '__file__', str(helper_file))
+    expected_hash = hashlib.sha256(helper_file.read_bytes()).hexdigest()
+    candidate_profile = SFTExecutionProfile(gradient_checkpointing=False,
+                                            loss_implementation='spatial_fused_backward')
+    assert sft_fit._loaded_loss_helper_hash(SFTExecutionProfile()) == {}
+    assert sft_fit._loaded_loss_helper_hash(candidate_profile) == {'loss_helper_sha256': expected_hash}
+    outputs, rngs = [], []
+    for profile in (SFTExecutionProfile(gradient_checkpointing=False), candidate_profile):
+        model, optimizer, scheduler, examples = fixture_model()
+        losses = one_optimizer_update(model, optimizer, scheduler, examples, 0, execution_profile=profile)
+        outputs.append(copy.deepcopy({'losses': losses, 'weights': model.state_dict(),
+            'gradients': {name: value.grad for name, value in model.named_parameters()},
+            'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict()}))
+        rngs.append(capture_rng())
+    def equal_states(left, right):
+        if isinstance(left, torch.Tensor):
+            assert torch.equal(left, right)
+        elif isinstance(left, dict):
+            assert left.keys() == right.keys()
+            for key in left:
+                equal_states(left[key], right[key])
+        elif isinstance(left, (list, tuple)):
+            assert len(left) == len(right)
+            for first, second in zip(left, right, strict=True):
+                equal_states(first, second)
+        else:
+            assert left == right
+    equal_states(*outputs)
+    assert torch.equal(rngs[0]['torch_cpu'], rngs[1]['torch_cpu'])
+    model, _, _, examples = fixture_model()
+    before, rng_before = copy.deepcopy(model.state_dict()), torch.get_rng_state().clone()
+    probe = verify_mask_gradients(model, examples[0], 0, require_lora=False,
+                                  execution_profile=candidate_profile)
+    assert probe['status'] == 'passed' and probe['loss_helper_sha256'] == expected_hash
+    candidate_validation = validation_loss(model, examples[:3], 0, execution_profile=candidate_profile)
+    baseline_validation = validation_loss(model, examples[:3], 0)
+    assert candidate_validation == baseline_validation
+    assert torch.equal(rng_before, torch.get_rng_state())
+    equal_states(before, model.state_dict())
+    assert len(calls) == 20  # 16 training microbatches, one probe and three validation examples.
+
+
+def test_spatial_backward_failure_propagates_and_count_guards_precede_kernel(monkeypatch):
+    import torch
+    from training.sft import spatial_loss
+    profile = SFTExecutionProfile(loss_implementation='spatial_fused_backward')
+    def unavailable(*args, **kwargs):
+        raise RuntimeError('Declared missing spatial CUDA kernel fixture')
+    monkeypatch.setattr(spatial_loss, 'spatial_token_cross_entropy', unavailable)
+    values = torch.randn(1, 3, 7)
+    with pytest.raises(RuntimeError, match='missing spatial CUDA kernel'):
+        profile_completion_loss(values, torch.tensor([[-100, 2, 3]]), execution_profile=profile)
+    with pytest.raises(SFTInputError, match='no supervised'):
+        profile_completion_loss(values, torch.tensor([[-100, -100, -100]]), execution_profile=profile)
+    batch = collate_completion([{'input_ids': [1, 2, 3], 'labels': [-100, 2, 3]}], 0)
+    batch['labels'].view(-1)[-1] = -100
+    with pytest.raises(SFTInputError, match='unchanged collated labels'):
+        profile_completion_loss(values, batch['labels'], execution_profile=profile,
+                                validated_counts=batch['validated_completion_counts'])

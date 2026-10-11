@@ -28,6 +28,10 @@ REQUIRED_SOURCE_FILES = (
     "src/training/sft/individual_fit/sft_fit.py", "src/training/sft/execution_profile.py",
     "src/training/sft/runtime_migration.py", "requirements.lock",
 )
+LOSS_HELPER_FILES = {
+    "fused_ce": "src/training/sft/fused_loss.py",
+    "spatial_fused_backward": "src/training/sft/spatial_loss.py",
+}
 
 
 class MigrationError(ValueError):
@@ -76,9 +80,10 @@ def validate_identity_compatibility(original_identity: Mapping[str, Any],
 def _source_bindings(plan: Mapping[str, Any]) -> None:
     hashes = plan.get("source_file_hashes")
     required = set(REQUIRED_SOURCE_FILES)
-    if any(_profile(settings).to_dict().get("loss_implementation") == "fused_ce"
-           for settings in plan.get("profiles", {}).values()):
-        required.add("src/training/sft/fused_loss.py")
+    for settings in plan.get("profiles", {}).values():
+        helper = LOSS_HELPER_FILES.get(_profile(settings).to_dict().get("loss_implementation"))
+        if helper is not None:
+            required.add(helper)
     if not isinstance(hashes, Mapping) or required - hashes.keys():
         raise MigrationError("Benchmark lacks executed source-file bindings")
     for name, digest in hashes.items():
@@ -89,13 +94,18 @@ def _source_bindings(plan: Mapping[str, Any]) -> None:
             raise MigrationError("Benchmark executed source bytes differ: " + str(name))
 
 
-def _loss_execution_binding(row: Mapping[str, Any], settings: Mapping[str, Any]) -> None:
+def _loss_execution_binding(row: Mapping[str, Any], settings: Mapping[str, Any],
+                            source_hashes: Mapping[str, Any] | None = None) -> None:
     """Old spatial-CE receipts need no new field; new kernels do."""
     expected = settings.get("loss_implementation", "spatial_ce")
     for field in ("runtime", "actual_execution_policy", "longest_sequence_probe"):
         evidence = row.get(field, {})
         if not isinstance(evidence, Mapping) or evidence.get("loss_implementation", "spatial_ce") != expected:
             raise MigrationError("Actual benchmark loss execution evidence differs")
+        if expected == "spatial_fused_backward":
+            digest = (source_hashes or {}).get(LOSS_HELPER_FILES[expected])
+            if not digest or evidence.get("loss_helper_sha256") != digest:
+                raise MigrationError("Actual loaded spatial-loss helper differs from frozen source")
 
 
 def validate_execution_benchmark(report: Mapping[str, Any], source: str,
@@ -152,8 +162,8 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
             or baseline.get("hardware") != candidate.get("hardware")
             or baseline.get("packages") != candidate.get("packages")):
         raise MigrationError("Benchmark profile was not actually measured as requested")
-    _loss_execution_binding(baseline, reference_profile)
-    _loss_execution_binding(candidate, chosen)
+    _loss_execution_binding(baseline, reference_profile, plan["source_file_hashes"])
+    _loss_execution_binding(candidate, chosen, plan["source_file_hashes"])
     required_flags = ("numerical_screen_passed", "speedup_threshold_passed",
                       "final_rng_states_identical", "losses_within_declared_tolerance")
     if (comparison.get("technical_gate") != "PASSED" or comparison.get("invariant_failures") != []
@@ -212,8 +222,8 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
                 or reference_run.get("hardware") != candidate_run.get("hardware")
                 or reference_run.get("packages") != candidate_run.get("packages")):
             raise MigrationError("Paired measurements changed execution inputs or hardware")
-        _loss_execution_binding(reference_run, reference_profile)
-        _loss_execution_binding(candidate_run, chosen)
+        _loss_execution_binding(reference_run, reference_profile, plan["source_file_hashes"])
+        _loss_execution_binding(candidate_run, chosen, plan["source_file_hashes"])
         first, second = reference_run.get("wall_seconds_per_update"), candidate_run.get("wall_seconds_per_update")
         if (not isinstance(first, list) or not isinstance(second, list)
                 or len(first) != plan["measured_updates"] or len(second) != len(first)

@@ -1,6 +1,6 @@
 # sft_fit.md
 
-**Owner:** `sft`. **Implementation status:** source `05f42b0` has accepted no-recomputation evidence and READY affected-runtime controls for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB. Original H100 state remains preserved at step 214; the continuation worker launched from inherited step 214 with verified Drive child state. CUDA input caching and earlier fd23db9 candidates remain rejected.
+**Owner:** `sft`. **Implementation status:** source `05f42b0` has accepted no-recomputation evidence and READY affected-runtime controls for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB. Original H100 state remains preserved at step 214; its continuation reached a safe step-401 pause with full state verified in Drive. CUDA input caching and earlier fd23db9 candidates remain rejected.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,7 +50,7 @@ Use the common [artifact contracts](../../../../contracts.md), [frozen prompt in
 
 ## Implemented interface and evidence
 
-The new `loss_implementation` field selects `spatial_ce` (original default), `flat_ce` (same FP32 logits and targets reshaped for stock PyTorch CE), or `fused_ce` (explicit Triton token CE). `profile_completion_loss` owns the unchanged causal shift, ignored prompt/padding labels and mean-within-example then mean-across-examples reduction. The [fused loss helper](../../../../../src/training/sft/fused_loss.py) exposes `fused_token_cross_entropy(logits, targets, *, ignore_index=-100)` for unreduced FP32 token losses. It never mutates logits or consumes RNG, stores gradients separately, and rejects unsupported devices/dtypes/dependencies without fallback. It is first-order only and leaves the LM head and full vocabulary intact. GPU numerical equality and speed are not assumed. Both new profiles retain the currently accepted disabled recomputation and must pass a paired screen with `no_gradient_checkpointing` as the declared reference, plus current source/condition-bound migration controls. New focused checks and actual GPU results are pending; the existing accepted source 05f42b0 worker continues during CPU preparation.
+The explicit `loss_implementation` field retains `spatial_ce` (original default), `flat_ce` and `fused_ce`; the third candidate adds `spatial_fused_backward`. `profile_completion_loss` owns the unchanged causal shift, ignored prompt/padding labels and per-example reduction. The [fused helper](../../../../../src/training/sft/fused_loss.py) exposes unreduced FP32 token CE, leaves the LM head/full vocabulary intact, consumes no RNG and rejects unsupported execution without fallback. Its trial remains pending. Actual source 6d21fff flat-CE comparisons failed the frozen loss bounds before the first update despite faster timings; flat CE is rejected. The new `src/training/sft/spatial_loss.py` helper retains stock spatial `torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss` forward, then tiles only the backward expression `gradOutput - exp(log_probability)*summed_grad` with libdevice exponential and the single nonzero target gradient. No numerical equality is assumed for that custom backward; focused checks and actual GPU measurements remain pending. All candidates compare against accepted no recomputation, with unchanged dtype, masks, objective and RNG contract. The official source 05f42b0 fit is safely paused at step 401 with full recovery state verified in Drive; isolated trial updates do not advance it.
 
 Source `05f42b0` adds `cache_collated_inputs` and `gradient_checkpointing` execution controls, defaulting to false and true respectively. The protocol describes checkpointing as a memory-saving execution setting. Identical base freezing, FP32 parameter preparation and LoRA setup precede an explicit no-recomputation override. Immutable CUDA caching retains exact IDs, masks, labels and microbatch shapes with mutation guards, but failed the speed gate and remains disabled. The actual two-repetition step-214 recovery screen accepted only no recomputation for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB: 1.2695x and 1.2806x median throughput ratios, with bitwise loss, gradient, update, final adapter/optimizer/scheduler and RNG agreement. The 3,190-token worst-case probe used 89.13 GiB reserved memory, so this approval is not portable to other conditions. Source/GPU/condition-bound launch evidence and explicit parent-preserving lineage remain required. Learning rate, exposure, dropout, loss weighting and Drive checkpoint cadence stay fixed.
 
@@ -116,7 +116,9 @@ flowchart TD
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
 %% CUDA input caching failed speed; other conditions retain the original execution defaults.
-%% CE policy defaults to spatial_ce; flat_ce and fused_ce are explicit pending candidates.
+%% CE policy defaults to spatial_ce; measured flat_ce failed numerical bounds and is rejected.
+%% Fused CE and spatial-forward/fused-backward remain pending; no loss candidate is approved.
+%% Production source 05f42b0 safely paused at step 401; full state is verified in Drive.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
