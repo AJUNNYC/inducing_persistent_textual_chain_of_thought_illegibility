@@ -1,8 +1,8 @@
-## Baseline repeatability running — 2026-10-11
+## Baseline repeatability backend replacement — 2026-10-11
 
 The [live launch receipt](evidence/baseline_repeatability_launch.json) records actual 7B seed-42 native inference and independent Drive readback of its first raw response and scored item. The worker schedules both untouched models with seeds 42, 43 and 44 on all 1,233 fixed items (7,398 outputs). Completed artifacts are replicated to Drive before advancing. Startup failures were retained; JSON numeric loading and control identity handling were fixed in GitHub before redeployment, and the native cache environment/metadata lookup was corrected. No full suite, transformation or GPU control suite was repeated.
 
-The baseline gate is **pending**, not passed; SFT has not started. The worker pauses safely at the existing 2026-10-11 20:20 UTC deadline if unfinished. See the [worker instructions](baseline_repeatability_worker.md). Scientific native decoder settings and acceptance thresholds are unchanged.
+The native worker stopped after eight complete items when Pod-side judge requests were rejected. Its receipt is historical, not current running status. The replacement uses batched BF16 vLLM capability diagnostics on one H100, 7B then 14B, with all 3,072 response tokens per request and verified whole-batch Drive backups. Judges are explicitly deferred; no successful legibility evaluation is claimed. The baseline gate is **pending** and SFT has not started. The existing deadline remains in force. See the [worker instructions](baseline_repeatability_worker.md). Public prompts, SFT recipe and scientific success thresholds are unchanged; both new baselines and trained-model evaluations must use the same frozen vLLM backend.
 
 ## SFT data handoff — 2026-10-11
 

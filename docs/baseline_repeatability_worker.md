@@ -33,3 +33,47 @@ After all six complete passes, the unchanged `baseline_repeatability` function
 checks domain retention of at least 0.8 for diagnostic seeds and common retention
 of at least 0.6. Only its actual passing report satisfies the gate. A started or
 partially completed worker does not authorize SFT.
+
+## Active replacement: batched vLLM capability diagnostics
+
+The native attempt stopped after eight scored items when Pod-side provider calls
+were rejected. Its launch receipt and raw outputs remain historical evidence;
+they are excluded from the replacement baseline. Use
+`scripts/run_vllm_baseline_repeatability.py --config CONFIG --evaluation-package PACKAGE
+--mbpp-evidence RECEIPT --deadline UTC_TIMESTAMP` in the existing vLLM environment.
+The configuration must explicitly select `runtime.evaluation_backend: vllm` and
+bind the executed source revision. This also selects vLLM for subsequent trained
+state evaluation through the experiment runner; a mismatched protocol is rejected.
+
+Run 7B then 14B in separate child processes on one H100. Freeze vLLM 0.11.0,
+Transformers 4.57.3, Torch 2.8.0+cu128, BF16, 128 requests, 8,192 scheduler tokens,
+8,192 context tokens, 90% GPU memory and disabled prefix caching. The full 3,072
+new-token allowance belongs to each response; prompts are never truncated.
+Retain the original public templates, temperature 0.6, top-p 0.95, unrestricted
+top-k, EOS IDs and diagnostic seeds. The engine enables LoRA with maximum rank 32
+for both bases and adapters. Actual adapter bytes and full-checkpoint provenance
+must verify before adapter evaluation. Train with the existing native training
+lock; evaluate in the separately pinned vLLM environment.
+
+Backend changes can alter sampled answers. Rebuild all six baselines with this
+backend and use the same engine contract for trained models. Do not pool native
+and vLLM measurements or claim exact output equivalence. This revision changes
+the measurement implementation, not SFT records, optimizer or success thresholds.
+
+The repeatability worker scores capability only. Its packages explicitly say
+`baseline_capability_diagnostics`, with legibility deferred and scientific opacity
+evidence indeterminate. No provider credentials are required. The unchanged
+repeatability gate uses capability correctness across all 7,398 outputs; completing
+this worker does not complete seed-42 legibility evaluation or every training gate.
+Full evaluation later uses the saved seed-42 raw outputs, with a distinct scored
+cache identity, and performs the original three scheduled judgments.
+
+Each immutable batch bundle contains scored records and full raw text/token IDs.
+The worker registers and verifies that bundle in Drive before advancing, using
+up to eight upload threads. Individual raw/scoring files are reconstructable
+scratch. Restore the verified bundles into the matching `evaluation/batches`
+namespace; startup checks their hashes, state, configuration, backend and protocol
+before reconstructing local caches. Preserve original configuration/source
+identities when resuming. Model changes release the preceding process entirely.
+Timing reports separate generation/scoring from Drive time; the first batch also
+includes engine startup, so estimate throughput from subsequent batches.

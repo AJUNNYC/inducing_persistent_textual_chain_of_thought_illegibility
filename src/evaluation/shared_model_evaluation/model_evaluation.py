@@ -12,16 +12,33 @@ from evaluation.shared_model_evaluation.item_evaluation.legibility_judging.legib
 
 
 def evaluate_model(state: dict, protocol: dict, generator, judge_client=None, *, sandbox=None,
-                   cache_root: str | Path | None = None, seed: int = 42) -> dict:
+                   cache_root: str | Path | None = None, seed: int = 42, defer_judging: bool = False, batch_completed=None) -> dict:
     validate_state(state)
     validate_protocol(protocol, allow_draft=state.get("family", "base") == "base")
+    if hasattr(generator,'identity') and protocol['specifications']['generation']['version'] != generator.identity(state,protocol['items'][0],seed)['version']:
+        raise ValueError('Generator does not match frozen measurement backend')
+    if hasattr(generator,'identity') and generator.identity(state,protocol['items'][0],seed).get('backend') != protocol['specifications']['generation'].get('backend'):
+        raise ValueError('Generator backend settings differ from frozen protocol')
+    if defer_judging and state.get('family','base') != 'base':
+        raise ValueError('Only baseline diagnostics may defer judging')
     records = []
-    for item in protocol["items"]:
+    def batched_items():
+        size = getattr(generator,'batch_size',1)
+        for start in range(0,len(protocol['items']),size):
+            batch = protocol['items'][start:start+size]
+            if hasattr(generator,'generate_batch'):
+                generator.generate_batch(state,batch,seed)
+            yield from batch
+            if batch_completed:
+                batch_completed(records)
+    for item in batched_items():
         record = evaluate_item(state, item, protocol, generator, judge_client, sandbox=sandbox,
-                               cache_root=cache_root, seed=seed)
+                               cache_root=cache_root, seed=seed, defer_judging=defer_judging)
         records.append(record)
         # Persistent execution failures stop the worker; retain honest coverage.
         if record["status"] == "incomplete":
+            if batch_completed:
+                batch_completed(records)
             break
     expected_ids = [question_id(item) for item in protocol["items"]]
     present = {record["question_id"] for record in records}
@@ -37,13 +54,14 @@ def evaluate_model(state: dict, protocol: dict, generator, judge_client=None, *,
             "accuracy": sum(record["correct"] for record in observed)/denominator if len(observed)==denominator else None,
             "missing_scoring": denominator-len(observed)}
     legibility_records = [{**record["legibility"], "domain": record["domain"]} for record in records if record["selected"]]
-    summary = summarize_legibility(legibility_records) if len(legibility_records) == 200 else None
-    package = {"status": "complete" if not missing and not incomplete else "incomplete",
+    summary = summarize_legibility(legibility_records) if len(legibility_records) == 200 and not defer_judging else None
+    package = {"evaluation_scope": "baseline_capability_diagnostics" if defer_judging else "full_evaluation",
+        "legibility_status": "deferred" if defer_judging else "scheduled", "status": "complete" if not missing and not incomplete else "incomplete",
         "state": state, "state_id": state["state_id"], "protocol_hash": protocol["protocol_hash"], "seed": seed,
         "records": records, "expected_item_count": len(expected_ids), "missing_question_ids": missing,
         "incomplete_question_ids": incomplete, "capability_summary": capabilities, "legibility_summary": summary,
         "record_statuses": dict(Counter(record["status"] for record in records)),
-        "scientific_evidence_status": "indeterminate" if missing or incomplete or any(record.get("scientific_evidence_status")=="indeterminate" for record in records) else "recorded"}
+        "scientific_evidence_status": "indeterminate" if defer_judging or missing or incomplete or any(record.get("scientific_evidence_status")=="indeterminate" for record in records) else "recorded"}
     package["package_hash"] = content_hash(package)
     if cache_root:
         path = Path(cache_root) / "capability" / state["state_id"] / ("package_" + content_hash({"state": state, "protocol": protocol["protocol_hash"], "seed": seed}) + ".json")

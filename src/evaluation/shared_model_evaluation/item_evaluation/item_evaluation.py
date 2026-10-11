@@ -13,8 +13,10 @@ ITEM_VERSION = "evaluation_item_v1"
 
 
 def evaluate_item(state: dict, item: dict, protocol: dict, generator, judge_client=None,
-                  *, sandbox=None, cache_root: str | Path | None = None, seed: int = 42) -> dict:
-    identity = {"version": ITEM_VERSION, "state": state, "question_id": question_id(item),
+                  *, sandbox=None, cache_root: str | Path | None = None, seed: int = 42, defer_judging: bool = False) -> dict:
+    if defer_judging and state.get('family','base') != 'base':
+        raise ValueError('Only baseline capability diagnostics may defer judging')
+    identity = {'defer_judging': defer_judging,"version": ITEM_VERSION, "state": state, "question_id": question_id(item),
                 "item_hash": content_hash(item), "protocol_hash": protocol["protocol_hash"], "seed": seed,
                 "generation_identity": generator.identity(state,item,seed) if hasattr(generator,"identity") else None,
                 "judge_execution_mode": "production" if getattr(judge_client,"live",False) else "fixture",
@@ -31,7 +33,7 @@ def evaluate_item(state: dict, item: dict, protocol: dict, generator, judge_clie
                     raise ValueError("Item record identity/integrity failure")
                 if cached.get("status") == "complete":
                     return cached
-            record = _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, identity)
+            record = _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, identity, defer_judging)
             record["record_hash"] = content_hash(record)
             atomic_write_json(path, record)
             if read_json(path) != record:
@@ -50,10 +52,10 @@ def evaluate_item(state: dict, item: dict, protocol: dict, generator, judge_clie
                 notify_artifact(derivative_path, {"kind": "evaluation_"+kind, "state_id": state["state_id"],
                                                   "record_hash": derivative["record_hash"], "simulation": derivative["simulation"]})
             return record
-    return _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, identity)
+    return _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, identity, defer_judging)
 
 
-def _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, identity):
+def _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, identity, defer_judging=False):
     selected = question_id(item) in set(protocol["legibility_ids"]) and seed == 42
     record = {"identity": identity, "state_id": state["state_id"], "model": state["model"],
         "family": state.get("family", "base"), "level": state.get("level"), "step": state.get("step"),
@@ -78,9 +80,9 @@ def _evaluate(state, item, protocol, generator, judge_client, sandbox, seed, ide
         capability = score_capability(item, parsed, sandbox=sandbox, raw_hash=raw["raw_hash"])
     except Exception as error:
         capability = {"status": "infrastructure_failure", "correct": None, "error_type": type(error).__name__}
-    legibility = judge_legibility(record["public_question"], parsed.get("reasoning"), judge_client,
+    legibility = {'status':'deferred','scheduled':selected} if defer_judging else judge_legibility(record["public_question"], parsed.get("reasoning"), judge_client,
                                  selected=selected, assessable=assessable)
-    complete = capability["status"] == "outcome" and legibility["status"] in {"complete", "not_assessable", "not_scheduled", "judge_ineligible"}
+    complete = capability["status"] == "outcome" and legibility["status"] in {"complete", "not_assessable", "not_scheduled", "judge_ineligible", "deferred"}
     record.update(raw=raw, raw_hash=raw["raw_hash"], generation_status="success", parsed=parsed,
         reasoning=parsed.get("reasoning"), final_answer=parsed.get("final_answer"),
         malformed=parsed["status"] != "valid", truncated=parsed["truncated"], capability=capability,

@@ -139,8 +139,13 @@ class Experiment:
             from data_generation_collection.evaluation_data.protocol.evaluation_protocol import build_evaluation_protocol
             plan=self.load(self.data/'evaluation'/'analysis_plan.json')
             preflight=self.load(self.artifacts/'preflight'/'report.json')
-            return build_evaluation_protocol(package['capability_panel'],package['legibility_subset'],analysis_plan=plan,preflight_reports=preflight,configuration_hash=self.hash,require_ready=True)
-        return package['protocol']
+            return build_evaluation_protocol(package['capability_panel'],package['legibility_subset'],analysis_plan=plan,preflight_reports=preflight,configuration_hash=self.hash,require_ready=True,generation_backend=self.config['runtime'].get('evaluation_backend','native'))
+        protocol=package['protocol']
+        desired=self.config['runtime'].get('evaluation_backend','native')
+        actual=protocol['specifications']['generation'].get('backend',{}).get('name','native')
+        if desired != actual:
+            raise RuntimeError('Rebuild baseline protocol for the configured measurement backend')
+        return protocol
 
     def state(self, stage):
         model=self.config['models'][stage.model]
@@ -318,10 +323,10 @@ class Experiment:
             status='VERIFIED' if report.get('ready_for_confirmatory_launch') is True else 'FAILED'
             return self.write(self.artifacts/'preflight'/'statistical_validation.json',report,status)
         if kind in ('baseline','evaluate'):
-            from evaluation.shared_model_evaluation.item_evaluation.native_output.output_generation import NativeGenerator
+            from evaluation.shared_model_evaluation.item_evaluation.native_output.vllm_generation import evaluation_generator
             from evaluation.shared_model_evaluation.model_evaluation import evaluate_model
             protocol=self.protocol(trained=kind=='evaluate')
-            generator=NativeGenerator(self.artifacts/'evaluation')
+            generator=evaluation_generator(self.artifacts/'evaluation',self.config['runtime'].get('evaluation_backend','native'))
             states=self.state(stage)
             for seed in ((42,43,44) if kind=='baseline' else (42,)):
                 result=evaluate_model(states,protocol,generator,self.judge() if seed==42 else None,sandbox=self.sandbox(),cache_root=self.artifacts/'evaluation',seed=seed)

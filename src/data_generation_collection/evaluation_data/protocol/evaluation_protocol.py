@@ -56,7 +56,7 @@ def _gate_passed(row: dict | None) -> bool:
 
 def build_evaluation_protocol(panel: dict | list[dict], legibility, *, analysis_plan: dict | None = None,
                               preflight_reports: dict | None = None, require_ready: bool = False,
-                              configuration_hash: str | None = None) -> dict:
+                              configuration_hash: str | None = None, generation_backend: str = 'native') -> dict:
     items = panel.get("items") if isinstance(panel, dict) else panel
     if not isinstance(items, list):
         raise ValueError("Capability panel must contain item records")
@@ -97,9 +97,16 @@ def build_evaluation_protocol(panel: dict | list[dict], legibility, *, analysis_
         code_root / "evaluation/shared_model_evaluation/item_evaluation/legibility_judging/legibility_judging.py",
         code_root / "evaluation/shared_model_evaluation/item_evaluation/legibility_judging/readable_solution_audit/readable_solution_audit.py",
         code_root / "shared_procedures/response_parsing.py"]
+    generation = {'version': GENERATION_VERSION, 'settings': GENERATION_SETTINGS, 'seed':42, 'diagnostic_baseline_seeds':[43,44]}
+    if generation_backend == 'vllm':
+        from evaluation.shared_model_evaluation.item_evaluation.native_output.vllm_generation import VERSION, BACKEND
+        generation.update(version=VERSION, backend=dict(BACKEND))
+        sources.append(code_root / 'evaluation/shared_model_evaluation/item_evaluation/native_output/vllm_generation.py')
+    elif generation_backend != 'native':
+        raise ValueError('Unknown measurement backend')
     specifications = {"version": PROTOCOL_VERSION, "panel_hash": content_hash(items),
         "legibility_ids": sorted(selected), "domain_counts": DOMAIN_COUNTS,
-        "generation": {"version": GENERATION_VERSION, "settings": GENERATION_SETTINGS, "seed": 42, "diagnostic_baseline_seeds": [43,44]},
+        "generation": generation,
         "prompts": prompts, "prompt_hashes": {name: content_hash(text) for name,text in prompts.items()},
         "parser": {"version": PARSER_VERSION, "reasoning": "single_native_think_boundary", "choice": "one_exact_public_label",
                    "mbpp": "final_field_only_remove_at_most_one_python_fence_no_repairs"},

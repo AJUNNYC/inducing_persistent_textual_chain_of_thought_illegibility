@@ -53,3 +53,13 @@ def test_generation_infrastructure_failure_is_incomplete():
         def generate(self,*args,**kw): raise OSError('not available')
     result=evaluate_item(STATE,ITEM,PROTOCOL,Failed())
     assert result['correct'] is None and result['status']=='incomplete' and result['raw'] is None
+
+
+def test_deferred_baseline_diagnostics_do_not_claim_judge_evidence(tmp_path):
+    g=Generator();c=Client()
+    diagnostic=evaluate_item(STATE,ITEM,PROTOCOL,g,c,cache_root=tmp_path,defer_judging=True)
+    assert diagnostic['status']=='complete' and diagnostic['legibility']['status']=='deferred'
+    assert diagnostic['correct'] is True and diagnostic['scientific_evidence_status']=='indeterminate'
+    assert not c.calls and diagnostic['qualified_opacity'] is None
+    full=evaluate_item(STATE,ITEM,PROTOCOL,g,c,cache_root=tmp_path)
+    assert full['legibility']['status']=='complete' and len(c.calls)==3

@@ -284,6 +284,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_experiment.py
     run_model_generation_worker.py
     run_preflight.py
+    run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
     setup_environment.py
     synchronize_manifest.py
@@ -489,6 +490,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           native_output/
             __init__.py
             output_generation.py
+            vllm_generation.py
         model_evaluation.py
     experiment_overview/
       __init__.py
@@ -618,6 +620,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
               test_legibility_judging.py
             native_output/
               test_output_generation.py
+              test_vllm_generation.py
             test_item_evaluation.py
           test_model_evaluation.py
         test_evaluation.py

@@ -3002,23 +3002,25 @@ change both the text being transformed and the transformation strength. Paired p
 the base models’ own generated targets.
 E.2.3 Machine-readable configuration and exact artifact contracts
 54
-The resolved configuration pins model, tokenizer, dataset, intervention and dependency identities,
-generation and training settings, evaluation sizes and storage requirements. SHA-256 establishes
-agreement with recorded bytes, not scientific correctness. A later training implementation consumes the
-original corpus through an explicit producer-to-consumer handoff certificate: retain every original record
-configuration hash, verify the complete Drive-readback artifact bytes and all forty ordered train/validation
-conditions, and compare scientific settings with only code/dependency identities separated. Bind the
-certificate to actual consumer source files, native training lock and exact per-condition dataset hashes.
-Recheck it during scheduling and before fitting; checkpoints retain both identities. This certificate does not
-replace baseline repeatability or launch gates [1, 20].
-The SFT corpus engine has a separate environment: vLLM 0.11.0, Transformers 4.57.3 and Torch
-2.8.0+cu128; the native Torch 2.9 training lock does not describe it. Save actual package inventories and
-hashes per model. Backend settings are BF16, max_model_len=4096, max_num_seqs=128,
-max_num_batched_tokens=8192, GPU memory utilization 0.9 and prefix caching disabled. The scheduler
-token budget is processing capacity, not a shared response-length budget. Generation source is frozen at
-dc520cb73bf43b59a9566404dd4a7aa8358f1cc3, configuration hash
-3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54, run ID vllm_fresh_dc520cb.
-Later documentation commits do not silently change active workers.
+Freeze model, tokenizer, dataset, intervention, code and dependency identities. SHA-256 establishes agreement
+with recorded bytes, not scientific correctness. The producer-to-consumer SFT handoff retains original record
+configuration hashes, verifies all forty ordered train/validation conditions against the independently checked Drive
+bytes, and binds consumer source, native training lock and exact dataset hashes. Checkpoints retain both
+identities. This certificate does not replace baseline repeatability or launch gates.
+SFT source generation uses vLLM 0.11.0, Transformers 4.57.3 and Torch 2.8.0+cu128 separately from native
+Torch 2.9 training. Save actual package inventories. Its BF16 contract has context 4096, 128 sequences, 8192
+scheduler tokens, GPU fraction 0.9 and no prefix caching. Each response retains 3072 new tokens. Producer
+source dc520cb and configuration 3757493e remain frozen; later documentation commits do not change active
+workers.
+Approved evaluation migration: use the same pinned BF16 vLLM engine for untouched baselines and all SFT/RL
+adapters, with 128 requests, context 8192, scheduler budget 8192, GPU fraction 0.9, no prefix caching, and
+LoRA enabled (maximum rank 32) even for bases. Verify exact adapter/checkpoint bytes. Preserve public
+templates, EOS, per-item seeds, temperature 0.6, top-p 0.95 and the full 3072-token response cap; never
+truncate prompts. Archive native measurements and rebuild six full baselines. Different engines may change
+sampled answers. On one GPU run 7B then 14B in separate processes. Capability repeatability may defer
+judges explicitly; this does not certify opacity or complete full evaluation. Later judge the saved seed-42 outputs
+without regeneration. Verify full raw/scored batch bundles in Drive before advancing. SFT data, optimizer and
+success floors are unchanged.
 ```
 
 ## page_055
