@@ -244,7 +244,7 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
                     'runtime':runtime,'generation_settings':response['generation_settings'],'seed':response['seed'],
                     'native_reasoning_prefix':prefix,'generated_token_count':len(ids),'eos_token_ids':eos_ids,
                     'eos_complete':True,'parser_status':parsed['status'],'control_hash':control_hash})
-                if generator.batch_size > 1:
+                if generator.batch_size_for(size) > 1:
                     companions = [candidate, {**candidate, 'example_id':candidate['example_id']+'_companion',
                         'prompt':'A notebook has three blank pages. After one additional blank page is inserted, how many blank pages does it contain?'}]
                     batched = list(generator.generate_many(size, companions))

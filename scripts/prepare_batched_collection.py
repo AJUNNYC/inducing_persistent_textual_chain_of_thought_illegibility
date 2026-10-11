@@ -80,6 +80,9 @@ def prepare(old, new, *, old_certificate, input_root, certificate_output, old_re
             'generation_original_configuration_hash':old_hash,'generation_original_file_sha256':record['sha256'],
             'generation_original_artifact_id':record['artifact_id'],'generation_original_drive_file_id':record['drive_file_id'],
             'cache_adoption_mode':'original_whole_response_with_explicit_consumer_binding'}
+        if raw.get('generation_original_producer_commit'):
+            adopted_raw['cache_adoption_history']=[*raw.get('cache_adoption_history',[]),
+                {key:raw[key] for key in raw if key.startswith('generation_original_')}]
         destination=Path(new_data_root)/source.relative_to(Path(old_data_root))
         if destination.exists():
             if read_json(destination)!=adopted_raw:raise RuntimeError('Existing adopted response differs')

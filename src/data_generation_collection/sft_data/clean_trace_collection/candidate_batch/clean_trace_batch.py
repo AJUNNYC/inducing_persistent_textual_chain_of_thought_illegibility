@@ -47,8 +47,13 @@ class NativeCleanGenerator:
         self.active, self.model, self.tokenizer = None, None, None
         self.stop_requested = stop_requested
         self.batch_size = int(batch_size if batch_size is not None else os.getenv("CLEAN_GENERATION_BATCH_SIZE", "1"))
-        if not 1 <= self.batch_size <= 64:
-            raise ValueError("Clean generation batch size must be between 1 and 64")
+        self.model_batch_sizes = {model: int(os.getenv("CLEAN_GENERATION_BATCH_SIZE_"+model.upper(), str(self.batch_size)))
+                                  for model in self.models}
+        if any(not 1 <= size <= 256 for size in (self.batch_size, *self.model_batch_sizes.values())):
+            raise ValueError("Clean generation batch size must be between 1 and 256")
+
+    def batch_size_for(self, model_id):
+        return self.model_batch_sizes[model_id]
 
     def _load(self, model_id):
         if self.active == model_id:
@@ -86,7 +91,7 @@ class NativeCleanGenerator:
         import torch
         from transformers import set_seed
         spec = self.models[model_id]
-        if self.batch_size > 1:
+        if self.batch_size_for(model_id) > 1:
             yield from self._generate_batches(model_id, candidates, request_stop)
             return
         for candidate in candidates:
@@ -123,8 +128,9 @@ class NativeCleanGenerator:
         spec = self.models[model_id]
         eos = self.model.generation_config.eos_token_id
         eos_ids = eos if isinstance(eos, list) else [eos]
-        for start in range(0, len(candidates), self.batch_size):
-            batch = candidates[start:start + self.batch_size]
+        batch_size = self.batch_size_for(model_id)
+        for start in range(0, len(candidates), batch_size):
+            batch = candidates[start:start + batch_size]
             if request_stop and request_stop():
                 raise CleanDataPause({"phase": "before_generation_batch", "model_id": model_id,
                                       "example_id": batch[0]["example_id"]})

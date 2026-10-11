@@ -33,7 +33,8 @@ def test_rebinding_rejects_model_revision_changes(tmp_path):
 
 
 @pytest.mark.parametrize('finish',['stop','length'])
-def test_original_whole_response_is_not_regenerated_or_relabelled_as_new_generation(tmp_path,monkeypatch,finish):
+@pytest.mark.parametrize('previous_adoption',[False,True])
+def test_original_whole_response_is_not_regenerated_or_relabelled_as_new_generation(tmp_path,monkeypatch,finish,previous_adoption):
     old,new=configurations(tmp_path)
     parent=tmp_path/'parent.json';atomic_write_json(parent,{'fixture_complete_audit':True})
     calls=[]
@@ -48,6 +49,8 @@ def test_original_whole_response_is_not_regenerated_or_relabelled_as_new_generat
          'execution_mode':'production','seed':derive_seed(42,'clean_generation','id','7b'),
          'raw_generation':'original whole response','raw_hash':content_hash('original whole response'),
          'generation_settings':GENERATION_SETTINGS,'generation_token_ids':[1,2],'generated_token_count':2,'finish_reason':finish}
+    if previous_adoption:
+        raw.update(generation_original_producer_commit='f'*40,generation_original_drive_file_id='original_drive')
     atomic_write_json(source,raw);original_bytes=source.read_bytes()
     service=ArtifactService(tmp_path/'old',tmp_path/'old/registry.json')
     provenance={'experiment_id':'fixture','branch':'shared','model':'all','run_id':'clean','stage':'collect_clean',
@@ -62,5 +65,8 @@ def test_original_whole_response_is_not_regenerated_or_relabelled_as_new_generat
     assert adopted['raw_generation']==raw['raw_generation'] and adopted['generation_token_ids']==raw['generation_token_ids']
     assert adopted['finish_reason']==finish and adopted['generation_original_producer_commit']=='a'*40
     assert adopted['generation_original_file_sha256']==file_hash(source)
+    if previous_adoption:
+        assert adopted['cache_adoption_history'][-1]=={'generation_original_producer_commit':'f'*40,
+                                                      'generation_original_drive_file_id':'original_drive'}
     assert adopted['config_hash']==configuration_hash(new) and source.read_bytes()==original_bytes
     assert calls==['a'*40,'b'*40] and report['adopted_response_count']==1

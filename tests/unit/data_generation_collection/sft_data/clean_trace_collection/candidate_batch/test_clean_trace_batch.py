@@ -69,6 +69,44 @@ def test_batched_generation_keeps_whole_prompts_order_and_per_row_eos():
     assert all(r['finish_reason']=='stop' for r in responses)
 
 
+def test_large_batches_split_at_256_without_changing_response_limits(monkeypatch):
+    from types import SimpleNamespace
+    from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import NativeCleanGenerator
+    class Encoded(dict):
+        def to(self,device):return self
+        @property
+        def input_ids(self):return self['input_ids']
+    class BatchTokenizer:
+        pad_token_id=0
+        eos_token_id=9
+        def apply_chat_template(self,messages,**kwargs):return messages[0]['content']+'<think>'
+        def __call__(self,prompts,**kwargs):
+            return Encoded(input_ids=torch.tensor([[1,2]]*len(prompts)),attention_mask=torch.ones(len(prompts),2))
+        def decode(self,ids,**kwargs):return 'one two three</think> answer'
+    sizes=[]
+    class BatchModel:
+        device='cpu'
+        generation_config=SimpleNamespace(eos_token_id=9)
+        def generate(self,**kwargs):
+            count=kwargs['input_ids'].shape[0];sizes.append(count)
+            assert kwargs['max_new_tokens']==3072 and kwargs['temperature']==.6 and kwargs['top_p']==.95
+            return torch.cat([kwargs['input_ids'],torch.tensor([[5,9]]*count)],dim=1)
+    models={size:{'id':name,'revision':'a'*40,'tokenizer_revision':'b'*40} for size,name in
+        [('7b','deepseek-ai/DeepSeek-R1-Distill-Qwen-7B'),('14b','deepseek-ai/DeepSeek-R1-Distill-Qwen-14B')]}
+    monkeypatch.setenv('CLEAN_GENERATION_BATCH_SIZE_7B','256')
+    monkeypatch.setenv('CLEAN_GENERATION_BATCH_SIZE_14B','64')
+    generator=NativeCleanGenerator(models,batch_size=32)
+    assert generator.batch_size_for('7b')==256 and generator.batch_size_for('14b')==64
+    generator.model,generator.tokenizer=BatchModel(),BatchTokenizer();generator._load=lambda model:None
+    candidates=[{**candidate(),'example_id':str(i)} for i in range(257)]
+    responses=list(generator.generate_many('7b',candidates))
+    assert sizes==[256,1] and len(responses)==257
+    assert [i for i,r in enumerate(responses) if r['generation_batch_end']]==[255,256]
+    assert [r['runtime']['generation_batch_size'] for r in responses]==[256]*256+[1]
+    monkeypatch.setenv('CLEAN_GENERATION_BATCH_SIZE_7B','257')
+    with pytest.raises(ValueError,match='between 1 and 256'):NativeCleanGenerator(models)
+
+
 class Tokenizer:
     def encode(self,text,**kwargs):return list(range(len(text.split())))
     def apply_chat_template(self,messages,tokenize=False,add_generation_prompt=False,**kwargs):
