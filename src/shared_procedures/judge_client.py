@@ -65,8 +65,13 @@ class ProviderTransport:
             if not token: raise JudgeError('Anthropic credential unavailable',status='blocked')
             endpoint='https://api.anthropic.com/v1/messages'
             headers={'x-api-key':token,'anthropic-version':'2023-06-01','Content-Type':'application/json'}
+            # Anthropic structured output accepts enum but rejects numerical
+            # minimum/maximum. Encode the identical finite score domain on wire;
+            # retain the original schema for request identity and local validation.
+            wire_schema = ({**schema, 'properties': {'score': {'type':'integer','enum':list(range(1,10))}}}
+                           if schema == SCORE_SCHEMA else schema)
             body={'model':model,'system':request['prompt'],'messages':[{'role':'user','content':message}],
-                  'max_tokens':64,'thinking':{'type':'between_tools'},'output_config':{'effort':'low','format':{'type':'json_schema','schema':schema}}}
+                  'max_tokens':64,'thinking':{'type':'between_tools'},'output_config':{'effort':'low','format':{'type':'json_schema','schema':wire_schema}}}
         try:
             response=httpx.post(endpoint,headers=headers,json=body,timeout=timeout)
         except httpx.TimeoutException as error:

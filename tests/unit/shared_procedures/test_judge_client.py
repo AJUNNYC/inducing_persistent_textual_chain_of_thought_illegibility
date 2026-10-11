@@ -4,6 +4,24 @@ from shared_procedures.judge_client import *
 
 def client(tmp_path,transport):return JudgeClient(tmp_path/'cache',tmp_path/'state',transport=transport)
 
+def test_anthropic_wire_score_schema_preserves_allowed_scores(monkeypatch):
+    import httpx
+    import jsonschema
+    captured=[]
+    def post(url,**kwargs):
+        captured.append(kwargs['json']['output_config']['format']['schema'])
+        return httpx.Response(200,json={'model':'claude-sonnet-5-5','content':[{'type':'text','text':'{"score":7}'}],
+                                      'usage':{'input_tokens':1,'output_tokens':1},'stop_reason':'end_turn','id':'control'})
+    monkeypatch.setenv('ANTHROPIC_API_KEY','fixture')
+    monkeypatch.setattr(httpx,'post',post)
+    ProviderTransport()({'model':'claude-sonnet-5-5','settings':default_settings('claude-sonnet-5-5'),
+                         'schema':SCORE_SCHEMA,'trace':'control','question':None,'prompt':'control','kind':'rl_pass_a'})
+    wire=captured[0]
+    assert 'minimum' not in wire['properties']['score'] and 'maximum' not in wire['properties']['score']
+    for score in [True,False,0,10,1.5,*range(1,10)]:
+        assert jsonschema.Draft202012Validator(wire).is_valid({'score':score}) == jsonschema.Draft202012Validator(SCORE_SCHEMA).is_valid({'score':score})
+    assert SCORE_SCHEMA['properties']['score']['minimum']==1
+
 def test_independent_cached_passes_and_provenance(tmp_path):
     calls=[]
     def transport(request):
