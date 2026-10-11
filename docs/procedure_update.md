@@ -1,6 +1,6 @@
 # Current procedure: 11 October 2026
 
-This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It replaces the earlier native Transformers SFT generation procedure for corpus construction. Training recipes, GRPO rollout generation, native evaluation generation, scientific success floors and validation acceptance rules remain unchanged. The subsequently approved evaluation-only concentration guard is documented in [the statistical method specification](statistical_concentration_guard.md).
+This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It replaces the earlier native Transformers SFT generation procedure for corpus construction. Training recipes, GRPO rollout generation, scientific success floors and validation acceptance rules remain unchanged. The later approved evaluation migration uses batched vLLM for both rebuilt baselines and trained states, as described below. The subsequently approved evaluation-only concentration guard is documented in [the statistical method specification](statistical_concentration_guard.md).
 
 ## SFT corpus generation
 
@@ -36,7 +36,7 @@ Refills use new audited IDs in fixed order, with the batch size exactly equal to
 
 ## Evaluation and RL data
 
-The frozen 1,233-item capability panel and nested 200-item legibility subset were prepared and backed up before the backend change. Their IDs are reused unchanged; actual model evaluations are pending. The SFT generation engine change does not alter native evaluation decoding or judging.
+The frozen 1,233-item capability panel and nested 200-item legibility subset were prepared and backed up before the backend change. Their IDs are reused unchanged; actual model evaluations are pending. The SFT generation migration originally left evaluation unchanged. The subsequently approved measurement migration now uses pinned BF16 vLLM for both rebuilt untouched baselines and trained adapter evaluations. Preserve all public prompts, per-item seeds and the full 3,072-token allowance. Run 7B then 14B on one GPU. Capability repeatability explicitly defers judging; later judge the same saved seed-42 outputs. Native baseline attempts remain archived and excluded from the replacement. See [the active worker contract](baseline_repeatability_worker.md).
 
 The repository's `prepare_rl_data` function has now selected 800 unique GSM8K training questions from revision `740312add88f781978c0658806c59bc2815b9866`. It checked valid numeric references, duplicate questions, and overlap against the complete official evaluation frames, then fixed seed-42 ordering into 100 consecutive groups of eight. Manifest content hash: `bc4c6b1b50906a9ee1c3ee47c9f4a6b72a7dd6dacc852ac58a1b090688b4a0a8`. Preparation source commit: `a03a70dbd520a34cf0dda67e73d0de2337a87140`. The manifest was uploaded and verified in the shared RL folder linked above.
 

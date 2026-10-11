@@ -26,13 +26,14 @@ flowchart TD
     HIT{"Exact verified cache hit for raw output?"}
     LOAD["Load matching raw output"]
     INVALIDATE["Invalidate affected stale derived records"]
-    GEN["Generate native answer once<br/>No opacity instruction<br/>3,072 new tokens with seed 42<br/>Never resample an ordinary bad answer"]
-    SAVE["Save raw output and provenance"]
+    GEN["Batched BF16 vLLM: 128 requests<br/>Same backend for bases and adapters<br/>3,072 new tokens per response with seed 42<br/>Never resample an ordinary bad answer"]
+    SAVE["Save exact raw token IDs, text and provenance"]
+    DRIVE["Verify whole raw/scored batch bundle in Google Drive<br/>Deferred baseline judges remain pending"]
     OUT["Return raw output"]
     STOP["Stop after bounded recovery fails"]
     INPUT --> HIT
     HIT -->|Yes| LOAD --> OUT
-    HIT -->|No| INVALIDATE --> GEN --> SAVE --> OUT
+    HIT -->|No| INVALIDATE --> GEN --> SAVE --> DRIVE --> OUT
     GEN -.->|Unrecoverable| STOP
     SAVE -.->|Unrecoverable| STOP
     classDef stop fill:#fbe9e7,stroke:#b45448
