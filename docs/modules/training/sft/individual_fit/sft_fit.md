@@ -42,6 +42,8 @@ After two epochs save the final adapter and compute validation loss on the fixed
 
 ## Interfaces and dependent procedures
 
+The [proposed four-worker plan](../../../../sft_multi_gpu_execution_plan.md) assigns whole independent fits, without distributing a logical optimizer update across GPUs. Each condition has one owner, separate adapter/optimizer/scheduler/sampler state and immutable verified Drive outputs. The currently owned 7B ROT13 level-1 fit is excluded from new queues. Additional A100/14B capacity and profiles remain unvalidated; the original checkpointed baseline is only a capacity candidate. Current optimized helpers require SM120 and pinned Triton 3.5.0, so a hardware change requires affected source/runtime evidence and any continuation provenance before launch. No additional worker deployment is claimed.
+
 Use the common [artifact contracts](../../../../contracts.md), [frozen prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). Typed signatures/serialization are delegated implementation details; their scientific meaning is not. The named owner defines this module with its consumers before dependent integration.
 
 | Source node | Called procedure (exact path) | Specification |
@@ -129,6 +131,9 @@ flowchart TD
 %% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
 %% Resume accepted a6e3295 from step 673 in the same existing lineage; no new migration.
 %% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
+%% PROPOSED only: two PRO 6000 workers for 14B and two Colab A100 workers for remaining 7B fits.
+%% Current 7B ROT13 level 1 stays owned; no duplicate condition, new deployment or A100/14B approval.
+%% Planning source: docs/sft_multi_gpu_execution_plan.md; forecasts are estimates, not benchmarks.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -179,6 +184,9 @@ flowchart TD
     MEASURE["Freeze prospective paired target-GPU screen<br/>Losses, gradients, updates, speed and RNG"]
     ACCEPT{"Source / GPU / condition evidence passes?"}
     MIGRATE["If continuing: preserve parent checkpoint<br/>Inherit full state and publish child lineage"]
+    PROPOSED["PROPOSED worker assignment<br/>One owner per independent fit<br/>Exclude active 7B ROT13 level 1"]
+    INPUT -.->|Additional workers unvalidated| PROPOSED
+    PROPOSED -.->|Record source, hardware and Drive ownership| PROFILE
     INPUT --> PROFILE --> SETUP --> DONE
     PROFILE -.->|Candidate or migration| MEASURE --> ACCEPT
     ACCEPT -->|Yes| MIGRATE --> SETUP
@@ -201,4 +209,7 @@ flowchart TD
 %% Unit test: tests/unit/training/sft/individual_fit/test_sft_fit.py
 %% Owner: sft
 %% Source sections: C.2.2–C.2.4; E.1.3; E.2.4,E.2.6; H.9
+
+    classDef proposal fill:#fff3d9,stroke:#95733f,stroke-dasharray:5 5
+    class PROPOSED proposal
 ```

@@ -21,6 +21,22 @@ Activation checkpointing is the original default. Disabling recomputation is an
 explicit execution-profile override, permitted only after its measured screen
 and production migration gates pass; it is not concealed as unchanged execution.
 
+## Proposed worker allocation
+
+The [canonical four-worker plan](sft_multi_gpu_execution_plan.md) records the
+new scheduling and price discussion without reopening optimization trials. Two
+PRO 6000 workers would handle the 14B families; two Colab A100 workers would
+handle 7B ROT13 levels 2–10 and 7B KaziText levels 1–10. The currently owned 7B
+ROT13 level-1 fit stays on its existing worker. Additional workers are not
+deployed or validated, and no condition may be trained twice. The 150/75/about
+50-hour forecasts are conditional estimates, not full-fit benchmarks. A100
+compute-unit consumption and all A100/14B rates/capacity remain unmeasured;
+the plan records quoted prices and the conditional 11.91-CU/hour break-even.
+The checkpointed 7B baseline is a capacity candidate for Colab, whereas current
+optimized helpers require Blackwell SM120 and pinned Triton 3.5.0. Distinct
+immutable fit outputs remain in the shared Drive project. The current accepted
+profile, full scientific recipe and forty-fit matrix are unchanged.
+
 ## Ordered candidates
 
 | Order | Change | Evidence and effect on results | Status |

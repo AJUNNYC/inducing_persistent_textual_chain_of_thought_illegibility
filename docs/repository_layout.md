@@ -270,6 +270,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     requirements.md
     runbook.md
     sft_data_handoff.md
+    sft_multi_gpu_execution_plan.md
     sft_optimizations.md
     source_map.md
     statistical_concentration_guard.md

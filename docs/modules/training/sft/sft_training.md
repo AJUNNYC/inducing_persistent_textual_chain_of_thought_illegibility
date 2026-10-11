@@ -15,6 +15,8 @@ Source `05f42b0` has accepted no-recomputation evidence and READY affected-runti
 
 ## Responsibility and controlling details
 
+The [four-worker plan](../../../sft_multi_gpu_execution_plan.md) is **proposed**: PRO A runs 14B ROT13 after its currently owned 7B fit finishes if using that Pod; PRO B runs 14B KaziText; Colab A runs 7B ROT13 levels 2–10; Colab B runs 7B KaziText levels 1–10. The 39 proposed assignments plus the already owned level-1 fit cover all 40 exactly once. It allocates independent fits rather than changing training batches. A100/14B memory, throughput, profile support and worker coordination are unvalidated; distinct Drive namespaces and affected launch controls remain mandatory. The 150/75/about 50-hour forecasts are conditional planning estimates, not deployed or benchmarked behavior.
+
 Create two independent family queues, one for ROT13 and one for KaziText, each covering both models at ten fixed levels: twenty independent fits per queue and forty total. Both call the same `sft_fit` implementation. Every level initializes from its untouched base; a previous level is not a warm start. Only an exact-fit matching full checkpoint may resume a fit.
 
 Each queue runs its fits sequentially on its assigned GPU. The launcher can serialize selected levels on one GPU. The current source a6e3295 acceptance selects only 7B ROT13 level 1; remaining levels require their condition-specific affected evidence before activation. The full forty-fit scientific matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
@@ -78,6 +80,9 @@ flowchart TD
 %% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
 %% Resume accepted a6e3295 from step 673 in the same existing lineage; no new migration.
 %% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
+%% PROPOSED only: two PRO 6000 workers for 14B and two Colab A100 workers for remaining 7B fits.
+%% Current 7B ROT13 level 1 stays owned; no duplicate condition, new deployment or A100/14B approval.
+%% Planning source: docs/sft_multi_gpu_execution_plan.md; forecasts are estimates, not benchmarks.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
@@ -103,6 +108,11 @@ flowchart TD
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
     BENCH["New source or hardware: paired candidate measurements<br/>Active-profile comparison; scoped acceptance and full-state lineage"]
+    PROPOSED["PROPOSED independent-fit allocation<br/>2 PRO 6000: 14B; 2 Colab A100: 7B"]
+    OWNERS["PROPOSED disjoint condition ownership<br/>Exclude active 7B ROT13 level 1<br/>Distinct verified Drive outputs; same 40 fits"]
+    PLAN -.->|Proposal; target hardware unvalidated| PROPOSED
+    PROPOSED -.-> OWNERS
+    OWNERS -.->|Require affected runtime evidence| GATES
     INPUT --> CERT --> GATES --> PLAN
     CERT -.->|Migration| BENCH --> GATES
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT
@@ -110,6 +120,8 @@ flowchart TD
     WAIT --> OUT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class ROTFIT,KAZFIT detail
+    classDef proposal fill:#fff3d9,stroke:#95733f,stroke-dasharray:5 5
+    class PROPOSED,OWNERS proposal
 
 %% Repository module: src/training/sft/sft_training.py
 %% Module documentation: docs/modules/training/sft/sft_training.md
