@@ -19,7 +19,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from shared_procedures.identity import content_hash
-from shared_procedures.storage import atomic_write_json, read_json, file_lock
+from shared_procedures.storage import atomic_write_json, read_json, file_lock, artifact_hook
 from shared_procedures.configuration import configuration_hash
 from operations.artifacts import ArtifactService
 from operations.drive import DriveStore, drive_service
@@ -145,12 +145,36 @@ def main():
         with file_lock(data/'preparation.lock'):
             if a.phase == 'build':
                 source = read_json(data/'accepted/accepted_pool.json')
-                bundle = build_sft_datasets(source, tokenizers, data/'transformed',
-                                           config_hash=GENERATION_HASH, kazitext=kazi())
+                completed_files = []
+                def dataset_ready(path, metadata):
+                    if metadata.get('kind') != 'sft_dataset':
+                        return
+                    publish([path])
+                    completed_files.append(str(path))
+                    state = {'status':'BUILDING', 'drive_verified_dataset_files':len(completed_files),
+                             'expected_dataset_files':80, 'last_verified_file':str(path)}
+                    atomic_write_json(artifacts/'preparation_progress.json',state)
+                    print(json.dumps(state),flush=True)
+                with artifact_hook(dataset_ready):
+                    bundle = build_sft_datasets(source, tokenizers, data/'transformed',
+                                               config_hash=GENERATION_HASH, kazitext=kazi())
                 validate_sft_bundle(bundle, source)
                 publish([path for path in (data/'transformed').rglob('*') if path.is_file()])
+                entries = [r for r in service.list_artifacts() if
+                           Path(r['local_path']).is_relative_to(data/'transformed') or
+                           Path(r['local_path']) == data/'accepted/accepted_pool.json']
+                catalog = {'status':'VERIFIED', 'configuration_hash':GENERATION_HASH,
+                           'accepted_pool_hash':source['content_hash'], 'conditions':40,
+                           'artifacts':[{k:r[k] for k in ('relative_path','sha256','size',
+                                        'artifact_id','drive_file_id','drive_folder_id')} for r in entries]}
+                index = artifacts/'dataset_drive_index.json'
+                atomic_write_json(index,catalog)
+                publish([index])
+                index_record = next(r for r in service.list_artifacts() if r['local_path']==str(index))
                 state = {'status':'COMPLETE', 'conditions':40, 'records':404000,
-                         'configuration_hash':GENERATION_HASH, 'source_code_commit':commit}
+                         'configuration_hash':GENERATION_HASH, 'source_code_commit':commit,
+                         'drive_folder_id':index_record['drive_folder_id'],
+                         'drive_index_file_id':index_record['drive_file_id']}
                 atomic_write_json(artifacts/'preparation_progress.json', state)
                 publish([artifacts/'preparation_progress.json'])
                 print(json.dumps(state), flush=True)
