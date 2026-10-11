@@ -254,6 +254,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     manage_runpod.py
     monitor_vllm_generation.py
     prepare_batched_collection.py
+    prepare_vllm_sft_data.py
     refresh_dependency_locks.py
     revalidate_collection_inputs.py
     run_collection_until.py
