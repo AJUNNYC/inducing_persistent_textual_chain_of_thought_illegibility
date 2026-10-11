@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 452,
+  "files": 454,
   "directories_including_root": 202,
   "entries": [
     {
@@ -2338,6 +2338,17 @@
       "blank": false
     },
     {
+      "path": "docs/statistical_concentration_guard.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/statistical_concentration_guard.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d39631a8c666ef",
+      "blank": false
+    },
+    {
       "kind": "documentation",
       "owner": "coordinator",
       "source": "PDF E,G,H and supplied Mermaid workflows; explicit organizational contracts",
@@ -2915,6 +2926,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_8de5342769eaeb",
+      "blank": false
+    },
+    {
+      "path": "scripts/validate_statistical_coverage.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/validate_statistical_coverage.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7f50ac1ba05997",
       "blank": false
     },
     {

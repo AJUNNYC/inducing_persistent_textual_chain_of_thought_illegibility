@@ -11,6 +11,8 @@ from __future__ import annotations
 from pathlib import Path
 from statistics import NormalDist
 from typing import Any, Mapping
+from concurrent.futures import ProcessPoolExecutor
+from contextlib import nullcontext
 import numpy as np
 
 from data_generation_collection.evaluation_data.protocol.analysis_plan.prospective_analysis_plan import (
@@ -254,12 +256,41 @@ def _scenario_summary(scenario: str, runs: list[dict], frozen: Mapping[str, Any]
             "diagnostics": diagnostics, "runs": runs}
 
 
+def _validation_repetition(population, frozen, scenario, repetition):
+    seed = derive_seed(frozen['seed'], frozen['namespace'], scenario, repetition, 'sample')
+    panel, leg, records = sample_population(population, seed)
+    plan = create_analysis_plan(panel, leg)
+    bounds = compute_simultaneous_bounds(records, plan, draws=frozen['draws'])
+    truth = population['validation_truth']
+    applicable = np.isfinite(truth)
+    lower = np.asarray([g['lower_bound'] for g in bounds['gates']])
+    violations = np.flatnonzero(applicable & (lower > truth + 1e-12))
+    structural = len(bounds['gates']) == len(plan['gate_registry']) and len(plan['windows']) == 216
+    structural &= all(g['status'] == 'indeterminate' for g, undefined in zip(bounds['gates'], ~applicable) if undefined)
+    return {'repetition':repetition, 'seed':seed, 'joint_covered':len(violations)==0,
+            'structural_ok':bool(structural), 'critical_value':bounds['critical_value'],
+            'unsupported_gate_count':bounds['unsupported_gate_count'],
+            'undefined_population_targets':int((~applicable).sum()),
+            'violations':[{'gate_id':bounds['gates'][j]['gate_id'], 'lower_bound':float(lower[j]),
+                           'population_truth':float(truth[j])} for j in violations],
+            'violation_count':len(violations)}
+
+
+def _initialize_validation_worker(population, frozen, scenario):
+    global _validation_worker_context
+    _validation_worker_context = (population, frozen, scenario)
+
+
+def _worker_repetition(repetition):
+    return _validation_repetition(*_validation_worker_context, repetition)
+
+
 def run_statistical_validation(analysis_plan: Mapping[str, Any] | None = None, *,
                                simulation_plan: Mapping[str, Any] | None = None,
                                repetitions: int = 100, draws: int = 10000,
                                output_path: str | Path | None = None,
                                fixture: bool = False, scenarios: list[str] | None = None,
-                               resume: bool = False) -> dict:
+                               resume: bool = False, workers: int = 1) -> dict:
     """Run frozen cases, atomically checkpoint every repetition, resume by identity.
 
     A subset retains the complete mandatory registry and is ``partial`` when
@@ -267,6 +298,7 @@ def run_statistical_validation(analysis_plan: Mapping[str, Any] | None = None, *
     Checkpoints cannot cross code/plan/selection identities. Nothing is resampled
     because of failure; resumed repetition seeds continue their frozen sequence.
     """
+    if workers < 1:raise ValueError('Positive validation worker count required')
     frozen = dict(simulation_plan or freeze_simulation_plan(analysis_plan, repetitions=repetitions, draws=draws, fixture=fixture))
     digest = frozen.pop("simulation_plan_hash", None)
     if content_hash(frozen) != digest:
@@ -317,30 +349,21 @@ def run_statistical_validation(analysis_plan: Mapping[str, Any] | None = None, *
         summary = _scenario_summary(scenario, runs, frozen)
         if summary["status"] == "running":
             population = generate_finite_population(frozen, scenario)
-            truth = population_truth(population)
-            applicable = np.isfinite(truth)
-            for repetition in range(len(runs), frozen["repetitions"]):
-                sample_seed = derive_seed(frozen["seed"], frozen["namespace"], scenario, repetition, "sample")
-                panel, leg, records = sample_population(population, sample_seed)
-                sample_plan = create_analysis_plan(panel, leg)
-                bounds = compute_simultaneous_bounds(records, sample_plan, draws=frozen["draws"])
-                lower = np.asarray([g["lower_bound"] for g in bounds["gates"]])
-                covered = bool(np.all(lower[applicable] <= truth[applicable] + 1e-12))
-                violations = np.flatnonzero(applicable & (lower > truth + 1e-12))
-                structural_ok = len(bounds["gates"]) == len(sample_plan["gate_registry"]) and len(sample_plan["windows"]) == 216
-                structural_ok &= all(g["status"] == "indeterminate" for g, undefined in zip(bounds["gates"], ~applicable) if undefined)
-                runs.append({"repetition": repetition, "seed": sample_seed, "joint_covered": covered,
-                             "structural_ok": bool(structural_ok), "critical_value": bounds["critical_value"],
-                             "unsupported_gate_count": bounds["unsupported_gate_count"],
-                             "undefined_population_targets": int((~applicable).sum()),
-                             "violations": [{"gate_id": bounds["gates"][j]["gate_id"],
-                                             "lower_bound": float(lower[j]), "population_truth": float(truth[j])}
-                                            for j in violations], "violation_count": len(violations)})
-                report["active_scenario"] = {"name": scenario, "completed_repetitions": len(runs), "runs": runs}
-                _persist_report(report, output_path)
-                summary = _scenario_summary(scenario, runs, frozen)
-                if summary["status"] != "running":
-                    break
+            population['validation_truth'] = population_truth(population)
+            executor = ProcessPoolExecutor(max_workers=workers, initializer=_initialize_validation_worker,
+                                           initargs=(population,frozen,scenario)) if workers > 1 else None
+            with executor if executor is not None else nullcontext():
+                indices = range(len(runs), frozen['repetitions'])
+                outcomes = executor.map(_worker_repetition, indices) if executor else (
+                    _validation_repetition(population,frozen,scenario,i) for i in indices)
+                for run in outcomes:
+                    runs.append(run)
+                    report['active_scenario'] = {'name':scenario, 'completed_repetitions':len(runs), 'runs':runs}
+                    _persist_report(report, output_path)
+                    summary = _scenario_summary(scenario, runs, frozen)
+                    if summary['status'] != 'running':
+                        if executor:executor.shutdown(wait=True,cancel_futures=True)
+                        break
         registry[scenario].clear()
         registry[scenario].update(summary)
         report.pop("active_scenario", None)

@@ -70,4 +70,6 @@ All choices were implemented before any trained experimental outcomes existed. S
 
 ## Current procedure: 11 October 2026
 
+The user subsequently authorized a conservative confidence-bound revision conditional on leaving SFT validity and efficacy unchanged. The [design concentration guard](statistical_concentration_guard.md) caps the original bootstrap bounds with simultaneous bounded-variable ratio bounds. All SFT inputs and optimization, scientific floors, panel IDs, validation seeds and acceptance rules remain unchanged. This prospectively versioned evaluation-only change can reduce inferential power; it does not create a training efficacy guarantee. Historical failed simulations remain archived, and the revised implementation requires full fresh validation before clearance.
+
 The [current procedure](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance, exact-deficit refills, all 40 transformed conditions and Drive copies are complete. Training and actual evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

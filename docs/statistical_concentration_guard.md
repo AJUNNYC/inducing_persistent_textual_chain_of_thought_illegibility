@@ -1,0 +1,25 @@
+# Statistical concentration guard
+
+The user authorized a more conservative evaluation method on 11 October 2026, conditional on leaving SFT validity and efficacy unchanged. No trained experimental outcomes have been inspected. This revision changes confidence bounds only. It does not change SFT examples, transformations, loss, optimizer, learning rate, epochs, checkpoints, scientific success thresholds, panel IDs, simulation seeds or the frozen Monte Carlo acceptance rule.
+
+The original maximum-standardized bootstrap failed coverage in two decision-boundary repetitions. Exact reproduction found an opacity estimate of 0.95 on 20 common-correct items with a lower bound of 0.6573 against population truth 0.5484, and a retention lower bound of 0.7865 against truth 0.7830. Those historical reports remain preserved. The revised method retains the paired bootstrap and uses the smaller of its lower bound and a simultaneous design-based concentration lower bound. Bootstrap estimates, standard errors and critical values remain available separately.
+
+## Sampling argument
+
+Conditional on the complete finite population of question outcome vectors, a capability stratum is a simple random sample without replacement (SRSWOR). A uniformly chosen nested legibility subset is marginally SRSWOR from the original stratum. Sampling without replacement has a bounded-variable exponential-moment bound no larger than independent sampling from the same population; this is Hoeffding's sampling comparison. Thus using the independent-draw bound conservatively accounts for finite populations. Exact censuses contribute no sampling variation. We do not rely on an estimated Bernoulli variance or shrink the bound by a finite-population correction that could underestimate uncertainty.
+
+For a metric on a fixed allocation of T questions, independent strata contribute Vq = sum(n_h/T^2) over noncensus strata. For capability this includes all 57 fixed MMLU subjects. For MMLU legibility, selected single-question errors contribute to Vq, and the separate sample of m subjects from S subjects contributes Vs = m/T^2 if m < S, otherwise zero. The target contribution is the uniform mean of all S subject means with allocation weight m/T. The conditional question error and the selected-subject mean error are bounded separately; no independence between these two stages is assumed.
+
+For component error allowance delta, set r = sqrt(log(2/delta)*Vq/2) + sqrt(log(2/delta)*Vs/2). Bounded variables in [a,b] have one-sided error at most (b-a)*r. Each of the two stage terms receives delta/2. Other strata remain independent of MMLU subject selection. This also bounds pooled metrics with their fixed allocation weights; it does not replace them with unweighted population averages.
+
+## Ratios and the complete family
+
+For each scalar gate, use the sample average of its numerator X and denominator D on the original fixed domain or pooled panel. Common-correct membership stays part of these fixed bounded item vectors. Numerators are in [0,1] for retention and opacity and in [-1,1] for paired opacity increases; denominators are in [0,1]. There are p = 10,800 scalar gates. Each numerator-lower, denominator-upper and denominator-lower component receives delta = 0.05/(3p). A union bound therefore gives at least 95% simultaneous coverage of all these component bounds, irrespective of dependence across gates.
+
+Clip the component intervals to their natural ranges. If the numerator lower bound is nonnegative, divide it by the denominator upper bound. If negative, divide by the denominator lower bound; if that bound is zero, use the ratio's natural lower bound. Clip the resulting ratio lower bound to its natural range. This sign-dependent division is necessary for valid negative difference bounds. Undefined true ratios, unresolved evidence and degenerate bootstrap metrics retain the existing natural-range bounds and indeterminate statuses; no hypothesis or candidate window is removed.
+
+Taking the minimum with the original bootstrap lower bound can only widen the interval downward. The design guard supplies coverage independently of bootstrap approximation quality. It can reduce inferential power, especially on small common-correct subsets, and may leave no confirmatory success despite useful trained models. It provides no universal statement about training-seed variation, judge bias, missing evidence or efficacy. The unchanged full seven-scenario, 100-repetition, 10,000-draw validation must still pass before launch clearance is claimed.
+
+Reference: W. Hoeffding, *Probability Inequalities for Sums of Bounded Random Variables*, JASA 58(301), 1963, pp. 13–30, especially the sampling-without-replacement comparison in Section 6. DOI: https://doi.org/10.1080/01621459.1963.10500830.
+
+Run [the repository validation entrypoint](../scripts/validate_statistical_coverage.py) against the retained capability panel and nested legibility subset. Parallel workers use the same per-repetition seeds and retain ordered checkpoint records. A passing certificate requires all mandatory scenarios; fixture or partial reports remain insufficient.

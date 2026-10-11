@@ -3218,14 +3218,15 @@ Independent CPU-only Drive readback verified all 122 artifacts and 404,000 recor
 Pod. Training and actual model evaluations remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned
 model, tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv)
-checked real reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only
-loss masks; (v) shared 10,000 training and 100 validation IDs and every transformed variant passing
-acceptance; (vi) valid live judge schemas, error pauses and optimizer-boundary recovery; (vii) a secure
-MBPP executor and complete evaluation interfaces; and (viii) actual funding and billing controls. These are
-engineering gates, not extra scientific replicates. Reuse valid compatible evidence; do not claim unexecuted
-checks passed.
-Prospective statistical validation recorded 34 of 36 jointly covered repetitions, with two coverage failures.
-This generation-engine change does not waive the training/confirmatory launch blocker.
+checked real reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss
+masks; (v) shared 10,000 training and 100 validation IDs and every transformed variant passing acceptance;
+(vi) valid live judge schemas, error pauses and optimizer-boundary recovery; (vii) a secure MBPP executor and
+complete evaluation interfaces; and (viii) actual funding and billing controls. These are engineering gates, not
+extra scientific replicates. Reuse valid compatible evidence; do not claim unexecuted checks passed.
+Prospective statistical validation recorded 34 of 36 jointly covered repetitions, with two coverage failures. The
+original report remains historical failed evidence. A user-approved conservative design-concentration guard
+now caps the bootstrap lower bounds without changing SFT or scientific success thresholds. Its full validation
+remains pending; no launch clearance is claimed.
 ```
 
 ## page_059
@@ -3708,8 +3709,9 @@ CoT Illegibility - Implementation decisions
 Status. The implementation decisions supplied on 10 October 2026 are integrated with the approved 11
 October procedure updates. SFT corpus generation now uses separate fresh vLLM model workers and
 Drive-only permanent storage. Shared evaluation panels and the 800-question RL selection are prepared and
-backed up. This document does not claim completed paired SFT datasets, training, model evaluation or
-passing prospective statistical validation.
+backed up. All forty paired SFT conditions are complete and independently verified from Drive. Training and
+model evaluation remain unexecuted. The approved concentration-guard revision changes evaluation
+confidence bounds only; full prospective validation remains pending.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in
@@ -4284,86 +4286,100 @@ CoT Illegibility - Implementation decisions
 
 ```text
 10 October 2026
-H.8.3
-Maximum-standardized lower-bound construction
-Let ˆθj denote the observed estimate of required scalar metric j, and ˆθ∗(b)
-j
-its paired, design-aware estimate
-in bootstrap draw b. Estimate its standard error by the sample standard deviation of the bootstrap
-estimates:
-¯θ∗
-j = 1
-B
-B
-X
-b=1
-ˆθ∗(b)
-j
-,
-sj =
-v
-u
-u
-t
-1
-B −1
-B
-X
-b=1
-ˆθ∗(b)
-j
-−¯θ∗
-j
-2.
-For metrics supported by the prospectively validated computation, calculate
-Zb = max
-j
-ˆθ∗(b)
-j
-−ˆθj
-sj
-,
-q = max
+L
+e
+i
+p
+e
+F
+T
+.
+F
+s
 n
-0, bQ0.95(Z1, . . . , ZB)
+r
+is
+a
+f
+T
+n
+r
+d
+n
+g
+w
+l
+r
+l
+i
+t,
+u
+e
+s
+e
+c
+B
+n
+t
+s
+w
+s
+n
 o
+T
+g
+t
+s,
+s
+c
+T
+s,
+e
 ,
-LCBj = ˆθj −q sj.
-The maximum is over the full required scalar family, with the explicit indeterminate handling below.
-Freeze the empirical-quantile convention. The upward deviation has the required direction: lower bounds
-need protection against estimates overstating their population quantities. The proposed standard error
-is fixed across draws; this is a maximum-standardized bootstrap, not a claim to have implemented a
-fully studentized bootstrap-t.
-The relevant lower bounds must clear the selected floors: 0.80 for per-level retention, 0.60 for common
-retention, 0.50 for absolute qualified opacity, and 0.20 for paired opacity increases. The same fixed
-nonmath-domain pair must pass the full and common-correct checks throughout its window.
-Maximum-statistic resampling and joint confidence regions have a methodological basis in multiple-testing
-work. That precedent does not validate this particular small, nested-panel procedure, its conditional
-ratios, or its coverage under every dependence structure. [H6]
-Degeneracy and missingness.
-Zero estimated variance must never yield a zero-width interval
-interpreted as certainty. An empty denominator, undefined replicate, missing required primary judgment,
-unresolved readable-solution assessment, or unsupported variance estimate must retain an explicit gate
-status. Preserve the registry of all 216 windows. Do not silently omit problematic metrics from the
-correction and declare a more favorable remainder successful.
-Before outcome inspection, freeze conservative handling for such cases, including their contribution
-to the family-wide computation and the affected indeterminate claims. Natural-range lower bounds
-with an indeterminate status are permissible; replacing uncertainty with a precise positive result is
-not. Zero-variance and degenerate-bootstrap behavior is a concrete numerical risk, not a reason to
-manufacture variation or additional data. [H7]
-H.8.4
-Mandatory simulation preflight
-The implementing agent must define, execute, and freeze a simulation-validation plan before inspecting
-trained outcomes. This includes the finite-population scenario generator, exact sampling mechanisms,
-seeds and replication budget, and a quantitative Monte Carlo acceptance rule for joint one-sided 95%
-coverage across the complete family. Report simulation uncertainty as well as estimated coverage.
-The mandatory scenario set covers the decision boundaries, correlated checkpoints, uneven domains,
-extreme proportions, and small or empty common-correct subsets. Check pairing, sample inclusion,
-intersection recomputation, denominator bookkeeping, all candidate windows, transfer-domain selection,
-and nondegenerate versus indeterminate behavior. These checks are required properties, not a claim
-that any particular fixture list establishes universal coverage.
+i
+,
+a
+t
 79
 CoT Illegibility - Implementation decisions
+H.8.3 Maximum-standardized lower bounds with a design-based concentration guard
+The paired, design-aware bootstrap still uses 10,000 draws. For each scalar metric j, retain its observed
+estimate theta_j, bootstrap standard error s_j and full-family critical value q = max(0, higher empirical 95th
+percentile of max_j[(theta*_j - theta_j)/s_j]). The original bootstrap lower bound is theta_j - q*s_j, clipped to
+its natural range. It is retained separately for diagnosis.
+Approved revision, 11 October 2026: the original method failed mandatory coverage validation. Before any
+trained outcomes were inspected, the user authorized a more conservative confidence-bound construction
+conditional on leaving SFT unchanged. The reported lower bound is now the smaller of the original
+bootstrap lower bound and a simultaneous design-concentration ratio lower bound. This changes only
+evaluation uncertainty; all training data, loss, optimizer, epochs, scientific success floors, evaluation IDs
+and Monte Carlo acceptance rules remain unchanged.
+For bounded item outcomes, SRS without replacement has a moment bound no larger than independent
+sampling from the same finite population. Combine independent strata using their fixed allocation weights;
+exact censuses contribute zero variation. Nested non-MMLU legibility subsets are marginal SRS from the
+original stratum. MMLU capability retains all 57 fixed subject strata. Its legibility calculation separately
+bounds selected single-question errors and selection of 50 of 57 subject means.
+For T allocated questions, Vq = sum(n_h/T^2) over noncensus question strata. The separate MMLU subject
+contribution is Vs = m/T^2 when m subjects are selected from S and m < S, otherwise zero. A bounded
+component in [a,b] has one-sided radius (b-a)*r, where r = sqrt(log(2/delta)*Vq/2) + sqrt(log(2/delta)*Vs/2).
+Each stage receives delta/2. Allocate delta = 0.05/(3*p) to each numerator-lower, denominator-upper and
+denominator-lower component across the complete p = 10,800-gate family.
+Clip component bounds to their natural ranges. Divide a nonnegative numerator lower bound by the
+denominator upper bound. For a negative numerator lower bound, use the denominator lower bound; if
+zero, use the ratio's natural lower bound. The union bound protects the complete family, including
+common-correct ratios and paired differences, without assuming independent gates. No hypotheses or
+windows are deleted.
+Success floors remain 0.80 for per-level retention, 0.60 for common retention, 0.50 for absolute qualified
+opacity and 0.20 for paired increases. A fixed nonmath-domain pair must pass full and common-correct
+checks throughout the window. Undefined denominators, missing evidence and unsupported bootstrap
+variance retain natural-range lower bounds and explicit indeterminate status. The guard can reduce
+inferential power; it does not alter SFT efficacy or certify a trained model.
+H.8.4 Mandatory simulation preflight
+Freeze the revised implementation and validation plan before trained outcome inspection. All seven
+mandatory finite-population scenarios, 100 repetitions each and 10,000 bootstrap draws per repetition
+remain required. Each scenario must clear the unchanged one-sided 95% Wilson lower coverage bound of
+0.95, with no structural failures. Historical failed reports cannot certify the revised method. Full
+mathematical conventions and the sampling-comparison reference are recorded in
+docs/statistical_concentration_guard.md.
 ```
 
 ## page_080

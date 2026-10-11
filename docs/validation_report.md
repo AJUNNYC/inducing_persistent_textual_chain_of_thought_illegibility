@@ -2,6 +2,8 @@
 
 ## SFT handoff follow-up (2026-10-11)
 
+Following exact failure reproduction, the user authorized a conservative statistical-method revision conditional on preserving SFT validity and efficacy. The [design concentration guard](statistical_concentration_guard.md) affects evaluation uncertainty only and preserves the complete gate family and acceptance thresholds. Version 2 requires fresh full-budget validation; the earlier reports below remain historical failed evidence. No trained outcomes have been inspected and no SFT training has started.
+
 The completed corpus contains ROT13 encoding and official KaziText degradation at all ten levels for both models. Construction evidence and independent full Drive readback cover forty conditions and 404,000 records; no regeneration was performed for this handoff. The clean-data preflight now reads the preparation worker's `transformed/manifest.json`, with compatibility for the older `sft_manifest.json` location. Both manifest-location regression cases passed.
 
 The existing 7B Pod is reachable with an idle H100 80 GB. Its native training environment successfully imported Torch 2.9.0+cu128, Transformers 4.57.3, PEFT 0.18.0 and bitsandbytes 0.48.2, with CUDA available. This verifies dependency availability, not loss-mask gradients or optimizer-resume behavior.

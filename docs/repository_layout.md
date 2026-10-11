@@ -222,6 +222,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     requirements.md
     runbook.md
     source_map.md
+    statistical_concentration_guard.md
     validation.md
     validation_report.md
   prompts/
@@ -275,6 +276,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     setup_environment.py
     synchronize_manifest.py
     validate_repository.py
+    validate_statistical_coverage.py
   spec/
     archive/
       experiment_original.pdf

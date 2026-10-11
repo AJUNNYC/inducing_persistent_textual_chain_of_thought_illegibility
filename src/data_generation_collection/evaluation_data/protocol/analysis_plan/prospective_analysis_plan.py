@@ -19,7 +19,7 @@ DOMAINS = ("gsm8k", "mmlu", "arc", "mbpp")
 NONMATH = DOMAINS[1:]
 BRANCHES = ("rot13", "kazitext", "rl")
 MODELS = ("7b", "14b")
-METHOD_VERSION = "nested_rao_wu_conservative_v1"
+METHOD_VERSION = "nested_rao_wu_with_design_concentration_guard_v2"
 
 
 def state_id(branch: str, model: str, level: int) -> str:
@@ -139,6 +139,7 @@ def create_analysis_plan(panel: Sequence[Mapping[str, Any]] | Mapping[str, Any],
             "degeneracy": "any_undefined_draw_or_zero_variance_indeterminate",
             "mmlu": "fixed_capability_subjects_separate_legibility_subject_stage",
             "resampling": "rao_wu_n_minus_one_finite_population_first_phase_times_nested_second_phase",
+            "concentration_guard": "joint_hoeffding_srswor_ratio_guard_alpha_0.05_over_3_full_family_gates; separate_mmlu_question_and_subject_stages",
             "limitations": ["conservative nested variance; mandatory scenario validation required",
                             "item sampling only; excludes training seed and judge model uncertainty"]}
     plan["plan_hash"] = content_hash(plan)

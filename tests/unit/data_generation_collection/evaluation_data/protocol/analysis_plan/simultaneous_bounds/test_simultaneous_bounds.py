@@ -1,6 +1,44 @@
 import numpy as np
 from data_generation_collection.evaluation_data.protocol.analysis_plan.prospective_analysis_plan import create_analysis_plan
-from data_generation_collection.evaluation_data.protocol.analysis_plan.simultaneous_bounds.simultaneous_bounds import qualified_opacity, maximum_standardized_bounds, design_weights, assemble_outcomes, metric_arrays, compute_simultaneous_bounds
+from data_generation_collection.evaluation_data.protocol.analysis_plan.simultaneous_bounds.simultaneous_bounds import qualified_opacity, maximum_standardized_bounds, design_weights, assemble_outcomes, metric_arrays, compute_simultaneous_bounds, apply_concentration_guard
+
+
+def test_concentration_guard_uses_population_sampling_and_signed_ratio_bounds():
+    registry=[{'domain':'arc','natural_lower':0.}, {'domain':'arc','natural_lower':-1.}]
+    plan={'gate_registry':registry,'sample_design':[{'domain':'arc','population_size':100,'indices':list(range(20)), 'legibility_indices':list(range(20))}]}
+    arrays={'kind':['capability','legibility'],'original_denominator':[20,20],
+            'numerator':np.column_stack([np.ones(20),np.full(20,-.5)]),
+            'denominator':np.ones((20,2))}
+    result={'gates':[{'lower_bound':.9},{'lower_bound':-.6}]}
+    apply_concentration_guard(arrays,plan,result)
+    radius=np.sqrt(np.log(2/(.05/6))/40)
+    assert np.isclose(result['gates'][0]['lower_bound'],1-radius)
+    assert result['gates'][0]['bootstrap_lower_bound']==.9
+    assert result['gates'][1]['lower_bound']==-1
+    # An exact census removes sampling uncertainty without inventing variance.
+    plan['sample_design'][0]['population_size']=20
+    result={'gates':[{'lower_bound':.9},{'lower_bound':-.6}]}
+    apply_concentration_guard(arrays,plan,result)
+    assert result['gates'][0]['concentration_lower_bound']==1
+    assert result['gates'][1]['concentration_lower_bound']==-.5
+    assert result['gates'][1]['lower_bound']==-.6
+
+
+def test_concentration_guard_retains_separate_mmlu_subject_uncertainty():
+    registry=[{'domain':'mmlu','natural_lower':0.}]
+    design=[{'domain':'mmlu','population_size':1,'indices':[i], 'legibility_indices':[i] if i<50 else []} for i in range(57)]
+    plan={'gate_registry':registry,'sample_design':design}
+    arrays={'kind':['legibility'],'original_denominator':[50],
+            'numerator':np.ones((50,1)),'denominator':np.ones((50,1))}
+    result={'gates':[{'lower_bound':1.}]}
+    apply_concentration_guard(arrays,plan,result)
+    # Census questions still leave uncertainty from selecting 50 of 57 subjects.
+    radius=np.sqrt(np.log(2/(.05/3))/100)
+    assert np.isclose(result['gates'][0]['lower_bound'],1-radius)
+    for s in design:s['population_size']=10
+    result={'gates':[{'lower_bound':1.}]}
+    apply_concentration_guard(arrays,plan,result)
+    assert np.isclose(result['gates'][0]['lower_bound'],1-2*radius)
 
 
 def test_option_a_missingness_padding_and_readable_solution():

@@ -218,6 +218,71 @@ def maximum_standardized_bounds(point: Sequence[float], replicates: np.ndarray,
             "unsupported_family_handling": "natural_range_bounds_with_indeterminate_status; these gates remain in registry"}
 
 
+def apply_concentration_guard(arrays: Mapping[str, Any], plan: Mapping[str, Any], result: dict) -> None:
+    """Cap bootstrap lower bounds with simultaneous bounded-variable bounds.
+
+    SRSWOR has an exponential-moment bound no larger than independent draws
+    from the same finite population (Hoeffding's sampling comparison). We use
+    that conservative bound, removing variance only for exact censuses.
+    Independent strata combine through squared fixed allocation weights.
+    Nested non-MMLU legibility samples are marginally SRSWOR from the original
+    stratum. MMLU's selected-subject means and their single-question errors
+    receive separate bounds, combined by the triangle/union bounds.
+
+    Each gate spends alpha/(3*p) on numerator lower, denominator upper and
+    denominator lower. Each component divides its allowance between question
+    and subject stages. This covers signed differences as well as ratios;
+    dependence between gates, numerator and denominator does not matter.
+    No observed successes, failures or simulated coverage tune these radii.
+    """
+    p = len(plan['gate_registry'])
+    delta = .05 / (3 * p)
+    radii = {}
+    for j, gate in enumerate(plan['gate_registry']):
+        kind, domain = arrays['kind'][j], gate['domain']
+        key = (kind, domain)
+        if key not in radii:
+            total = arrays['original_denominator'][j]
+            question_variance = subject_variance = 0.
+            mmlu_total = mmlu_selected = 0
+            for stratum in plan['sample_design']:
+                if domain != 'pooled' and stratum['domain'] != domain:
+                    continue
+                population = stratum['population_size']
+                count = len(stratum['indices'] if kind == 'capability' else stratum['legibility_indices'])
+                if kind == 'legibility' and stratum['domain'] == 'mmlu':
+                    if count not in (0, 1):
+                        raise ValueError('MMLU guard requires one question per selected subject')
+                    mmlu_total += 1
+                    mmlu_selected += count
+                if count and count < population:
+                    question_variance += count / (total * total)
+            if mmlu_selected and mmlu_selected < mmlu_total:
+                subject_variance = mmlu_selected / (total * total)
+            radii[key] = (np.sqrt(.5 * np.log(2 / delta) * question_variance)
+                          + np.sqrt(.5 * np.log(2 / delta) * subject_variance)) if total else float('inf')
+        radius = radii[key]
+        total = arrays['original_denominator'][j]
+        output = result['gates'][j]
+        output['bootstrap_lower_bound'] = output['lower_bound']
+        lower = gate['natural_lower']
+        if total:
+            numerator = arrays['numerator'][:, j].sum() / total
+            denominator = arrays['denominator'][:, j].sum() / total
+            numerator_lower = max(gate['natural_lower'], numerator - (1 - gate['natural_lower']) * radius)
+            denominator_upper = min(1., denominator + radius)
+            denominator_lower = max(0., denominator - radius)
+            divisor = denominator_upper if numerator_lower >= 0 else denominator_lower
+            if divisor > 0:
+                lower = max(gate['natural_lower'], min(1., numerator_lower / divisor))
+        output['concentration_lower_bound'] = float(lower)
+        output['lower_bound'] = min(output['lower_bound'], float(lower))
+    result['concentration_guard'] = {'confidence':.95, 'scalar_gates':p,
+                                    'component_error_budget':delta,
+                                    'method':'bounded_srswor_moment_comparison_with_separate_mmlu_stages',
+                                    'combination':'minimum_of_bootstrap_and_design_concentration_lower_bounds'}
+
+
 def compute_simultaneous_bounds(records_by_state: Mapping[str, Any], plan: Mapping[str, Any],
                                 *, draws: int = 10000, seed: int = 42,
                                 batch_size: int = 128, retain_replicates: bool = False) -> dict:
@@ -252,6 +317,7 @@ def compute_simultaneous_bounds(records_by_state: Mapping[str, Any], plan: Mappi
             reps[start:start + size, selected] = np.divide(weighted_num, weighted_den,
                 out=np.full_like(weighted_num, np.nan), where=weighted_den > 0)
     result = maximum_standardized_bounds(arrays["point"], reps, plan["gate_registry"], arrays["unresolved"])
+    apply_concentration_guard(arrays, plan, result)
     result.update({"plan_hash": plan["plan_hash"], "method_version": plan["method_version"],
                    "mode": "prospective_computation" if draws == 10000 and plan["status"] == "frozen" else "fixture",
                    "linear_vector_deduplication": [{"kind": kind, "scalar_gates": len(selected),

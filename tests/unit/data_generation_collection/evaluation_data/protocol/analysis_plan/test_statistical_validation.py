@@ -103,3 +103,16 @@ def test_subset_never_issues_certificate_or_silently_changes_registry(tmp_path):
     with pytest.raises(ValueError, match='existing output'):
         validation.run_statistical_validation(simulation_plan=frozen, output_path=tmp_path/'absent',
                                              scenarios=['decision_boundaries'], resume=True)
+
+
+def test_parallel_repetitions_match_serial_seeds_bounds_and_statuses():
+    from concurrent.futures import ProcessPoolExecutor
+    frozen=freeze_simulation_plan(repetitions=100,draws=2,fixture=True)
+    scenario='decision_boundaries'
+    population=generate_finite_population(frozen,scenario)
+    population['validation_truth']=validation.population_truth(population)
+    serial=[validation._validation_repetition(population,frozen,scenario,i) for i in (0,1)]
+    with ProcessPoolExecutor(max_workers=2,initializer=validation._initialize_validation_worker,
+                             initargs=(population,frozen,scenario)) as pool:
+        parallel=list(pool.map(validation._worker_repetition,(0,1)))
+    assert parallel==serial
