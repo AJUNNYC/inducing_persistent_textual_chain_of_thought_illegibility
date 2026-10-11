@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 458,
+  "files": 459,
   "directories_including_root": 202,
   "entries": [
     {
@@ -954,6 +954,17 @@
       "display_path": "docs/evidence/existing_runpod_inspection.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_6c62b1c7fa12ac",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/judge_profile_guard_live_report.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/judge_profile_guard_live_report.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_2852e28de55d2d",
       "blank": false
     },
     {

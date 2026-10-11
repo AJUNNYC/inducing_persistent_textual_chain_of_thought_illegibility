@@ -1,15 +1,15 @@
 {
   "status": "PASSED",
-  "checked_at": "2026-10-11T12:51:49.971987+00:00",
+  "checked_at": "2026-10-11T14:39:56.551003+00:00",
   "repository_validation": {
     "status": "VERIFIED",
-    "intended_static_files": 457,
-    "tracked_files": 457,
+    "intended_static_files": 459,
+    "tracked_files": 459,
     "inventory_source": "git",
-    "manifest_entries": 659,
+    "manifest_entries": 661,
     "modules": 58,
     "requirements": 91,
-    "local_markdown_links": 1380,
+    "local_markdown_links": 1382,
     "errors": [],
     "scope": "static integrity only; run unit/integration/live preflights and native Mermaid parser separately"
   },
@@ -20,7 +20,7 @@
   },
   "pdf": {
     "pages": 81,
-    "active_sha256": "23105305e4be435d85933f593100ffe4c844b40571844a14314edb91fdae473b",
+    "active_sha256": "9ae7f8161e4c9df3fa9e1b85180cbc1d3928f76fef8212a57be9dcff52a743ee",
     "archived_original_sha256": "db5e7dcd68b7632f2c222468a02affabe8526bedc48ef2b7139c31077343a704",
     "changes_integrated_into_existing_pages": true
   },
@@ -36,7 +36,15 @@
     "full dataset handoff and download index",
     "scope and date of historical handoffs",
     "statistical coverage repetitions distinguished from test/scenario counts",
-    "Approved concentration guard and full passing seven-scenario validation; no SFT recipe/data changes"
+    "Approved concentration guard and full passing seven-scenario validation; no SFT recipe/data changes",
+    "Model identities and backend fingerprints checked per frozen judge request profile; legacy and cache drift guards retained"
   ],
-  "limits": "Active documentation/static integrity and revised statistical component verified; no current-head full-suite or trained-model-result certification."
+  "limits": "Active documentation/static integrity and revised statistical component verified; no current-head full-suite or trained-model-result certification.",
+  "judge_profile_guard": {
+    "targeted_tests_passed": 17,
+    "canonical_live_checks_passed": 5,
+    "fresh_same_profile_controls_passed": 2,
+    "source_revision": "54c355a",
+    "training_ready": false
+  }
 }

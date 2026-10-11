@@ -1,5 +1,11 @@
 # Current implementation and validation report
 
+## Judge request-profile guard verified (2026-10-11)
+
+The user-authorized repair passed all five canonical live provider/schema/version/cache/cost checks. Two fresh GPT-4o calls confirmed stable fingerprints within the trace-only score profile (`fp_8876ebca54`) and question-aware audit profile (`fp_558abb94fe`). The backend guard compares fixed model/request-kind/prompt/schema/settings profiles and still stops on within-profile drift or returned-model mismatch, including cache reads and legacy migration. [Live evidence](evidence/judge_profile_guard_live_report.json) and historical failures are saved in Google Drive. Seventeen targeted judge tests and four PDF provenance tests passed; all 75 Mermaid diagrams parsed. The correction is integrated into PDF page 73. Judge prompts, models, schemas, scoring rules and SFT data/recipe are unchanged.
+
+Baseline repeatability and the dataset-to-training provenance handoff remain outstanding; no SFT training has started.
+
 ## Live training controls completed (2026-10-11)
 
 Both pinned models passed actual CUDA runtime, completion-only loss masking/nonzero LoRA gradients, full SFT optimizer/scheduler/RNG restoration, and controlled eight-by-four GRPO updates with exact full-state restoration. A fresh registered Drive download and the restricted MBPP executor also passed. The [execution report](evidence/sft_runtime_checks_report.json) preserves actual source identities and receipts. Completed SFT corpus and statistical validation were retained.
