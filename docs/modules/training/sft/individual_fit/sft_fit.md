@@ -1,6 +1,6 @@
 # sft_fit.md
 
-**Owner:** `sft`. **Implementation status:** source `a6e3295` accepted scheduled spatial CE only for 7B ROT13 level 1 on the measured Blackwell96GB GPU. The [worker](../../../../evidence/sft_scheduled_forward_pro6000_training_resume.json) is running from restored step 509, with passed native mask/gradient checks and verified Drive child state. Parent checkpoints and scientific state remain preserved; earlier flat/fused forward CE stay rejected.
+**Owner:** `sft`. **Implementation status:** source `a6e3295` remains accepted only for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Its existing lineage is running from verified step 673 with passed native gradients, verified Drive recovery and the original deadline. The final memory-copy candidate failed speed despite bitwise agreement. All parent checkpoints and science remain unchanged; optimization rounds are closed.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -50,7 +50,7 @@ Use the common [artifact contracts](../../../../contracts.md), [frozen prompt in
 
 ## Implemented interface and evidence
 
-The pending `causal_contiguous_gradient_ce` helper, `src/training/sft/causal_gradient_loss.py`, accepts full FP32 logits and the unchanged shifted targets. Causal logit shifting moves inside its custom autograd. Forward delegates to the accepted scheduled spatial CE with its existing coalesced input copy; 32-class by 32-time backward tiles write the complete contiguous token/vocabulary gradient and zero only the unused last row. The proposal removes separate slice-backward and gradient-layout copies while retaining head/GEMM precision, all vocabulary classes, masks, weighting and RNG. Its actual numerical/state/memory/speed screen references accepted scheduled CE from the same full checkpoint. Implementation checks and GPU approval are pending; current source a6e3295 remains authoritative.
+The [causal-gradient helper](../../../../../src/training/sft/causal_gradient_loss.py), `causal_gradient_token_cross_entropy(logits, targets, *, ignore_index=-100)`, moves causal shifting inside custom autograd and writes the complete contiguous token/vocabulary gradient, zeroing only the unused last row. Forward reuses accepted scheduled CE and its coalesced input copy; backward removes separate slice/scatter/layout copies. Source 07f8a68 passed 359 affected CPU checks and both bitwise numerical/state/RNG comparisons, but failed the speed gate: 1.93% less median time in one pair, 0.17% more in the other, minimum matched ratio 0.99834x versus required 1.05x. Peak allocated memory did not improve. The helper is rejected; source a6e3295 scheduled CE remains selected. Its exact existing lineage is running from verified step 673 with passed native gradients, verified Drive recovery and the unchanged deadline. No migration to the rejected source occurs, all parents and science are preserved, and optimization rounds are closed.
 
 The accepted `spatial_scheduled_ce` option uses [scheduled_spatial_token_cross_entropy](../../../../../src/training/sft/scheduled_spatial_loss.py) with the original shifted FP32 logits and targets. It retains serial class-index accumulation, native libdevice exp/log and target-loss arithmetic, schedules 64 tokens per CUDA thread block, stores target losses/row statistics and reconstructs log-probabilities during tiled backward. Shifted sequences of at most 64 tokens explicitly retain original spatial forward; errors never choose another backend. Full head/logits, vocabulary, masks, per-example weighting and RNG behavior stay fixed. Two counterbalanced step-509 recovery pairs passed bitwise losses, gradients, updates and final adapter/optimizer/scheduler/RNG, with 24.70–24.98% less median update time versus accepted spatial-forward/tiled-backward. The longest 3,190-token probe had the same loss and 84.28 GiB allocated/87.32 GiB reserved peak as reference. A total of 236 focused CPU checks and affected launch controls passed; acceptance is limited to the source/GPU/condition binding. This does not prove final-result equivalence, improve all conditions or establish a full-fit ETA.
 
@@ -125,9 +125,10 @@ flowchart TD
 %% Historical source 218900d inherited step 401 with preserved parent checkpoints and verified Drive state.
 %% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
 %% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
-%% New source a6e3295 continuation runs from restored step 509; parent bytes remain unchanged.
-%% Pending causal_contiguous_gradient_ce owns causal shift and writes full contiguous BTV gradients.
-%% Reuse accepted scheduled forward; compare incrementally without changing science or RNG.
+%% Historical a6e3295 lineage began at step 509 with preserved parent bytes.
+%% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
+%% Resume accepted a6e3295 from step 673 in the same existing lineage; no new migration.
+%% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.

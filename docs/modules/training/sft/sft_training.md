@@ -1,6 +1,6 @@
 # sft_training.md
 
-**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass. Source `a6e3295` accepted scheduled spatial CE for only 7B ROT13 level 1; its [worker](../../../evidence/sft_scheduled_forward_pro6000_training_resume.json) is running from restored step 509, with passed native mask/gradient checks and verified Drive child state. Both earlier optimizations remain historical and all parent checkpoints are preserved; the forty-fit study is incomplete.
+**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass. Accepted source `a6e3295` runs from verified step 673 in its same existing lineage, with passed native gradients and verified Drive recovery. The final memory-copy trial is rejected on speed and optimization rounds are closed. All scientific settings and 40 planned fits remain unchanged; approval covers only 7B ROT13 level 1.
 
 Source `05f42b0` has accepted no-recomputation evidence and READY affected-runtime controls for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB; the production continuation is now safely paused at step 401 with verified Drive state. CUDA input caching failed the speed gate and remains disabled. Activation evidence is scoped to this model/family/level. Explicit continuation lineage inherits full step-214 state while preserving parent bytes; a passing first-fit screen does not authorize the entire forty-fit matrix.
 
@@ -30,7 +30,7 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 
 ## Implemented interface and evidence
 
-The final contiguous-gradient memory-copy candidate remains pending. Its paired reference is the active scheduled spatial-CE profile, with unchanged full science and latest recovery state. Existing source a6e3295 training continues during preparation. Only actual source/GPU/condition-bound numerical, state, RNG, speed and memory evidence plus parent-preserving migration may activate the new helper; previous approval and other conditions do not authorize it.
+The final copy-removal trial retained bitwise numerical/state/RNG agreement but failed the 1.05x per-update speed rule: median time improved 1.93% in one pair and slowed 0.17% in the other; no peak allocated-memory benefit. Source 07f8a68 is rejected, while archived source a6e3295 remains selected. Its worker is running from verified step 673 via --resume-existing, preserving the same lineage and original deadline, with passed native gradients and verified Drive recovery. The older step-509 migration stays historical. A total of 359 affected CPU checks passed; no unrelated suite/provider/statistical repeat occurred. Optimization rounds are closed, with exactly 40 planned fits and unchanged science; current approval remains only 7B ROT13 level 1.
 
 Source `a6e3295` passed the counterbalanced scheduled spatial-CE screen: two step-509 recovery pairs measured 24.70–24.98% less median update time versus accepted spatial-forward/tiled-backward, with bitwise numerical/state/RNG agreement and minimum matched ratio 1.31995x. Source/GPU/condition-bound READY controls and 236 focused CPU checks approve only 7B ROT13 level 1 on Blackwell96GB. Parent-preserving full-state migration and the unchanged science remain mandatory; unrelated suites, provider/statistical controls and the remaining matrix were not repeated. Prior flat/fused forward failures remain rejected.
 
@@ -74,9 +74,10 @@ flowchart TD
 %% Historical source 218900d inherited step 401 with preserved parent checkpoints and verified Drive state.
 %% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
 %% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
-%% New source a6e3295 continuation runs from restored step 509; parent bytes remain unchanged.
-%% Pending causal_contiguous_gradient_ce owns causal shift and writes full contiguous BTV gradients.
-%% Reuse accepted scheduled forward; compare incrementally without changing science or RNG.
+%% Historical a6e3295 lineage began at step 509 with preserved parent bytes.
+%% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
+%% Resume accepted a6e3295 from step 673 in the same existing lineage; no new migration.
+%% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.

@@ -117,6 +117,9 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_loss_optimization_pro6000_selected_profile.json
       sft_loss_optimization_pro6000_spatial_backward.json
       sft_loss_optimization_pro6000_training_resume.json
+      sft_memory_copy_pro6000_benchmark.json
+      sft_memory_copy_pro6000_pause_673.json
+      sft_memory_copy_pro6000_training_resume.json
       sft_optimization_benchmark_plan.json
       sft_optimization_cpu_audit.json
       sft_optimization_drive_index.json
