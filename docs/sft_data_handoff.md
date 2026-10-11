@@ -72,3 +72,8 @@ ARTIFACT_ROOT=/workspace/artifacts/sft_launch_773cfd3 \
 ```
 
 For training, remove `--validate-only` and provide the existing private `GOOGLE_OAUTH_TOKEN_FILE` and central `GOOGLE_DRIVE_FOLDER_ID` bindings. The deadline must still be in the future; the worker preserves full checkpoints to Drive before pausing. The frozen measurement contract is `/workspace/artifacts/sft_launch_773cfd3/measurement_protocol.json`; its configuration binding differs explicitly from the original baseline binding, while measurement settings, panels and code hashes agree. Legibility judging remains pending.
+
+
+## Live first fit
+
+The [launch receipt](evidence/sft_training_launch.json) records 7B ROT13 level 1 training on the existing H100, after native model initialization and successful actual completion-loss/adapter-gradient verification. The original ten independent levels remain queued. The launch-only `HF_HUB_OFFLINE` flag was removed after it blocked a tokenizer metadata request; model revisions and cached weights are unchanged. Verified Drive checkpoints occur every 100 optimizer updates, and the authorized 20:20 UTC deadline pauses after a whole update and preserved full checkpoint. The readiness snapshot above predates this launch.

@@ -1,3 +1,9 @@
+## Live SFT launch — 2026-10-11, 17:36 UTC
+
+The [live launch receipt](evidence/sft_training_launch.json) records the first 7B ROT13 fit running on the existing H100 at level 1. The model initialized, all 10,000 training and 100 validation records were tokenized, and actual finite completion loss with nonzero adapter gradients passed. GPU utilization was 100%. The unchanged ten-level queue uses source `773cfd3`; checkpoints are saved at 100-step intervals and verified in Drive. No completed optimizer-step count or first full training checkpoint was yet observed at this launch snapshot. A read-only monitor polls every 30 seconds.
+
+The first launch failed before GPU work because a launch-only offline flag blocked a Transformers tokenizer metadata request. Removing that flag allowed initialization; pinned model revisions, corpus, source and recipe were unchanged. Both the retained failure and [live receipt](evidence/sft_training_launch_drive.json) are verified in Drive. The readiness and unstarted-training observations below describe the preceding handoff stage.
+
 ## SFT launch checks reconciled after scoring repair — 2026-10-11
 
 The [versioned baseline repeatability report](evidence/vllm_baseline_rescored_repeatability.json) **passed all eight model/domain checks** on the complete six-pass panel. The [repair receipt](evidence/vllm_baseline_scoring_repair.json) verifies reuse of all **7,398 original real outputs**, zero new generations, and verified Drive preservation of revised packages and reports. Diagnostic retention remains at least 0.80 per repeat and 0.60 across all three seeds; the observed minimums are 0.8042 and 0.7208. Ordinary incorrect, malformed and truncated outputs still count as failures.
