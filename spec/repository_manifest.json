@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 441,
+  "files": 442,
   "directories_including_root": 201,
   "entries": [
     {
@@ -2630,6 +2630,17 @@
       "display_path": "scripts/build_protocol_pdf.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_b883603a139fb0",
+      "blank": false
+    },
+    {
+      "path": "scripts/coordinate_vllm_sft_preparation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/coordinate_vllm_sft_preparation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_31e177f4d00995",
       "blank": false
     },
     {
