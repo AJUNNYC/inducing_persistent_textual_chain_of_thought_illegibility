@@ -1,0 +1,15 @@
+{
+  "primary_pod": "primary",
+  "deadline": "2026-10-11T20:20:00Z",
+  "pods": [
+    {"id": "primary", "credential_file": "/workspace/.secrets/runpod_jupyter.json", "adapter": "/workspace/scratch/runpod_control.py"},
+    {"id": "secondary", "credential_file": "/workspace/.secrets/runpod_jupyter_14b.json", "adapter": "/workspace/scratch/runpod_control_14b.py"}
+  ],
+  "generation_workers": [
+    {"pod": "primary", "model": "7b", "python": "/workspace/vllm_generation_env/bin/python", "config": "/workspace/bootstrap/runtime_75eec060b1fe_batched.yaml"},
+    {"pod": "secondary", "model": "14b", "python": "/workspace/vllm_benchmark_env/bin/python", "config": "/workspace/bootstrap/consumer_75eec060b1fe.yaml"}
+  ],
+  "verification_shards": [
+    {"id": "later_pairs", "pod": "secondary", "round": 0, "start": 2048, "stop": 10100, "chunk_size": 128, "data_root": "/workspace/data/vllm_sft_preparation", "state_file": "/workspace/bootstrap/verification_shard_state.json"}
+  ]
+}

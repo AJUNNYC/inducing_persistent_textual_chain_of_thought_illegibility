@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Coordinate the existing two Pods through protected Jupyter connections.
+"""Coordinate configurable Pod assignments through protected Jupyter connections.
 
 Scientific work runs only through committed repository scripts. The supplied
 connection adapters execute short remote commands; credentials never enter logs.
@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+import threading
 import time
 from urllib.parse import quote
 
@@ -24,13 +25,14 @@ ARTIFACTS = BASE+'/artifacts/vllm_sft_preparation'
 GENERATION_REPO = BASE+'/inducing_persistent_textual_chain_of_thought_illegibility'
 PREPARATION_REPO = BASE+'/vllm_preparation_repo'
 DEADLINE = '2026-10-11T20:20:00Z'
-MODELS = ('7b','14b')
+from coordinator_topology import DEFAULT_TOPOLOGY, load_topology
 
 
 class Pod:
     def __init__(self, credential_file, adapter, controller_python):
         auth = json.loads(Path(credential_file).read_text())
         self.base, self.adapter, self.python = auth['base_url'].rstrip('/'), adapter, controller_python
+        self.command_lock = threading.Lock()
         self.session = requests.Session()
         self.session.headers['Authorization'] = 'token '+auth['token']
 
@@ -46,14 +48,15 @@ class Pod:
         response.raise_for_status()
 
     def execute(self, code):
-        with tempfile.NamedTemporaryFile(mode='w',dir='/workspace/scratch',suffix='.py') as f:
-            f.write(code);f.flush()
-            result = subprocess.run([self.python,self.adapter,f.name,'--timeout','45'],
-                                    capture_output=True,text=True,timeout=55)
-        if result.returncode:
-            # Do not propagate arbitrary connection errors or secret-bearing URLs.
-            raise RuntimeError('Jupyter command failed; inspect protected controller log')
-        return next(json.loads(line) for line in reversed(result.stdout.splitlines()) if line.startswith('{'))
+        with self.command_lock:
+            with tempfile.NamedTemporaryFile(mode='w',dir='/workspace/scratch',suffix='.py') as f:
+                f.write(code);f.flush()
+                result = subprocess.run([self.python,self.adapter,f.name,'--timeout','45'],
+                                        capture_output=True,text=True,timeout=55)
+            if result.returncode:
+                # Do not propagate arbitrary connection errors or secret-bearing URLs.
+                raise RuntimeError('Jupyter command failed; inspect protected controller log')
+            return next(json.loads(line) for line in reversed(result.stdout.splitlines()) if line.startswith('{'))
 
     def download(self, path, target, expected_hash):
         response = self.session.get(self.base+'/files/'+quote(path.lstrip('/')),
@@ -121,11 +124,10 @@ print(json.dumps({{'live':live,'progress':progress,'last_event':events[-1] if ev
         time.sleep(20)
 
 
-def launch_refill(pod, model, round_number, candidate_path):
+def launch_refill(pod, model, round_number, candidate_path, worker):
     root = BASE+'/data/collection_vllm_refill_'+str(round_number).zfill(3)
     artifacts = BASE+'/artifacts/collection_vllm_refill_'+str(round_number).zfill(3)
-    python = '/workspace/vllm_generation_env/bin/python' if model=='7b' else '/workspace/vllm_benchmark_env/bin/python'
-    config = '/workspace/bootstrap/runtime_75eec060b1fe_batched.yaml' if model=='7b' else '/workspace/bootstrap/consumer_75eec060b1fe.yaml'
+    python, config = worker['python'], worker['config']
     value = pod.execute(f"""
 import json,os,subprocess
 from pathlib import Path
@@ -150,10 +152,10 @@ if not state.exists():
     return artifacts, root
 
 
-def wait_refills(pods, round_number, roots, emit):
+def wait_refills(pods, models, round_number, roots, emit):
     while True:
         statuses = []
-        for pod,model,root in zip(pods,MODELS,roots):
+        for pod,model,root in zip(pods,models,roots):
             value = pod.execute(f"""
 from pathlib import Path
 import json
@@ -175,8 +177,8 @@ print(json.dumps({{'model':{model!r},'completed':state['completed'],'terminal':t
         time.sleep(20)
 
 
-def import_refills(pods, round_number, roots, local_root):
-    for pod,model,root in zip(pods,MODELS,roots):
+def import_refills(pods, models, primary, round_number, roots, local_root):
+    for pod,model,root in zip(pods,models,roots):
         info = pod.execute(f"""
 from pathlib import Path
 import json,hashlib,zipfile
@@ -186,14 +188,14 @@ with zipfile.ZipFile(target,'w',zipfile.ZIP_DEFLATED,compresslevel=1) as z:
  for path in source.glob('*.json'):z.write(path,path.name)
 print(json.dumps({{'path':str(target),'sha256':hashlib.sha256(target.read_bytes()).hexdigest()}}))
 """)
-        if model=='14b':
+        if pod is not primary:
             local=local_root/f'refill_{round_number:03d}_{model}.zip'
             pod.download(info['path'],local,info['sha256'])
             with local.open('rb') as f:
                 count=0
                 while chunk:=f.read(4*1024*1024):
-                    pods[0].put(f'/workspace/bootstrap/refill_transfer_part_{count}.bin',chunk);count+=1
-            pods[0].execute(f"""
+                    primary.put(f'/workspace/bootstrap/refill_transfer_part_{count}.bin',chunk);count+=1
+            primary.execute(f"""
 from pathlib import Path
 import hashlib,json
 target=Path({info['path']!r})
@@ -202,7 +204,7 @@ with target.open('wb') as f:
 assert hashlib.sha256(target.read_bytes()).hexdigest()=={info['sha256']!r}
 print(json.dumps({{'transfer':'VERIFIED'}}))
 """)
-        pods[0].execute(f"""
+        primary.execute(f"""
 from pathlib import Path
 import zipfile,hashlib,re,json
 target=Path({DATA!r})/'clean_traces/raw/production'/{model!r};target.mkdir(parents=True,exist_ok=True)
@@ -219,12 +221,19 @@ print(json.dumps({{'model':{model!r},'imported':len(z.namelist())}}))
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--controller-python',default='python')
+    p.add_argument('--topology',default=str(DEFAULT_TOPOLOGY))
     p.add_argument('--output-root',default='/workspace/scratch/sft_coordinator')
     a=p.parse_args()
     root=Path(a.output_root);root.mkdir(parents=True,exist_ok=True)
-    pods=[Pod('/workspace/.secrets/runpod_jupyter'+suffix+'.json',
-              '/workspace/scratch/runpod_control'+suffix+'.py',a.controller_python)
-          for suffix in ('','_14b')]
+    topology=load_topology(a.topology)
+    global DEADLINE
+    DEADLINE=topology['deadline']
+    connections={entry['id']:Pod(entry['credential_file'],entry['adapter'],a.controller_python)
+                 for entry in topology['pods']}
+    primary=connections[topology['primary_pod']]
+    workers=topology['generation_workers']
+    pods=[connections[w['pod']] for w in workers]
+    models=[w['model'] for w in workers]
     previous=None
     def emit(value):
         nonlocal previous
@@ -237,29 +246,29 @@ def main():
     # executing acceptance worker reaches a complete, verified boundary.
     round_number=0
     while True:
-        result=wait_cpu(pods[0],emit)
+        result=wait_cpu(primary,emit)
         if result['status']=='COMPLETE':
             return
         if result['status']=='ACCEPTED_POOL_VERIFIED':
-            upgrade_preparation(pods[0])
-            launch_preparation(pods[0],'build',round_number,'/workspace/bootstrap/vllm_candidates.json')
+            upgrade_preparation(primary)
+            launch_preparation(primary,'build',round_number,'/workspace/bootstrap/vllm_candidates.json')
             continue
         if datetime.now(timezone.utc)>=datetime.fromisoformat(DEADLINE.replace('Z','+00:00')):
             raise RuntimeError('Authorized worker deadline reached')
         round_number=result['round']+1
         candidate_path=result['refill_candidates']
-        payload=pods[0].read(candidate_path)
+        payload=primary.read(candidate_path)
         selected=json.loads(payload)
         if len(selected['candidates'])!=result['deficit']:
             raise ValueError('Refill size differs from the accepted deficit')
         candidate_path=f'/workspace/bootstrap/refill_candidates_{round_number:03d}.json'
-        for pod in pods:
+        for pod in {primary,*pods}:
             pod.put(candidate_path,payload)
-        launched=[launch_refill(pod,model,round_number,candidate_path) for pod,model in zip(pods,MODELS)]
-        wait_refills(pods,round_number,[x[0] for x in launched],emit)
-        import_refills(pods,round_number,[x[1] for x in launched],root)
-        upgrade_preparation(pods[0])
-        launch_preparation(pods[0],'accept',round_number,candidate_path)
+        launched=[launch_refill(pod,w['model'],round_number,candidate_path,w) for pod,w in zip(pods,workers)]
+        wait_refills(pods,models,round_number,[x[0] for x in launched],emit)
+        import_refills(pods,models,primary,round_number,[x[1] for x in launched],root)
+        upgrade_preparation(primary)
+        launch_preparation(primary,'accept',round_number,candidate_path)
 
 
 if __name__=='__main__':

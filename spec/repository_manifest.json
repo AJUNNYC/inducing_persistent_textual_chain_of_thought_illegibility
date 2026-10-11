@@ -4,8 +4,8 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 443,
-  "directories_including_root": 201,
+  "files": 446,
+  "directories_including_root": 202,
   "entries": [
     {
       "kind": "directory",
@@ -695,6 +695,27 @@
       "display_path": "deploy/runpod/pod.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_a41587507a3cf4",
+      "blank": false
+    },
+    {
+      "path": "deployment",
+      "kind": "directory",
+      "entry_type": "directory",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_aee50b18a03c89"
+    },
+    {
+      "path": "deployment/coordinator.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/coordinator.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_47e075e61e913f",
       "blank": false
     },
     {
@@ -2652,6 +2673,17 @@
       "display_path": "scripts/coordinate_vllm_sft_preparation.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_31e177f4d00995",
+      "blank": false
+    },
+    {
+      "path": "scripts/coordinator_topology.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/coordinator_topology.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_275162dd1fe1ad",
       "blank": false
     },
     {
@@ -6450,6 +6482,17 @@
       "display_path": "tests/unit/operations/test_consent_notebook.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_4faf667eb915f6",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_coordinator_topology.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_coordinator_topology.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_dbc1939d573a8c",
       "blank": false
     },
     {

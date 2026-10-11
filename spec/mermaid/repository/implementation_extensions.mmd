@@ -19,6 +19,10 @@ flowchart TD
     EXT --> p_8b6f0d357bb9df
     p_a41587507a3cf4["deploy/runpod/pod.json"]
     EXT --> p_a41587507a3cf4
+    p_aee50b18a03c89["deployment/"]
+    EXT --> p_aee50b18a03c89
+    p_47e075e61e913f["deployment/coordinator.json"]
+    EXT --> p_47e075e61e913f
     p_254db0fb64a77d["dockerfile"]
     EXT --> p_254db0fb64a77d
     p_b42a2e46d7f183["docs/deployment/"]
@@ -117,6 +121,8 @@ flowchart TD
     EXT --> p_7029ef2faa51cf
     p_31e177f4d00995["scripts/coordinate_vllm_sft_preparation.py"]
     EXT --> p_31e177f4d00995
+    p_275162dd1fe1ad["scripts/coordinator_topology.py"]
+    EXT --> p_275162dd1fe1ad
     p_33cb887cb01d59["scripts/create_google_consent_notebook.py"]
     EXT --> p_33cb887cb01d59
     p_9b1bd16ed66d21["scripts/freeze_runtime_config.py"]
@@ -205,6 +211,8 @@ flowchart TD
     EXT --> p_ee44a2d5333a05
     p_4faf667eb915f6["tests/unit/operations/test_consent_notebook.py"]
     EXT --> p_4faf667eb915f6
+    p_dbc1939d573a8c["tests/unit/operations/test_coordinator_topology.py"]
+    EXT --> p_dbc1939d573a8c
     p_a7a6af1a909d4f["tests/unit/operations/test_drive.py"]
     EXT --> p_a7a6af1a909d4f
     p_0211822d80d42b["tests/unit/operations/test_operations.py"]
