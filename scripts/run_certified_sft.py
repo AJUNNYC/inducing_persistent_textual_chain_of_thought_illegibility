@@ -65,6 +65,8 @@ def main():
     parser.add_argument('--family', choices=('rot13','kazitext'), default='rot13')
     parser.add_argument('--model', choices=('7b','14b'), default='7b')
     parser.add_argument('--level', type=int, choices=range(1,11))
+    parser.add_argument('--validate-only', action='store_true',
+                        help='Validate saved launch bindings without GPU work or Drive requests.')
     args = parser.parse_args()
     config = validate_configuration(read_json(args.config),runtime=True)
     experiment = Experiment(config,config_path=args.config)
@@ -83,6 +85,14 @@ def main():
         raise ValueError('Deadline must use UTC')
     if datetime.now(timezone.utc) >= deadline:
         raise ValueError('Deadline already passed; SFT was not launched')
+    if args.validate_only:
+        print(__import__('json').dumps({'status':'READY','source_code_commit':experiment.code,
+            'configuration_hash':experiment.hash,'handoff_certificate_hash':certificate['certificate_hash'],
+            'preflight_report_hash':preflight['report_hash'],'required_gates':len(preflight_requirements('training')),
+            'certified_conditions':len(certificate['conditions']),'selected_conditions':len(tasks),
+            'family':args.family,'model':args.model,'deadline':deadline.isoformat(),
+            'gpu_work_started':False,'drive_requests_made':False}),flush=True)
+        return 0
     stop = {'requested':False}
     def request_pause(_signum,_frame):
         stop['requested'] = True

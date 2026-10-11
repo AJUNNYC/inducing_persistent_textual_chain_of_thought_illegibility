@@ -283,6 +283,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     prepare_batched_collection.py
     prepare_vllm_sft_data.py
     produce_vllm_baseline_raw.py
+    reconcile_sft_launch.py
     refresh_dependency_locks.py
     rescore_vllm_baselines.py
     revalidate_collection_inputs.py

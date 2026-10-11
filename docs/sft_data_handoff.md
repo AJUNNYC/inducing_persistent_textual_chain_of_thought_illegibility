@@ -27,3 +27,27 @@ certificate and worklist in Drive. Compatibility certification does not satisfy
 baseline repeatability or authorize a scientific fit by itself.
 
 The completed certificate and worklist are in the [verified Drive handoff folder](https://drive.google.com/drive/folders/15wW4PXRzf_i4yNaN3jyOeMMFddXrLpRv). Source/configuration identities are frozen at `a50de2c`; subsequent evidence-only commits do not redefine that consumer.
+
+
+## Certified single-GPU launch
+
+`scripts/run_certified_sft.py` consumes the consumer configuration, certificate,
+production `transformed/manifest.json`, certified worklist, canonical preflight
+report and UTC deadline. `--family rot13 --model 7b` runs the ten independent
+encoding levels sequentially; `--level 1` selects only the first fit. Each fit
+uses a fresh base or an exact full checkpoint. The fixed optimizer, loss, counts
+and two epochs remain unchanged. Checkpoints and final adapter payloads pass
+verified Drive barriers. SIGTERM and the deadline pause at a whole optimizer
+update. `--validate-only` checks every launch binding and all thirteen gates
+without loading a model or starting training.
+
+`scripts/reconcile_sft_launch.py` reuses compatible passed control evidence,
+retaining its original source/configuration hashes and adding verified current
+source/recipe bindings. The newly certified consumer changes implementation
+identity only. It still requires the repaired full baseline gate to pass.
+Scoring, prompt and GPU controls are not declared passed through fixture tests.
+
+The SFT consumer configuration is separate from the vLLM measurement protocol.
+Subsequent adapter evaluations must explicitly use the saved frozen vLLM
+contract; the generic experiment evaluator must not silently default to native
+inference. Capability-only repeatability does not complete legibility judging.
