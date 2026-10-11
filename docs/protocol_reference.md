@@ -3005,22 +3005,22 @@ E.2.3 Machine-readable configuration and exact artifact contracts
 Freeze model, tokenizer, dataset, intervention, code and dependency identities. SHA-256 establishes agreement
 with recorded bytes, not scientific correctness. The producer-to-consumer SFT handoff retains original record
 configuration hashes, verifies all forty ordered train/validation conditions against the independently checked Drive
-bytes, and binds consumer source, native training lock and exact dataset hashes. Checkpoints retain both
-identities. This certificate does not replace baseline repeatability or launch gates.
-SFT source generation uses vLLM 0.11.0, Transformers 4.57.3 and Torch 2.8.0+cu128 separately from native
-Torch 2.9 training. Save actual package inventories. Its BF16 contract has context 4096, 128 sequences, 8192
-scheduler tokens, GPU fraction 0.9 and no prefix caching. Each response retains 3072 new tokens. Producer
-source dc520cb and configuration 3757493e remain frozen; later documentation commits do not change active
-workers.
+bytes, and binds consumer source, native training lock and exact dataset hashes. Checkpoints retain both identities.
+This certificate does not replace baseline repeatability or launch gates.
+SFT source generation uses vLLM 0.11.0, Transformers 4.57.3 and Torch 2.8.0+cu128 separately from native Torch
+2.9 training. Save actual package inventories. Its BF16 contract has context 4096, 128 sequences, 8192 scheduler
+tokens, GPU fraction 0.9 and no prefix caching. Each response retains 3072 new tokens. Producer source dc520cb
+and configuration 3757493e remain frozen; later documentation commits do not change active workers.
 Approved evaluation migration: use the same pinned BF16 vLLM engine for untouched baselines and all SFT/RL
-adapters, with 128 requests, context 8192, scheduler budget 8192, GPU fraction 0.9, no prefix caching, and
-LoRA enabled (maximum rank 32) even for bases. Verify exact adapter/checkpoint bytes. Preserve public
-templates, EOS, per-item seeds, temperature 0.6, top-p 0.95 and the full 3072-token response cap; never
-truncate prompts. Archive native measurements and rebuild six full baselines. Different engines may change
-sampled answers. On one GPU run 7B then 14B in separate processes. Capability repeatability may defer
-judges explicitly; this does not certify opacity or complete full evaluation. Later judge the saved seed-42 outputs
-without regeneration. Verify full raw/scored batch bundles in Drive before advancing. SFT data, optimizer and
-success floors are unchanged.
+adapters, with 128 requests, context 8192, scheduler budget 8192, GPU fraction 0.9, no prefix caching, and LoRA
+enabled (maximum rank 32) even for bases. Verify exact adapter/checkpoint bytes. Preserve public templates,
+EOS, per-item seeds, temperature 0.6, top-p 0.95 and the full 3072-token response cap; never truncate prompts.
+Archive native measurements and rebuild six full baselines. Different engines may change sampled answers. On
+one GPU run 7B then 14B in separate processes. Capability repeatability may defer judges explicitly; this does not
+certify opacity or complete full evaluation. Later judge the saved seed-42 outputs without regeneration. Verify raw
+batches in Drive before advancing GPU work. Score the exact saved outputs in the validated cloud Docker sandbox
+and verify scored bundles and final reports there. Bind handoff drivers separately from frozen measurement source.
+SFT data, optimizer and success floors are unchanged.
 ```
 
 ## page_055

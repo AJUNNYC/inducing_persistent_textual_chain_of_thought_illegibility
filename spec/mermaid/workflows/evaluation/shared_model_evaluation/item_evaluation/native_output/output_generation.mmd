@@ -28,7 +28,7 @@ flowchart TD
     INVALIDATE["Invalidate affected stale derived records"]
     GEN["Batched BF16 vLLM: 128 requests<br/>Same backend for bases and adapters<br/>3,072 new tokens per response with seed 42<br/>Never resample an ordinary bad answer"]
     SAVE["Save exact raw token IDs, text and provenance"]
-    DRIVE["Verify whole raw/scored batch bundle in Google Drive<br/>Deferred baseline judges remain pending"]
+    DRIVE["Verify raw batch bundle in Google Drive<br/>Cloud Docker scoring preserves exact outputs<br/>Scored bundles verified separately; judges deferred"]
     OUT["Return raw output"]
     STOP["Stop after bounded recovery fails"]
     INPUT --> HIT
