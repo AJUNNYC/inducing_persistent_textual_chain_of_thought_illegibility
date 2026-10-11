@@ -277,6 +277,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     prepare_vllm_sft_data.py
     refresh_dependency_locks.py
     revalidate_collection_inputs.py
+    run_baseline_repeatability.py
     run_collection_until.py
     run_experiment.py
     run_model_generation_worker.py
