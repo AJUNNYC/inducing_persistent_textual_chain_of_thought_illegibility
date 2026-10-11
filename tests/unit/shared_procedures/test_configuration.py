@@ -72,6 +72,13 @@ def test_local_udpipe_dictionary_paths_excluded_but_content_provenance_retained(
     changed['interventions']['kazitext']['aspell_dictionary_provenance']=[{'name':'en_dictionary','sha256':'a'*64}]
     assert configuration_hash(c)!=configuration_hash(changed)
 
+def test_drive_primary_recovery_evidence_is_operational_and_snapshot_audited():
+    c=load_configuration(CONFIG);changed=deepcopy(c)
+    changed['runtime']['durability_evidence']={'mode':'google_drive_primary','live':True,
+        'registered_probe':{'sha256':'a'*64},'independent_restore':{'observed_at':'explicit_fixture'}}
+    assert configuration_hash(c)==configuration_hash(changed)
+    assert snapshot_hash(c)!=snapshot_hash(changed)
+
 @pytest.mark.parametrize('mutation',['missing','duplicate','path','bad_hash'])
 def test_incomplete_aspell_provenance_prevents_runtime_freeze(tmp_path,mutation):
     c=load_configuration(CONFIG)

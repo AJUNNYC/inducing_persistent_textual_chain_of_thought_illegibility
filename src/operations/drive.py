@@ -6,14 +6,134 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import tempfile
 import time
 from pathlib import Path
+from types import SimpleNamespace
+from urllib.parse import urlsplit
 from shared_procedures.recovery_procedure import RecoveryManager, RetryableFailure
 
 SCOPE = "https://www.googleapis.com/auth/drive.file"
 PROJECT_TITLE = "Inducing Persistent Textual Chain-of-Thought Illegibility"
 INTENDED_ACCOUNT = "antoniojun.nyc@gmail.com"
+GOOGLE_TRANSPORT_HOSTS = {"www.googleapis.com", "oauth2.googleapis.com", "accounts.google.com"}
+MAX_TRANSPORT_BYTES = 9 * 1024 * 1024  # Accommodate each fixed 8-MiB media chunk.
+
+
+def _checked_google_uri(uri):
+    try:
+        value = urlsplit(uri)
+        accepted = (value.scheme == "https" and value.hostname in GOOGLE_TRANSPORT_HOSTS
+                    and value.username is None and value.password is None and not value.fragment
+                    and value.port in (None, 443))
+    except (TypeError, ValueError):
+        accepted = False
+    if not accepted:
+        raise RuntimeError("Drive transport requires an approved Google HTTPS destination")
+
+
+def _bounded_request_body(body, headers):
+    if hasattr(body, "read"):
+        try:
+            length = next(int(value) for key, value in headers.items() if key.lower() == "content-length")
+        except (ValueError, StopIteration):
+            raise RuntimeError("Drive streaming request lacks a bounded chunk length") from None
+        if not 0 <= length <= MAX_TRANSPORT_BYTES:
+            raise RuntimeError("Drive streaming request lacks a bounded chunk length")
+        body = body.read(length)
+        if len(body) != length:
+            raise RuntimeError("Drive streaming chunk length differs")
+    if body is not None and (not isinstance(body, (str, bytes))
+        or len(body.encode('utf-8') if isinstance(body, str) else body) > MAX_TRANSPORT_BYTES):
+        raise RuntimeError("Drive request body exceeds the bounded chunk size")
+    return body
+
+
+def _google_request(session, uri, method, body, headers, *, resumable=False):
+    """One TLS-verified request; retries belong to the shared recovery manager."""
+    import requests
+    _checked_google_uri(uri)
+    selected = dict(headers or {})
+    selected['Accept-Encoding'] = 'identity'
+    body = _bounded_request_body(body, selected)
+    response = None
+    try:
+        response = session.request(method, uri, data=body, headers=selected,
+            timeout=(30, 60), allow_redirects=False, verify=True, stream=True)
+        if 300 <= response.status_code < 400 and not (resumable and response.status_code == 308):
+            raise RuntimeError("Unexpected Google transport redirect")
+        content = bytearray()
+        for chunk in response.iter_content(chunk_size=64 * 1024):
+            if len(content) + len(chunk) > MAX_TRANSPORT_BYTES:
+                raise RuntimeError("Google transport response exceeds the bounded chunk size")
+            content.extend(chunk)
+        return response.status_code, dict(response.headers), response.reason, bytes(content)
+    except requests.exceptions.SSLError:
+        raise RuntimeError("Google Drive TLS validation failed") from None
+    except requests.exceptions.Timeout:
+        raise TimeoutError("Google Drive HTTPS transport timed out") from None
+    except requests.exceptions.ConnectionError:
+        raise ConnectionError("Google Drive HTTPS transport unavailable") from None
+    finally:
+        if response is not None:
+            response.close()
+
+
+class _BoundedAuthRequest:
+    def __init__(self):
+        import requests
+        self.session = requests.Session()
+
+    def __call__(self, url, method="GET", body=None, headers=None, timeout=60, **kwargs):
+        status, response_headers, _, content = _google_request(self.session, url, method, body, headers)
+        # Google Auth otherwise retries transient token responses internally.
+        # Raising before its response loop leaves all retries to shared recovery.
+        retryable = status in (408, 429, 500, 502, 503, 504)
+        if status != 200:
+            try:
+                document = json.loads(content)
+                if isinstance(document, dict):
+                    retryable = retryable or any(document.get(key) in
+                        {'internal_failure', 'server_error', 'temporarily_unavailable'}
+                        for key in ('error', 'error_description'))
+            except (ValueError, TypeError):
+                pass
+        if retryable:
+            raise ConnectionError("Google OAuth endpoint unavailable; shared recovery must retry")
+        return SimpleNamespace(status=status, data=content, headers=response_headers)
+
+
+class RequestsDriveTransport:
+    """googleapiclient HTTP interface honoring standard HTTPS proxy settings."""
+    def __init__(self, credentials):
+        from google.auth.transport.requests import AuthorizedSession
+        self.credentials = credentials
+        self.auth_request = _BoundedAuthRequest()
+        self.session = AuthorizedSession(credentials, max_refresh_attempts=0,
+            refresh_timeout=60, auth_request=self.auth_request)
+        self.timeout = 60
+
+    def request(self, uri, method="GET", body=None, headers=None, redirections=5,
+                connection_type=None, **kwargs):
+        import httplib2
+        status, response_headers, reason, content = _google_request(
+            self.session, uri, method, body, headers, resumable=True)
+        metadata = {key.lower(): value for key, value in response_headers.items()}
+        metadata['status'] = str(status)
+        result = httplib2.Response(metadata)
+        result.reason = reason
+        return result, content
+
+    def close(self):
+        self.session.close()
+        self.auth_request.session.close()
+
+
+def _proxy_aware_http(credentials):
+    if any(os.environ.get(name) for name in ('HTTPS_PROXY', 'https_proxy', 'HTTP_PROXY', 'http_proxy', 'ALL_PROXY', 'all_proxy')):
+        return RequestsDriveTransport(credentials)
+    return None
 
 
 def _private_json(path: Path, value: dict) -> None:
@@ -39,12 +159,18 @@ def _validate_scope_set(scopes) -> None:
 def _validate_live_scope(credentials) -> None:
     import requests
     # Do not log request/response exceptions: the token is a confidential argument.
+    result = None
     try:
-        result=requests.get('https://oauth2.googleapis.com/tokeninfo',params={'access_token':credentials.token},timeout=30)
-        if not result.ok: raise ValueError('Token introspection failed')
+        result=requests.get('https://oauth2.googleapis.com/tokeninfo',params={'access_token':credentials.token},timeout=30,
+                            allow_redirects=False,verify=True)
+        if result.status_code != 200: raise ValueError('Token introspection failed')
         scopes=result.json().get('scope','').split()
     except Exception:
         raise RuntimeError('Google token scope verification unavailable; authorization not accepted') from None
+    finally:
+        if result is not None:
+            try: result.close()
+            except Exception: pass
     _validate_scope_set(scopes)
 
 
@@ -73,17 +199,20 @@ def drive_service(token_file: str | Path):
     credentials = Credentials.from_authorized_user_file(str(path))
     if not credentials.has_scopes([SCOPE]):
         raise RuntimeError("Existing OAuth credentials lack drive.file scope; reauthorize")
+    http = _proxy_aware_http(credentials)
     if not credentials.valid:
         if not credentials.refresh_token:
             raise RuntimeError("OAuth refresh token unavailable; reauthorize")
         try:
-            credentials.refresh(Request())
+            credentials.refresh(http.auth_request if http is not None else Request())
         except RefreshError:
             raise RuntimeError("Google OAuth authorization expired or was revoked; repeat drive-authorize") from None
         if credentials.granted_scopes is not None: _validate_scope_set(credentials.granted_scopes)
         _validate_live_scope(credentials)
         _private_json(path, json.loads(credentials.to_json()))
     _validate_live_scope(credentials)
+    if http is not None:
+        return build("drive", "v3", http=http, cache_discovery=False, static_discovery=True)
     return build("drive", "v3", credentials=credentials, cache_discovery=False)
 
 
@@ -194,6 +323,9 @@ class DriveStore:
         from googleapiclient.http import MediaFileUpload
         if not self.folder_id:
             raise RuntimeError("Project folder must be verified before upload")
+        worker_id = os.environ.get('ILLEGIBILITY_WORKER_ID','coordinator')
+        if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}',worker_id):
+            raise RuntimeError('Drive publication requires a stable worker identity')
         self.verify_folder_ancestry(folder_id)
         path = Path(path)
         checksum, size = file_hash(path), path.stat().st_size
@@ -228,6 +360,16 @@ class DriveStore:
             return response
         response = self.recovery.run("upload_"+artifact_id, transfer)
         self.verify_artifact(response["id"], path)
+        # Publish the actual indexed retry total only after this operation has
+        # completed. A lost native collection worker can retain that known floor
+        # without uploading a growing SQLite ledger after every raw response.
+        with self.recovery._database() as connection:
+            retry_floor = connection.execute('SELECT retries FROM worker WHERE singleton=1').fetchone()[0]
+            operation_retries = connection.execute('SELECT retries FROM operations WHERE operation_id=?',
+                ('upload_'+artifact_id,)).fetchone()[0]
+        properties['worker_id'] = worker_id
+        properties['worker_retry_floor'] = str(retry_floor)
+        properties['operation_retries'] = str(operation_retries)
         properties["upload_status"] = "verified"
         self.service.files().update(fileId=response["id"], body={"appProperties": properties}, fields="id").execute()
         return {**response, "appProperties": properties}
@@ -240,7 +382,47 @@ class DriveStore:
             raise RuntimeError("Remote registered artifact is missing or changed")
         if remote.get("md5Checksum") != record["md5"] or props.get("sha256") != record["sha256"] or props.get("config_hash") != record["configuration_hash"] or props.get("project_id") != self.folder_id:
             raise RuntimeError("Remote registered artifact integrity/provenance differs")
+        if remote.get("id") != record["drive_file_id"] or props.get("artifact_id") != record["artifact_id"] or props.get("upload_status") != "verified":
+            raise RuntimeError("Remote registered artifact identity/publication differs")
         return remote
+
+    def restore_registered_artifact(self, record: dict, destination: str | Path, *, expected_provenance: dict) -> Path:
+        """Recover from Drive into a new path, without consulting any local copy.
+
+        The caller supplies a separately preserved registry record and expected
+        immutable provenance. A VERIFIED registry flag alone supplies no proof:
+        current remote metadata and the newly downloaded complete bytes are checked.
+        """
+        from operations.artifacts import validate_registered_record
+        validate_registered_record(record)
+        critical = {"configuration_hash", "source_code_commit", "dataset_revision", "model_revision", "seeds", "model"}
+        if (not isinstance(record, dict) or not isinstance(expected_provenance, dict)
+            or critical - expected_provenance.keys()
+            or any(expected_provenance.get(key) in (None, "", []) for key in critical)
+            or any(record.get(key) != value for key, value in expected_provenance.items())):
+            raise RuntimeError("Drive recovery requires matching complete critical provenance")
+        if (record.get("sync_status") != "VERIFIED" or record.get("completion_status") != "COMPLETED"
+            or not record.get("drive_file_id") or not record.get("drive_folder_id")):
+            raise RuntimeError("Drive recovery requires a complete registered remote copy")
+        destination = Path(destination)
+        if destination.exists() or destination.is_symlink():
+            raise RuntimeError("Drive recovery destination must be a new path")
+        self.verify_registered_artifact(record)
+        remote = self.resolve_artifact_id(record["artifact_id"])
+        if remote is None or remote.get("id") != record["drive_file_id"]:
+            raise RuntimeError("Drive recovery artifact lookup differs from the registry")
+        try:
+            restored = self.download_artifact(record["artifact_id"], destination,
+                                              config_hash=record["configuration_hash"])
+            if (restored != destination or not destination.is_file() or destination.is_symlink()
+                or destination.stat().st_size != record["size"]
+                or file_hash(destination) != record["sha256"] or file_hash(destination, "md5") != record["md5"]):
+                raise RuntimeError("Drive recovery complete-file integrity differs from the registry")
+            self.verify_registered_artifact(record)
+            return destination
+        except Exception:
+            destination.unlink(missing_ok=True)
+            raise
 
     def verify_artifact(self, file_id: str, local_path: str | Path) -> dict:
         path = Path(local_path)

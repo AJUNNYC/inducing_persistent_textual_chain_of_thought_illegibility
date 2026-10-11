@@ -7,10 +7,12 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
+import shutil
 from pathlib import Path
 from shared_procedures.configuration import load_configuration, configuration_hash, validate_configuration, freeze_configuration, scientific_configuration
 from shared_procedures.identity import content_hash
-from shared_procedures.storage import atomic_write_json, read_json, artifact_hook, notify_artifact
+from shared_procedures.storage import atomic_write_json, read_json, artifact_hook, notify_artifact, file_lock, fsync_directory
 from operations.workflow import StageRunner, experiment_graph, topological_order
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -167,8 +169,67 @@ class Experiment:
     def artifact_service(self):
         from operations.artifacts import ArtifactService
         if self._artifact_service is None:
-            self._artifact_service=ArtifactService(Path(os.path.commonpath([self.data,self.artifacts])),self.artifacts/'state'/'artifact_registry.json',drive_store(self.config))
+            self._artifact_service=ArtifactService(Path(os.path.commonpath([self.data,self.artifacts])),self.artifacts/'state'/'artifact_registry.json',drive_store(self.config),drive_recovery=True)
         return self._artifact_service
+
+    def prepared_collection_inputs(self, stage):
+        """Reuse complete independently audited original CPU inputs explicitly."""
+        input_root = os.environ.get('COLLECTION_INPUT_ROOT')
+        certificate_path = os.environ.get('COLLECTION_INPUT_CERTIFICATE')
+        if not input_root and not certificate_path:
+            return None
+        if not input_root or not certificate_path:
+            raise RuntimeError('Prepared collection reuse requires both COLLECTION_INPUT_ROOT and COLLECTION_INPUT_CERTIFICATE')
+        from operations.collection_inputs import validate_consumer_certificate
+        from operations.drive import file_hash
+        certificate = validate_consumer_certificate(certificate_path,self.config,consumer_commit=self.code,
+            input_root=input_root,asset_cache=self.config.get('operations',{}).get('hf_cache') or self.cache)
+        names = (('data/evaluation/capability_panel.json','data/evaluation/legibility_subset.json',
+                  'data/evaluation/evaluation_package.json','data/evaluation/official_pools.json')
+                 if stage.kind=='prepare_panels' else ('data/candidates/manifest.json',))
+        inventory = {row['relative_path']:row for row in certificate['input_files']}
+        service = self.artifact_service()
+        outputs = []
+        for name in names:
+            info = inventory[name]
+            source = Path(input_root)/name
+            destination = self.data/Path(name).relative_to('data')
+            with file_lock(str(destination)+'.copy.lock'):
+                if destination.exists():
+                    if destination.is_symlink() or destination.stat().st_size!=info['size_bytes'] or file_hash(destination)!=info['sha256']:
+                        raise RuntimeError('Existing prepared collection input differs from the certified original')
+                else:
+                    destination.parent.mkdir(parents=True,exist_ok=True)
+                    descriptor,temporary_name = tempfile.mkstemp(prefix='.collection_input_',dir=destination.parent)
+                    temporary = Path(temporary_name)
+                    try:
+                        with os.fdopen(descriptor,'wb') as output,source.open('rb') as original:
+                            shutil.copyfileobj(original,output,length=8*1024*1024)
+                            output.flush();os.fsync(output.fileno())
+                        if temporary.stat().st_size!=info['size_bytes'] or file_hash(temporary)!=info['sha256']:
+                            raise RuntimeError('Prepared collection copy differs from the certified original')
+                        os.replace(temporary,destination);fsync_directory(destination.parent)
+                    finally:
+                        temporary.unlink(missing_ok=True)
+            service.register(destination,{**self.provenance(stage),'producer':'collection_input_revalidator',
+                'original_producer_commit':certificate['original_producer_commit'],
+                'original_configuration_hash':certificate['original_configuration_hash'],
+                'original_file_sha256':info['sha256'],'consumer_certificate_hash':certificate['certificate_hash']})
+            outputs.append(str(destination))
+        report = self.artifacts/'configurations'/f'{stage.kind}_input_reuse.json'
+        atomic_write_json(report,{'status':'VERIFIED','stage':stage.kind,'consumer_commit':self.code,
+            'consumer_configuration_hash':self.hash,'original_producer_commit':certificate['original_producer_commit'],
+            'original_configuration_hash':certificate['original_configuration_hash'],
+            'original_inventory_sha256':certificate['original_inventory_sha256'],
+            'consumer_certificate_hash':certificate['certificate_hash'],
+            'original_bytes_preserved':True,'input_files':[inventory[name] for name in names]})
+        service.register(report,{**self.provenance(stage),'producer':'collection_input_revalidator',
+            'original_producer_commit':certificate['original_producer_commit'],
+            'consumer_certificate_hash':certificate['certificate_hash']})
+        if service.sync_artifacts()['status']!='VERIFIED':
+            raise RuntimeError('Validated prepared collection inputs have incomplete Drive replication')
+        return {'status':'VERIFIED','output_files':outputs+[str(report)],
+                'input_policy':'independently_validated_original_bytes','consumer_certificate_hash':certificate['certificate_hash']}
 
     def action(self, stage):
         kind=stage.kind
@@ -179,6 +240,8 @@ class Experiment:
                 if asset['repo_type']=='model': manifests.append(provision_asset(asset,self.cache,tokenizer_only=True))
             return self.write(self.artifacts/'configurations'/'public_asset_manifest.json',{'status':'tokenizers_verified','assets':manifests,'configuration_hash':self.hash})
         if kind=='prepare_panels':
+            prepared=self.prepared_collection_inputs(stage)
+            if prepared is not None:return prepared
             from data_generation_collection.evaluation_data.evaluation_data_preparation import prepare_evaluation_data
             pools=self.source_pools()
             sandbox=self.sandbox()
@@ -187,6 +250,8 @@ class Experiment:
                 raise RuntimeError('Frozen panel/reference validation incomplete')
             return {'status':'VERIFIED','output_files':[str(p) for p in (self.data/'evaluation').glob('*.json')]}
         if kind=='prepare_candidates':
+            prepared=self.prepared_collection_inputs(stage)
+            if prepared is not None:return prepared
             from data_generation_collection.sft_data.clean_trace_collection.candidate_manifest import load_lmsys_source,prepare_candidate_manifest
             authorized=self.config.get('operations',{}).get('lmsys_authorization') is True
             revision=self.config['datasets']['lmsys']['revision']
@@ -413,6 +478,9 @@ class Experiment:
             # Recover any pending replication before allowing additional paid work.
             if service.sync_artifacts()['status']!='VERIFIED':
                 raise RuntimeError('Existing artifact replication remains incomplete')
+            if 'clean' in stages:
+                expected={key:self.provenance()[key] for key in ('configuration_hash','source_code_commit','dataset_revision','model_revision','seeds','model')}
+                service.assert_collection_reconciled(expected)
             with artifact_hook(self.publish_permanent):
                 for stage_id in stages:
                     status=self.runner.status(stage_id)
@@ -429,7 +497,7 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config',default=str(ROOT/'config.yaml'))
     sub=parser.add_subparsers(dest='command',required=True)
-    for name in ('hardware','plan','status','provision','preflight','drive-init','sync','validate','smoke'):
+    for name in ('hardware','plan','status','provision','preflight','drive-init','recover-collection','sync','validate','smoke'):
         p=sub.add_parser(name)
         if name=='plan': p.add_argument('--target',action='append',default=None)
         if name=='provision': p.add_argument('--include-weights',action='store_true');p.add_argument('--offline',action='store_true')
@@ -445,7 +513,7 @@ def main(argv=None):
         config=load_configuration(args.config)
         experiment=Experiment(config,config_path=args.config)
         config=experiment.config
-        if args.command in ('run','provision','drive-init','drive-authorize','sync','retrieve','runpod-deploy') or (args.command=='preflight' and args.execute_live):
+        if args.command in ('run','provision','drive-init','drive-authorize','recover-collection','sync','retrieve','runpod-deploy') or (args.command=='preflight' and args.execute_live):
             from shared_procedures.recovery_procedure import configure_worker_recovery
             configure_worker_recovery(experiment.artifacts)
         if args.command=='hardware':
@@ -480,6 +548,11 @@ def main(argv=None):
         elif args.command=='drive-init':
             store=drive_store(config);folder=store.create_project_folder();result=store.roundtrip(folder,experiment.hash);result['folder_id']=folder
             atomic_write_json(experiment.artifacts/'state'/'drive_folder.json',{'folder_id':folder})
+        elif args.command=='recover-collection':
+            if config['runtime']['implementation_revision']!=experiment.code:
+                raise RuntimeError('Collection recovery requires the same pinned source revision')
+            expected={key:experiment.provenance()[key] for key in ('configuration_hash','source_code_commit','dataset_revision','model_revision','seeds','model')}
+            result=experiment.artifact_service().restore_collection(expected,data_root=experiment.data)
         elif args.command=='sync': result=experiment.action(experiment.runner.graph['sync'])
         elif args.command=='retrieve':
             expected=read_json(args.expected_provenance)

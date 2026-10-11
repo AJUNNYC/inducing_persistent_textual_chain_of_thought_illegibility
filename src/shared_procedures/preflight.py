@@ -185,6 +185,75 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
     if not spending.get('authorized') or not spending.get('authorization_evidence'):
         return {n:CheckResult(n,'blocked','Current compute spending authorization required.',{'live':False}) for n in names}
     validate_configuration(config,runtime=True)
+    if not include_training:
+        from data_generation_collection.sft_data.clean_trace_collection.candidate_batch import clean_trace_batch
+        from .response_parsing import parse_native_output
+        from .identity import derive_seed,file_hash
+        from .storage import notify_artifact
+        import gc
+        control_prompt='A notebook has three blank pages. One more blank page is added. How many blank pages are there now?'
+        control_hash=content_hash({'kind':'nonexperimental_native_clean_control_v1','prompt':control_prompt})
+        root=Path(config['runtime'].get('artifact_root','artifacts'))/'preflight'/'model_runtime'
+        generator=clean_trace_batch.NativeCleanGenerator(config['models'],device_map='auto',torch_dtype='bfloat16',
+                                                         cache_root=config['runtime'].get('cache_root'))
+        records=[]
+        try:
+            for size,model_spec in config['models'].items():
+                candidate={'example_id':'control_native_clean_'+size+'_'+control_hash[:16],
+                           'prompt':control_prompt,'source_content_hash':content_hash(control_prompt)}
+                responses=list(generator.generate_many(size,[candidate]))
+                if len(responses)!=1:
+                    raise PreflightBlocked('Native clean control must return exactly one response per selected model')
+                response=responses[0]
+                model=generator.model
+                dtypes=sorted({str(parameter.dtype) for parameter in model.parameters() if parameter.is_floating_point()})
+                quantized=bool(getattr(model,'is_loaded_in_4bit',False) or getattr(model,'is_loaded_in_8bit',False)
+                               or getattr(model.config,'quantization_config',None))
+                adapter=bool(getattr(model,'peft_config',None) or getattr(model,'_hf_peft_config_loaded',False))
+                if dtypes!=[str(torch.bfloat16)] or quantized or adapter:
+                    raise PreflightBlocked('Native clean control did not load the untouched unquantized BF16 base')
+                ids=response.get('generation_token_ids',[])
+                eos=model.generation_config.eos_token_id
+                eos_ids=eos if isinstance(eos,list) else [eos]
+                prefix=response.get('native_reasoning_prefix','')
+                raw=response.get('raw_generation')
+                if (response.get('simulation') is not False or response.get('model_name')!=model_spec['id']
+                    or response.get('model_revision')!=model_spec['revision']
+                    or response.get('tokenizer_revision')!=model_spec['tokenizer_revision']
+                    or response.get('seed')!=derive_seed(42,'clean_generation',candidate['example_id'],size)
+                    or response.get('generation_settings')!=clean_trace_batch.GENERATION_SETTINGS
+                    or prefix not in ('','<think>') or not isinstance(raw,str)
+                    or response.get('generated_token_count')!=len(ids) or not ids or ids[-1] not in eos_ids
+                    or response.get('finish_reason')!='stop'):
+                    raise PreflightBlocked('Native clean control generation identity, decoding policy or EOS completion differs')
+                parsed=parse_native_output(prefix+raw)
+                runtime={**response.get('runtime',{}),'loader':'NativeCleanGenerator','base_dtype':str(model.dtype),
+                    'floating_parameter_dtypes':dtypes,'quantization':None,'adapter_loaded':False,'optimizer_loaded':False,
+                    'device_map':{key:str(value) for key,value in getattr(model,'hf_device_map',{}).items()},
+                    'model_device':str(model.device),'generator_implementation_hash':file_hash(clean_trace_batch.__file__)}
+                raw_record={**response,'execution_mode':'control_preflight','control_preflight':True,
+                    'scientific_result':False,'model':model_spec,'control_hash':control_hash,
+                    'prompt':control_prompt,'example_id':candidate['example_id'],'raw_hash':content_hash(raw),
+                    'runtime':runtime,'configuration_hash':configuration_hash(config),'parser_status':parsed['status'],
+                    'eos_token_ids':eos_ids,'eos_complete':True}
+                raw_path=root/('native_clean_control_'+size+'.json')
+                atomic_write_json(raw_path,raw_record);notify_artifact(raw_path,raw_record)
+                if parsed['status']!='valid':
+                    raise PreflightBlocked('Actual native clean control did not yield a complete separated reasoning/final response')
+                records.append({'model':model_spec,'raw_path':str(raw_path),'raw_hash':raw_record['raw_hash'],
+                    'runtime':runtime,'generation_settings':response['generation_settings'],'seed':response['seed'],
+                    'native_reasoning_prefix':prefix,'generated_token_count':len(ids),'eos_token_ids':eos_ids,
+                    'eos_complete':True,'parser_status':parsed['status'],'control_hash':control_hash})
+                model=None
+        finally:
+            generator.model=generator.tokenizer=None
+            generator=model=None
+            gc.collect();torch.cuda.empty_cache()
+        return {'model_runtime':CheckResult('model_runtime','passed','Both pinned untouched BF16 bases passed actual native clean controls.',
+                    {'live':True,'simulation':False,'control_preflight':True,'scientific_results':False,
+                     'runtime_kind':'native_clean_base_bfloat16','training_runtime_loaded':False,'models':records}),
+                **{n:CheckResult(n,'skipped','Training microstate control is outside generation scope.',
+                    {'live':False,'out_of_scope':True},False) for n in ('loss_mask_gradients','full_checkpoint_resume')}}
     from training.sft.individual_fit.sft_fit import (SFTFitSpec,_runtime,tokenize_completion,verify_mask_gradients,
         collate_completion,completion_loss,capture_rng,restore_rng)
     from peft import get_peft_model_state_dict,set_peft_model_state_dict
@@ -223,8 +292,6 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
             if parsed['status']!='valid' or not ids or ids[-1] not in eos_ids:
                 raise PreflightBlocked('Actual selected-model native control did not yield a complete separated reasoning/final response')
             evidence['model_runtime'].append({'model':model_spec,'raw_path':str(raw_path),'raw_hash':raw_record['raw_hash'],'runtime':runtime})
-            if not include_training:
-                continue
             example=tokenize_completion({'example_id':'control_'+size,'prompt':control_prompt,'completion':control_completion},tokenizer)
             pad=tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
             gradients=verify_mask_gradients(model,example,pad,require_lora=True)
@@ -299,6 +366,12 @@ def _run_judge_checks(config: dict) -> CheckResult:
 
 
 def _run_durable_checks(config: dict) -> CheckResult:
+    durability=config.get('runtime',{}).get('durability_evidence')
+    mode=durability.get('mode','runpod_lifecycle') if isinstance(durability,dict) else 'runpod_lifecycle'
+    if mode=='google_drive_primary':
+        return _run_drive_primary_checks(config,durability)
+    if mode!='runpod_lifecycle':
+        return CheckResult('durable_storage','failed','Unsupported durable-storage mode.',{'live':False})
     from .storage import publish_artifact,verify_artifact,notify_artifact
     root=Path(config['runtime'].get('artifact_root','artifacts'))/'preflight'/'durable_storage'
     root.mkdir(parents=True,exist_ok=True)
@@ -316,6 +389,73 @@ def _run_durable_checks(config: dict) -> CheckResult:
         return CheckResult('durable_storage','failed','Lifecycle evidence names another persistence probe.',{'live':False})
     return CheckResult('durable_storage','passed','Actual recorded lifecycle survival and independent backup match the verified probe.',
                        {'live':True,'probe_path':str(path),'probe_hash':record['content_hash'],'lifecycle':lifecycle})
+
+
+def _run_drive_primary_checks(config: dict,durability: dict) -> CheckResult:
+    """Check a retained Drive copy and a fresh restore on every scoped launch."""
+    import tempfile
+    from operations.drive import DriveStore,drive_service,file_hash
+    from .storage import verify_artifact
+    record=durability.get('registered_probe')
+    independent=durability.get('independent_restore')
+    config_hash=configuration_hash(config)
+    expected_identity={'configuration_hash':config_hash,'purpose':'durability_probe_v1'}
+    expected_content=content_hash({'payload':'durable_probe_v1'})
+    expected_provenance={'configuration_hash':config_hash,
+        'source_code_commit':config['runtime'].get('implementation_revision'),
+        'dataset_revision':content_hash(config['datasets']),'model_revision':content_hash(config['models']),
+        'seeds':[config['seed']],'model':'all'}
+    unavailable={'live':False,'mode':'google_drive_primary'}
+    if (durability.get('live') is not True or durability.get('simulation') is True
+        or not isinstance(record,dict) or not isinstance(independent,dict)
+        or independent.get('simulation') is True):
+        return CheckResult('durable_storage','blocked','Actual retained probe and independent Drive restore evidence required.',unavailable)
+    if (any(record.get(key)!=value for key,value in expected_provenance.items())
+        or independent.get('status')!='INDEPENDENT_DRIVE_RETRIEVAL_VERIFIED'
+        or independent.get('pod_filesystem_read_for_retrieval') is not False
+        or independent.get('source_commit')!=expected_provenance['source_code_commit']
+        or independent.get('configuration_hash')!=config_hash
+        or independent.get('probe_identity')!=expected_identity
+        or independent.get('content_hash')!=expected_content
+        or not isinstance(independent.get('observed_at'),str) or not independent['observed_at']
+        or any(independent.get(key)!=record.get(key) for key in ('artifact_id','drive_file_id','sha256','md5','size'))):
+        return CheckResult('durable_storage','failed','Independent Drive probe identity, complete-file digests or source provenance differ.',unavailable)
+    token=os.environ.get('GOOGLE_OAUTH_TOKEN_FILE')
+    folder=os.environ.get('GOOGLE_DRIVE_FOLDER_ID') or config.get('operations',{}).get('drive_folder_id')
+    if not token or not folder:
+        return CheckResult('durable_storage','blocked','Protected Google OAuth token and canonical project folder are required.',unavailable)
+    store=None
+    try:
+        store=DriveStore(drive_service(token),folder,
+            state_root=Path(config['runtime'].get('artifact_root','artifacts'))/'state'/'drive_durability')
+        store.create_project_folder()
+        # A distinct absent destination prevents DriveStore's ordinary local-copy
+        # optimization from supplying apparent cloud recovery evidence.
+        with tempfile.TemporaryDirectory(prefix='illegibility_drive_restore_') as scratch:
+            restored=store.restore_registered_artifact(record,Path(scratch)/'probe.json',
+                expected_provenance=expected_provenance)
+            probe=verify_artifact(restored,expected_identity=expected_identity)
+            if probe['content_hash']!=expected_content or probe['data']!={'payload':'durable_probe_v1'}:
+                raise ValueError('Retained Drive persistence probe differs')
+            full_sha256=file_hash(restored)
+            full_md5=file_hash(restored,'md5')
+            size=restored.stat().st_size
+    except Exception as error:
+        # Transport exceptions can include credentials; only the type is safe.
+        return CheckResult('durable_storage','blocked','Actual Drive restore or integrity verification failed; paid work remains blocked.',
+            {**unavailable,'error_type':type(error).__name__})
+    finally:
+        service=getattr(store,'service',None)
+        if service is not None and hasattr(service,'close'):
+            try:service.close()
+            except Exception:pass
+    return CheckResult('durable_storage','passed','Actual registered Drive metadata and a fresh complete-file restore verify; RunPod storage is scratch.',
+        {'live':True,'simulation':False,'mode':'google_drive_primary','configuration_hash':config_hash,
+         'source_code_commit':expected_provenance['source_code_commit'],'artifact_id':record['artifact_id'],
+         'drive_file_id':record['drive_file_id'],'drive_folder_id':record['drive_folder_id'],
+         'probe_identity':expected_identity,'probe_hash':probe['content_hash'],'sha256':full_sha256,'md5':full_md5,'size':size,
+         'independent_restore':independent,'verification':'current_remote_metadata_and_fresh_drive_download',
+         'runpod_storage_required':False})
 
 
 def _run_clean_checks(config: dict) -> CheckResult:

@@ -205,3 +205,270 @@ def test_image_inventory_runs_without_git_and_excludes_runtime(tmp_path):
     (tmp_path/'.env.example').write_text('FIXTURE=')
     (tmp_path/'.venv').mkdir();(tmp_path/'.venv'/'binary').touch()
     assert tracked_inventory(tmp_path)==['.env.example','artifacts/.gitkeep','src/example.py']
+
+
+class MemoryCollectionDrive(DriveStore):
+    """Explicit offline transport fixture; production integrity/restore code is real."""
+    def __init__(self,recovery_path):
+        from shared_procedures.recovery_procedure import RecoveryManager
+        self.recovery=RecoveryManager(recovery_path)
+        self.folder_id='project';self._verified_folders={'project'}
+        self.metadata={};self.payloads={};self.folders={};self.publications=[]
+        self.fail_payload=False
+        self.service=SimpleNamespace(files=lambda:SimpleNamespace(get=lambda fileId,**kwargs:
+            SimpleNamespace(execute=lambda:deepcopy(self.metadata[fileId]))))
+
+    def create_project_folder(self):return self.folder_id
+
+    def ensure_path(self,parts):
+        folder='/'.join(parts)
+        self.folders[folder]=folder;self._verified_folders.add(folder)
+        return folder
+
+    def list_artifacts(self,folder_id=None):
+        return [deepcopy(remote) for remote in self.metadata.values() if remote['parents']==[folder_id]]
+
+    def resolve_artifact_id(self,artifact_id):
+        found=[remote for remote in self.metadata.values() if remote['appProperties']['artifact_id']==artifact_id]
+        if len(found)>1:raise RuntimeError('Duplicate artifact identity')
+        return deepcopy(found[0]) if found else None
+
+    def upload_artifact(self,path,*,artifact_id,folder_id,config_hash):
+        if self.fail_payload and not folder_id.startswith('recovery/'):
+            raise ConnectionError('Explicit fixture interruption')
+        path=Path(path);existing=self.resolve_artifact_id(artifact_id)
+        if existing:
+            self.verify_artifact(existing['id'],path)
+            return existing
+        identifier=f'file_{len(self.metadata)}'
+        remote={'id':identifier,'name':path.name,'size':str(path.stat().st_size),
+            'md5Checksum':file_hash(path,'md5'),'parents':[folder_id],
+            'appProperties':{'artifact_id':artifact_id,'project_id':self.folder_id,
+                'sha256':file_hash(path),'config_hash':config_hash,'upload_status':'verified',
+                'worker_id':__import__('os').environ.get('ILLEGIBILITY_WORKER_ID','coordinator'),
+                'worker_retry_floor':str(self.recovery.counters()['worker_retries']),
+                'operation_retries':str(self.recovery.counters()['operations'].get('upload_'+artifact_id,0))}}
+        self.metadata[identifier]=remote;self.payloads[identifier]=path.read_bytes()
+        self.publications.append(('descriptor' if folder_id.startswith('recovery/') else 'payload',artifact_id))
+        return deepcopy(remote)
+
+    def download_artifact(self,artifact_id,destination,*,config_hash=None):
+        from shared_procedures.storage import atomic_write_bytes
+        remote=self.resolve_artifact_id(artifact_id)
+        if not remote or remote['appProperties']['config_hash'] != config_hash:
+            raise RuntimeError('Incompatible fixture remote artifact')
+        atomic_write_bytes(destination,self.payloads[remote['id']])
+        self.verify_artifact(remote['id'],destination)
+        return Path(destination)
+
+
+def collection_provenance():
+    return {**provenance(),'stage':'collect_clean','branch':'shared','model':'all',
+            'model_revision':'d'*64,'dataset_revision':'c'*64,'run_id':'clean'}
+
+
+def collection_expected():
+    source=collection_provenance()
+    return {key:source[key] for key in ('configuration_hash','source_code_commit','dataset_revision','model_revision','seeds','model')}
+
+
+def publish_native_snapshot(service,drive,root):
+    snapshot=Path(root)/'artifacts/operations/worker_state/coordinator/native_boundary/retries.sqlite3'
+    drive.recovery.snapshot_database(snapshot)
+    service.register(snapshot,{**collection_provenance(),'stage':'generation_preflight','run_id':'generation_preflight'})
+    assert service.sync_artifacts()['status']=='VERIFIED'
+
+
+def test_drive_only_scratch_loss_restores_raw_without_native_generation(tmp_path):
+    import shutil
+    from data_generation_collection.sft_data.clean_trace_collection.candidate_batch.clean_trace_batch import NativeCleanGenerator,process_clean_batch
+    from shared_procedures.identity import content_hash
+    from shared_procedures.storage import artifact_hook
+    class Tokenizer:
+        def encode(self,text,**kwargs):return list(range(len(text.split())))
+        def apply_chat_template(self,messages,tokenize=False,**kwargs):
+            rendered=''.join(message['content'] for message in messages)
+            return self.encode(rendered) if tokenize else rendered
+    class Noise:
+        def transform(self,reasoning,*args,**kwargs):
+            return {'reasoning':reasoning,'content_hash':content_hash(reasoning),'source_hash':content_hash(reasoning),
+                'status':'verified','protected_content_valid':True,'changed_word_fraction':0}
+    class FixtureNative(NativeCleanGenerator):
+        # Native class membership exercises production cache paths; this is
+        # explicitly a fixture and supplies no live model/scientific evidence.
+        def __init__(self):
+            self.models={model:{'revision':'e'*40,'tokenizer_revision':'f'*40} for model in ('7b','14b')}
+            self.stop_requested=None;self.calls=[];self.forbid=False
+        def generate_many(self,model,candidates,**kwargs):
+            if self.forbid:raise AssertionError('Restored raw response was regenerated')
+            for row in candidates:
+                self.calls.append((model,row['example_id']))
+                yield {'raw_generation':'<think>one two three</think> answer','finish_reason':'stop',
+                    'generated_token_count':10,'model_revision':'e'*40,'tokenizer_revision':'f'*40,'seed':42}
+    original=tmp_path/'old';data=original/'data';root=data/'clean_traces'
+    drive=MemoryCollectionDrive(tmp_path/'transport/retries.json')
+    service=ArtifactService(original,original/'artifacts/state/artifact_registry.json',drive,drive_recovery=True)
+    publish_native_snapshot(service,drive,original)
+    generator=FixtureNative();row={'example_id':'fixture-only','prompt':'question','source_content_hash':content_hash('question')}
+    options={'kazitext':Noise(),'config_hash':'b'*64}
+    with artifact_hook(service.completion_hook(collection_provenance())):
+        first=process_clean_batch([row],generator,{model:Tokenizer() for model in ('7b','14b')},output_dir=root,**options)
+    assert len(generator.calls)==2 and first[0]['status']=='accepted'
+    assert [kind for kind,_ in drive.publications]==['descriptor','payload']*4
+    assert not service.registry.exists()  # No stage-boundary full registry export.
+    shutil.rmtree(original)  # Lose every byte, registry DB and WAL of the old worker.
+    fresh=tmp_path/'fresh';fresh_data=fresh/'data'
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/artifact_registry.json',drive,drive_recovery=True)
+    report=recovered.restore_collection(collection_expected(),data_root=fresh_data)
+    assert report['restored_artifacts']==3 and report['native_retry_state']=='VERIFIED'
+    assert len(recovered.list_artifacts(sync_status='VERIFIED'))==3
+    generator.forbid=True
+    repeated=process_clean_batch([row],generator,{model:Tokenizer() for model in ('7b','14b')},output_dir=fresh_data/'clean_traces',**options)
+    assert repeated==first and len(generator.calls)==2
+    recovered.assert_collection_reconciled(collection_expected())
+
+
+def test_descriptor_survives_loss_after_remote_upload_before_sqlite_commit(tmp_path,monkeypatch):
+    import shutil
+    original=tmp_path/'old';path=original/'data/clean_traces/raw/production/7b/fixture.json'
+    atomic_write_json(path,{'fixture':'full-response-cache'})
+    drive=MemoryCollectionDrive(tmp_path/'transport/retries.json')
+    service=ArtifactService(original,original/'artifacts/state/registry.json',drive,drive_recovery=True)
+    publish_native_snapshot(service,drive,original)
+    service.register(path,collection_provenance())
+    original_put=service._put
+    def interrupted_commit(db,record):
+        if record['sync_status']=='VERIFIED':raise OSError('Explicit fixture process loss')
+        original_put(db,record)
+    monkeypatch.setattr(service,'_put',interrupted_commit)
+    with pytest.raises(OSError):service.sync_artifacts()
+    assert [kind for kind,_ in drive.publications]==['descriptor','payload']*2
+    shutil.rmtree(original)
+    fresh=tmp_path/'fresh'
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/registry.json',drive,drive_recovery=True)
+    assert recovered.restore_collection(collection_expected(),data_root=fresh/'data')['restored_artifacts']==1
+    assert json.loads((fresh/'data/clean_traces/raw/production/7b/fixture.json').read_text())=={'fixture':'full-response-cache'}
+
+
+def test_uncertain_payload_never_becomes_a_missing_cache_generation(tmp_path):
+    path=tmp_path/'old/data/clean_traces/raw/production/7b/fixture.json'
+    atomic_write_json(path,{'fixture':'response'})
+    drive=MemoryCollectionDrive(tmp_path/'transport/retries.json')
+    service=ArtifactService(tmp_path/'old',tmp_path/'old/artifacts/state/registry.json',drive,drive_recovery=True)
+    publish_native_snapshot(service,drive,tmp_path/'old')
+    drive.fail_payload=True
+    service.register(path,collection_provenance())
+    assert service.sync_artifacts()['status']=='FAILED'
+    fresh=tmp_path/'fresh'
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/registry.json',drive,drive_recovery=True)
+    with pytest.raises(RuntimeError,match='unresolved uploads'):
+        recovered.restore_collection(collection_expected(),data_root=fresh/'data')
+    with pytest.raises(RuntimeError,match='recover-collection'):
+        recovered.assert_collection_reconciled(collection_expected())
+    assert not list((fresh/'data').rglob('*.json'))
+
+
+def test_descriptor_tampering_and_unsafe_destination_are_rejected(tmp_path):
+    from shared_procedures.identity import canonical_json
+    path=tmp_path/'old/data/clean_traces/raw/production/7b/fixture.json'
+    atomic_write_json(path,{'fixture':'response'})
+    drive=MemoryCollectionDrive(tmp_path/'transport/retries.json')
+    service=ArtifactService(tmp_path/'old',tmp_path/'old/artifacts/state/registry.json',drive,drive_recovery=True)
+    publish_native_snapshot(service,drive,tmp_path/'old')
+    service.register(path,collection_provenance());assert service.sync_artifacts()['status']=='VERIFIED'
+    descriptor=next(remote for remote in drive.metadata.values() if remote['parents'][0].startswith('recovery/'))
+    value=json.loads(drive.payloads[descriptor['id']]);value['artifact']['relative_path']='../../outside.json'
+    payload=canonical_json(value)+b'\n'
+    drive.payloads[descriptor['id']]=payload
+    descriptor['size']=str(len(payload));descriptor['md5Checksum']=hashlib.md5(payload).hexdigest()
+    descriptor['appProperties']['sha256']=hashlib.sha256(payload).hexdigest()
+    fresh=tmp_path/'fresh'
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/registry.json',drive,drive_recovery=True)
+    with pytest.raises(RuntimeError,match='provenance/path'):
+        recovered.restore_collection(collection_expected(),data_root=fresh/'data')
+    assert not (tmp_path/'outside.json').exists()
+
+
+def test_original_flattened_registry_keeps_complete_asset_provenance(tmp_path):
+    from operations.artifacts import validate_registered_record
+    path=tmp_path/'native_inputs/model_descriptor.json'
+    atomic_write_json(path,{'fixture':'original producer input'})
+    original={**provenance(),'artifact_kind':'source_asset','upstream_filename':'dataset/train.parquet',
+        'license':'CC-BY-NC-SA-4.0','source_revision':'e'*40,
+        'model_descriptor':{'revision':'f'*40,'tokenizer_revision':'1'*40}}
+    service=ArtifactService(tmp_path,tmp_path/'registry.json')
+    record=service.register(path,original)
+    legacy={key:value for key,value in record.items() if key!='provenance'}
+    validate_registered_record(legacy)
+    assert ArtifactService._recovery_descriptor(legacy)['artifact']['provenance']==original
+    legacy['license']='changed-license'
+    with pytest.raises(RuntimeError,match='identity differs'):
+        validate_registered_record(legacy)
+
+
+def test_native_restore_imports_actual_retry_floor_without_reset_or_double_charge(tmp_path):
+    import shutil
+    from shared_procedures.recovery_procedure import RecoveryManager
+    original=tmp_path/'old';fresh=tmp_path/'fresh'
+    path=original/'data/clean_traces/raw/production/7b/fixture.json'
+    atomic_write_json(path,{'fixture':'response'})
+    drive=MemoryCollectionDrive(original/'artifacts/state/retries.json')
+    for index in range(7):drive.recovery.reserve_retry(f'old_transport_{index}')
+    service=ArtifactService(original,original/'artifacts/state/registry.json',drive,drive_recovery=True)
+    service.register(path,collection_provenance());assert service.sync_artifacts()['status']=='VERIFIED'
+    snapshot=original/'artifacts/operations/worker_state/coordinator/fixture/retries.sqlite3'
+    drive.recovery.snapshot_database(snapshot)
+    service.register(snapshot,collection_provenance());assert service.sync_artifacts()['status']=='VERIFIED'
+    shutil.rmtree(original)
+    drive.recovery=RecoveryManager(fresh/'artifacts/state/retries.json')
+    for _ in range(2):drive.recovery.reserve_retry('new_restore_transport')
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/registry.json',drive,drive_recovery=True)
+    report=recovered.restore_collection(collection_expected(),data_root=fresh/'data')
+    assert report['worker_retry_floor']==7 and len(report['non_collection_descriptor_ids'])==1
+    assert drive.recovery.counters()['worker_retries']==9
+    recovered.assert_collection_reconciled(collection_expected())
+    recovered.restore_collection(collection_expected(),data_root=fresh/'data')
+    assert drive.recovery.counters()['worker_retries']==9
+    recovered.assert_collection_reconciled(collection_expected())
+
+
+@pytest.mark.parametrize('kind',['descriptor','payload'])
+def test_native_resume_cannot_invent_missing_old_retry_metadata(tmp_path,kind):
+    path=tmp_path/'old/data/clean_traces/raw/production/7b/fixture.json'
+    atomic_write_json(path,{'fixture':'response'})
+    drive=MemoryCollectionDrive(tmp_path/'transport/retries.json')
+    service=ArtifactService(tmp_path/'old',tmp_path/'old/artifacts/state/registry.json',drive,drive_recovery=True)
+    publish_native_snapshot(service,drive,tmp_path/'old')
+    service.register(path,collection_provenance());assert service.sync_artifacts()['status']=='VERIFIED'
+    remote=next(value for value in drive.metadata.values()
+        if value['parents'][0].startswith('recovery/') is (kind=='descriptor'))
+    remote['appProperties'].pop('worker_retry_floor')
+    fresh=tmp_path/'fresh'
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/registry.json',drive,drive_recovery=True)
+    with pytest.raises(RuntimeError,match='authoritative worker retry metadata'):
+        recovered.restore_collection(collection_expected(),data_root=fresh/'data')
+
+
+def test_coherent_native_snapshot_preserves_asset_operation_retry_ceiling(tmp_path):
+    import shutil
+    from shared_procedures.recovery_procedure import RecoveryManager,RecoveryStopped,RetryableFailure
+    original=tmp_path/'old';fresh=tmp_path/'fresh'
+    drive=MemoryCollectionDrive(original/'artifacts/state/retries.json')
+    operation='metadata:model:fixture/model:'+'e'*40
+    drive.recovery._begin_attempt(operation)
+    drive.recovery.reserve_retry(operation);drive.recovery.reserve_retry(operation)
+    service=ArtifactService(original,original/'artifacts/state/registry.json',drive,drive_recovery=True)
+    publish_native_snapshot(service,drive,original)
+    raw=original/'data/clean_traces/raw/production/7b/fixture.json'
+    atomic_write_json(raw,{'fixture':'response'})
+    service.register(raw,collection_provenance());assert service.sync_artifacts()['status']=='VERIFIED'
+    shutil.rmtree(original)
+    drive.recovery=RecoveryManager(fresh/'artifacts/state/retries.json')
+    recovered=ArtifactService(fresh,fresh/'artifacts/state/registry.json',drive,drive_recovery=True)
+    recovered.restore_collection(collection_expected(),data_root=fresh/'data')
+    assert drive.recovery.counters()['operations'][operation]==2
+    assert operation in drive.recovery.counters()['started_operations']
+    attempts=[]
+    def fail():attempts.append(1);raise RetryableFailure('Explicit fixture transient error')
+    with pytest.raises(RecoveryStopped):drive.recovery.run(operation,fail,sleep=lambda _:None)
+    assert attempts==[1] and drive.recovery.counters()['operations'][operation]==3

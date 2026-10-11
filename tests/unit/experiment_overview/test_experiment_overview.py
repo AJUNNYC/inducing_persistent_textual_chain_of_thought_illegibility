@@ -192,3 +192,75 @@ def test_native_dictionary_mismatch_blocks_before_generation(experiment,monkeypa
     with pytest.raises(RuntimeError,match='dictionary content/settings'):
         experiment.kazi()
     assert closed==[True]
+
+
+def test_intact_pending_collection_uploads_are_repaired_before_recovery_guard(experiment,monkeypatch,tmp_path):
+    experiment.config['spending'].update(authorized=True,authorization_evidence='explicit fixture')
+    monkeypatch.setattr(program,'validate_configuration',lambda *args,**kwargs:None)
+    monkeypatch.setattr(program,'freeze_configuration',lambda *args,**kwargs:None)
+    monkeypatch.setattr(program.subprocess,'run',lambda *args,**kwargs:SimpleNamespace(returncode=0,stdout=''))
+    monkeypatch.setenv('ILLEGIBILITY_WORKER_RECOVERY_PATH',str(tmp_path/'retries.json'))
+    calls=[];pending=[True]
+    def synchronize():
+        calls.append('repair_pending');pending[0]=False;return {'status':'VERIFIED'}
+    def reconcile(expected):
+        assert pending[0] is False
+        calls.append('recovery_guard')
+    service=SimpleNamespace(drive=SimpleNamespace(create_project_folder=lambda:None),
+        sync_artifacts=synchronize,assert_collection_reconciled=reconcile)
+    monkeypatch.setattr(experiment,'artifact_service',lambda:service)
+    monkeypatch.setattr(experiment.runner,'run',lambda targets,actions:{'status':'fixture_no_paid_execution'})
+    assert experiment.execute(['clean'])=={'status':'fixture_no_paid_execution'}
+    assert calls==['repair_pending','recovery_guard']
+
+
+def test_prepared_collection_stage_reuse_preserves_bytes_and_original_producer(experiment,monkeypatch,tmp_path):
+    import hashlib
+    import operations.collection_inputs as inputs
+    root=tmp_path/'original';certificate_path=tmp_path/'certificate.json'
+    names=['data/evaluation/capability_panel.json','data/evaluation/legibility_subset.json',
+           'data/evaluation/evaluation_package.json','data/evaluation/official_pools.json','data/candidates/manifest.json']
+    payload=b'{"explicit_offline_child_fixture": true} \n'
+    files=[]
+    for name in names:
+        source=root/name;source.parent.mkdir(parents=True,exist_ok=True);source.write_bytes(payload)
+        files.append({'relative_path':name,'sha256':hashlib.sha256(payload).hexdigest(),'size_bytes':len(payload)})
+    certificate={'input_files':files,'original_producer_commit':'e'*40,'original_configuration_hash':'f'*64,
+        'certificate_hash':'1'*64,'original_inventory_sha256':'2'*64}
+    checks=[]
+    def validate(path,config,**kwargs):
+        assert path==str(certificate_path) and config is experiment.config
+        assert kwargs=={'consumer_commit':experiment.code,'input_root':str(root),'asset_cache':experiment.cache}
+        checks.append(1);return certificate
+    monkeypatch.setattr(inputs,'validate_consumer_certificate',validate)
+    monkeypatch.setenv('COLLECTION_INPUT_ROOT',str(root));monkeypatch.setenv('COLLECTION_INPUT_CERTIFICATE',str(certificate_path))
+    registrations=[];replications=[]
+    service=SimpleNamespace(register=lambda path,provenance:registrations.append((Path(path),provenance)),
+        sync_artifacts=lambda:(replications.append(1) or {'status':'VERIFIED'}))
+    monkeypatch.setattr(experiment,'artifact_service',lambda:service)
+    monkeypatch.setattr(experiment,'source_pools',lambda:pytest.fail('Certified stage must not fetch sources'))
+    monkeypatch.setattr(experiment,'sandbox',lambda:pytest.fail('Certified stage must not invoke Docker'))
+    for stage in (Stage('panels','prepare_panels',()),Stage('candidates','prepare_candidates',())):
+        assert experiment.action(stage)['status']=='VERIFIED'
+    assert len(checks)==2 and len(replications)==2
+    for name in names:assert (experiment.data/Path(name).relative_to('data')).read_bytes()==payload
+    originals=[provenance for _,provenance in registrations if 'original_file_sha256' in provenance]
+    assert len(originals)==5
+    assert all(record['producer']=='collection_input_revalidator' and record['source_code_commit']==experiment.code
+        and record['original_producer_commit']=='e'*40 and record['consumer_certificate_hash']=='1'*64 for record in originals)
+
+
+def test_incomplete_or_failed_prepared_certificate_never_falls_back_to_collection(experiment,monkeypatch,tmp_path):
+    import operations.collection_inputs as inputs
+    monkeypatch.setenv('COLLECTION_INPUT_ROOT',str(tmp_path/'original'))
+    monkeypatch.delenv('COLLECTION_INPUT_CERTIFICATE',raising=False)
+    monkeypatch.setattr(experiment,'source_pools',lambda:pytest.fail('Must not fetch sources after reuse failure'))
+    for stage in (Stage('panels','prepare_panels',()),Stage('candidates','prepare_candidates',())):
+        with pytest.raises(RuntimeError,match='requires both'):
+            experiment.action(stage)
+    monkeypatch.setenv('COLLECTION_INPUT_CERTIFICATE',str(tmp_path/'invalid.json'))
+    def invalid(*args,**kwargs):raise RuntimeError('Actual certificate/config mismatch')
+    monkeypatch.setattr(inputs,'validate_consumer_certificate',invalid)
+    for stage in (Stage('panels','prepare_panels',()),Stage('candidates','prepare_candidates',())):
+        with pytest.raises(RuntimeError,match='certificate/config mismatch'):
+            experiment.action(stage)
