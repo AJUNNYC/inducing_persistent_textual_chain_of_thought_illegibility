@@ -1,5 +1,9 @@
 # overview.md
 
+## Current session: paused on 11 October 2026
+
+At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+
 ## Purpose and boundary
 
 Construct language-model states whose ordinary native outputs contain less interpretable textual chain-of-thought while retaining measured capability and cross-domain coverage. This is an intentionally controlled construction experiment, not a demonstration that opacity emerges naturally or that opaque text is causally useful. It exports checkpoints and provenance for a subsequent monitoring project. The title is **Inducing Persistent Textual Chain-of-Thought Illegibility**, using the visible title on PDF page 1, rather than the shorter metadata title embedded in the PDF. Sources: [pp. 1–3](../spec/experiment.pdf#page=1), [G.1](../spec/experiment.pdf#page=65), [H.1](../spec/experiment.pdf#page=68).

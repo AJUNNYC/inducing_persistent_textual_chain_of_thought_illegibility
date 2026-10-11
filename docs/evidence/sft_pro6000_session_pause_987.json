@@ -1,0 +1,233 @@
+{
+  "schema_version": "sft_safe_pause_frozen_recovery_v1",
+  "status": "PAUSED",
+  "observed_at": "2026-10-11T23:19:10.892547+00:00",
+  "worker_status": {
+    "at": "2026-10-11T23:18:49.587149+00:00",
+    "completed_fits": 0,
+    "completed_run_ids": [],
+    "completed_steps": 987,
+    "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+    "current_run_id": "rot13_7b_level_01",
+    "deadline": "2026-10-12T02:24:01.558671+00:00",
+    "drive_status": "VERIFIED",
+    "family": "rot13",
+    "handoff_certificate_hash": "c0deed5fb6663e3898ecb64a5d216979c8fc2eb87decc4f93b92afe43faa2514",
+    "model": "7b",
+    "required_fits": 1,
+    "source_code_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+    "status": "PAUSED"
+  },
+  "checkpoint_manifest": {
+    "checkpoint_hash": "3aa6100b12ae2fa794c398bd2fb1997d179eb84de2d349c765561db4836eb4eb",
+    "files": {
+      "full_state.pt": {
+        "sha256": "c0e84a69de64b6c2cd113b601f7ccee2fa25ba84ac1a0d2cbcbe9b29e15a3231",
+        "size_bytes": 242617885
+      }
+    },
+    "identity": {
+      "code_revision": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+      "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+      "dataset_hash": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "dependency_hash": "105fdef0f204ddf5b4a5570f86c91fce03164b5746e14835f1b569e5b3af29e2",
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "loss_implementation": "spatial_scheduled_ce",
+        "validated_loss_counts": false
+      },
+      "family": "rot13",
+      "handoff_certificate_hash": "c0deed5fb6663e3898ecb64a5d216979c8fc2eb87decc4f93b92afe43faa2514",
+      "implementation_version": "completion_sft_v1",
+      "level": 1,
+      "model_id": "7b",
+      "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer_configuration_hash": "3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54",
+      "recipe": {
+        "checkpoint_steps": 100,
+        "compute_dtype": "bfloat16",
+        "double_quantization": true,
+        "early_stopping": false,
+        "effective_batch_size": 16,
+        "epochs": 2,
+        "gradient_accumulation_steps": 16,
+        "gradient_checkpointing": true,
+        "learning_rate": 0.0002,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_rank": 8,
+        "loss_reduction": "mean_supervised_tokens_per_example_then_mean_examples",
+        "max_grad_norm": 0.3,
+        "max_length": 4096,
+        "microbatch_size": 1,
+        "optimizer": "paged_adamw_32bit",
+        "quantization": "nf4",
+        "scheduler": "cosine",
+        "seed": 42,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "warmup_ratio": 0.03,
+        "weight_decay": 0.0
+      },
+      "run_id": "rot13_7b_level_01",
+      "strength": 0.1,
+      "tokenizer_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
+    },
+    "progress": {
+      "completed_steps": 987,
+      "example_presentations": 15792,
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "loss_implementation": "spatial_scheduled_ce",
+        "validated_loss_counts": false
+      },
+      "exposure_order_hash": "fd2c10e50de28407a0a8280962668c2862edddde801156189d14d516b4095c22",
+      "processed_tokens": 17190548,
+      "sampler_position": 15792,
+      "total_optimizer_steps": 1250
+    },
+    "state_keys": [
+      "adapter",
+      "optimizer",
+      "progress",
+      "rng",
+      "runtime",
+      "scheduler"
+    ],
+    "status": "complete",
+    "version": "full_state_v1"
+  },
+  "checkpoint_records": [
+    {
+      "artifact_id": "9476a555448c03f2757804d703e8c91cc85dece0ccc6c198d0a6990e4c255f3b",
+      "branch": "rot13",
+      "completion_status": "COMPLETED",
+      "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+      "created_at": "2026-10-11T23:18:24.997142+00:00",
+      "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "drive_file_id": "1aOXFsl8kpXbDGbkMps9UKpS36gILXzvr",
+      "drive_folder_id": "142UamKwaFNprt3DbsXP1F0YNR3iizBU5",
+      "experiment_id": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+      "local_path": "/workspace/artifacts/sft_execution_a6e3295/training/sft/rot13/7b/level_01/checkpoint_000987/full_state.pt",
+      "md5": "4503cf02c1285db8ad858a5684080954",
+      "model": "7b",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer": "experiment_overview",
+      "provenance": {
+        "branch": "rot13",
+        "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+        "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+        "experiment_id": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+        "model": "7b",
+        "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+        "producer": "experiment_overview",
+        "run_id": "rot13_7b_level_01",
+        "seeds": [
+          42
+        ],
+        "source_code_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+        "stage": "sft"
+      },
+      "recovery_descriptor_id": "485cee7f643e4a64b6d21b8d1791bfd4fef9b28ad225aac1e1b2ab161d165c33",
+      "relative_path": "artifacts/sft_execution_a6e3295/training/sft/rot13/7b/level_01/checkpoint_000987/full_state.pt",
+      "retention": "required",
+      "run_id": "rot13_7b_level_01",
+      "seeds": [
+        42
+      ],
+      "sha256": "c0e84a69de64b6c2cd113b601f7ccee2fa25ba84ac1a0d2cbcbe9b29e15a3231",
+      "size": 242617885,
+      "source_code_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+      "stage": "sft",
+      "sync_status": "VERIFIED",
+      "validation_status": "content_hashed"
+    },
+    {
+      "artifact_id": "4e0b9d42ce4f9445d5cee1ce119d98a895d01adc47c1e2d1b69682f177fa0779",
+      "branch": "rot13",
+      "completion_status": "COMPLETED",
+      "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+      "created_at": "2026-10-11T23:18:37.605180+00:00",
+      "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "drive_file_id": "1dNngvg94lQzcjx-4XBeo-8IV9chQvZQ2",
+      "drive_folder_id": "142UamKwaFNprt3DbsXP1F0YNR3iizBU5",
+      "experiment_id": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+      "local_path": "/workspace/artifacts/sft_execution_a6e3295/training/sft/rot13/7b/level_01/checkpoint_000987/manifest.json",
+      "md5": "9d0732924f677a70a5304b2cbcac2045",
+      "model": "7b",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer": "experiment_overview",
+      "provenance": {
+        "branch": "rot13",
+        "configuration_hash": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+        "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+        "experiment_id": "8c0270c3b53607b6003450e56006ee1c8f137a9d58062b1b8a7e20b1fff603c3",
+        "model": "7b",
+        "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+        "producer": "experiment_overview",
+        "run_id": "rot13_7b_level_01",
+        "seeds": [
+          42
+        ],
+        "source_code_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+        "stage": "sft"
+      },
+      "recovery_descriptor_id": "0f7d454e6f9a57af6e5ae34e737f612bad92b799112e62bb7f907789f64cfec3",
+      "relative_path": "artifacts/sft_execution_a6e3295/training/sft/rot13/7b/level_01/checkpoint_000987/manifest.json",
+      "retention": "required",
+      "run_id": "rot13_7b_level_01",
+      "seeds": [
+        42
+      ],
+      "sha256": "879a99b2af5a3336649ffc81d3e2319407bbe5ed4e3a6c3638c26f4c50713f1d",
+      "size": 2470,
+      "source_code_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+      "stage": "sft",
+      "sync_status": "VERIFIED",
+      "validation_status": "content_hashed"
+    }
+  ],
+  "native_frozen_parent": "/workspace/artifacts/sft_optimization_recovery/session_stop_parent/checkpoint_000987",
+  "original_checkpoint": "/workspace/artifacts/sft_execution_a6e3295/training/sft/rot13/7b/level_01/checkpoint_000987",
+  "full_checkpoint_verified": true,
+  "frozen_full_checkpoint_verified": true,
+  "byte_identical_frozen_copy": true,
+  "original_checkpoint_modified": false,
+  "frozen_directory_mode": "0700",
+  "frozen_files": {
+    "full_state.pt": {
+      "sha256": "c0e84a69de64b6c2cd113b601f7ccee2fa25ba84ac1a0d2cbcbe9b29e15a3231",
+      "size_bytes": 242617885,
+      "mode": "0400"
+    },
+    "manifest.json": {
+      "sha256": "879a99b2af5a3336649ffc81d3e2319407bbe5ed4e3a6c3638c26f4c50713f1d",
+      "size_bytes": 2470,
+      "mode": "0400"
+    }
+  },
+  "wrapper_state": {
+    "status": "EXITED",
+    "exit_code": 3,
+    "at": 1791760730.775579
+  },
+  "source_code_commit": "a6e3295bfeca2c213360ae6d772dbfec6a08017e",
+  "reference_profile": "spatial_scheduled_ce_no_gradient_checkpointing",
+  "training_deadline": "2026-10-12T02:24:01.558671+00:00",
+  "drive_verification_basis": "Published worker synchronous Drive barrier and completed permanent registry records; no new Drive calls.",
+  "receipt_hash": "b18dd6037866375899379498703c5439e70d89f7ced5fffd5ae72df643fa1e4b"
+}

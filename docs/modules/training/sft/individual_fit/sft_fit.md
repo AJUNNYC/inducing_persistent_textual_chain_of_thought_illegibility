@@ -1,5 +1,9 @@
 # sft_fit.md
 
+## Current session: paused on 11 October 2026
+
+At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](../../../../evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+
 **Owner:** `sft`. **Implementation status:** source `a6e3295` remains accepted only for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Its existing lineage is running from verified step 673 with passed native gradients, verified Drive recovery and the original deadline. The final memory-copy candidate failed speed despite bitwise agreement. All parent checkpoints and science remain unchanged; optimization rounds are closed.
 
 | Artifact | Exact repository path |

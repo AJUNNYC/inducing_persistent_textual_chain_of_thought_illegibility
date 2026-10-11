@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 535,
+  "files": 536,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1361,6 +1361,17 @@
       "display_path": "docs/evidence/sft_optimization_pro6000_training_resume.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_5ea41ebcb9f929",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_pro6000_session_pause_987.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_pro6000_session_pause_987.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_6a71f689dd7627",
       "blank": false
     },
     {

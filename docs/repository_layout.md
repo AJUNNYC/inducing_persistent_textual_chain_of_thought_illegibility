@@ -130,6 +130,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_optimization_pro6000_recovery_drive_index.json
       sft_optimization_pro6000_selected_profile.json
       sft_optimization_pro6000_training_resume.json
+      sft_pro6000_session_pause_987.json
       sft_runtime_checks_report.json
       sft_scheduled_forward_pro6000_benchmark.json
       sft_scheduled_forward_pro6000_pause_509.json

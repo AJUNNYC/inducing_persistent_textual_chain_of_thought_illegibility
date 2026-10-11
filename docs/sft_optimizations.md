@@ -1,5 +1,9 @@
 # SFT execution optimizations
 
+## Current session: paused on 11 October 2026
+
+At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+
 The decision rule is to change execution in order of least expected effect on the
 trained result, require established precedent, and measure correctness and speed
 on the intended GPU before enabling a candidate. Source `a6e3295` now selects
@@ -127,8 +131,8 @@ there is no new migration to the rejected source. Parents at steps 214, 401,
 Optimization rounds are closed; no further candidates are scheduled. Deferred
 entries are an inventory, not additional planned optimization trials. The full
 study remains exactly 40 SFT fits; current approval still covers only 7B ROT13
-level 1 on the measured Blackwell GPU. Training continues with the accepted
-profile, not the rejected copy-removal candidate.
+level 1 on the measured Blackwell GPU. The accepted profile remains selected; the current session is paused.
+The rejected copy-removal candidate is not activated.
 
 ## Current scheduled spatial-forward profile
 

@@ -1,5 +1,9 @@
 # SFT producer-to-consumer data handoff
 
+## Current session: paused on 11 October 2026
+
+At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+
 The prepared corpus keeps its original generation configuration, source commit,
 model traces and transformed targets. A repaired training implementation has its
 own configuration and native dependency lock. These identities are explicitly

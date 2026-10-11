@@ -3008,13 +3008,13 @@ E.2.3 Machine-readable configuration and exact artifact contracts
 Freeze model, tokenizer, dataset, intervention, source and dependency identities. SHA-256 checks agreement with recorded bytes,
 not scientific correctness. The forty-condition SFT handoff retains producer hashes and verifies ordered records against Drive. Paused
 consumer 773cfd3 passed thirteen launch gates and actual H100 validation; those receipts keep their original scope.
-Accepted source a6e3295 scheduled FP32 CE remains scoped to 7B ROT13 level 1. Final copy removal failed speed despite bitwise
-agreement; that source is rejected. The accepted worker resumed verified step 673 in its same lineage and deadline. PROPOSED
-scheduling assigns two PRO 6000 workers to 14B and two Colab A100 workers to remaining 7B fits; exclude the currently owned
-level-1 condition. Assign each fit once, with distinct immutable Drive outputs and unchanged science. No additional worker or
-A100/14B profile, capacity or rate is validated. Current helpers require SM120/Triton 3.5.0. The 150-hour one-PRO, 75-hour balanced
-two-PRO and about 50-hour four-worker forecasts are estimates; the last assumes the A100 7B group finishes within the 14B PRO
-group duration. Record target runtime evidence before deployment.
+Accepted a6e3295 scheduled FP32 CE remains scoped to 7B ROT13 level 1. Final copy removal agreed bitwise but failed speed and
+remains rejected. Session PAUSED at step 987/1250 (7:19 PM EDT, 11 October); full adapter/optimizer/scheduler/RNG/sampler state
+is Drive-verified. 263 updates and final validation remain. PROPOSED: two PRO 6000 workers for 14B and two Colab A100s for
+remaining 7B fits; exclude the owned level-1 condition. Keep distinct immutable Drive outputs and unchanged science. No new worker
+or A100/14B profile, capacity or rate is validated. Helpers require SM120/Triton 3.5.0. The 150-hour one-PRO, 75-hour balanced
+two-PRO and about 50-hour four-worker forecasts are estimates; 50 hours assumes the A100 7B group finishes within the 14B PRO
+group. Record runtime evidence before deployment.
 Generation uses vLLM 0.11.0, Transformers 4.57.3, Torch 2.8+cu128 separately from native Torch 2.9 training. Save actual
 inventories. BF16 context 4096, sequences 128, scheduler 8192, GPU fraction 0.9, no prefix caching; every response keeps 3072
 new tokens. Producer dc520cb and configuration 3757493e stay frozen.
@@ -3216,18 +3216,18 @@ Current status (11 October 2026). Licensed LMSYS acquisition and the one-million
 are frozen. Evaluation panels and the shared 800-question RL manifest are backed up. Fresh vLLM/refills yielded 10,100 accepted
 pairs and 1539 rejections from 11,639 IDs. All 40 transformed conditions (404,000 records) and the download index are Drive-verified.
 CPU-only readback verified 122 corpus artifacts; both models passed repeatability after rescoring 7398 saved outputs.
-Measured execution. Accepted a6e3295 remains limited to 7B ROT13 level 1. Final copy removal preserved bitwise
-numerical/state/RNG agreement but failed speed: 1.93% less/0.17% more median time, minimum 0.99834x versus 1.05x. Its 359
-affected CPU checks passed; no unrelated suite/provider/statistical repeat. The accepted worker resumed verified step 673 in the
-same lineage/deadline. Parents remain unchanged; optimization rounds are closed.
-PROPOSED deployment. Two PRO 6000 workers would run 14B ROT13/KaziText; two Colab A100s would run 7B ROT13 levels
-2-10/KaziText levels 1-10. Current 7B ROT13 level 1 stays owned, leaving 39 new assignments and 40 total fits. No additional worker
-is deployed. Forecasts 150h one PRO, 75h two balanced PROs and about 50h four workers are conditional estimates, not
-benchmarks; 50h assumes the A100 7B group fits within the PRO 14B group duration. A100/14B rates/capacity/profile support remain
-unvalidated. Current 7B peak 84.28 GiB contrasts with measured checkpointed baseline 15.95 GiB allocated/21.12 GiB reserved:
-baseline is only an A100 capacity candidate. Optimized helpers require SM120/Triton 3.5.0. User quoted 5090 $1.19/h and Colab
-$9.99/100 CU; A100 CU/h unknown, price break-even 11.91 CU/h. Preserve distinct immutable fit outputs in shared Drive and all
-scientific settings; full training/evaluation remain pending.
+Measured execution: accepted a6e3295 only for 7B ROT13 level 1. Final copy removal agreed bitwise but failed speed: 1.93%
+less/0.17% more median time; minimum 0.99834x versus 1.05x. Its 359 affected CPU checks passed; unrelated
+suites/providers/statistics were not repeated. Session PAUSED at step 987/1250 (7:19 PM EDT, 11 October), with full
+adapter/optimizer/scheduler/RNG/sampler state verified in Drive. 263 updates and final validation remain. Parents stay unchanged;
+optimization rounds are closed.
+PROPOSED: two PRO 6000 workers for 14B ROT13/KaziText; two Colab A100s for 7B ROT13 levels 2-10/KaziText levels 1-10. The
+owned level-1 fit plus 39 assignments preserves 40 fits. No additional deployment. Forecasts 150h one PRO, 75h two balanced PROs
+and about 50h four workers are estimates, not benchmarks; 50h assumes the A100 7B group finishes within the PRO 14B group.
+A100/14B rate/capacity/profile support is unvalidated. Current 7B peak 84.28 GiB versus checkpointed baseline 15.95 GiB
+allocated/21.12 reserved supports only an A100 capacity candidate. Helpers require SM120/Triton 3.5.0. User quotes: 5090 $1.19/h,
+Colab $9.99/100 CU; A100 CU/h unknown, price break-even 11.91 CU/h. Preserve immutable Drive outputs and scientific settings;
+training/evaluation remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3719,12 +3719,13 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status (11 October 2026). Corpus and 40 conditions are Drive-verified; accepted a6e3295 continues only 7B ROT13
-level 1. Final copy removal failed speed and stays rejected; optimization rounds are closed. PROPOSED only: two
-PRO 6000s for 14B, two Colab A100s for remaining 7B; exclude the currently owned fit and preserve 40 unique
-conditions/immutable Drive outputs. No additional deployment or A100/14B rate/capacity/profile validation. Forecasts
-150/75/about 50 hours are conditional estimates, not benchmarks; 50 hours requires the A100 7B group to finish
-within the PRO 14B group. Science and current deadline stay fixed; full training/evaluation remain pending.
+Status (11 October 2026). Corpus and 40 conditions are Drive-verified; accepted a6e3295 is PAUSED at step 987/1250 for 7B
+ROT13 level 1 (7:19 PM EDT, 11 October), with full Drive state verified and 263 updates remaining. Final copy removal failed
+speed and stays rejected; optimization rounds are closed. PROPOSED only: two PRO 6000s for 14B, two Colab A100s for
+remaining 7B; exclude the currently owned fit and preserve 40 unique conditions/immutable Drive outputs. No additional
+deployment or A100/14B rate/capacity/profile validation. Forecasts 150/75/about 50 hours are conditional estimates, not
+benchmarks; 50 hours requires the A100 7B group to finish within the PRO 14B group. Science and current deadline stay fixed; full
+training/evaluation remain pending.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in

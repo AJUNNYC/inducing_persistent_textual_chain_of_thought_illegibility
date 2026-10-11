@@ -1,5 +1,9 @@
 # Proposed SFT deployment across RunPod and Colab
 
+## Current session: paused on 11 October 2026
+
+At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+
 Status: planning discussion recorded on 11 October 2026. The additional workers
 have not been deployed or validated by this plan. The study remains 40 independent
 fits: two model sizes, two transformation families and ten levels per family.
@@ -16,7 +20,7 @@ their original scope. The [final memory-copy trial](evidence/sft_memory_copy_pro
 passed exact numerical/state comparisons but failed speed and remains rejected.
 The [existing-lineage resume](evidence/sft_memory_copy_pro6000_training_resume.json)
 preserved step 673 and the original deadline. These are dated evidence snapshots,
-not a live optimizer-step counter. Training continues on its accepted profile.
+not a live optimizer-step counter. The accepted profile remains selected; the current session is paused as recorded above.
 
 Optimization trials are closed. Allocating independent fits to additional GPU
 sessions is a deployment proposal; it does not approve new kernels, hardware,
