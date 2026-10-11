@@ -1,6 +1,6 @@
 # simultaneous_bounds.md
 
-**Owner:** `analysis`. **Implementation status:** original candidate rejected; approved evaluation-only concentration guard implemented and tested, with full revised coverage validation underway.
+**Owner:** `analysis`. **Implementation status:** original candidate rejected; approved evaluation-only concentration guard implemented and tested, with full revised coverage validation passed (700/700 repetitions).
 
 ## Implemented interface and frozen construction
 

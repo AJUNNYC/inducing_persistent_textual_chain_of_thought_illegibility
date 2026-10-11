@@ -1,6 +1,6 @@
 # statistical_validation.md
 
-**Owner:** `analysis`. **Implementation status:** original candidate rejected; approved evaluation-only guard implemented and targeted checks passed. Full revised seven-scenario validation is underway; no passing certificate is claimed yet.
+**Owner:** `analysis`. **Implementation status:** original candidate rejected; approved evaluation-only guard implemented and targeted checks passed. Full revised seven-scenario validation passed (700/700 repetitions); this clears the statistical component only.
 
 ## Implemented interface and prospective acceptance rule
 

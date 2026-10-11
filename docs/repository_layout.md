@@ -103,6 +103,9 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_implementation_report.json
       shared_infrastructure_validation.json
       statistical_failure_diagnosis.json
+      statistical_guard_v2_analysis_plan.json
+      statistical_guard_v2_plan.json
+      statistical_guard_v2_report.json
       statistical_validation_interrupted_plan.json
       statistical_validation_interrupted_report.json
       statistical_validation_plan.json

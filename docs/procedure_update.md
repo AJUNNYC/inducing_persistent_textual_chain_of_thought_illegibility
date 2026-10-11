@@ -1,6 +1,6 @@
 # Current procedure: 11 October 2026
 
-This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It replaces the earlier native Transformers SFT generation procedure for corpus construction. Training recipes, GRPO rollout generation, evaluation settings, acceptance rules, and statistical gates retain their existing definitions.
+This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It replaces the earlier native Transformers SFT generation procedure for corpus construction. Training recipes, GRPO rollout generation, native evaluation generation, scientific success floors and validation acceptance rules remain unchanged. The subsequently approved evaluation-only concentration guard is documented in [the statistical method specification](statistical_concentration_guard.md).
 
 ## SFT corpus generation
 
@@ -46,7 +46,7 @@ Both RL trajectories use this same ordered manifest. Preparation does not create
 
 The vLLM benchmark checked actual generation, formatting, token limits, and GPU memory on the existing hardware. Matched 14B batches of 32 took approximately 40.53 seconds with vLLM versus 342.78 seconds with native generation; the 128-request vLLM sample took 52.64 seconds without OOM. These are generation-only samples, not quality equivalence or end-to-end throughput guarantees. Every production batch separately passes Drive integrity verification.
 
-At the user's request, the full test suite and full launch preflights were not repeated for the engine migration. Final acceptance, cross-model pairing, all transformed datasets and Drive copies are verified. Training and actual model evaluations have not started. Prior prospective statistical validation recorded 34/36 jointly covered repetitions with two coverage failures; this update does not waive that training/confirmatory launch blocker.
+At the user's request, the full test suite and full launch preflights were not repeated for the engine migration. Final acceptance, cross-model pairing, all transformed datasets and Drive copies are verified. Training and actual model evaluations have not started. Prior prospective statistical validation recorded 34/36 jointly covered repetitions with two coverage failures; the approved concentration-guard revision subsequently passed all seven full-budget scenarios (700/700 jointly covered repetitions). [The new report](evidence/statistical_guard_v2_report.json) clears this statistical component; other training launch prerequisites remain separate.
 
 `scripts/monitor_vllm_generation.py` checks both Pods every 30 seconds, records safe status snapshots locally, and reports progress, terminal events, connection errors, and ten-minute stalls. It does not restart workers or send autonomous chat notifications. Its ETA covers initial raw generation and Drive replication only, excluding refills, transformations, training, and evaluation.
 
@@ -77,7 +77,7 @@ All 40 conditions (two models, two interventions, ten levels) are built and vali
 - [Final dataset folder](https://drive.google.com/drive/folders/1kNpUWZ7Z9zXPF-0cu-zifoPpLh2lLg8A)
 - [Verified download index](https://drive.google.com/file/d/1jVgApFjn1sDsBaTTWooGn3XdvF8av75O/view)
 
-Dataset completion does not waive the outstanding prospective statistical failures or authorize a claim that training/evaluation completed. Pod billing remains controlled manually through the account operator.
+Dataset completion and the passing revised statistical validation do not establish completion of training, actual evaluations or other launch gates. Pod billing remains controlled manually through the account operator.
 
 ## Independent Drive readback audit
 

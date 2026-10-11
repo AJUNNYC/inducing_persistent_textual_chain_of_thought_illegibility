@@ -3216,17 +3216,18 @@ quality equivalence. Every production batch undergoes Drive integrity verificati
 full suite and full launch preflights were not repeated for this migration. Native validators passed.
 Independent CPU-only Drive readback verified all 122 artifacts and 404,000 records without connecting to a
 Pod. Training and actual model evaluations remain pending.
-Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned
-model, tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv)
-checked real reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss
-masks; (v) shared 10,000 training and 100 validation IDs and every transformed variant passing acceptance;
-(vi) valid live judge schemas, error pauses and optimizer-boundary recovery; (vii) a secure MBPP executor and
-complete evaluation interfaces; and (viii) actual funding and billing controls. These are engineering gates, not
-extra scientific replicates. Reuse valid compatible evidence; do not claim unexecuted checks passed.
+Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
+tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
+reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
+shared 10,000 training and 100 validation IDs and every transformed variant passing acceptance; (vi) valid live
+judge schemas, error pauses and optimizer-boundary recovery; (vii) a secure MBPP executor and complete
+evaluation interfaces; and (viii) actual funding and billing controls. These are engineering gates, not extra
+scientific replicates. Reuse valid compatible evidence; do not claim unexecuted checks passed.
 Prospective statistical validation recorded 34 of 36 jointly covered repetitions, with two coverage failures. The
-original report remains historical failed evidence. A user-approved conservative design-concentration guard
-now caps the bootstrap lower bounds without changing SFT or scientific success thresholds. Its full validation
-remains pending; no launch clearance is claimed.
+original report remains historical failed evidence. A user-approved conservative design-concentration guard now
+caps the bootstrap lower bounds without changing SFT or scientific success thresholds. It passed all seven
+full-budget scenarios (700/700 covered repetitions). This clears statistical validation only; other training launch
+gates remain separate.
 ```
 
 ## page_059
@@ -3706,12 +3707,12 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status. The implementation decisions supplied on 10 October 2026 are integrated with the approved 11
-October procedure updates. SFT corpus generation now uses separate fresh vLLM model workers and
-Drive-only permanent storage. Shared evaluation panels and the 800-question RL selection are prepared and
-backed up. All forty paired SFT conditions are complete and independently verified from Drive. Training and
-model evaluation remain unexecuted. The approved concentration-guard revision changes evaluation
-confidence bounds only; full prospective validation remains pending.
+Status. The implementation decisions supplied on 10 October 2026 are integrated with the approved 11 October
+procedure updates. SFT corpus generation now uses separate fresh vLLM model workers and Drive-only permanent
+storage. Shared evaluation panels and the 800-question RL selection are prepared and backed up. All forty paired SFT
+conditions are complete and independently verified from Drive. Training and model evaluation remain unexecuted. The
+approved concentration-guard revision changes evaluation confidence bounds only; full prospective validation passed all
+seven scenarios (700/700 covered repetitions). Other mandatory training launch gates remain separate.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in
