@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "f07b8f3551ea951b2e79901ce72b7136e79211e72269beb74feec1385dd80b11"
+    "sha256": "6e3510ca108b79880c8234ce34fe6c780cc53b63ae2d148d0aa4bec748910362"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",

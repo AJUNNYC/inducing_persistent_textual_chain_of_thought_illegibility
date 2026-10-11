@@ -3213,8 +3213,9 @@ Validation evidence. The vLLM benchmark exercised generation, formatting, token 
 Matched 14B chunks of 32 took approximately 40.53 seconds versus 342.78 seconds natively; a
 128-request sample took 52.64 seconds without OOM. These generation-only measurements do not prove
 quality equivalence. Every production batch undergoes Drive integrity verification. At the user's request, the
-full suite and full launch preflights were not repeated for this migration. Native final acceptance and dataset
-validators passed on the real corpus. Training and actual model evaluations remain pending.
+full suite and full launch preflights were not repeated for this migration. Native validators passed.
+Independent CPU-only Drive readback verified all 122 artifacts and 404,000 records without connecting to a
+Pod. Training and actual model evaluations remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned
 model, tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv)
 checked real reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only

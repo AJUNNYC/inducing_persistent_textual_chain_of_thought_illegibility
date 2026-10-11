@@ -86,6 +86,10 @@ def main():
     root=Path('/workspace')/PREFIX
     pool=json.loads((root/'accepted/accepted_pool.json').read_text())
     bundle=json.loads((root/'transformed/manifest.json').read_text())
+    for condition in bundle['datasets']:
+        manifest=Path(condition['train_path']).parent/'manifest.json'
+        if json.loads(manifest.read_text())!=condition:
+            raise ValueError('Downloaded condition manifest differs from bundle')
     validate_accepted_pool(pool,CONFIG_HASH)
     revisions={model:set() for model in ('7b','14b')}
     for pair in pool['pairs']:
@@ -106,6 +110,7 @@ def main():
             'index_sha256':content_hash(response.content),'verified_files':len(verified),
             'downloaded_bytes':sum(e['bytes'] for e in verified),
             'accepted_pairs':len(pool['pairs']),'train_pairs':len(pool['train_ids']),
+            'condition_manifests_checked':len(bundle['datasets']),
             'validation_pairs':len(pool['validation_ids']),'rejected_pairs':len(pool['rejected_ids']),
             'production_backend':'vllm_seeded_batch_v1','generation_commit':GENERATION_COMMIT,
             'pinned_revisions':{m:list(next(iter(values))) for m,values in revisions.items()},

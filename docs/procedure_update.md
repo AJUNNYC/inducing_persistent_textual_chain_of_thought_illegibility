@@ -78,3 +78,13 @@ All 40 conditions (two models, two interventions, ten levels) are built and vali
 - [Verified download index](https://drive.google.com/file/d/1jVgApFjn1sDsBaTTWooGn3XdvF8av75O/view)
 
 Dataset completion does not waive the outstanding prospective statistical failures or authorize a claim that training/evaluation completed. Pod billing remains controlled manually through the account operator.
+
+## Independent Drive readback audit
+
+A separate CPU-only audit passed at 08:03 Eastern on 11 October 2026, with no Pod connections or GPU use. It downloaded all 122 indexed artifacts (7,000,839,153 bytes) directly from Drive and checked every file's SHA-256 and size. All 40 condition manifests matched the bundle. The native accepted-pool and dataset validators passed again on all 10,100 paired sources and 404,000 records, including split order, both models' revisions, source identities, completions, recorded transformation hashes and token/protection invariants. Production provenance identified the frozen vLLM backend and excluded fixture/simulation traces.
+
+The audit checks integrity and frozen record invariants. It does not grade answer quality or recompute the official transformations/tokenizer lengths. It does not rerun or waive prospective statistical validation.
+
+- [Machine-readable audit report](evidence/vllm_sft_drive_readback_audit.json)
+- [Verified audit report in Drive](https://drive.google.com/file/d/18-T8LwpuQJM9oG6FGcoDZesqcCFepcxk/view)
+- Repeat with `scripts/audit_sft_drive.py --credentials /protected/google_token.json --index-id 1jVgApFjn1sDsBaTTWooGn3XdvF8av75O --report /workspace/scratch/drive_audit.json`. Credential values never appear in the report.
