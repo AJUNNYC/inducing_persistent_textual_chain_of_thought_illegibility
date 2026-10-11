@@ -19,12 +19,13 @@ from shared_procedures.storage import atomic_write_json,append_jsonl,file_lock,r
 
 
 def inspect(session,base,worker_path,expected_commit):
-    def fetch(path,optional=False):
+    def fetch(path,optional=False,decode_json=True):
         response=session.get(base+'/api/contents/'+quote(path.lstrip('/')),
             params={'content':1,'format':'base64'},timeout=30)
         if optional and response.status_code==404:return None
         if response.status_code!=200:raise RuntimeError('HTTP_'+str(response.status_code))
-        return json.loads(base64.b64decode(response.json()['content']))
+        content=base64.b64decode(response.json()['content']).decode()
+        return json.loads(content) if decode_json else content
     worker=fetch(worker_path)
     if worker['source_commit']!=expected_commit:raise ValueError('Worker identity changed')
     root=worker['artifact_root']
@@ -49,7 +50,15 @@ def inspect(session,base,worker_path,expected_commit):
     report=fetch(root+'/preflight/baseline_repeatability.json',optional=True)
     state='RUNNING'
     if report is not None:
-        state='COMPLETE' if report.get('ready_for_training') is True else 'GATE_FAILED'
+        # Parent emits this event only after verifying the final report in Drive.
+        events=[]
+        for line in fetch(worker['log'],decode_json=False).splitlines():
+            if line.startswith('{'):
+                try:events.append(json.loads(line))
+                except ValueError:pass
+        final=next((e for e in reversed(events) if e.get('full_evaluation')=='pending_legibility_judgments'),None)
+        verified=final is not None and final.get('repeatability_gate')==report.get('ready_for_training') and final.get('status')==report.get('status')
+        state=('COMPLETE' if report.get('ready_for_training') is True else 'GATE_FAILED') if verified else 'FINALIZING'
     elif any(m['status']=='FAILED' for m in models):state='FAILED'
     elif any(m['status']=='PAUSED' for m in models):state='PAUSED'
     elif all(m['status']=='COMPLETE' for m in models):state='FINALIZING'
