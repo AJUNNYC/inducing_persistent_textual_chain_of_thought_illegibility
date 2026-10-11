@@ -1,0 +1,210 @@
+{
+  "status": "PAUSED",
+  "observed_at": "2026-10-11T20:59:27.685750+00:00",
+  "worker_status": {
+    "at": "2026-10-11T20:59:00.537869+00:00",
+    "completed_fits": 0,
+    "completed_run_ids": [],
+    "completed_steps": 401,
+    "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+    "current_run_id": "rot13_7b_level_01",
+    "deadline": "2026-10-12T02:24:01.558671+00:00",
+    "drive_status": "VERIFIED",
+    "family": "rot13",
+    "handoff_certificate_hash": "4d8316faf977d7a0bff083638c3f5deaa6e475edf322d4c28b9986c476f5a2aa",
+    "model": "7b",
+    "required_fits": 1,
+    "source_code_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+    "status": "PAUSED"
+  },
+  "checkpoint_manifest": {
+    "checkpoint_hash": "d5137bff0cd8b16d04536b5d10d8d5903d0eab6bc78ba5094269375e32c1ce11",
+    "files": {
+      "full_state.pt": {
+        "sha256": "74697d816efb06256cf07eafd1ea417b2d3f1d666161f647120a92b5b10393c0",
+        "size_bytes": 242617117
+      }
+    },
+    "identity": {
+      "code_revision": "05f42b00b0bbac030e9393f4806430956bfff526",
+      "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+      "dataset_hash": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "dependency_hash": "105fdef0f204ddf5b4a5570f86c91fce03164b5746e14835f1b569e5b3af29e2",
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "validated_loss_counts": false
+      },
+      "family": "rot13",
+      "handoff_certificate_hash": "4d8316faf977d7a0bff083638c3f5deaa6e475edf322d4c28b9986c476f5a2aa",
+      "implementation_version": "completion_sft_v1",
+      "level": 1,
+      "model_id": "7b",
+      "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer_configuration_hash": "3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54",
+      "recipe": {
+        "checkpoint_steps": 100,
+        "compute_dtype": "bfloat16",
+        "double_quantization": true,
+        "early_stopping": false,
+        "effective_batch_size": 16,
+        "epochs": 2,
+        "gradient_accumulation_steps": 16,
+        "gradient_checkpointing": true,
+        "learning_rate": 0.0002,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_rank": 8,
+        "loss_reduction": "mean_supervised_tokens_per_example_then_mean_examples",
+        "max_grad_norm": 0.3,
+        "max_length": 4096,
+        "microbatch_size": 1,
+        "optimizer": "paged_adamw_32bit",
+        "quantization": "nf4",
+        "scheduler": "cosine",
+        "seed": 42,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "warmup_ratio": 0.03,
+        "weight_decay": 0.0
+      },
+      "run_id": "rot13_7b_level_01",
+      "strength": 0.1,
+      "tokenizer_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60"
+    },
+    "progress": {
+      "completed_steps": 401,
+      "example_presentations": 6416,
+      "execution_profile": {
+        "attention_implementation": "eager",
+        "cache_collated_inputs": false,
+        "defer_finite_checks": false,
+        "gradient_checkpointing": false,
+        "validated_loss_counts": false
+      },
+      "exposure_order_hash": "fd2c10e50de28407a0a8280962668c2862edddde801156189d14d516b4095c22",
+      "processed_tokens": 6972137,
+      "sampler_position": 6416,
+      "total_optimizer_steps": 1250
+    },
+    "state_keys": [
+      "adapter",
+      "optimizer",
+      "progress",
+      "rng",
+      "runtime",
+      "scheduler"
+    ],
+    "status": "complete",
+    "version": "full_state_v1"
+  },
+  "checkpoint_records": [
+    {
+      "artifact_id": "0128bdfa0a47e5f4b260148babc88e987b0f5681fd0e18cd9e17f2a0cc37459f",
+      "branch": "rot13",
+      "completion_status": "COMPLETED",
+      "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+      "created_at": "2026-10-11T20:58:34.693084+00:00",
+      "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "drive_file_id": "1v3uHVSggrtS2KWHAvjVyul7NVKcy-EjQ",
+      "drive_folder_id": "142UamKwaFNprt3DbsXP1F0YNR3iizBU5",
+      "experiment_id": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+      "local_path": "/workspace/artifacts/sft_execution_05f42b0/training/sft/rot13/7b/level_01/checkpoint_000401/full_state.pt",
+      "md5": "f440e4b389f360a0e64e8d7f4e20d51b",
+      "model": "7b",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer": "experiment_overview",
+      "provenance": {
+        "branch": "rot13",
+        "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+        "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+        "experiment_id": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+        "model": "7b",
+        "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+        "producer": "experiment_overview",
+        "run_id": "rot13_7b_level_01",
+        "seeds": [
+          42
+        ],
+        "source_code_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+        "stage": "sft"
+      },
+      "recovery_descriptor_id": "b077c9fbf077e2e945d5ac876bab40847b2af25d8ebcf356a5e8512e2b6e9b95",
+      "relative_path": "artifacts/sft_execution_05f42b0/training/sft/rot13/7b/level_01/checkpoint_000401/full_state.pt",
+      "retention": "required",
+      "run_id": "rot13_7b_level_01",
+      "seeds": [
+        42
+      ],
+      "sha256": "74697d816efb06256cf07eafd1ea417b2d3f1d666161f647120a92b5b10393c0",
+      "size": 242617117,
+      "source_code_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+      "stage": "sft",
+      "sync_status": "VERIFIED",
+      "validation_status": "content_hashed"
+    },
+    {
+      "artifact_id": "d99a5e83d628338773a94ee03fb1e989523ddfd1fffc7610c0c02371ba14eed4",
+      "branch": "rot13",
+      "completion_status": "COMPLETED",
+      "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+      "created_at": "2026-10-11T20:58:48.467778+00:00",
+      "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "drive_file_id": "1MGDI610FGnaPx2Y3YyIi7za7yUjYr6Ps",
+      "drive_folder_id": "142UamKwaFNprt3DbsXP1F0YNR3iizBU5",
+      "experiment_id": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+      "local_path": "/workspace/artifacts/sft_execution_05f42b0/training/sft/rot13/7b/level_01/checkpoint_000401/manifest.json",
+      "md5": "e1c94cc9f043dc1b334d2238aa53d67c",
+      "model": "7b",
+      "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "producer": "experiment_overview",
+      "provenance": {
+        "branch": "rot13",
+        "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+        "dataset_revision": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+        "experiment_id": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+        "model": "7b",
+        "model_revision": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+        "producer": "experiment_overview",
+        "run_id": "rot13_7b_level_01",
+        "seeds": [
+          42
+        ],
+        "source_code_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+        "stage": "sft"
+      },
+      "recovery_descriptor_id": "ecc54c070ace20652a1a83f55db17ed373433d51c33595093fde1fc0901beb38",
+      "relative_path": "artifacts/sft_execution_05f42b0/training/sft/rot13/7b/level_01/checkpoint_000401/manifest.json",
+      "retention": "required",
+      "run_id": "rot13_7b_level_01",
+      "seeds": [
+        42
+      ],
+      "sha256": "bdabb882fcc4fca9e1fe3e5495b17794be577c935a24dd5b7fcb7dd0eecba155",
+      "size": 2377,
+      "source_code_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+      "stage": "sft",
+      "sync_status": "VERIFIED",
+      "validation_status": "content_hashed"
+    }
+  ],
+  "native_frozen_parent": "/workspace/artifacts/sft_optimization_recovery/loss_trial_parent/checkpoint_000401",
+  "original_checkpoint": "/workspace/artifacts/sft_execution_05f42b0/training/sft/rot13/7b/level_01/checkpoint_000401",
+  "full_checkpoint_verified": true,
+  "wrapper_state": {
+    "status": "EXITED",
+    "exit_code": 3,
+    "at": 1791752341.8208137
+  },
+  "receipt_hash": "5ecf414fd53dd02d987a255fe2f850326a1a7d3f9868aba5f81829c2f6fcd596"
+}

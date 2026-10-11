@@ -111,6 +111,12 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_launch_pod_validation.json
       sft_launch_preflight_report.json
       sft_launch_readiness.json
+      sft_loss_optimization_pro6000_parallel_ce.json
+      sft_loss_optimization_pro6000_pause_401.json
+      sft_loss_optimization_pro6000_readiness.json
+      sft_loss_optimization_pro6000_selected_profile.json
+      sft_loss_optimization_pro6000_spatial_backward.json
+      sft_loss_optimization_pro6000_training_resume.json
       sft_optimization_benchmark_plan.json
       sft_optimization_cpu_audit.json
       sft_optimization_drive_index.json

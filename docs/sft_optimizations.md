@@ -2,13 +2,14 @@
 
 The decision rule is to change execution in order of least expected effect on the
 trained result, require established precedent, and measure correctness and speed
-on the intended GPU before enabling a candidate in production. The current
-production default remains eager attention with the original loss checks. The
-first Blackwell comparison rejected redundant-check removal and SDPA. The later
-source `05f42b0` paired recovery screen rejected CUDA input caching on speed and
-accepted `no_gradient_checkpointing` for **7B ROT13 level 1** on RTX PRO 6000
-Blackwell Server Edition 96GB. Activation requires the separately bound launch
-controls; this approval does not extend to other levels or 14B.
+on the intended GPU before enabling a candidate. Source `218900d` now selects
+`spatial_fused_backward_no_gradient_checkpointing` only for **7B ROT13 level 1**
+on RTX PRO 6000 Blackwell Server Edition 96GB. It retains the stock spatial CE
+forward and tiles only backward, with an additional 11.65–13.52% reduction in
+measured median update time versus the already accepted no-recomputation profile.
+All measured numerical/state/RNG comparisons were bitwise identical. The faster
+flat and fully fused forward candidates failed the numerical screen and remain
+rejected. This approval does not extend to other levels, 14B or final outcomes.
 
 The frozen recipe remains two epochs over the same 10,000 examples, logical batch
 16, NF4 with double quantization, BF16 computation, FP32 cross-entropy, the same
@@ -28,8 +29,8 @@ and production migration gates pass; it is not concealed as unchanged execution.
 | 3 | Replace eager attention with built-in SDPA. | Transformers supports this for Qwen2 and recommends it for efficient training. It retains the attention definition, but fused floating-point kernels can produce different numerical results. | Implemented and measured as `sdpa`. Median speedup was 0.9937x; the numerical screen failed. No fused kernel was independently observed. Not activated. |
 | 4 | Disable activation checkpointing if worst-case examples fit in VRAM. | Removes recomputation after identical PEFT preparation, base freezing, parameter casting and LoRA setup. Original protocol page29 calls checkpointing a memory-saving execution setting, not a behavioral intervention. Compare actual losses, gradients, updates and RNG. | Accepted as `no_gradient_checkpointing` for source `05f42b0`, RTX PRO 6000 Blackwell 96GB, 7B ROT13 level 1. Two paired repetitions measured 1.2695x and 1.2806x median throughput ratios, with bitwise numerical/state/RNG agreement. Other conditions retain the original checkpointing default. |
 | 5 | Flatten the token CE input from spatial `[batch, vocabulary, tokens]` to `[batch*tokens, vocabulary]`. | PyTorch supports both CE layouts, but real GPU measurements show that their floating-point results differ beyond the frozen bound before the first update. | Source `6d21fff` completed two paired repetitions. Native/flat median seconds were 9.4263/5.8296 and 9.5075/5.6417. Faster timings did not clear the numerical screen; rejected and not activated. |
-| 6 | Fuse only FP32 token cross-entropy with the pinned Triton runtime. | Liger provides online softmax/CE precedent. The independent helper retains the full vocabulary and separate gradient storage, with unchanged LM head, logits, masks and per-example reduction. Online normalization changes operation order; equality must be measured. | Implemented as `fused_ce_no_gradient_checkpointing`; focused checks and paired GPU evidence are pending. Unsupported execution fails without fallback; production activation requires the source/GPU/profile-bound screen. |
-| 7 | Retain stock spatial CE forward and tile only its backward gradient. | Keeps `torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss`; the candidate uses the pinned PyTorch backward formula with libdevice exponential and the one nonzero target gradient per supervised token. Numerical equivalence still requires measured evidence. | Newly implemented as `spatial_fused_backward`, combined with accepted no recomputation. Focused checks, target-GPU measurements and acceptance are pending. |
+| 6 | Fuse only FP32 token cross-entropy with the pinned Triton runtime. | Liger provides online softmax/CE precedent, but changing the forward normalization order exceeded the frozen numerical bounds on this workload. | Source `6d21fff` measured median ratios 1.6751x and 1.7008x, but maximum loss difference was 0.00595903 and gradient/update relative L2 differences were 2.169%/1.922%, above 0.1% bounds. Rejected and not activated. |
+| 7 | Retain stock spatial CE forward and tile only its backward gradient. | Keeps `torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss`; the tiled backward follows the pinned PyTorch epilogue with libdevice exponential and the one nonzero target gradient. | Source `218900d` accepted for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Two paired median ratios were 1.1564x/1.1318x, minimum matched ratio 1.1146x; losses, gradients, updates and final full state/RNG were bitwise identical. |
 | 8 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
 
 Epoch count, training exposure, BF16 versus NF4 construction, optimizer precision,
@@ -45,7 +46,7 @@ across examples**. Stock model loss or token-global averaging must not silently
 replace it. A faster implementation must preserve the current weighting, causal
 shift and assistant-end supervision.
 
-## Current continuation screen
+## Historical recomputation continuation screen
 
 Source `05f42b0` adds explicit cache and recomputation controls while preserving
 eager attention, NF4/BF16, original finite-loss checks, physical microbatch 1,
@@ -90,7 +91,7 @@ has acceptance hash
 `578a7eed0b174017882649a3fb0d0c0d831866012e94bbbb0a1f861325c4d963`
 and binds the unmodified report hash
 `11c055bf2edf87738d0e31eb24eb7cbb9a79279670679a797fa3738401a39417`.
-The [current readiness receipt](evidence/sft_optimization_pro6000_readiness.json)
+The [historical readiness receipt](evidence/sft_optimization_pro6000_readiness.json)
 is `READY` for this one condition after affected GPU controls; the entire matrix
 and statistical simulations were not repeated. The benchmark itself retains
 `approved_for_production=false`: selection is a separate hash-validated decision,
@@ -98,61 +99,80 @@ not automatic benchmark approval. The [verified Drive index](evidence/sft_optimi
 preserves source, inputs, reports and launch evidence in the
 [recovery folder](https://drive.google.com/drive/folders/1MPZAIU9kj53i3uzFxhXG35OCtdMXuiYj).
 
-## Incremental loss trials
+## Incremental loss trials and selected profile
 
-The first loss candidates at source `6d21fff` compare against the accepted
-`no_gradient_checkpointing` profile, retaining `spatial_ce` as the reference.
-Training source `05f42b0` is now safely paused at step **401**, with full state
-verified in Drive; its accepted no-recomputation profile remains valid. Isolated
-trial updates do not advance this official checkpoint.
+The [step-401 pause](evidence/sft_loss_optimization_pro6000_pause_401.json)
+preserves the source `05f42b0` fit's full state in Drive. All loss trials restore
+that same adapter, optimizer, scheduler, sampler and RNG; isolated measurements
+do not advance the official parent. The declared reference is
+`no_gradient_checkpointing` with original `spatial_ce`, so measured gains are
+incremental to the previous recomputation optimization. Each comparison uses
+two paired repetitions of one warmup plus five measured logical updates,
+96 ordered examples per profile/repetition, with the frozen numerical and speed
+bounds. Every matched update must improve by at least 5%; relative L2 gradient
+and update differences must each stay within 0.1%. Loss tolerance is
+`1e-5 + 1e-4*abs(reference_loss)`, with identical-RNG requirements retained.
 
-Flat CE completed two paired repetitions, each one warmup plus five measured
-updates from the same step-401 state. Native/flat median update seconds were
-9.4263/5.8296 and 9.5075/5.6417. Both native repetitions reproduced the same 96
-losses, as did both flat repetitions. Native versus flat, however, failed the
-frozen numerical screen **before the first optimizer update**: the first loss
-was 0.5324794054 versus 0.5325533152, an absolute difference of 0.0000739098
-against an allowed 0.0000632479. Across the 96 examples, 86 exceeded the loss
-bound; the maximum absolute difference was 0.0043541193. Reproducibility within
-a candidate and faster timings do not override this failure. Flat CE is rejected
-and has not been selected for production. The separate fused-CE trial is still
-pending; no result or acceptance is inferred for it.
+| Candidate and source | Native / candidate median seconds, repetitions 1 and 2 | Numerical outcome | Decision |
+|---|---|---|---|
+| Flat CE, `6d21fff` | 9.4263 / 5.8296; 9.5075 / 5.6417 | Max loss difference 0.00435412; gradient L2 2.360%; update L2 1.804% | Rejected |
+| Fully fused token CE, `6d21fff` | 9.4186 / 5.6228; 9.5238 / 5.5995 | Max loss difference 0.00595903; gradient L2 2.169%; update L2 1.922% | Rejected |
+| Stock spatial forward / tiled backward, `218900d` | 9.4654 / 8.1854; 9.4791 / 8.3750 | Bitwise losses, gradients, updates, final adapter/optimizer/scheduler and RNG | Accepted for selected condition |
 
-`loss_implementation` retains explicit `spatial_ce`, `flat_ce` and `fused_ce`
-choices. They preserve the full FP32 logits and vocabulary, shifted targets,
-ignore masks and mean supervised-token loss within each example, then mean
-across examples. The [FP32 fused helper](../src/training/sft/fused_loss.py) uses
-already locked Triton 3.5.0, separate gradient storage and no extra RNG; unsupported
-execution fails explicitly without a silent fallback. Preserving the formula
-and dtype is insufficient to guarantee the original floating-point results.
+The [rejected forward-candidate report](evidence/sft_loss_optimization_pro6000_parallel_ce.json)
+retains both failures. Each candidate reproduced its own loss sequence across
+repetitions, but both differed from native before the first optimizer update:
+0.5324794054 versus 0.5325533152, absolute difference 0.0000739098 against an
+allowed 0.0000632479. Flat CE exceeded the loss bound on 86/96 examples and
+fused CE on 87/96. Identical starting weights/data/RNG and faster timing did not
+override these failures. Preserving FP32 dtype and the mathematical formula was
+insufficient to preserve native floating-point results.
 
-The newly implemented third candidate, `spatial_fused_backward`, therefore
-retains the **actual stock spatial forward**: `torch.log_softmax` over dimension
-1 and `F.nll_loss` with no reduction. Only the backward gradient is tiled. Its
-candidate expression follows pinned PyTorch's
-`gradOutput - exp(log_probability) * summed_grad` epilogue, using libdevice
-exponential and the single nonzero target gradient per supervised token. The
-new helper is `src/training/sft/spatial_loss.py`. This preserves the forward
-operation rather than assuming flattening is numerically identical. It remains
-an execution candidate: focused checks, actual GPU gradients/updates/RNG/speed
-and new-profile acceptance are pending.
+The [accepted spatial-backward report](evidence/sft_loss_optimization_pro6000_spatial_backward.json)
+records median throughput ratios 1.15637x and 1.13183x: **13.52% and 11.65% less
+median update time**, respectively. The minimum matched ratio was 1.11456x,
+about 10.28% less update time. Every paired loss and gradient/update comparison
+was bitwise equal, as were final adapter, optimizer, scheduler and RNG hashes.
+This establishes the measured continuation behavior, not final-result
+identity or a full-fit ETA. The actual longest 3,190-token forward/backward
+probe passed, allocating 84.28 GiB and reserving 87.32 GiB, versus 86.09 GiB
+allocated for its no-recomputation reference. Memory evidence remains scoped
+to this condition on the measured 94.97-GiB device.
+
+`loss_implementation` explicitly supports `spatial_ce`, `flat_ce`, `fused_ce`
+and `spatial_fused_backward`. The selected
+[spatial helper](../src/training/sft/spatial_loss.py) retains actual stock
+`torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss` forward. Its tiled
+backward follows `gradOutput - exp(log_probability)*summed_grad`, using libdevice
+exponential and the single nonzero target gradient per supervised token. It
+retains FP32 head/logits/CE, all vocabulary classes, causal shift, original masks
+and per-example weighting, with no extra RNG or hidden fallback. Locked Triton
+3.5.0 supplies the existing runtime; no extra package was installed for it.
 
 [PyTorch 2.9.0 SoftMax.cu](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/aten/src/ATen/native/cuda/SoftMax.cu)
-contains distinct spatial reduction paths, including serial accumulation across
-the class dimension when `blockDim.x == 1`, and the stated backward epilogue.
-This source explains why changing layout can change arithmetic across the
-152,064-class vocabulary; no independent GPU kernel-dispatch observation is
-claimed. Keeping its forward path is precedent for the third candidate, not
-empirical approval of the custom backward.
+contains distinct spatial reduction paths, including serial class accumulation
+when `blockDim.x == 1`, and the stated backward epilogue. That source explains
+why layout changes can alter arithmetic across the 152,064-class vocabulary;
+no independent GPU kernel-dispatch observation is claimed. Retaining stock
+forward plus using that backward formula supplies precedent; the actual paired
+GPU report separately supplies workload evidence.
 
-The next recovery screen again declares
-`--reference-profile no_gradient_checkpointing`, uses the latest preserved
-accepted full state and keeps eager attention with recomputation disabled.
-Any accepted improvement must be incremental to that profile, not the original
-checkpointed reference. The frozen speed, numerical, state and identical-RNG
-rules remain in force. Dataset bytes, masks, exposure order, LoRA/dropout,
-optimizer, microbatch 1/logical batch 16 and Drive-save cadence stay fixed. No
-loss candidate has been accepted and no final-result equivalence is claimed.
+The shared validator [selected this profile](evidence/sft_loss_optimization_pro6000_selected_profile.json)
+with source/GPU/condition bindings; [current affected launch controls](evidence/sft_loss_optimization_pro6000_readiness.json)
+are READY. A total of 165 affected CPU checks
+passed in 4.08 seconds; the full unrelated suite, matrix and statistical
+simulations were not repeated. Benchmark report flags remain
+`approved_for_production=false` because separate validated selection performs
+activation. The selected receipt binds report hash
+`f3252b23ceb80bf7836e7eca18477940b1d2a8224851fc4eba7a05844c3a1df2`
+and acceptance hash
+`78d5dcee6af0235ac8ef55744caaf1f15959e6ab45c559172749df0f2019091a`.
+The [actual continuation startup](evidence/sft_loss_optimization_pro6000_training_resume.json)
+records the worker running from restored step 401, with the selected runtime
+profile, passed completion-mask/adapter-gradient checks and Drive-verified child state.
+The launch observation does not claim a later completed optimizer step.
+Original step-214 and step-401 parent bytes remain preserved under separate
+lineage. Dataset bytes, scientific settings and Drive-save cadence are unchanged.
 
 ## What the empirical checks establish
 
@@ -236,7 +256,7 @@ prove a fused kernel was selected.
 
 ## Preserved parent fit and migration
 
-The [actual continuation launch](evidence/sft_optimization_pro6000_training_resume.json)
+The [earlier no-recomputation launch](evidence/sft_optimization_pro6000_training_resume.json)
 records startup from inherited step 214 with a Drive-verified child
 checkpoint. The child records source `05f42b0`, the accepted profile and hardware
 migration; the parent checkpoint remains unchanged. The launch snapshot does
@@ -282,7 +302,8 @@ Verified reports and the integrated protocol are preserved in the central projec
 No published source above directly measures this frozen 7B/14B recipe on an RTX
 PRO 6000 Blackwell 96GB. The actual short 7B comparisons now supply local empirical
 evidence: the earlier two candidates failed, while the paired step-214 recovery
-screen accepted only disabling recomputation for the selected condition. They
+screen accepted disabling recomputation, and the later step-401 screen accepted
+only stock spatial forward with tiled backward for the same selected condition. They
 do not certify the full 7B/14B matrix, final-result equivalence or an
-H100-versus-Blackwell training-time ratio. The current readiness receipt separately
+H100-versus-Blackwell training-time ratio. The current source 218900d readiness receipt separately
 binds the declared continuation; it does not change the parent's identity.

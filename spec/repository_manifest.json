@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 516,
+  "files": 522,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1152,6 +1152,72 @@
       "display_path": "docs/evidence/sft_launch_readiness.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_001d320e5e46f7",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_loss_optimization_pro6000_parallel_ce.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_loss_optimization_pro6000_parallel_ce.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_564d8f5d5e3c05",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_loss_optimization_pro6000_pause_401.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_loss_optimization_pro6000_pause_401.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_c67151321b2c23",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_loss_optimization_pro6000_readiness.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_loss_optimization_pro6000_readiness.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d7984acd388e6b",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_loss_optimization_pro6000_selected_profile.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_loss_optimization_pro6000_selected_profile.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_fe0ac16fd741fe",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_loss_optimization_pro6000_spatial_backward.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_loss_optimization_pro6000_spatial_backward.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_6f9bbb33f06fa5",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_loss_optimization_pro6000_training_resume.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_loss_optimization_pro6000_training_resume.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_823d6919161112",
       "blank": false
     },
     {

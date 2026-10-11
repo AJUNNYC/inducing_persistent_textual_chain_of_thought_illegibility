@@ -1,0 +1,135 @@
+{
+  "schema_version": "sft_native_training_start_observation_v1",
+  "observed_at": "2026-10-11T21:33:08.896372+00:00",
+  "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+  "condition": {
+    "family": "rot13",
+    "model": "7b",
+    "level": 1
+  },
+  "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+  "handoff_certificate_hash": "ebd1e1a87a8e13abbb2fec914468c502802e460559881c941d4c52f37c53f3f9",
+  "runtime": {
+    "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "vram_bytes": 101975851008,
+    "cuda_version": "12.8",
+    "packages": {
+      "bitsandbytes": "0.48.2",
+      "numpy": "2.3.5",
+      "peft": "0.18.0",
+      "torch": "2.9.0",
+      "transformers": "4.57.3"
+    },
+    "gradient_checkpointing": false,
+    "loss_implementation": "spatial_fused_backward",
+    "loss_helper_sha256": "eaf979123e343f91be7b1d3250fb310833da17bf8a49f4691c55af8630a2704a",
+    "execution_profile": {
+      "attention_implementation": "eager",
+      "cache_collated_inputs": false,
+      "defer_finite_checks": false,
+      "gradient_checkpointing": false,
+      "loss_implementation": "spatial_fused_backward",
+      "validated_loss_counts": false
+    }
+  },
+  "mask_gradient_status": "passed",
+  "restored_progress": {
+    "completed_steps": 401,
+    "example_presentations": 6416,
+    "execution_profile": {
+      "attention_implementation": "eager",
+      "cache_collated_inputs": false,
+      "defer_finite_checks": false,
+      "gradient_checkpointing": false,
+      "loss_implementation": "spatial_fused_backward",
+      "validated_loss_counts": false
+    },
+    "exposure_order_hash": "fd2c10e50de28407a0a8280962668c2862edddde801156189d14d516b4095c22",
+    "processed_tokens": 6972137,
+    "sampler_position": 6416,
+    "total_optimizer_steps": 1250
+  },
+  "worker_observation": {
+    "status": "RUNNING",
+    "at": 1791754166.6331913,
+    "observed_at": 1791754379.6914926,
+    "milestones": {
+      "run_identity.json": true,
+      "runtime_migration.json": true,
+      "runtime_evidence.json": true,
+      "fit_result.json": false
+    },
+    "checkpoints": [
+      "checkpoint_000401"
+    ],
+    "worker_status": {
+      "at": "2026-10-11T21:30:19.731627+00:00",
+      "completed_fits": 0,
+      "completed_run_ids": [],
+      "completed_steps": 401,
+      "configuration_hash": "79f7a49825f7b82ff6668f7918ceddb248e8c7d91f75c4f116773fac56d281b1",
+      "current_run_id": "rot13_7b_level_01",
+      "deadline": "2026-10-12T02:24:01.558671+00:00",
+      "drive_status": "VERIFIED",
+      "family": "rot13",
+      "handoff_certificate_hash": "ebd1e1a87a8e13abbb2fec914468c502802e460559881c941d4c52f37c53f3f9",
+      "model": "7b",
+      "required_fits": 1,
+      "source_code_commit": "218900dc3cfd1a78b895347947d8b787c3439a68",
+      "status": "RUNNING"
+    },
+    "gpu_memory_mib_utilization_percent": "93773, 100"
+  },
+  "migration": {
+    "status": "MIGRATED",
+    "receipt_hash": "adc2e656840eb8408b5847a2c94b203053cc57c429dadf9f9c90ad3c508655a3",
+    "receipt_hash_verified": true,
+    "parent_source_code_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+    "parent_checkpoint_hash": "d5137bff0cd8b16d04536b5d10d8d5903d0eab6bc78ba5094269375e32c1ce11",
+    "target_checkpoint_hash": "99067809c06e36c14d41ee1aa154597f30d56d0468a70d9674801f3f57cfbaaf",
+    "manifest_hash_verified": true,
+    "parent_payload_sha256": "74697d816efb06256cf07eafd1ea417b2d3f1d666161f647120a92b5b10393c0",
+    "target_payload_sha256": "b8a1214c233077d717c19b38b9717a7ac2715ff75788e80e4c653cb54c21e329",
+    "serialized_payload_sha256_equal": false,
+    "serialized_payload_difference_reason": "Explicit migration rewrites execution-profile/runtime lineage metadata; native migration verifies exact inherited adapter, optimizer, scheduler, RNG and scientific progress states.",
+    "full_training_state_inherited": true,
+    "exact_state_readback_verified": true,
+    "parent_modified": false,
+    "full_state_downloaded_for_observation": false
+  },
+  "execution_benchmark": {
+    "report_hash": "f3252b23ceb80bf7836e7eca18477940b1d2a8224851fc4eba7a05844c3a1df2",
+    "plan_hash": "b0baa6cd3f16b8609bf367e33bf397de22740a564277ed9c74bc0d07a63aeae8",
+    "profile_name": "spatial_fused_backward_no_gradient_checkpointing",
+    "technical_gate": "PASSED",
+    "numerical_screen_passed": true,
+    "exact_state_comparison_passed": true,
+    "minimum_paired_update_speedup": 1.1145623480455933,
+    "invariant_failures": [],
+    "scientific_equivalence_established": false
+  },
+  "mirrored_metadata": {
+    "runtime_migration.json": {
+      "size_bytes": 17628,
+      "sha256": "89895efff0712cd2a7dfaabb7a58293a6c942bc53836b17d623358fb20d4337a"
+    },
+    "run_identity.json": {
+      "size_bytes": 1668,
+      "sha256": "8dfe1a4b735e5671effc2eafca536db3d4f165e4ce3eeff5573c34263b09c89d"
+    },
+    "runtime_evidence.json": {
+      "size_bytes": 35398,
+      "sha256": "71673fdf3251b6f842dd7702c3b3889e931e8c782599a24c7c249a5a86caa4e4"
+    },
+    "checkpoint_000401/manifest.json": {
+      "size_bytes": 2471,
+      "sha256": "5742ed4cdde2b3699cfaaf3ee61b1c0aae828ed170547a5024e2596872cd110f"
+    },
+    "fit_status.json": {
+      "size_bytes": 1760,
+      "sha256": "e5479ccb063f2b51be12b49b7da1829a0aac4c782259dce2c86c0eb15849f8bb"
+    }
+  },
+  "drive_backup_performed_by_observer": false,
+  "observation_hash": "b044eabcfbe50593ab056cc5aa48cd5ed8db243b8401311802a17d392054cdf6"
+}
