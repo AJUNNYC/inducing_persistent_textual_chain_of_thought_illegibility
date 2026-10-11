@@ -93,6 +93,74 @@ def test_masked_cross_entropy_and_zero_prompt_logit_gradients():
         completion_loss(logits, torch.full((2,5), -100))
 
 
+@pytest.mark.parametrize('dtype_name', ['float32', 'bfloat16'])
+def test_cpu_validated_counts_preserve_loss_gradients_and_rng_bitwise(dtype_name):
+    import torch
+    torch.manual_seed(913)
+    examples = [
+        {'input_ids': [1, 2, 3, 4, 5], 'labels': [-100, -100, 3, 4, 5]},
+        {'input_ids': [2, 6, 1], 'labels': [-100, -100, 1]},
+    ]
+    batch = collate_completion(examples, 0)
+    # A transposed source exercises non-contiguous logits as well as padding.
+    source = torch.randn(2, 8, 5, dtype=getattr(torch, dtype_name)).transpose(1, 2)
+    direct_logits = source.detach().requires_grad_()
+    fast_logits = source.detach().requires_grad_()
+    rng_before = torch.get_rng_state().clone()
+    direct = completion_loss(direct_logits, batch['labels'])
+    fast = completion_loss(fast_logits, batch['labels'],
+                           validated_counts=batch['validated_completion_counts'])
+    assert torch.equal(direct, fast)
+    direct.backward()
+    fast.backward()
+    assert torch.equal(direct_logits.grad, fast_logits.grad)
+    assert torch.equal(rng_before, torch.get_rng_state())
+    assert batch['validated_completion_counts'].counts.tolist() == [3, 1]
+
+
+def test_bound_counts_reject_substitution_label_alias_mutation_and_count_mutation():
+    import torch
+    example = {'input_ids': [1, 2, 3], 'labels': [-100, 2, 3]}
+    logits = torch.randn(1, 3, 4)
+    batch = collate_completion([example], 0)
+    bound = batch['validated_completion_counts']
+    with pytest.raises(SFTInputError, match='unchanged collated labels'):
+        completion_loss(logits, batch['labels'].clone(), validated_counts=bound)
+    with pytest.raises(SFTInputError, match='unchanged collated labels'):
+        completion_loss(logits, batch['labels'], validated_counts=(2,))
+    batch['labels'].view(-1)[1:] = -100
+    with pytest.raises(SFTInputError, match='unchanged collated labels'):
+        completion_loss(logits, batch['labels'], validated_counts=bound)
+    # Direct callers continue to reject the now-empty target.
+    with pytest.raises(SFTInputError, match='no supervised'):
+        completion_loss(logits, batch['labels'])
+    batch = collate_completion([example], 0)
+    bound = batch['validated_completion_counts']
+    bound.counts.fill_(0)
+    with pytest.raises(SFTInputError, match='unchanged collated labels'):
+        completion_loss(logits, batch['labels'], validated_counts=bound)
+    with pytest.raises(SFTInputError, match='no supervised'):
+        collate_completion([{'input_ids': [1, 2], 'labels': [1, -100]}], 0)
+    with pytest.raises(SFTInputError, match='sequence length'):
+        collate_completion([{'input_ids': [1, 2], 'labels': [-100, 1, 2]}], 0)
+
+
+def test_bound_counts_remove_host_scalar_extraction_from_loss_hotpath():
+    import torch
+    batch = collate_completion([{'input_ids': [1, 2, 3], 'labels': [-100, 2, 3]}], 0)
+    logits = torch.randn(1, 3, 4)
+    with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU]) as direct:
+        completion_loss(logits, batch['labels'])
+    with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU]) as fast:
+        completion_loss(logits, batch['labels'],
+                        validated_counts=batch['validated_completion_counts'])
+    direct_events = {event.key: event.count for event in direct.key_averages()}
+    fast_events = {event.key: event.count for event in fast.key_averages()}
+    assert direct_events['aten::_local_scalar_dense'] == 1
+    assert fast_events.get('aten::_local_scalar_dense', 0) == 0
+    assert direct_events['aten::cross_entropy_loss'] == fast_events['aten::cross_entropy_loss'] == 1
+
+
 def test_frozen_counts_hashes_and_partition_integrity():
     train = [record(f'train_{i}') for i in range(10000)]
     heldout = [record(f'validation_{i}', 'validation') for i in range(100)]
@@ -160,6 +228,50 @@ def tiny_runtime():
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: 1 - step / 10)
     examples = [tokenize_completion(record(str(i)), CharacterTokenizer()) for i in range(16)]
     return model, optimizer, scheduler, examples
+
+
+def test_validated_counts_preserve_real_optimizer_scheduler_and_rng_bitwise(monkeypatch):
+    import torch
+    from training.sft.individual_fit import sft_fit
+    original_collate, original_loss = sft_fit.collate_completion, sft_fit.completion_loss
+
+    def train_with_count_path(use_bound):
+        latest_batch, calls = [], []
+        def collate(*args, **kwargs):
+            # This isolated count audit deliberately supplies bound metadata to
+            # both paths, independent of the caller's selected profile.
+            kwargs['validate_counts'] = True
+            batch = original_collate(*args, **kwargs)
+            latest_batch[:] = [batch]
+            return batch
+        def loss(logits, labels, *, validated_counts=None):
+            assert latest_batch[0]['labels'] is labels
+            calls.append(use_bound)
+            return original_loss(logits, labels, validated_counts=(
+                latest_batch[0]['validated_completion_counts'] if use_bound else None))
+        monkeypatch.setattr(sft_fit, 'collate_completion', collate)
+        monkeypatch.setattr(sft_fit, 'completion_loss', loss)
+        model, optimizer, scheduler, examples = tiny_runtime()
+        progress = sft_fit.train_optimizer_updates(model, optimizer, scheduler, examples, 0)
+        assert len(calls) == 32
+        return (copy.deepcopy(model.state_dict()), copy.deepcopy(optimizer.state_dict()),
+                copy.deepcopy(scheduler.state_dict()), torch.get_rng_state().clone(), progress)
+
+    def assert_equal(left, right):
+        if isinstance(left, torch.Tensor):
+            assert torch.equal(left, right)
+        elif isinstance(left, dict):
+            assert left.keys() == right.keys()
+            for key in left:
+                assert_equal(left[key], right[key])
+        elif isinstance(left, (list, tuple)):
+            assert len(left) == len(right)
+            for item_left, item_right in zip(left, right, strict=True):
+                assert_equal(item_left, item_right)
+        else:
+            assert left == right
+
+    assert_equal(train_with_count_path(False), train_with_count_path(True))
 
 
 def test_two_epoch_exposure_and_validation_cannot_update_weights():

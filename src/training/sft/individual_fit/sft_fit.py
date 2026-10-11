@@ -18,6 +18,8 @@ import shutil
 import time
 from typing import Any, Callable, Mapping, Sequence
 
+from training.sft.execution_profile import SFTExecutionProfile, resolve_execution_profile
+
 MODELS = {
     "7b": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
     "14b": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
@@ -234,28 +236,66 @@ def tokenize_completion(record: Mapping[str, Any], tokenizer: Any, max_length: i
             "supervised_token_count": target_count}
 
 
-def collate_completion(examples: Sequence[Mapping[str, Any]], pad_token_id: int, device: Any = None) -> dict[str, Any]:
+@dataclass(frozen=True)
+class _ValidatedCompletionCounts:
+    """CPU-checked counts bound to one unchanged collated labels tensor."""
+    labels: Any
+    counts: Any
+    labels_version: int
+    counts_version: int
+
+
+def collate_completion(examples: Sequence[Mapping[str, Any]], pad_token_id: int, device: Any = None,
+                       *, validate_counts: bool = True) -> dict[str, Any]:
     import torch
     if not examples:
         raise SFTInputError("Empty completion batch")
     length = max(len(example["input_ids"]) for example in examples)
     result = {key: [] for key in ("input_ids", "attention_mask", "labels")}
+    supervised_counts = []
     for example in examples:
+        labels = list(example["labels"])
+        if len(labels) != len(example["input_ids"]):
+            raise SFTInputError("Completion labels do not match input sequence length")
+        if validate_counts:
+            count = sum(label != -100 for label in labels[1:])
+            if not count:
+                raise SFTInputError("An example has no supervised shifted target")
+            supervised_counts.append(count)
         padding = length - len(example["input_ids"])
         result["input_ids"].append(list(example["input_ids"]) + [pad_token_id] * padding)
         result["attention_mask"].append([1] * len(example["input_ids"]) + [0] * padding)
-        result["labels"].append(list(example["labels"]) + [-100] * padding)
-    return {key: torch.tensor(values, dtype=torch.long, device=device) for key, values in result.items()}
+        result["labels"].append(labels + [-100] * padding)
+    batch = {key: torch.tensor(values, dtype=torch.long, device=device) for key, values in result.items()}
+    if validate_counts:
+        counts = torch.tensor(supervised_counts, dtype=torch.long, device=device)
+        batch["validated_completion_counts"] = _ValidatedCompletionCounts(
+            batch["labels"], counts, batch["labels"]._version, counts._version)
+    return batch
 
 
-def completion_loss(logits: Any, labels: Any) -> Any:
-    """Mean assistant-token CE within example, then mean across examples."""
+def completion_loss(logits: Any, labels: Any, *, validated_counts: Any = None) -> Any:
+    """Mean assistant-token CE within example, then mean across examples.
+
+    Collation can validate counts before device transfer. Its bound metadata
+    avoids a device-to-host scalar check while preserving the same integer
+    denominators and floating-point CE/reduction operations. Standalone calls
+    retain direct validation; stale or substituted metadata is rejected.
+    """
     import torch
     import torch.nn.functional as functional
     shifted_logits, shifted_labels = logits[:, :-1, :].float(), labels[:, 1:]
-    counts = (shifted_labels != -100).sum(dim=1)
-    if torch.any(counts == 0):
-        raise SFTInputError("An example has no supervised shifted target")
+    if validated_counts is None:
+        counts = (shifted_labels != -100).sum(dim=1)
+        if torch.any(counts == 0):
+            raise SFTInputError("An example has no supervised shifted target")
+    else:
+        if (not isinstance(validated_counts, _ValidatedCompletionCounts)
+                or validated_counts.labels is not labels
+                or validated_counts.labels_version != labels._version
+                or validated_counts.counts_version != validated_counts.counts._version):
+            raise SFTInputError("Validated completion counts do not match unchanged collated labels")
+        counts = validated_counts.counts
     token_losses = functional.cross_entropy(shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100, reduction="none")
     return (token_losses.sum(dim=1) / counts).mean()
 
@@ -326,17 +366,54 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
         restore_rng(before)
 
 
+def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
+                         examples: Sequence[Mapping[str, Any]], pad_token_id: int,
+                         *, execution_profile: SFTExecutionProfile | None = None) -> tuple[Any, ...]:
+    """One real update, also used by the isolated hardware benchmark.
+
+    The optional count metadata preserves CE and reduction operation order.
+    Deferred checks synchronize once after all microbatches, before clipping or
+    either state update. Any nonfinite loss still requires checkpoint rollback.
+    Returned losses are detached; collecting diagnostics does not retain graphs.
+    """
+    import torch
+    profile = resolve_execution_profile(execution_profile)
+    recipe = SFTRecipe()
+    if not 1 <= len(examples) <= recipe.gradient_accumulation_steps:
+        raise SFTInputError("One SFT update requires one to sixteen ordered examples")
+    device = next(model.parameters()).device
+    optimizer.zero_grad(set_to_none=True)
+    losses = []
+    for example in examples:
+        batch = collate_completion([example], pad_token_id, device, validate_counts=profile.validated_loss_counts)
+        counts = batch["validated_completion_counts"] if profile.validated_loss_counts else None
+        loss = completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
+                               batch["labels"], validated_counts=counts)
+        if not profile.defer_finite_checks and not torch.isfinite(loss):
+            raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
+        (loss / len(examples)).backward()
+        losses.append(loss.detach())
+    if profile.defer_finite_checks and not torch.isfinite(torch.stack(losses)).all():
+        raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
+    torch.nn.utils.clip_grad_norm_([parameter for parameter in model.parameters() if parameter.requires_grad],
+                                  recipe.max_grad_norm, error_if_nonfinite=True)
+    optimizer.step()
+    scheduler.step()
+    return tuple(losses)
+
+
 def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
                             examples: Sequence[Mapping[str, Any]], pad_token_id: int,
                             *, progress: Mapping[str, Any] | None = None,
                             save: Callable[[dict[str, Any]], None] | None = None,
-                            should_pause: Callable[[], bool] | None = None) -> dict[str, Any]:
+                            should_pause: Callable[[], bool] | None = None,
+                            execution_profile: SFTExecutionProfile | None = None) -> dict[str, Any]:
     """Real optimizer loop, shared by GPU production and tiny CPU fixtures.
 
     Pause happens only after one complete logical optimizer update. Exceptions
     propagate without claiming the potentially partial update as completed.
     """
-    import torch
+    profile = resolve_execution_profile(execution_profile)
     recipe = SFTRecipe()
     order = exposure_order(len(examples))
     order_hash = _hash(order)
@@ -345,30 +422,23 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
     position = int((progress or {}).get("sampler_position", 0))
     if progress and progress.get("exposure_order_hash") != order_hash:
         raise SFTInputError("Resume sampler/exposure identity mismatch")
+    if progress and progress.get("execution_profile", SFTExecutionProfile().to_dict()) != profile.to_dict():
+        raise SFTInputError("Resume execution profile differs; declare a runtime migration")
     if completed < 0 or completed > total_steps or position != min(completed * 16, len(order)):
         raise SFTInputError("Checkpoint is not at a completed optimizer boundary")
     processed_tokens = int((progress or {}).get("processed_tokens", 0))
-    device = next(model.parameters()).device
     model.train()
     for step in range(completed, total_steps):
         indices = order[position:position + recipe.gradient_accumulation_steps]
-        optimizer.zero_grad(set_to_none=True)
-        for index in indices:
-            example = examples[index]
-            batch = collate_completion([example], pad_token_id, device)
-            loss = completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits, batch["labels"])
-            if not torch.isfinite(loss):
-                raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
-            (loss / len(indices)).backward()
-        torch.nn.utils.clip_grad_norm_([parameter for parameter in model.parameters() if parameter.requires_grad], recipe.max_grad_norm, error_if_nonfinite=True)
-        optimizer.step()
-        scheduler.step()
+        one_optimizer_update(model, optimizer, scheduler, [examples[index] for index in indices],
+                             pad_token_id, execution_profile=profile)
         position += len(indices)
         processed_tokens += sum(len(examples[index]["input_ids"]) for index in indices)
         completed = step + 1
         state = {"completed_steps": completed, "sampler_position": position,
                  "exposure_order_hash": order_hash, "processed_tokens": processed_tokens,
-                 "total_optimizer_steps": total_steps, "example_presentations": position}
+                 "total_optimizer_steps": total_steps, "example_presentations": position,
+                 "execution_profile": profile.to_dict()}
         pause = bool(should_pause and should_pause())
         if save and (completed % 100 == 0 or completed == total_steps or pause):
             save(state)
@@ -376,7 +446,8 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
             return {**state, "status": "paused"}
     return {"completed_steps": completed, "sampler_position": position,
             "exposure_order_hash": order_hash, "processed_tokens": processed_tokens,
-            "total_optimizer_steps": total_steps, "example_presentations": position, "status": "complete"}
+            "total_optimizer_steps": total_steps, "example_presentations": position,
+            "execution_profile": profile.to_dict(), "status": "complete"}
 
 
 def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token_id: int) -> float:
@@ -396,7 +467,9 @@ def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token
     return sum(values) / len(values)
 
 
-def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = None) -> tuple[Any, Any, Any, Any, dict[str, Any]]:
+def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = None,
+             execution_profile: SFTExecutionProfile | None = None) -> tuple[Any, Any, Any, Any, dict[str, Any]]:
+    profile = resolve_execution_profile(execution_profile)
     try:
         import numpy as np
         import torch
@@ -420,7 +493,7 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
         spec.model_name, revision=spec.model_revision, trust_remote_code=False,
         **model_load_kwargs(spec.model_name, spec.model_revision, cache_root),
         quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16),
-        torch_dtype=torch.bfloat16, device_map={"": device}, attn_implementation="eager")
+        torch_dtype=torch.bfloat16, device_map={"": device}, attn_implementation=profile.attention_implementation)
     model.config.use_cache = False
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
     model = get_peft_model(model, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05,
@@ -431,7 +504,8 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=math.ceil(1250 * 0.03), num_training_steps=1250)
     runtime = {"device": device, "gpu_name": torch.cuda.get_device_name(torch.device(device)),
                "vram_bytes": torch.cuda.get_device_properties(torch.device(device)).total_memory,
-               "cuda_version": torch.version.cuda, "attention_implementation": "eager", "use_reentrant": False,
+               "cuda_version": torch.version.cuda, "attention_implementation": profile.attention_implementation,
+               "execution_profile": profile.to_dict(), "use_reentrant": False,
                "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8, "warmup_steps": 38,
                "packages": {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "bitsandbytes", "numpy")}}
     return model, tokenizer, optimizer, scheduler, runtime
