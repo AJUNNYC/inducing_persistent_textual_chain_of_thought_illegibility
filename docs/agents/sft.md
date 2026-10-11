@@ -1,5 +1,7 @@
 # sft.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `sft`. Reports to: `coordinator`.
 
 Implement one fit engine for forty independent conditions and two sequential family queues, using the fixed QLoRA recipe and no cross-level warm start, early stopping or adaptive exposure. Integrate actual loss-mask, gradient and checkpoint evidence before launch.

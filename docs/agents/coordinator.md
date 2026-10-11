@@ -1,5 +1,7 @@
 # coordinator.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `coordinator`. Owns overall integration.
 
 Own integration and source consistency. Read every guide, workflow, source page and subagent completion report. Do not do scientific redesign to turn a blocker into a passing launch. Coordinate the six responsibility owners and preserve exact filenames, shared interfaces and independent validation evidence.

@@ -90,6 +90,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     evidence/
       coordinator_validation.json
       data_preparation.json
+      documentation_consistency_audit.json
       evaluation_validation.json
       existing_runpod_inspection.json
       kazitext_auxiliary_runtime.json
@@ -614,6 +615,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_coordinator_topology.py
         test_drive.py
         test_operations.py
+        test_protocol_provenance.py
         test_runpod.py
       shared_procedures/
         test_checkpointing.py

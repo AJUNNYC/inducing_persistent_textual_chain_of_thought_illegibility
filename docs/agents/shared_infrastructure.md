@@ -1,5 +1,7 @@
 # shared_infrastructure.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `shared_infrastructure`. Reports to: `coordinator`.
 
 Own common services and preflight coordination. Keep scientific rules in their prescribed consumers while providing typed records, stable identities, durable state, bounded failure handling and request-specific transport/cache. Define public interfaces jointly with producer/consumer owners before integration.

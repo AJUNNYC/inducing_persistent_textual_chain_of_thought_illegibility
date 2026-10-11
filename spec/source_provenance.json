@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "6e3510ca108b79880c8234ce34fe6c780cc53b63ae2d148d0aa4bec748910362"
+    "sha256": "adf2619ce513a5091d000670ad134faace9216c8e9ebe27d379bb84ac2dfe09e"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -22,6 +22,10 @@
     "vLLM generation benchmark",
     "whole-batch Drive integrity",
     "evaluation panel preparation",
-    "shared RL question selection"
-  ]
+    "shared RL question selection",
+    "joint accepted-pair validation and exact-deficit refills",
+    "all forty SFT dataset conditions",
+    "independent full Drive byte readback and native record validation"
+  ],
+  "procedure_update_sha256": "3994b7313c0297161baf82ab5d89e537f021a213a14ad5e7f745a9cb44c01425"
 }

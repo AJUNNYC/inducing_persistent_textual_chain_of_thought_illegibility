@@ -3224,8 +3224,8 @@ acceptance; (vi) valid live judge schemas, error pauses and optimizer-boundary r
 MBPP executor and complete evaluation interfaces; and (viii) actual funding and billing controls. These are
 engineering gates, not extra scientific replicates. Reuse valid compatible evidence; do not claim unexecuted
 checks passed.
-Prospective statistical validation has two failed scenarios out of 36. This generation-engine change does not
-waive the training/confirmatory launch blocker.
+Prospective statistical validation recorded 34 of 36 jointly covered repetitions, with two coverage failures.
+This generation-engine change does not waive the training/confirmatory launch blocker.
 ```
 
 ## page_059

@@ -233,21 +233,23 @@
       "tests": [
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_candidate_manifest.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_with_live_dataset_validation",
       "implementation_status": "implemented",
       "verification": {
         "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
         "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "live_status": "verified_for_completed_dataset_scope",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
           "accepted_corpus_license_and_complete_frozen_source"
         ],
-        "final_audit": "pending",
+        "final_audit": "completed_dataset_readback_passed_full_study_pending",
         "evidence": [
           "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
+          "docs/implementation_acceptance.md",
+          "docs/procedure_update.md",
+          "docs/evidence/vllm_sft_drive_readback_audit.json"
         ]
       },
       "module_cards": [
@@ -273,21 +275,23 @@
         "tests/unit/data_generation_collection/test_data_generation.py",
         "tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_with_live_dataset_validation",
       "implementation_status": "implemented",
       "verification": {
         "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
         "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "live_status": "verified_for_completed_dataset_scope",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
           "actual_paired_clean_generations"
         ],
-        "final_audit": "pending",
+        "final_audit": "completed_dataset_readback_passed_full_study_pending",
         "evidence": [
           "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
+          "docs/implementation_acceptance.md",
+          "docs/procedure_update.md",
+          "docs/evidence/vllm_sft_drive_readback_audit.json"
         ]
       },
       "module_cards": [
@@ -351,21 +355,23 @@
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py",
         "tests/unit/shared_procedures/test_records.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_with_live_dataset_validation",
       "implementation_status": "implemented",
       "verification": {
         "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
         "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "live_status": "verified_for_completed_dataset_scope",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
           "actual_two_model_parsing_and_all_transform_integrity"
         ],
-        "final_audit": "pending",
+        "final_audit": "completed_dataset_readback_passed_full_study_pending",
         "evidence": [
           "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
+          "docs/implementation_acceptance.md",
+          "docs/procedure_update.md",
+          "docs/evidence/vllm_sft_drive_readback_audit.json"
         ]
       },
       "module_cards": [
@@ -476,21 +482,23 @@
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py",
         "tests/unit/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/test_clean_trace_batch.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_with_live_dataset_validation",
       "implementation_status": "implemented",
       "verification": {
         "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
         "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "live_status": "verified_for_completed_dataset_scope",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
           "actual_full_clean_collection_and_deficit_refills"
         ],
-        "final_audit": "pending",
+        "final_audit": "completed_dataset_readback_passed_full_study_pending",
         "evidence": [
           "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
+          "docs/implementation_acceptance.md",
+          "docs/procedure_update.md",
+          "docs/evidence/vllm_sft_drive_readback_audit.json"
         ]
       },
       "module_cards": [
@@ -663,21 +671,23 @@
         "tests/unit/data_generation_collection/sft_data/rot13/test_rot13_data_construction.py",
         "tests/unit/data_generation_collection/sft_data/kazitext/test_kazitext_data_construction.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_with_live_dataset_validation",
       "implementation_status": "implemented",
       "verification": {
         "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
         "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "live_status": "verified_for_completed_dataset_scope",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
           "actual_official_kazitext_runtime"
         ],
-        "final_audit": "pending",
+        "final_audit": "completed_dataset_readback_passed_full_study_pending",
         "evidence": [
           "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
+          "docs/implementation_acceptance.md",
+          "docs/procedure_update.md",
+          "docs/evidence/vllm_sft_drive_readback_audit.json"
         ]
       },
       "module_cards": [
@@ -3497,20 +3507,22 @@
       "diagrams": [
         "spec/mermaid/workflows/operations/drive.mmd"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_with_live_dataset_validation",
       "implementation_status": "implemented",
       "verification": {
         "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
         "local_scope": "Declared SDK/model fixtures and actual local operations; no real provider/GPU/Drive success inferred.",
-        "live_status": "pending",
+        "live_status": "verified_for_completed_dataset_scope",
         "external_dependencies": [
           "real_consent_refresh_scope_account_and_project_folder_verification"
         ],
         "scientific_results": "not_executed",
-        "final_audit": "pending",
+        "final_audit": "completed_dataset_readback_passed_full_study_pending",
         "evidence": [
           "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
+          "docs/implementation_acceptance.md",
+          "docs/procedure_update.md",
+          "docs/evidence/vllm_sft_drive_readback_audit.json"
         ]
       },
       "operational_entrypoints": [
@@ -3775,6 +3787,7 @@
     "implemented_with_local_tests_live_validation_pending": "Local implementation/fixture evidence exists; named actual hardware/service/artifact integration remains pending.",
     "partially_implemented_with_local_tests_live_validation_pending": "Local components exist but a named integration gap remains before actual launch.",
     "implemented_with_local_checks_final_audit_pending": "Executable local audit exists; final static/remote/cold-start reconciliation remains pending.",
-    "implemented_with_local_tests_mandatory_validation_failed": "Local implementation/contract checks exist, but the actual prospective coverage preflight failed; confirmatory launch is blocked. This is not a failed local unit-test claim."
+    "implemented_with_local_tests_mandatory_validation_failed": "Local implementation/contract checks exist, but the actual prospective coverage preflight failed; confirmatory launch is blocked. This is not a failed local unit-test claim.",
+    "implemented_with_live_dataset_validation": "Completed source/dataset or Drive requirement has actual live evidence; training, evaluation and full-study gates are separate."
   }
 }

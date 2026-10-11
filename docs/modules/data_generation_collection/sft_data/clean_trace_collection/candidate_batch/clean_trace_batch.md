@@ -13,7 +13,7 @@
 
 ## Responsibility and controlling details
 
-Native clean generation: temperature 0.6, `top_p=0.95`, at most 3072 new tokens, no added system prompt, native reasoning formatting and no opacity instruction. Both untouched models independently respond to the same candidate. Save both raw responses, finish reasons, token counts, model/tokenizer/runtime/seed identity and failures before derived processing.
+Active corpus generation uses `VLLMCleanGenerator` and the frozen vLLM workers; native Transformers remains available for native controls. Both paths retain temperature 0.6, `top_p=0.95`, at most 3072 new tokens, no added system prompt, native reasoning formatting and no opacity instruction. Both untouched models independently respond to the same candidate. Save both raw responses, finish reasons, token counts, model/tokenizer/runtime/seed identity and failures before derived processing.
 
 Each output must be completed and separable into nonempty reasoning and nonempty final response; reasoning has at least three original word spans containing an ASCII Latin letter. Apply the exact final transformation algorithms, profile settings, seeds and protected-span rules to preflight every variant. Clean and all variants must fit the **total prompt-plus-response 4096-token bound** for the relevant model tokenizer. Preserve final answers and prompts; KaziText protects numerical and mathematical spans. A failure for either model or any required variant rejects that shared candidate before freeze.
 
@@ -50,6 +50,8 @@ The following source comments retain the procedural detail of the supplied diagr
 - Short valid traces and repeated adjacent masks are accepted, not regenerated to manufacture ten distinct masks.
 
 ## Implemented interface and evidence
+
+The completed corpus uses `VLLMCleanGenerator` through `scripts/run_vllm_generation_worker.py`, with 128 requests per chunk and a full 3072-token allowance per request. Cached CPU acceptance uses the existing validator without loading models. See [current procedure](../../../../../procedure_update.md).
 
 `NativeCleanGenerator(models, *, device_map="auto", torch_dtype="bfloat16", cache_root=None)` loads each untouched frozen base lazily and emits native responses at temperature 0.6, top-p 0.95 and at most 3072 new tokens. `process_clean_batch(candidates, generator, tokenizers, *, kazitext, output_dir, config_hash)` saves full raw responses before parsing, then returns paired accepted/rejected JSON mappings. `validate_clean_trace` preserves explicit missing fields on boundary rejection and retains semantically wrong traces.
 

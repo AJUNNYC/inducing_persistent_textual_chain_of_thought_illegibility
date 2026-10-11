@@ -1,5 +1,7 @@
 # evaluation.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `evaluation`. Reports to: `coordinator`.
 
 Implement the frozen native protocol, shared runners, strict scoring and isolated MBPP execution. Keep raw outputs shared across capability and independent judging. Preserve exact prompt information boundaries, fixed denominators and the separate tri-state audit without changing the RL reward.

@@ -23,11 +23,15 @@ flowchart TD
     ROT["src/data_generation_collection/sft_data/rot13/rot13_data_construction.py<br/>ROT13 data construction<br/>Construct datasets for both models at all 10 levels"]
     KAZ["src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py<br/>KaziText data construction<br/>Construct datasets for both models at all 10 levels"]
     WAIT["Wait for both verified transformation families"]
+    DRIVE["Verify all 80 JSONLs and 40 condition manifests<br/>Bundle and accepted pool in Google Drive"]
+    INDEX["Publish download index<br/>Paths, SHA-256, sizes and Drive file IDs"]
+    AUDIT["Independent Drive full byte readback<br/>Native validation of all 404,000 records<br/>CPU only; no Pod or GPU needed"]
     OUT["Release 40 verified train / validation pairs"]
     INPUT --> COLLECT --> FREEZE
     FREEZE --> ROT --> WAIT
     FREEZE --> KAZ --> WAIT
-    WAIT --> OUT
+    WAIT --> DRIVE --> INDEX --> OUT
+    OUT -.-> AUDIT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class COLLECT,ROT,KAZ detail
 

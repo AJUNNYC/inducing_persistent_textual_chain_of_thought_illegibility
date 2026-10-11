@@ -10,6 +10,25 @@ from pathlib import Path
 from urllib.parse import unquote
 
 EXCLUDED={'.git','.venv','.pytest_cache','__pycache__','node_modules','.cache','build','dist'}
+ARCHIVED_PDF_SHA256='db5e7dcd68b7632f2c222468a02affabe8526bedc48ef2b7139c31077343a704'
+
+
+def validate_protocol_sources(root: Path) -> list[str]:
+    """Bind the editable active edition to its source; retain the archive pin."""
+    errors=[]
+    archive=root/'spec/archive/experiment_original.pdf'
+    if not archive.is_file() or hashlib.sha256(archive.read_bytes()).hexdigest()!=ARCHIVED_PDF_SHA256:
+        errors.append('Historical PDF changed: spec/archive/experiment_original.pdf')
+    provenance=json.loads((root/'spec/source_provenance.json').read_text())
+    active=root/'spec/experiment.pdf'
+    if provenance['pdf']['path']!='spec/experiment.pdf' or not active.is_file() or hashlib.sha256(active.read_bytes()).hexdigest()!=provenance['pdf']['sha256']:
+        errors.append('Active PDF differs from recorded provenance')
+    source=root/'spec/protocol_page_updates.json'
+    if (provenance.get('procedure_update_source')!='spec/protocol_page_updates.json'
+            or not source.is_file()
+            or hashlib.sha256(source.read_bytes()).hexdigest()!=provenance.get('procedure_update_sha256')):
+        errors.append('Integrated PDF source differs from recorded provenance')
+    return errors
 
 
 def tracked_inventory(root: Path) -> list[str]:
@@ -39,7 +58,8 @@ def validate_repository(root: str | Path) -> dict:
     # Ignore runtime data/artifacts, but retain tracked markers and inventories.
     files=tracked_inventory(root)
     for path in files:
-        if any(not re.fullmatch(r'[a-z0-9_.]+',part) for part in Path(path).parts): errors.append(f'Noncanonical tracked filename: {path}')
+        # Preserve the already frozen generation dependency filename.
+        if path!='requirements-vllm.txt' and any(not re.fullmatch(r'[a-z0-9_.]+',part) for part in Path(path).parts): errors.append(f'Noncanonical tracked filename: {path}')
         if path not in expected: errors.append(f'Tracked path absent from canonical manifest: {path}')
     for path,e in expected.items():
         target=root/path
@@ -69,8 +89,7 @@ def validate_repository(root: str | Path) -> dict:
             if re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:',link) or link.startswith('#'): continue
             if not (target.parent/unquote(link.split('#')[0])).exists(): errors.append(f'Broken local link in {path}: {link}')
             link_count+=1
-    for path,digest in {'spec/experiment.pdf':'160a88b33fd7e970aa0dfc6bac20c729115f4bab75178f89c488e97c6fb15e69','spec/archive/experiment_original.pdf':'db5e7dcd68b7632f2c222468a02affabe8526bedc48ef2b7139c31077343a704'}.items():
-        if hashlib.sha256((root/path).read_bytes()).hexdigest()!=digest: errors.append(f'Authoritative PDF changed: {path}')
+    errors.extend(validate_protocol_sources(root))
     req=json.loads((root/'spec/requirements_manifest.json').read_text())['requirements']
     canonical=json.loads((root/'spec/module_manifest.json').read_text())['modules']
     if manifest['modules']!=canonical: errors.append('Repository and module manifests disagree')

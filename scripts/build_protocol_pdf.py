@@ -81,8 +81,12 @@ def main():
     provenance['source_policy'] = ('Historical scientific source and approved user procedure decisions; '
                                    'active changes integrated directly into existing sections.')
     provenance['procedure_update_source'] = 'spec/protocol_page_updates.json'
+    provenance['procedure_update_sha256'] = hashlib.sha256((ROOT/'spec/protocol_page_updates.json').read_bytes()).hexdigest()
     provenance['validated_live_scope'] = ['vLLM generation benchmark', 'whole-batch Drive integrity',
-                                        'evaluation panel preparation', 'shared RL question selection']
+                                        'evaluation panel preparation', 'shared RL question selection',
+                                        'joint accepted-pair validation and exact-deficit refills',
+                                        'all forty SFT dataset conditions',
+                                        'independent full Drive byte readback and native record validation']
     provenance_path.write_text(json.dumps(provenance, indent=2)+'\n')
     print(f'Built {len(doc)}-page integrated protocol; refreshed extraction and provenance')
     doc.close()

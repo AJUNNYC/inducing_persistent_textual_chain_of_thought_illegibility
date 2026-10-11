@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 448,
+  "files": 450,
   "directories_including_root": 202,
   "entries": [
     {
@@ -921,6 +921,17 @@
       "display_path": "docs/evidence/data_preparation.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_f2265002d8153e",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/documentation_consistency_audit.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/documentation_consistency_audit.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_bafeb48a197394",
       "blank": false
     },
     {
@@ -6537,6 +6548,17 @@
       "display_path": "tests/unit/operations/test_operations.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_0211822d80d42b",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_protocol_provenance.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_protocol_provenance.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_189e3ce34ad176",
       "blank": false
     },
     {

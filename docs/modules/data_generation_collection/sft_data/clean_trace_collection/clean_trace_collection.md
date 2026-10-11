@@ -45,6 +45,10 @@ Optional callback or stop-file controls return `status="paused"` with `next_batc
 
 Unit checks exercise actual 10100-plus-exact-deficit control flow, common paired counts, disjoint ordered splits, wrong batch ordering and source shortage. No scientific accepted pool was created without the authorized LMSYS source and both real model runtimes.
 
+## Completed production evidence
+
+The 11 October 2026 run froze 10,000 training and 100 validation pairs after exact-deficit refills. All forty conditions and 404,000 records are saved in Drive. Independent full byte readback of all 122 artifacts and native record validation passed without Pod connections. Configurable Pod assignments and optional disjoint CPU shards preserve the fixed scientific pairing rules. See [current procedure](../../../../procedure_update.md) and [audit report](../../../../evidence/vllm_sft_drive_readback_audit.json). Training and actual evaluations remain unrun.
+
 ## Completion and failure boundary
 
 Implement and test `src/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.py` against its specified behavior in `tests/unit/data_generation_collection/sft_data/clean_trace_collection/test_clean_trace_collection.py`. Validate every emitted artifact and preserve its source/configuration identity. Do not claim completeness from a placeholder or passing import. Propagate required child failures and maintain ordinary model outcomes separately from infrastructure faults. Mandatory real preflights and permission gates remain in force. Unspecified allowed conventions must be documented/frozen before outcomes; new scientific choices are not silently authorized.
@@ -66,19 +70,23 @@ flowchart TD
 %% Each model trace must pass structural checks, including at least three eligible original word spans.
 %% No semantic correctness or quality filter. Clean means untransformed baseline output.
 %% Child: PROCESS => candidate_batch/clean_trace_batch.mmd
+    COORD["Configurable Pod roles and runtime assignments<br/>deployment/coordinator.json"]
     INPUT["Filtered LMSYS prompts from the first user turn<br/>In fixed candidate order"]
     INITIAL["Initial batch: 10,100 new IDs<br/>Fresh vLLM responses only; old results archived"]
     PROCESS["src/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.py<br/>One clean trace candidate batch<br/>Process every candidate in this batch"]
     WORKERS["Separate 7B and 14B vLLM workers<br/>128 requests per chunk; 3072 new tokens per request"]
     DRIVE["Save raw responses and provenance<br/>Verify every whole batch in Google Drive<br/>RunPod is disposable scratch"]
     JOIN["Join both fresh caches by prompt ID<br/>Apply structural and all-transformed checks"]
+    SHARDS["Optional disjoint CPU verification shards<br/>Save verified pair and transform caches to Drive<br/>Checked transfer to primary; preserve candidate order"]
     COUNT["Count cumulative accepted pairs"]
     ENOUGH{"10,100 accepted?"}
     POOL{"Enough new IDs for the deficit?"}
     REFILL["Next batch size equals<br/>10,100 minus accepted count"]
     OUT["Freeze 10,000 train and 100 validation IDs<br/>Build all ROT13 and KaziText datasets<br/>Verify final Drive copies"]
     STOP["Stop: insufficient candidate pool"]
-    INPUT --> INITIAL --> WORKERS --> DRIVE --> JOIN --> PROCESS --> COUNT --> ENOUGH
+    COORD --> WORKERS
+    COORD -.-> SHARDS
+    INPUT --> INITIAL --> WORKERS --> DRIVE --> JOIN --> SHARDS --> PROCESS --> COUNT --> ENOUGH
     ENOUGH -->|Yes| OUT
     ENOUGH -->|No| POOL
     POOL -->|Yes| REFILL --> WORKERS

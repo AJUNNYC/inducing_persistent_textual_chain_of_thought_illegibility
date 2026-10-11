@@ -1,5 +1,7 @@
 # rl.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `rl`. Reports to: `coordinator`.
 
 Implement the source-prescribed two trajectories and reusable eight-by-four rollout/reward/update cycle. Preserve the boolean two-pass Sonnet reward exactly and H.7 Dr. GRPO conventions. Never update with missing rewards or resample ordinary bad responses.

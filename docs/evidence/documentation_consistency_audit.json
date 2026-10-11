@@ -1,0 +1,41 @@
+{
+  "status": "PASSED",
+  "checked_at": "2026-10-11T12:12:30.796899+00:00",
+  "repository_validation": {
+    "status": "VERIFIED",
+    "intended_static_files": 450,
+    "tracked_files": 450,
+    "inventory_source": "git",
+    "manifest_entries": 652,
+    "modules": 58,
+    "requirements": 91,
+    "local_markdown_links": 1370,
+    "errors": [],
+    "scope": "static integrity only; run unit/integration/live preflights and native Mermaid parser separately"
+  },
+  "mermaid": {
+    "parser": "mermaid@11.12.1",
+    "passed": 75,
+    "failed": 0
+  },
+  "pdf": {
+    "pages": 81,
+    "exact_page_extraction": true,
+    "sha256": "adf2619ce513a5091d000670ad134faace9216c8e9ebe27d379bb84ac2dfe09e",
+    "original_archive_unchanged": true
+  },
+  "module_diagram_mirrors_match": true,
+  "protocol_provenance_checks": {
+    "passed": 4,
+    "failed": 0
+  },
+  "corrected_topics": [
+    "completed generation, refills, accepted corpus and Drive readback",
+    "Google consent and persistence status",
+    "configurable Pod roles and CPU shards",
+    "full dataset handoff and download index",
+    "scope and date of historical handoffs",
+    "statistical coverage repetitions distinguished from test/scenario counts"
+  ],
+  "limits": "Active documentation/static integrity audit; historical archives remain historical; no current-head full-suite or scientific-result certification."
+}

@@ -52,6 +52,10 @@ The intact native-training renderer counts all assistant reasoning plus final by
 
 Unit and integration checks use the actual source-record producer, parser, ROT13 algorithm, serializer/readback, shared schemas and SFT consumer. The disk fixture writes/reopens the full forty conditions (404000 records with common 10000/100 splits and distinct model-specific sources); the handoff fixture constructs the complete SFT worklist and rejects altered source finals. External model/noise outputs in these tests are labeled fixtures.
 
+## Completed production evidence
+
+The 11 October 2026 run froze 10,000 training and 100 validation pairs after exact-deficit refills. All forty conditions and 404,000 records are saved in Drive. Independent full byte readback of all 122 artifacts and native record validation passed without Pod connections. Configurable Pod assignments and optional disjoint CPU shards preserve the fixed scientific pairing rules. See [current procedure](../../../procedure_update.md) and [audit report](../../../evidence/vllm_sft_drive_readback_audit.json). Training and actual evaluations remain unrun.
+
 ## Completion and failure boundary
 
 Implement and test `src/data_generation_collection/sft_data/sft_data_preparation.py` against its specified behavior in `tests/unit/data_generation_collection/sft_data/test_sft_data_preparation.py`. Validate every emitted artifact and preserve its source/configuration identity. Do not claim completeness from a placeholder or passing import. Propagate required child failures and maintain ordinary model outcomes separately from infrastructure faults. Mandatory real preflights and permission gates remain in force. Unspecified allowed conventions must be documented/frozen before outcomes; new scientific choices are not silently authorized.
@@ -86,11 +90,15 @@ flowchart TD
     ROT["src/data_generation_collection/sft_data/rot13/rot13_data_construction.py<br/>ROT13 data construction<br/>Construct datasets for both models at all 10 levels"]
     KAZ["src/data_generation_collection/sft_data/kazitext/kazitext_data_construction.py<br/>KaziText data construction<br/>Construct datasets for both models at all 10 levels"]
     WAIT["Wait for both verified transformation families"]
+    DRIVE["Verify all 80 JSONLs and 40 condition manifests<br/>Bundle and accepted pool in Google Drive"]
+    INDEX["Publish download index<br/>Paths, SHA-256, sizes and Drive file IDs"]
+    AUDIT["Independent Drive full byte readback<br/>Native validation of all 404,000 records<br/>CPU only; no Pod or GPU needed"]
     OUT["Release 40 verified train / validation pairs"]
     INPUT --> COLLECT --> FREEZE
     FREEZE --> ROT --> WAIT
     FREEZE --> KAZ --> WAIT
-    WAIT --> OUT
+    WAIT --> DRIVE --> INDEX --> OUT
+    OUT -.-> AUDIT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class COLLECT,ROT,KAZ detail
 

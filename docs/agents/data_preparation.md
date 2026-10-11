@@ -1,5 +1,7 @@
 # data_preparation.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `data_preparation`. Reports to: `coordinator`.
 
 Own authorized source manifests, structural paired clean data, exact transforms and frozen evaluation/RL question selections. Preserve common IDs, model-specific traces, all-condition validity and no semantic-quality filter. Candidate filtering and short-mask cases must follow the sources, not a desired result.

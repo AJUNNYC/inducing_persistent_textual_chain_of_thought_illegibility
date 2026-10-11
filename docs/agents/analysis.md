@@ -1,5 +1,7 @@
 # analysis.md
 
+> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+
 Role identifier: `analysis`. Reports to: `coordinator`.
 
 Implement baseline-repeatability diagnostics, the prospective statistical plan/simulation validation, complete paired-window statistics and honest descriptive/confirmatory classification. All 216 windows and required scalar gates matter; unknown baseline evidence, zero variance and empty subsets are not favorable results.
