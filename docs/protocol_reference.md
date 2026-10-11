@@ -3002,15 +3002,16 @@ change both the text being transformed and the transformation strength. Paired p
 the base models’ own generated targets.
 E.2.3 Machine-readable configuration and exact artifact contracts
 54
-Freeze model, tokenizer, dataset, intervention, source and dependency identities. SHA-256 checks agreement with recorded
-bytes, not scientific correctness. The forty-condition SFT handoff retains producer hashes and verifies ordered records against
-Drive. Paused consumer 773cfd3 passed thirteen launch gates and actual H100 validation; those receipts keep their original
-scope.
-Execution candidates require precedent and empirical support, ordered by least expected result effect. First, CPU-validated counts
-and one loss-finiteness decision before clipping/updating remove redundant synchronization; CPU loss, gradients, updates and
-RNG agree bitwise. Next, built-in SDPA permits floating-point differences. Baseline eager remains default. RTX PRO 6000
-Blackwell 96GB measurement and changed-source certification are pending. Preserve step 214 under its old identity; record
-hardware/profile migration. Data, epochs, objective, precision, LoRA/dropout, optimizer and batch 16 remain fixed.
+Freeze model, tokenizer, dataset, intervention, source and dependency identities. SHA-256 checks agreement with recorded bytes,
+not scientific correctness. The forty-condition SFT handoff retains producer hashes and verifies ordered records against Drive. Paused
+consumer 773cfd3 passed thirteen launch gates and actual H100 validation; those receipts keep their original scope.
+Execution candidates follow precedent and least-result-impact ordering. Current source fd23db9 was recertified against the
+unchanged forty-condition handoff. On RTX PRO 6000 Blackwell 96GB, baseline, deferred checks and SDPA each completed one
+warmup and two measured updates. Median seconds were 11.899, 11.875 and 11.974. Deferred checks preserved bitwise losses,
+gradients, adapter updates and RNG but missed the preset speed threshold. SDPA failed numerical and speed bounds. Neither
+candidate is approved; baseline eager remains default. Short timings do not establish full-fit duration or final-result equivalence.
+Preserve paused step 214 under its old identity; any hardware/profile migration remains explicit. The frozen data and recipe stay
+unchanged.
 Generation uses vLLM 0.11.0, Transformers 4.57.3, Torch 2.8+cu128 separately from native Torch 2.9 training. Save actual
 inventories. BF16 context 4096, sequences 128, scheduler 8192, GPU fraction 0.9, no prefix caching; every response keeps 3072
 new tokens. Producer dc520cb and configuration 3757493e stay frozen.
@@ -3018,11 +3019,11 @@ Evaluation uses the same pinned BF16 vLLM engine for untouched bases and SFT/RL 
 scheduler 8192, GPU fraction 0.9, no prefix cache, LoRA enabled (maximum rank 32) even for bases. Verify checkpoint bytes.
 Preserve public templates, EOS, per-item seeds, temperature 0.6, top-p 0.95 and 3072 response tokens; never truncate prompts.
 Archive native measurements; different engines can change answers. Run 7B then 14B separately on one GPU. Judges may be
-explicitly deferred for capability repeatability, which does not certify opacity or full evaluation. Judge the same saved seed 42
-outputs later. Drive-verify raw batches before advancing, and scored bundles/reports after validated Docker scoring. Bind handoff
-and measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or exact code field, without prose
-inference, ambiguity repair or code repair. Rescoring 7398 preserved outputs passed both models and all four unchanged gates;
-no generation. Retain original failures; apply identical field rules to trained evaluations.
+explicitly deferred for capability repeatability, which does not certify opacity or full evaluation. Judge the same saved seed 42 outputs
+later. Drive-verify raw batches before advancing, and scored bundles/reports after validated Docker scoring. Bind handoff and
+measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or exact code field, without prose inference,
+ambiguity repair or code repair. Rescoring 7398 preserved outputs passed both models and all four unchanged gates; no generation.
+Retain original failures; apply identical field rules to trained evaluations.
 ```
 
 ## page_055
@@ -3208,20 +3209,21 @@ induction or apparent internal-monitor success subject to judge shortcuts, selec
 changes and intervention artifacts; the audit is intended to protect that inference rather than
 manufacture a stronger scientific result [41, 54, 59].
 58
-Current execution status (11 October 2026). Licensed LMSYS acquisition and the one-million-row audit are verified;
-407,214 eligible candidates are frozen. The 1,233-item capability panel, nested 200-item legibility subset and shared
-800-question RL manifest are backed up. Fresh vLLM generation/refills yielded 10,100 accepted pairs and 1,539
-rejections from 11,639 IDs. All 40 transformed conditions (404,000 records) and their download index are Drive-verified.
-Validation evidence. Independent CPU-only Drive readback verified all 122 artifacts without a Pod. Both models passed
-all four unchanged repeatability gates after final-field rescoring of 7,398 saved outputs; no response was regenerated.
-All thirteen launch gates and actual H100 launch validation passed for frozen consumer 773cfd3. The first 7B ROT13 fit
-passed actual gradients and paused at optimizer step 214 of 1,250; full recovery state is verified in Drive.
-Optimization status. The user requires precedent and empirical support in least-result-impact order. Redundant-check
-removal and explicit SDPA candidates are implemented. Focused CPU comparisons establish bitwise
-loss/gradient/optimizer/scheduler/RNG equality for the first candidate and fewer host scalar decisions. They do not
-establish GPU speed or final-result equivalence. Baseline eager remains active by default. RTX PRO 6000 Blackwell
-96GB is selected but unavailable; fresh source bindings and affected hardware checks precede activation. Compatible
-data, statistical and provider evidence remain reusable. Training completion and full legibility judging are pending.
+Current execution status (11 October 2026). Licensed LMSYS acquisition and the one-million-row audit are verified; 407,214
+eligible candidates are frozen. The 1,233-item capability panel, nested 200-item legibility subset and shared 800-question RL
+manifest are backed up. Fresh vLLM generation/refills yielded 10,100 accepted pairs and 1,539 rejections from 11,639 IDs. All
+40 transformed conditions (404,000 records) and their download index are Drive-verified.
+Validation evidence. Independent CPU-only Drive readback verified all 122 artifacts without a Pod. Both models passed all
+four unchanged repeatability gates after final-field rescoring of 7,398 saved outputs; no response was regenerated. All thirteen
+launch gates and actual H100 launch validation passed for frozen consumer 773cfd3. The first 7B ROT13 fit passed actual
+gradients and paused at optimizer step 214 of 1,250; full recovery state is verified in Drive.
+Optimization status. Least-result-impact candidates were measured on RTX PRO 6000 Blackwell 96GB under recertified
+source fd23db9, native Torch 2.9/CUDA 12.8 and the frozen recipe. Each profile used one warmup and two measured
+updates. Baseline, deferred checks and SDPA medians were 11.899, 11.875 and 11.974 seconds. Deferred checks preserved
+bitwise loss/gradient/update/RNG equality but failed the preset speed screen; SDPA failed numerical and speed bounds.
+Neither is approved. Actual reports are Drive-verified; the first cache-lock attempt is separately preserved. Baseline eager and
+paused step 214 remain unchanged. Short measurements do not establish final-result equivalence, a full-fit ETA or checkpoint
+migration. Compatible completed evidence remains reusable. Training completion and full legibility judging are pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3713,12 +3715,12 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status (11 October 2026). Fresh vLLM corpus and all 40 transformed conditions are complete and Drive-verified. Both
-models passed all four baseline gates after rescoring 7,398 preserved outputs. Consumer773cfd3 passed thirteen
-launch gates; its first 7B ROT13 fit is paused at step 214 with verified full Drive recovery. New redundant-check and
-SDPA candidates follow least-result-impact ordering and published precedent. CPU exactness checks pass; RTX PRO
-6000 Blackwell 96GB performance and source recertification remain pending. Baseline eager remains default. The
-evaluation-only concentration guard passed 700/700 repetitions. Training completion and full evaluation remain pending.
+Status (11 October 2026). The fresh vLLM corpus and forty transformed conditions are Drive-verified; both
+models passed all four baseline gates. Consumer 773cfd3 passed thirteen launch gates; its first fit remains
+paused at step 214 with full Drive recovery. Recertified source fd23db9 measured baseline, deferred checks
+and SDPA on RTX PRO 6000 Blackwell 96GB. Deferred checks matched exact results but missed speed
+bounds; SDPA failed numerical and speed bounds. Neither is approved. Baseline eager remains default.
+Reports are saved to Drive. Training completion and full evaluation remain pending.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in

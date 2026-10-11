@@ -1,0 +1,77 @@
+{
+  "folder_id": "1MsTcGg-78j-Wg6O7pxKc8EwhGBLBDy73",
+  "folder_path": "reports/sft_optimizations/fd23db9/pro6000_ssc7c06solwdco/gpu_benchmark_02",
+  "source_commit": "fd23db9a871a2a7ca95715c9f1e98e69a5f8cffe",
+  "artifacts": [
+    {
+      "name": "plan.json",
+      "drive_file_id": "1RvXPZGoS4f_0MLaQwsbF53j-KxSP-SKf",
+      "sha256": "f890c1b6dd16e7afaa9a27f84601ee18065dc36584c5fd9396e48a8dfa5a03f9",
+      "bytes": 525073
+    },
+    {
+      "name": "baseline.json",
+      "drive_file_id": "12idukzokvDidH5j2d_jyedhKCO6AOXrx",
+      "sha256": "975edf025d77be1cfd311ceb50c786efe3c63e71c587480cb1373a9971eed1df",
+      "bytes": 27958
+    },
+    {
+      "name": "deferred_checks.json",
+      "drive_file_id": "11xC_d1AWPOIifVFgIkO6t9WmEbGRLAhH",
+      "sha256": "e4b022bde1c5590b938a45eca3b6d0be927cd62cce0ec6de966cd479a0a0e638",
+      "bytes": 27960
+    },
+    {
+      "name": "sdpa.json",
+      "drive_file_id": "1YVsG0D0TjUEBQtAzZCsx6rSGq8PWiAfc",
+      "sha256": "c649daef292051b1a5a4cf725afde69b96e00dcd5a5d3a17a7c22482058bcff5",
+      "bytes": 27955
+    },
+    {
+      "name": "report.json",
+      "drive_file_id": "1gcejrDMYYhTb9wO-DF7hb7LJ6WLCW6C_",
+      "sha256": "be41433a7cccff7479c60fedc0cf1fe6ddd61a2363a6b4777b102fe89f12ca28",
+      "bytes": 94009
+    }
+  ],
+  "official_training_state_modified": false,
+  "prior_failed_attempt": {
+    "folder_id": "15GjvR1PJBRZWI7p61t4KB_XeqsYnvDIp",
+    "folder_path": "reports/sft_optimizations/fd23db9/pro6000_ssc7c06solwdco/gpu_benchmark_01",
+    "status": "BLOCKED_CACHE_LOCK",
+    "gpu_measurements_completed": false,
+    "artifacts": [
+      {
+        "name": "baseline.json",
+        "drive_file_id": "1oR1k2rcrGOPwYomA_ISAl62KVroag-a5",
+        "sha256": "9283a01dddde8f34402dcf137e01084489288c511a1b3c1f1e711e2e69e4ab2d",
+        "bytes": 343
+      },
+      {
+        "name": "deferred_checks.json",
+        "drive_file_id": "1Tk92yOQrbqNCcyNUB47BkBuT_rr8i1bg",
+        "sha256": "12f30a5da3e0ca0120157d35ea5c40069a47aea71f7f3b792b5b687c30ed5619",
+        "bytes": 350
+      },
+      {
+        "name": "plan.json",
+        "drive_file_id": "1nFyuOi3duAHl5ez23JwXpT_cKpVuoClA",
+        "sha256": "f890c1b6dd16e7afaa9a27f84601ee18065dc36584c5fd9396e48a8dfa5a03f9",
+        "bytes": 525073
+      },
+      {
+        "name": "report.json",
+        "drive_file_id": "15UKGP8yQxVPtlml4CqiBf3fYGdjhi8kV",
+        "sha256": "ff145bf73dd37faec780452436bcb922a9a2322d005d8db48a11f58a1ce124e7",
+        "bytes": 1981
+      },
+      {
+        "name": "sdpa.json",
+        "drive_file_id": "1dI0C45dzf9fO5FeWpcYGUEROZEsDlwkQ",
+        "sha256": "02703fd42b7150603878f5ee957bfd1116ef848a4273f8dcfa27ecbc5f13ad4e",
+        "bytes": 339
+      }
+    ]
+  },
+  "verification_scope": "Drive metadata size, MD5 and SHA-256 provenance verification; not an independent full byte readback"
+}

@@ -1,6 +1,6 @@
 # sft_training.md
 
-**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass; first 7B ROT13 fit paused at step 214 with verified Drive recovery. The forty-fit study remains incomplete; new execution candidates require current source bindings and target-GPU evidence.
+**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass; first 7B ROT13 fit remains paused at step 214 with verified Drive recovery. Actual Blackwell comparisons rejected both faster-execution candidates; the forty-fit study and production migration remain incomplete.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -46,7 +46,7 @@ The following source comments retain the procedural detail of the supplied diagr
 
 Implement and test `src/training/sft/sft_training.py` against its specified behavior in `tests/unit/training/sft/test_sft_training.py`. Validate every emitted artifact and preserve its source/configuration identity. Do not claim completeness from a placeholder or passing import. Propagate required child failures and maintain ordinary model outcomes separately from infrastructure faults. Mandatory real preflights and permission gates remain in force. Unspecified allowed conventions must be documented/frozen before outcomes; new scientific choices are not silently authorized.
 
-The [certified launch handoff](../../../sft_data_handoff.md) binds the original producer to consumer `773cfd3`, whose first fit is paused at step 214. New [execution candidates](../../../sft_optimizations.md) need source recertification and affected GPU controls; compatible upstream evidence remains reusable. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
+The [certified launch handoff](../../../sft_data_handoff.md) binds the original producer to consumer `773cfd3`, whose first fit is paused at step 214. The [source fd23db9 Blackwell comparison](../../../evidence/sft_optimization_pro6000_benchmark.json) used isolated fresh adapters and rejected both candidate technical screens; production still defaults to baseline. It does not authorize checkpoint migration or complete a scientific fit. Current source certification and affected production controls remain required, while compatible upstream evidence remains reusable. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
 
 ## Exact path-synchronized diagram
 
