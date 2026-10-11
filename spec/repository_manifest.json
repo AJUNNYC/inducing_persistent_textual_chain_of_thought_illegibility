@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 482,
+  "files": 489,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1067,6 +1067,17 @@
       "blank": false
     },
     {
+      "path": "docs/evidence/sft_data_handoff_773cfd3_certificate.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_data_handoff_773cfd3_certificate.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_c8ef4e2af5d051",
+      "blank": false
+    },
+    {
       "path": "docs/evidence/sft_data_handoff_certificate.json",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -1097,6 +1108,50 @@
       "display_path": "docs/evidence/sft_implementation_report.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_a82a2202c321ff",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_launch_drive_index.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_launch_drive_index.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d20b397cfa0ea7",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_launch_pod_validation.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_launch_pod_validation.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_f0fc18609d9f7d",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_launch_preflight_report.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_launch_preflight_report.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_3e660b8bc1cabb",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_launch_readiness.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_launch_readiness.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_001d320e5e46f7",
       "blank": false
     },
     {
@@ -1273,6 +1328,28 @@
       "display_path": "docs/evidence/vllm_baseline_repeatability.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_4922617bb3d146",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/vllm_baseline_rescored_repeatability.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/vllm_baseline_rescored_repeatability.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d38f7cd60f0b0b",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/vllm_baseline_scoring_repair.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/vllm_baseline_scoring_repair.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d5e32995b647f5",
       "blank": false
     },
     {

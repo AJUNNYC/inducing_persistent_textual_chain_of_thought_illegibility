@@ -1,0 +1,5 @@
+{
+  "returncode": 0,
+  "stdout": "{\"status\": \"READY\", \"source_code_commit\": \"773cfd3cc6a776262e9ca65ca10667aaad456b69\", \"configuration_hash\": \"5793a9424fff62717ae06c6aeb0db61dead454a26c836bf04401825221c3deb2\", \"handoff_certificate_hash\": \"e8b47049551c27a5bd73d669ee3f2d63ab30336c15098f0f999439f2faa871f2\", \"preflight_report_hash\": \"5695aea25fc43641454bc77d199b29670d17bb0f0ae225717dafda7131428ea9\", \"required_gates\": 13, \"certified_conditions\": 40, \"selected_conditions\": 10, \"family\": \"rot13\", \"model\": \"7b\", \"deadline\": \"2026-10-11T20:20:00+00:00\", \"gpu_work_started\": false, \"drive_requests_made\": false}\n",
+  "stderr": ""
+}

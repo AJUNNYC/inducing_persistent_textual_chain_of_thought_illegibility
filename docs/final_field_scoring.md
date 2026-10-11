@@ -38,3 +38,36 @@ report and repair receipt pass verified Drive barriers before completion.
 
 SFT readiness still requires the actual repeatability result and compatible
 training launch evidence; a passing parser test alone does not clear a gate.
+
+## Actual completed repair
+
+All 7,398 original responses were rescored once under the frozen final-field
+contract without a new generation. The revised [repeatability report](evidence/vllm_baseline_rescored_repeatability.json)
+passed every model/domain check. The [repair receipt](evidence/vllm_baseline_scoring_repair.json)
+binds the original failed report, original request/text identities, revised
+measurement protocol and actual executed source `1a72d4a`. Revised packages,
+report and receipt are integrity-verified in [Google Drive](https://drive.google.com/drive/folders/1ruy6fVcaVAmfIkZ3asQaGDxljhuMyA-2).
+
+| Model | Domain | Correct counts, seeds 42 / 43 / 44 | Seed-43 / seed-44 retention | Three-seed common retention |
+|---|---|---|---|---|
+| 7B | GSM8K | 249 / 254 / 250 | 0.9116 / 0.9116 | 0.8514 |
+| 7B | MMLU | 240 / 233 / 252 | 0.8042 / 0.8333 | 0.7208 |
+| 7B | ARC | 301 / 300 / 305 | 0.9402 / 0.9535 | 0.9003 |
+| 7B | MBPP | 122 / 126 / 113 | 0.8934 / 0.8443 | 0.8197 |
+| 14B | GSM8K | 246 / 257 / 256 | 0.9228 / 0.9187 | 0.8618 |
+| 14B | MMLU | 326 / 320 / 319 | 0.8896 / 0.9172 | 0.8528 |
+| 14B | ARC | 320 / 314 / 319 | 0.9594 / 0.9781 | 0.9469 |
+| 14B | MBPP | 115 / 117 / 118 | 0.8696 / 0.8783 | 0.8000 |
+
+The unchanged requirements are 0.80 retention in each repeat and 0.60 common
+retention. The smallest observed values are 0.8042 and 0.7208. Passing the
+repeatability gate does not imply every task answer is correct or certify opacity.
+Legibility judging is deferred; no scientific SFT fit has started. Compatible
+training evidence was subsequently reconciled to all 13 READY launch checks;
+[launch readiness](evidence/sft_launch_readiness.json) records the current binding.
+
+Twenty-three targeted scorer and reuse-guard tests passed. Changed generation
+settings, prompt bytes or generation source reject reuse. A missing saved raw
+response fails without loading an engine. The native reasoning parser, raw
+outputs and their original failed scoring packages remain unchanged. Later base
+and trained-state evaluation must use the same revised extraction contract.

@@ -1,0 +1,56 @@
+{
+  "folder_id": "1x7_brQz7cCutiTZ42adyQ4C5ilZQsrGV",
+  "configuration_hash": "5793a9424fff62717ae06c6aeb0db61dead454a26c836bf04401825221c3deb2",
+  "artifacts": [
+    {
+      "relative_path": "preflight/report.json",
+      "drive_file_id": "1o9lhLJPsXnvWz7W2uGeaPTXXxLAsYPsv",
+      "sha256": "674b65cfefa08cfb26be3701fb27cc9d13909d9e6ab6b75d056313123e116c4b",
+      "size": 80009,
+      "upload_status": "verified"
+    },
+    {
+      "relative_path": "measurement_protocol.json",
+      "drive_file_id": "1ENepWeLMsLqRv60pkupG9PfAvN3NZ_oL",
+      "sha256": "5700b74f5db6f49bdac88795b262733a7aa0f4d8e55105d940879d9e70a754db",
+      "size": 5019771,
+      "upload_status": "verified"
+    },
+    {
+      "relative_path": "readiness_receipt.json",
+      "drive_file_id": "12wenGcrbgNGTpPCWnfAoHSkWEfPWxwjn",
+      "sha256": "c97611907f00dc2b3a031fec68d9f21a950590f8f2622328671ac15396dc84c7",
+      "size": 5941,
+      "upload_status": "verified"
+    },
+    {
+      "relative_path": "pod_launch_validation.json",
+      "drive_file_id": "1Da4LVxPukxX_AAJprAvpDt3xool5kkf1",
+      "sha256": "618a41aaae1ec464d0e612d5dc6f7a4422d9c462f385b16fb69c068d2396a55a",
+      "size": 671,
+      "upload_status": "verified"
+    }
+  ],
+  "data_handoff_index": {
+    "artifacts": [
+      {
+        "drive_file_id": "1sD01eqfqitGcWmpsBGv6HFGNoNcT3WWt",
+        "name": "certificate.json",
+        "sha256": "cb5b93bb8792c9ee6d1a8e05899dd63a35267af3d5d61f3176be3c24665a8fb2"
+      },
+      {
+        "drive_file_id": "1fQOh6tlGBqKupkjIhQfoW4L0OGfGC9mG",
+        "name": "worklist.json",
+        "sha256": "f3fb1af75df8428adc127bb0f5fdc02831867f283a44ff0934e9e0bede79d26c"
+      },
+      {
+        "drive_file_id": "1SiWeH1RakxJPNGYBCmdvSxlvxrLCR8a9",
+        "name": "sft_launch_configuration_773cfd3.json",
+        "sha256": "54ecd24a9c752451a1ec5e2b2fcc537ef92033c6f359ed541c5a41122e9446a3"
+      }
+    ],
+    "certificate_hash": "e8b47049551c27a5bd73d669ee3f2d63ab30336c15098f0f999439f2faa871f2",
+    "folder_id": "1x7_brQz7cCutiTZ42adyQ4C5ilZQsrGV",
+    "status": "VERIFIED"
+  }
+}

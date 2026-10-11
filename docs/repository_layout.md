@@ -103,9 +103,14 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       mbpp_sandbox_prior_attempt.json
       readme.md
       scaffold_validation_report.md
+      sft_data_handoff_773cfd3_certificate.json
       sft_data_handoff_certificate.json
       sft_data_handoff_drive_index.json
       sft_implementation_report.json
+      sft_launch_drive_index.json
+      sft_launch_pod_validation.json
+      sft_launch_preflight_report.json
+      sft_launch_readiness.json
       sft_runtime_checks_report.json
       shared_infrastructure_validation.json
       statistical_failure_diagnosis.json
@@ -122,6 +127,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       vllm_baseline_completion.json
       vllm_baseline_launch.json
       vllm_baseline_repeatability.json
+      vllm_baseline_rescored_repeatability.json
+      vllm_baseline_scoring_repair.json
       vllm_sft_drive_readback_audit.json
     final_field_scoring.md
     implementation_acceptance.md

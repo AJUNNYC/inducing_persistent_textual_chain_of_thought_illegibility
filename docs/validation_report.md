@@ -1,22 +1,32 @@
-## Batched baseline capability verification finished — 2026-10-11
+## SFT launch checks reconciled after scoring repair — 2026-10-11
+
+The [versioned baseline repeatability report](evidence/vllm_baseline_rescored_repeatability.json) **passed all eight model/domain checks** on the complete six-pass panel. The [repair receipt](evidence/vllm_baseline_scoring_repair.json) verifies reuse of all **7,398 original real outputs**, zero new generations, and verified Drive preservation of revised packages and reports. Diagnostic retention remains at least 0.80 per repeat and 0.60 across all three seeds; the observed minimums are 0.8042 and 0.7208. Ordinary incorrect, malformed and truncated outputs still count as failures.
+
+The parser repair reads a unique designated scalar or Python solution within the native final response, resolving the separate-answer-line mismatch. It never infers an answer from reasoning or reference text, repairs code, or resamples outputs. The SFT corpus, optimizer, fixed panel, generation contract and scientific thresholds remain unchanged. The original failed report is retained below as historical evidence. [Extraction rules and actual results](final_field_scoring.md) document the frozen change.
+
+All 13 reused compatible launch checks are reconciled as READY for source `773cfd3`; the [current launch-readiness receipt](evidence/sft_launch_readiness.json) and [Pod validation receipt](evidence/sft_launch_pod_validation.json) record the final deployment bindings. The [current handoff certificate](evidence/sft_data_handoff_773cfd3_certificate.json) preserves original corpus identities while binding the current training consumer. Scientific SFT has not started. Legibility judgments remain explicitly deferred and must be completed for full evaluation. The repaired baselines are in the [Drive repair folder](https://drive.google.com/drive/folders/1ruy6fVcaVAmfIkZ3asQaGDxljhuMyA-2); the current handoff and launch evidence are in the [Drive SFT launch folder](https://drive.google.com/drive/folders/1x7_brQz7cCutiTZ42adyQ4C5ilZQsrGV).
+
+Thirty-five distinct focused tests passed across scorer/reuse guards, evaluation protocol, PDF provenance and SFT launch regressions. PDF provenance was rechecked after its integrated update; static repository integrity passed. No full suite, corpus regeneration, transformation run or repeated GPU-control suite was performed for this repair.
+
+## Historical original-format baseline failure — 2026-10-11
 
 All six live 7B/14B seed passes completed: **7,398 raw outputs and scored items**, with verified Drive bundles, packages and final report. The unchanged [repeatability gate failed](evidence/vllm_baseline_repeatability.json); `ready_for_training` is false. [Completion and recovery evidence](evidence/vllm_baseline_completion.json) distinguishes frozen measurement source from operational driver revisions. No training was started; legibility judgments remain deferred.
 
-Strict final-answer formatting dominates failures: seed-42 GSM8K rejected 300/300 7B answers and 299/300 14B answers as malformed final fields. Saved examples contain correct boxed answers alongside explanatory text, which the current exact-format scorer rejects. This is not evidence of semantic inability or proven vLLM quality degradation. Preserve these failed measurements; do not weaken acceptance rules or resample ordinary outputs silently. Any measurement revision requires its own frozen protocol and affected baseline validation.
+Strict final-answer formatting dominates failures: seed-42 GSM8K rejected 300/300 7B answers and 299/300 14B answers as malformed final fields. Saved examples contain correct boxed answers alongside explanatory text, which the original whole-field scorer rejected. This is not evidence of semantic inability or proven vLLM quality degradation. Preserve these failed measurements; do not weaken acceptance rules or resample ordinary outputs silently. Any measurement revision requires its own frozen protocol and affected baseline validation.
 
 The monitor recorded completion automatically. Pod Docker absence was repaired by scoring exact saved outputs in the already validated cloud sandbox. Duplicate recovery folders were merged without deleting payloads, paths were precreated before concurrent producers, and the old failed GPU process was released. Final workers release their engines on exit. Existing source data, SFT recipe and scientific success thresholds were retained.
 
-## Baseline repeatability backend replacement — 2026-10-11
+## Historical baseline backend replacement — 2026-10-11
 
 The [live launch receipt](evidence/baseline_repeatability_launch.json) records actual 7B seed-42 native inference and independent Drive readback of its first raw response and scored item. The worker schedules both untouched models with seeds 42, 43 and 44 on all 1,233 fixed items (7,398 outputs). Completed artifacts are replicated to Drive before advancing. Startup failures were retained; JSON numeric loading and control identity handling were fixed in GitHub before redeployment, and the native cache environment/metadata lookup was corrected. No full suite, transformation or GPU control suite was repeated.
 
-The native worker stopped after eight complete items when Pod-side judge requests were rejected. Its receipt is historical, not current running status. The replacement uses batched BF16 vLLM capability diagnostics on one H100, 7B then 14B, with all 3,072 response tokens per request and verified whole-batch Drive backups. Judges are explicitly deferred; no successful legibility evaluation is claimed. The baseline gate is **pending** and SFT has not started. The existing deadline remains in force. See the [worker instructions](baseline_repeatability_worker.md). Public prompts, SFT recipe and scientific success thresholds are unchanged; both new baselines and trained-model evaluations must use the same frozen vLLM backend.
+The native worker stopped after eight complete items when Pod-side judge requests were rejected. Its receipt is historical, not current running status. The replacement uses batched BF16 vLLM capability diagnostics on one H100, 7B then 14B, with all 3,072 response tokens per request and verified whole-batch Drive backups. Judges are explicitly deferred; no successful legibility evaluation is claimed. At that historical stage the baseline gate was pending and SFT had not started. The existing deadline remains in force. See the [worker instructions](baseline_repeatability_worker.md). Public prompts, SFT recipe and scientific success thresholds are unchanged; both new baselines and trained-model evaluations must use the same frozen vLLM backend.
 
 The [replacement live launch receipt](evidence/vllm_baseline_launch.json) records real 7B batches and verified Drive bundle IDs. A warm 128-item math batch took 14.13 seconds for generation/scoring and 8.53 seconds for Drive preservation. This is a measured subset throughput, not an end-to-end estimate for both models. Twenty-one targeted changed-component checks and static repository integrity passed; the full suite was not repeated. The executed scientific worker remains frozen at `0941ce5`; later documentation/evidence commits do not change it.
 
-The first vLLM pass later stopped at `mbpp_629`: Docker was absent on the Pod, so the scorer correctly reported infrastructure failure. All generated responses are retained. The repair separates GPU inference from cloud capability scoring through committed raw-bundle handoff scripts, retaining the original frozen measurement-source hashes, configuration, exact responses and validated digest-pinned Docker sandbox. The background monitor follows the cloud scoring status; no completed gate is claimed.
+The first vLLM pass later stopped at `mbpp_629`: Docker was absent on the Pod, so the scorer correctly reported infrastructure failure. All generated responses are retained. The repair separates GPU inference from cloud capability scoring through committed raw-bundle handoff scripts, retaining the original frozen measurement-source hashes, configuration, exact responses and validated digest-pinned Docker sandbox. The background monitor follows the cloud scoring status; at that historical stage no completed gate was claimed.
 
-## SFT data handoff — 2026-10-11
+## Original SFT data handoff — 2026-10-11
 
 The [producer-to-consumer certificate](evidence/sft_data_handoff_certificate.json) passed for all 40 conditions and 404,000 records. All 122 current corpus artifact hashes and sizes match the completed independent Drive readback. Production worklist validation checked exact 10,000/100 splits, ordered shared IDs, model-specific clean traces, immutable revisions, whole assistant targets and exact ordered record hashes. Original producer configuration and record bytes remain unchanged. The current consumer is frozen at `a50de2c`; its source files and native lock are bound separately. Scientific settings match with only implementation/dependency identities separated.
 
@@ -24,13 +34,13 @@ Six handoff regression checks, 16 existing SFT checks and four PDF provenance ch
 
 # Current implementation and validation report
 
-## Judge request-profile guard verified (2026-10-11)
+## Earlier judge request-profile guard verification (2026-10-11)
 
 The user-authorized repair passed all five canonical live provider/schema/version/cache/cost checks. Two fresh GPT-4o calls confirmed stable fingerprints within the trace-only score profile (`fp_8876ebca54`) and question-aware audit profile (`fp_558abb94fe`). The backend guard compares fixed model/request-kind/prompt/schema/settings profiles and still stops on within-profile drift or returned-model mismatch, including cache reads and legacy migration. [Live evidence](evidence/judge_profile_guard_live_report.json) and historical failures are saved in Google Drive. Seventeen targeted judge tests and four PDF provenance tests passed; all 75 Mermaid diagrams parsed. The correction is integrated into PDF page 73. Judge prompts, models, schemas, scoring rules and SFT data/recipe are unchanged.
 
 Baseline repeatability and the dataset-to-training provenance handoff remain outstanding; no SFT training has started.
 
-## Live training controls completed (2026-10-11)
+## Earlier live training controls (2026-10-11)
 
 Both pinned models passed actual CUDA runtime, completion-only loss masking/nonzero LoRA gradients, full SFT optimizer/scheduler/RNG restoration, and controlled eight-by-four GRPO updates with exact full-state restoration. A fresh registered Drive download and the restricted MBPP executor also passed. The [execution report](evidence/sft_runtime_checks_report.json) preserves actual source identities and receipts. Completed SFT corpus and statistical validation were retained.
 
@@ -62,7 +72,7 @@ Licensed LMSYS acquisition and the complete candidate audit finished. Fresh pinn
 
 A separate CPU-only audit downloaded all 122 artifacts (7,000,839,153 bytes) from Drive, matched every SHA-256 and size, checked all forty manifests against the bundle, and reran native validation over all 404,000 records. It connected to no Pod and loaded no GPU model. [Machine-readable audit](evidence/vllm_sft_drive_readback_audit.json), [procedure and download links](procedure_update.md). Configurable coordinator routing has no fixed Pod count; the scientific recipe remains the two pinned models.
 
-Training, GRPO trajectories and actual model evaluations have not started. The mandatory statistical coverage certificate remains failed (34/36 jointly covered repetitions). The full test suite was not repeated for the vLLM migration; historical test counts below are not current-head full-suite certification.
+All six untouched-baseline capability passes have completed, and the versioned final-field repair passed repeatability using the exact saved responses. Statistical validation passed all seven revised scenarios (700/700 covered repetitions); the old 34/36 report remains historical failed evidence. All 13 compatible training launch checks are reconciled as READY under the current consumer identity. SFT and GRPO scientific training have not started, and full legibility evaluation remains deferred. The full test suite was not repeated for the vLLM migration; historical test counts below are not current-head full-suite certification.
 
 ## Historical executed engineering evidence: 10 October 2026
 

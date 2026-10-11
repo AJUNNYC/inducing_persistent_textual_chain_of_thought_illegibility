@@ -1,4 +1,25 @@
-# Native baseline repeatability worker
+# Baseline repeatability: completed and calibrated
+
+All six vLLM passes completed for both models and seeds 42, 43 and 44: 7,398
+saved real outputs. The original whole-response scorer failed its format gate;
+the [versioned final-field repair](final_field_scoring.md) rescored the exact
+responses with zero new generations and passed all eight model/domain checks.
+The [passed report](evidence/vllm_baseline_rescored_repeatability.json) and
+[repair receipt](evidence/vllm_baseline_scoring_repair.json) are Drive-verified.
+The unchanged thresholds remain 0.80 per diagnostic repeat and 0.60 common
+retention. The original failed report and packages remain historical evidence.
+
+No baseline generation or rescoring worker remains active. All 13 compatible
+training launch checks have been reconciled as READY; deployment validation and
+consumer bindings are recorded in [launch readiness](evidence/sft_launch_readiness.json).
+Scientific SFT has not started, and legibility judging remains deferred.
+The retained operational instructions below describe each historical driver;
+new evaluations use the revised final-field contract and the same frozen vLLM
+engine as these baselines. Do not restart an old-format worker or combine native
+and vLLM measurements.
+
+## Historical native baseline worker
+
 
 `scripts/run_baseline_repeatability.py` runs both untouched pinned base models on
 the existing 1,233-item capability panel with seeds 42, 43 and 44 (7,398 outputs).
@@ -34,7 +55,7 @@ checks domain retention of at least 0.8 for diagnostic seeds and common retentio
 of at least 0.6. Only its actual passing report satisfies the gate. A started or
 partially completed worker does not authorize SFT.
 
-## Active replacement: batched vLLM capability diagnostics
+## Batched vLLM replacement contract and historical driver
 
 The native attempt stopped after eight scored items when Pod-side provider calls
 were rejected. Its launch receipt and raw outputs remain historical evidence;
@@ -114,3 +135,14 @@ explicitly defer legibility. `monitor_vllm_baseline.py --local-status
 /workspace/artifacts/baseline_vllm_cloud_0941ce5/coordinator_status.json` monitors
 the cloud scorer and its raw-producer progress. Completion is reported only after
 the final report's Drive barrier; the original failed attempt remains historical.
+
+## Completed scoring-only repair driver
+
+`scripts/rescore_vllm_baselines.py` validates complete original pass packages,
+unchanged raw request hashes, text hashes, prompts, inference settings, source
+inventory, panel, sandbox and judges. Only the scorer and protocol metadata may
+change. Its cache-only generator rejects missing responses without inference;
+up to eight independent restricted Docker tasks score preserved MBPP solutions.
+It creates a fresh protocol/cache namespace, retains original failures and
+verifies all revised packages, the passing repeatability report and receipt in
+Drive. All 7,398 responses are retained; no ordinary outcome is regenerated.

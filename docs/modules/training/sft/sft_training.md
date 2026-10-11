@@ -1,6 +1,6 @@
 # sft_training.md
 
-**Owner:** `sft`. **Implementation status:** implemented and verified over declared full-count dataset/runner fixtures; actual forty-fit GPU execution remains gated.
+**Owner:** `sft`. **Implementation status:** implemented and verified over declared full-count dataset/runner fixtures; actual forty-fit GPU execution remains unstarted; the current certified 7B ROT13 launch is ready.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -15,7 +15,7 @@
 
 Create two independent family queues, one for ROT13 and one for KaziText, each covering both models at ten fixed levels: twenty independent fits per queue and forty total. Both call the same `sft_fit` implementation. Every level initializes from its untouched base; a previous level is not a warm start. Only an exact-fit matching full checkpoint may resume a fit.
 
-Each queue runs its fits sequentially on its assigned GPU, while queues may run concurrently with the single RL queue. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
+Each queue runs its fits sequentially on its assigned GPU. With the currently available single GPU, the certified launcher selects 7B ROT13 first and runs its ten levels sequentially; the full forty-fit matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
 
 ## Interfaces and dependent procedures
 
@@ -28,7 +28,7 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 
 ## Implemented interface and evidence
 
-`build_worklist(config, datasets)` reads the forty verified JSONL conditions and binds actual ordered record bytes to exact fit specifications. It requires the same ordered train/validation IDs, prompt bytes and common accepted-pool hash across every condition; model-specific clean-trace hashes and final-answer bytes remain identical across that model's families/strengths. Different model traces are never interchangeable. `load_dataset_bundle(bundle)` verifies persisted JSONL content hashes before loading.
+`build_worklist(config, datasets, handoff_certificate=certificate)` reads the forty verified JSONL conditions and binds actual ordered record bytes to exact fit specifications. It requires the same ordered train/validation IDs, prompt bytes and common accepted-pool hash across every condition; model-specific clean-trace hashes and final-answer bytes remain identical across that model's families/strengths. Different model traces are never interchangeable. `load_dataset_bundle(bundle)` verifies persisted JSONL content hashes before loading.
 
 `run_family_queue(family, worklist, output_root, config, *, preflight_report=None, fit_runner=run_sft_fit, release_gpu=None, should_pause=None)` runs twenty sequential independent fits. A child failure or pause preserves verified prior fits and an explicit partial queue report. An injected runner is labeled `injected_fixture`, and cannot supply scientific results. `sft_training(..., families=('rot13','kazitext'))`, also exported as `run_sft_training`, runs selected queues with the same reusable engine. The single-process default is sequential; independent external workers may run queues on separately assigned GPUs. A failed family does not erase another family's work. A release callback runs when the queue returns.
 
@@ -46,6 +46,8 @@ The following source comments retain the procedural detail of the supplied diagr
 
 Implement and test `src/training/sft/sft_training.py` against its specified behavior in `tests/unit/training/sft/test_sft_training.py`. Validate every emitted artifact and preserve its source/configuration identity. Do not claim completeness from a placeholder or passing import. Propagate required child failures and maintain ordinary model outcomes separately from infrastructure faults. Mandatory real preflights and permission gates remain in force. Unspecified allowed conventions must be documented/frozen before outcomes; new scientific choices are not silently authorized.
 
+The [certified launch handoff](../../../sft_data_handoff.md) binds the original producer to consumer `773cfd3`, reuses compatible controls and requires all thirteen gates. Its actual H100 validation returned READY; no optimizer training has started. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
+
 ## Exact path-synchronized diagram
 
 The following diagram is byte-for-byte the active `.mmd` content at generation time. Its procedural content is from the supplied workflow or the cited PDF support requirement; file labels and role assignment are the requested repository organization.
@@ -60,20 +62,25 @@ flowchart TD
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
 %% Within each queue, select the next unfinished fit until all 20 are verified.
+%% Current certified launcher serializes selected model/levels on one GPU.
+%% Whole optimizer updates and full checkpoints must pass verified Drive barriers.
+%% Later adapter evaluation explicitly reuses the frozen vLLM measurement contract.
 %% A failed fit stops that queue and yields a partial report; the other queue may finish valid work.
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["40 verified condition datasets"]
-    PLAN["Two independent family queues"]
-    ROT["ROT13 queue: GPU A<br/>20 independent fits"]
-    KAZ["KaziText queue: GPU B<br/>20 independent fits"]
+    CERT["Bind original producer to certified consumer<br/>40-condition worklist and exact dataset hashes"]
+    GATES["All 13 mandatory gates passed<br/>Preserved baselines rescored without regeneration"]
+    PLAN["Two independent family queues<br/>Select 7B ROT13 first on the current single GPU"]
+    ROT["ROT13 queue: assigned GPU<br/>20 independent fits; 10 per model"]
+    KAZ["KaziText queue: when a GPU is available<br/>20 independent fits; 10 per model"]
     ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the ROT13 queue"]
     KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the KaziText queue"]
-    ROTDONE["Verify 20 fits<br/>Release GPU A"]
-    KAZDONE["Verify 20 fits<br/>Release GPU B"]
+    ROTDONE["Verify 20 fits<br/>Release assigned GPU"]
+    KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
-    INPUT --> PLAN
+    INPUT --> CERT --> GATES --> PLAN
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT
     PLAN --> KAZ --> KAZFIT --> KAZDONE --> WAIT
     WAIT --> OUT

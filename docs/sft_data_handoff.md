@@ -26,7 +26,7 @@ source commit and dependency lock hash must match `requirements.lock`. Store the
 certificate and worklist in Drive. Compatibility certification does not satisfy
 baseline repeatability or authorize a scientific fit by itself.
 
-The completed certificate and worklist are in the [verified Drive handoff folder](https://drive.google.com/drive/folders/15wW4PXRzf_i4yNaN3jyOeMMFddXrLpRv). Source/configuration identities are frozen at `a50de2c`; subsequent evidence-only commits do not redefine that consumer.
+The current certificate, worklist, consumer configuration and launch evidence are in the [verified Drive launch folder](https://drive.google.com/drive/folders/1x7_brQz7cCutiTZ42adyQ4C5ilZQsrGV). The consumer source is frozen at `773cfd3cc6a776262e9ca65ca10667aaad456b69`; later documentation commits do not redefine it. The prior `a50de2c` handoff remains historical in its original folder. The [current certificate](evidence/sft_data_handoff_773cfd3_certificate.json) retains the same original corpus and training settings.
 
 
 ## Certified single-GPU launch
@@ -51,3 +51,24 @@ The SFT consumer configuration is separate from the vLLM measurement protocol.
 Subsequent adapter evaluations must explicitly use the saved frozen vLLM
 contract; the generic experiment evaluator must not silently default to native
 inference. Capability-only repeatability does not complete legibility judging.
+
+
+## Validated launch on 11 October 2026
+
+The repaired baseline gate passed for all four domains of both models using the exact 7,398 preserved outputs. The [launch reconciliation receipt](evidence/sft_launch_readiness.json) records all thirteen mandatory training gates passed, and the [actual H100 validation](evidence/sft_launch_pod_validation.json) returned READY with forty certified conditions and ten selected 7B ROT13 fits. The [verified Drive launch index](evidence/sft_launch_drive_index.json) records preserved report, protocol and validation files. No training has started. Compatible GPU and full statistical controls were reused with their original evidence and explicit current source/recipe bindings.
+
+From the pinned Git archive `/workspace/sft_launch_773cfd3` on the existing H100, the tested launch validation is:
+
+```bash
+SOURCE_CODE_COMMIT=773cfd3cc6a776262e9ca65ca10667aaad456b69 \
+ARTIFACT_ROOT=/workspace/artifacts/sft_launch_773cfd3 \
+/workspace/illegibility_gpu_env/bin/python scripts/run_certified_sft.py \
+  --config /workspace/bootstrap/sft_launch_configuration_773cfd3.json \
+  --certificate /workspace/artifacts/sft_data_handoff_773cfd3/certificate.json \
+  --bundle /workspace/data/vllm_sft_preparation/transformed/manifest.json \
+  --worklist /workspace/artifacts/sft_data_handoff_773cfd3/worklist.json \
+  --preflight /workspace/artifacts/sft_launch_773cfd3/preflight/report.json \
+  --deadline 2026-10-11T20:20:00Z --family rot13 --model 7b --validate-only
+```
+
+For training, remove `--validate-only` and provide the existing private `GOOGLE_OAUTH_TOKEN_FILE` and central `GOOGLE_DRIVE_FOLDER_ID` bindings. The deadline must still be in the future; the worker preserves full checkpoints to Drive before pausing. The frozen measurement contract is `/workspace/artifacts/sft_launch_773cfd3/measurement_protocol.json`; its configuration binding differs explicitly from the original baseline binding, while measurement settings, panels and code hashes agree. Legibility judging remains pending.

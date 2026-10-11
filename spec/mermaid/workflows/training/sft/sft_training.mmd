@@ -7,20 +7,25 @@ flowchart TD
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
 %% Within each queue, select the next unfinished fit until all 20 are verified.
+%% Current certified launcher serializes selected model/levels on one GPU.
+%% Whole optimizer updates and full checkpoints must pass verified Drive barriers.
+%% Later adapter evaluation explicitly reuses the frozen vLLM measurement contract.
 %% A failed fit stops that queue and yields a partial report; the other queue may finish valid work.
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["40 verified condition datasets"]
-    PLAN["Two independent family queues"]
-    ROT["ROT13 queue: GPU A<br/>20 independent fits"]
-    KAZ["KaziText queue: GPU B<br/>20 independent fits"]
+    CERT["Bind original producer to certified consumer<br/>40-condition worklist and exact dataset hashes"]
+    GATES["All 13 mandatory gates passed<br/>Preserved baselines rescored without regeneration"]
+    PLAN["Two independent family queues<br/>Select 7B ROT13 first on the current single GPU"]
+    ROT["ROT13 queue: assigned GPU<br/>20 independent fits; 10 per model"]
+    KAZ["KaziText queue: when a GPU is available<br/>20 independent fits; 10 per model"]
     ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the ROT13 queue"]
     KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the KaziText queue"]
-    ROTDONE["Verify 20 fits<br/>Release GPU A"]
-    KAZDONE["Verify 20 fits<br/>Release GPU B"]
+    ROTDONE["Verify 20 fits<br/>Release assigned GPU"]
+    KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
-    INPUT --> PLAN
+    INPUT --> CERT --> GATES --> PLAN
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT
     PLAN --> KAZ --> KAZFIT --> KAZDONE --> WAIT
     WAIT --> OUT
