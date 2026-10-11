@@ -3983,11 +3983,17 @@ The three values distinguish an explicitly observed artifact, no artifact detect
 and an unresolved assessment. An API failure, refusal, malformed JSON, or unavailable model is an
 infrastructure status, not not_detected. Apply the existing bounded retries and preserve successfully
 cached independent requests.
-The following section fixes the audit instruction and schema. This is an experiment-specific operational
-check derived from the existing Pass B concepts. It is not an independent proof of human unreadability
-or semantic absence.
 73
 CoT Illegibility - Implementation decisions
+The following section fixes the audit instruction and schema. This is an experiment-specific operational check
+derived from the existing Pass B concepts. It is not an independent proof of human unreadability or semantic
+absence.
+Retain exact requested/returned model checks. Freeze backend fingerprints within each model, request-kind,
+prompt, schema and settings profile, including cache readback. OpenAI documents that request parameters
+can change system_fingerprint; the score and audit schemas therefore have separate backend baselines. A
+fingerprint change within a profile remains a stop/report condition. Preserve legacy registry history and
+reconstruct profile baselines only from integrity-verified successes; do not reset known fingerprints. This
+correction changes no judge prompts, models, scores, SFT data or training recipe.
 ```
 
 ## page_074

@@ -4,6 +4,41 @@ from shared_procedures.judge_client import *
 
 def client(tmp_path,transport):return JudgeClient(tmp_path/'cache',tmp_path/'state',transport=transport)
 
+def test_fingerprints_are_frozen_per_request_profile_across_restart(tmp_path):
+    def transport(r):
+        return {'text':'{"score":7}' if r['kind']=='evaluation_primary' else '{"readable_solution":"present","padding":"not_detected"}',
+                'model':r['model'],'usage':{},'provider_version':'score_fp' if r['kind']=='evaluation_primary' else 'audit_fp'}
+    c=client(tmp_path,transport)
+    assert c.request('evaluation_primary','gpt-4o-2024-11-20','score prompt','trace')['status']=='success'
+    assert c.request('evaluation_audit','gpt-4o-2024-11-20','audit prompt','trace',question='q')['status']=='success'
+    def changed(r):return {'text':'{"score":7}','model':r['model'],'usage':{},'provider_version':'changed_fp'}
+    restarted=client(tmp_path,changed)
+    assert restarted.request('evaluation_primary','gpt-4o-2024-11-20','score prompt','new trace')['status']=='model_mismatch'
+    assert restarted.request('evaluation_primary','gpt-4o-2024-11-20','score prompt','trace')['status']=='success'
+
+def test_success_cache_rechecks_fingerprint_registry(tmp_path):
+    from shared_procedures.storage import read_json,atomic_write_json
+    c=client(tmp_path,lambda r:{'text':'{"score":7}','model':r['model'],'usage':{},'provider_version':'original'})
+    record=c.request('evaluation_primary','gpt-4o-2024-11-20','prompt','trace')
+    registry=tmp_path/'state/judge_model_registry.json';saved=read_json(registry)
+    saved['profiles'][c._provider_profile(record)]['provider_version']='different'
+    atomic_write_json(registry,saved)
+    with pytest.raises(JudgeError,match='discontinuity'):
+        c.request('evaluation_primary','gpt-4o-2024-11-20','prompt','trace')
+
+def test_legacy_registry_migration_retains_profile_history(tmp_path):
+    from shared_procedures.storage import read_json,atomic_write_json
+    c=client(tmp_path,lambda r:{'text':'{"score":7}','model':r['model'],'usage':{},'provider_version':'original'})
+    record=c.request('evaluation_primary','gpt-4o-2024-11-20','prompt','trace')
+    registry=tmp_path/'state/judge_model_registry.json'
+    legacy={'gpt-4o-2024-11-20':{'returned_model':'gpt-4o-2024-11-20','provider_version':'original'}}
+    atomic_write_json(registry,legacy)
+    restarted=client(tmp_path,lambda r:{'text':'{"score":7}','model':r['model'],'usage':{},'provider_version':'changed'})
+    assert restarted.request('evaluation_primary','gpt-4o-2024-11-20','prompt','new trace')['status']=='model_mismatch'
+    assert read_json(registry)==legacy
+    assert restarted.request('evaluation_primary','gpt-4o-2024-11-20','prompt','trace')['status']=='success'
+    assert read_json(registry)['legacy_model_registry']==legacy
+
 def test_anthropic_wire_score_schema_preserves_allowed_scores(monkeypatch):
     import httpx
     import jsonschema

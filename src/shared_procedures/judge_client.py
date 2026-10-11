@@ -119,6 +119,49 @@ class JudgeClient:
         self.recovery=RecoveryManager.for_worker(self.state_root.parent) if self.live else RecoveryManager(self.state_root/'judge_retries.json')
         self.semaphore=threading.BoundedSemaphore(concurrency)
 
+    @staticmethod
+    def _provider_profile(record: dict) -> str:
+        # Fingerprints describe backend configuration, including request parameters,
+        # not just model weights. Compare each frozen prompt/schema/settings profile.
+        return content_hash({key:record[key] for key in
+            ('requested_model','request_kind','prompt_hash','schema_hash','settings_hash')})
+
+    def _verify_provider_identity(self,record: dict) -> None:
+        model=record['requested_model']
+        if record.get('returned_model')!=model:
+            raise JudgeError('returned model differs from requested immutable identity',status='model_mismatch')
+        version={'returned_model':record['returned_model'],'provider_version':record.get('provider_version')}
+        if self.live and model.startswith('gpt-') and not version['provider_version']:
+            raise JudgeError('provider fingerprint unavailable',status='model_mismatch')
+        registry=self.state_root/'judge_model_registry.json'
+        with file_lock(str(registry)+'.lock'):
+            saved=read_json(registry) if registry.exists() else {}
+            if saved.get('version')=='request_profile_v2':
+                profiles=saved['profiles']
+            else:
+                # Preserve the legacy model-wide registry and reconstruct profile
+                # baselines from integrity-verified successes; never reset known
+                # profile fingerprints during an implementation repair.
+                profiles={}
+                for path in self.cache_root.glob('*/*.json'):
+                    prior=read_json(path)
+                    if prior.get('status')!='success' or prior.get('simulation') is not (not self.live):continue
+                    if prior.get('record_hash')!=content_hash({k:v for k,v in prior.items() if k!='record_hash'}):
+                        raise JudgeError('cache record integrity corrupt')
+                    if prior.get('returned_model')!=prior.get('requested_model'):
+                        raise JudgeError('cached returned model mismatch',status='model_mismatch')
+                    key=self._provider_profile(prior)
+                    identity={'returned_model':prior['returned_model'],'provider_version':prior.get('provider_version')}
+                    if key in profiles and profiles[key]!=identity:
+                        raise JudgeError('provider version discontinuity within request profile',status='model_mismatch')
+                    profiles[key]=identity
+                saved={'version':'request_profile_v2','legacy_model_registry':saved,'profiles':profiles}
+            key=self._provider_profile(record)
+            if key in profiles and profiles[key]!=version:
+                raise JudgeError('provider version discontinuity within request profile',status='model_mismatch')
+            profiles[key]=version
+            atomic_write_json(registry,saved)
+
     def _reserve_rate(self,provider: str,token_bound: int) -> None:
         if self.quota_limits is None:
             if self.live: raise JudgeError('actual account quota limits unavailable',status='blocked')
@@ -180,6 +223,7 @@ class JudgeClient:
                     jsonschema.Draft202012Validator(schema).validate(old['parsed'])
                     if _strict_json(old.get('raw_response') or '')!=old['parsed']: raise JudgeError('cache raw/parsed disagreement')
                     if old.get('returned_model')!=model: raise JudgeError('cached returned model mismatch',status='model_mismatch')
+                    self._verify_provider_identity(old)
                     return old
                 if old.get('status')=='sent' and old.get('raw_response') is not None:
                     # A crash after receiving/persisting the raw response need not purchase another judgment.
@@ -188,12 +232,7 @@ class JudgeClient:
                         jsonschema.Draft202012Validator(schema).validate(parsed)
                         if old.get('returned_model')!=model: raise JudgeError('incomplete cached response model mismatch',status='model_mismatch')
                         if old.get('finish_reason') in {'length','max_tokens','refusal'}: raise JudgeError('incomplete cached provider response',status='schema_error')
-                        registry=self.state_root/'judge_model_registry.json'
-                        with file_lock(str(registry)+'.lock'):
-                            versions=read_json(registry) if registry.exists() else {}
-                            version={'returned_model':old.get('returned_model'),'provider_version':old.get('provider_version')}
-                            if model in versions and versions[model]!=version: raise JudgeError('provider version discontinuity',status='model_mismatch')
-                            versions[model]=version;atomic_write_json(registry,versions)
+                        self._verify_provider_identity(old)
                         if self.live:
                             if self.ledger is None or not old.get('provider_prices') or not old.get('pricing_evidence'):
                                 raise JudgeError('cached response billing reconciliation prerequisites unavailable',status='blocked')
@@ -255,16 +294,8 @@ class JudgeClient:
                     except SpendingBlocked as error: raise JudgeError(str(error),status='blocked') from error
                 if response.get('model')!=model:
                     raise JudgeError('returned model differs from requested immutable identity',status='model_mismatch')
-                # Detect alias discontinuity using an independent persistent provider identity registry.
-                registry=self.state_root/'judge_model_registry.json'
-                version={'returned_model':response.get('model'),'provider_version':response.get('provider_version')}
                 record['provider_version']=response.get('provider_version')
-                with file_lock(str(registry)+'.lock'):
-                    versions=read_json(registry) if registry.exists() else {}
-                    old_version=versions.get(model)
-                    if old_version is not None and old_version!=version:
-                        raise JudgeError('provider version discontinuity',status='model_mismatch')
-                    versions[model]=version;atomic_write_json(registry,versions)
+                self._verify_provider_identity(record)
                 if response.get('finish_reason') in {'length','max_tokens','refusal'}:
                     raise JudgeError('judge response truncated/refused',status='refusal' if response.get('finish_reason')=='refusal' else 'schema_error')
                 try:

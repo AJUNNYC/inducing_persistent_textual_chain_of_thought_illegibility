@@ -34,9 +34,6 @@ Implement and test `src/shared_procedures/judge_client.py` against its specified
 The following diagram is byte-for-byte the active `.mmd` content at generation time. Its procedural content is from the supplied workflow or the cited PDF support requirement; file labels and role assignment are the requested repository organization.
 
 ```mermaid
----
-title: "spec/mermaid/workflows/shared_procedures/judge_client.mmd"
----
 flowchart TD
 %% Source-derived support responsibility, separated into this module by the requested repository organization.
 %% Scientific source: C.3.3–C.3.4; D.2.4–D.2.6; E.1.4; H.5; PDF pages 33, 34, 45, 46, 51, 52, 73, 74.
@@ -51,6 +48,12 @@ flowchart TD
     MODULE --> CONTRACT
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
+    PROFILE["Freeze backend identity per model, request kind, prompt, schema and settings"]
+    CACHE["Recheck successful cache reads; preserve legacy profile history"]
+    STOP["Stop on returned-model mismatch or fingerprint change within a profile"]
+    CONTRACT --> PROFILE
+    PROFILE --> CACHE
+    CACHE --> STOP
 ```
 
 

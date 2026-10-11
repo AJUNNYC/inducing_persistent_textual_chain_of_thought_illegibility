@@ -15,3 +15,9 @@ flowchart TD
     MODULE --> CONTRACT
     MODULE -.-> DOCUMENT
     MODULE -.-> TEST
+    PROFILE["Freeze backend identity per model, request kind, prompt, schema and settings"]
+    CACHE["Recheck successful cache reads; preserve legacy profile history"]
+    STOP["Stop on returned-model mismatch or fingerprint change within a profile"]
+    CONTRACT --> PROFILE
+    PROFILE --> CACHE
+    CACHE --> STOP

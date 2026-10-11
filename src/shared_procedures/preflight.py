@@ -387,7 +387,9 @@ def _run_judge_checks(config: dict) -> CheckResult:
     return CheckResult('judge_services','passed','All five actual provider schema/version/cache/cost checks passed.',
                        {'live':True,'simulation':False,'control_preflight':True,'scientific_results':False,
                         'requests':[{'kind':r['request_kind'],'request_hash':r['request_hash'],'returned_model':r['returned_model'],
-                                     'usage':r['usage'],'cost_usd':r.get('cost_usd')} for r in requests]})
+                                     'provider_version':r.get('provider_version'),'request_profile_hash':client._provider_profile(r),
+                                     'usage':r['usage'],'cost_usd':r.get('cost_usd')} for r in requests],
+                        'version_guard_scope':'request_profile_v2'})
 
 
 def _run_durable_checks(config: dict) -> CheckResult:
