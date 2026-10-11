@@ -30,7 +30,7 @@ class VLLMCleanGenerator(NativeCleanGenerator):
         from vllm import LLM
         from transformers import AutoTokenizer
         from operations.assets import model_load_kwargs
-        from .candidate_manifest import validate_revision
+        from ..candidate_manifest import validate_revision
         if (vllm.__version__ != BACKEND['version']
                 or transformers.__version__ != BACKEND['transformers_version']
                 or torch.__version__ != BACKEND['torch_version']):
