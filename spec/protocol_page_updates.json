@@ -1,0 +1,138 @@
+{
+  "edition": "2026-10-11",
+  "page_count": 81,
+  "patches": [
+    {
+      "page": 3,
+      "rect": [
+        69,
+        322,
+        545,
+        594
+      ],
+      "text": "From LMSYS-Chat-1M take English first-user turns of at most 200 input tokens, remove duplicates and known detectable benchmark overlap, then use a fixed shuffled candidate order. The two unmodified R1-distill-Qwen models each generate their own single clean response to the same candidate prompt. Retain shared IDs only if both outputs satisfy the predeclared reasoning/finalanswer, finish-reason and sequence-length checks. The target is 10,000 accepted paired training prompt IDs plus 100 separate validation IDs, not merely 10,000 raw candidates. Clean traces are cached before any transformation [44, 39].\n\nThe clean generation policy is temperature 0.6, top-p = 0.95, up to 3,072 new tokens, no added system prompt and native reasoning formatting. The whole prompt-plus-transformed-answer must fit the 4,096-token SFT context bound across all strengths for the relevant tokenizer. Parsing failures, absent reasoning, cutoff completions and exclusions are saved rather than silently discarded. The common accepted prompt IDs do not imply that the two model sizes have identical clean traces. The accepted set is reasoning-eligible LMSYS-derived data, not a representative random sample of all LMSYS interactions.\n\nThe selected count of 10,000 is a fixed resource-risk compromise, not a sample-complexity theorem or a guarantee of sufficient training exposure. The closest ROT13 work used approximately 85,500 traces; ciphered-reasoning training on a mathematical corpus has also used 16,000 source problems expanded into multiple examples per problem [44, 46]. Full reasoning and accounting appear in Appendix B.1.4.\n\nSFT source generation uses fresh vLLM responses from separate pinned 7B and 14B workers on H100 80-GB Pods, in chunks of 128 requests. Every request retains its full 3072-new-token allowance; batching does not divide this cap. Use BF16 weights without quantization, native prompt token IDs and EOS IDs, and independent per-example seeds. Archive old native and benchmark outputs; do not mix them into training. Save and verify each whole batch in Google Drive before advancing. Initial raw generation is followed by joint acceptance and exact-deficit refills using new ordered IDs.",
+      "subject": "SFT corpus backend and whole-batch preservation"
+    },
+    {
+      "page": 3,
+      "rect": [
+        232,
+        73,
+        291,
+        101
+      ],
+      "text": "7B + 14B\nvLLM traces",
+      "subject": "Overview figure generation engine"
+    },
+    {
+      "page": 32,
+      "rect": [
+        69,
+        247,
+        545,
+        341
+      ],
+      "text": "Sample RL prompts exclusively from the official GSM8K training split; do not expose the frozen official-test evaluation IDs to RL training. Each prompt has a verifiable reference numeric answer, permitting correctness to be scored without a generative judge [28, 29]. A fixed prompt formatter asks the policy to give any intermediate reasoning it chooses and to end once with a line of the form Final answer: boxed{NUMBER}. This output contract is solely for separating reasoning from the answer; it must not prescribe readability, particular symbols, ROT13, or any opacity level.\n\nSelect 800 unique questions after numeric-reference, duplicate and full-evaluation-frame overlap checks. Freeze seed-42 ordering into 100 groups of eight, shared by both models. The selected manifest is Drive-verified. Policies generate their responses during RL; question selection does not generate training responses.",
+      "subject": "RL shared frozen question selection"
+    },
+    {
+      "page": 51,
+      "rect": [
+        69,
+        130,
+        545,
+        273
+      ],
+      "text": "RunPod container disk is disposable scratch. The active procedure relies entirely on Google Drive for permanent experimental storage, not a Pod volume or network volume. Central project folder: 176a8Tm6l4WhfakY_0nCOo4ICeT7KPSmx. Save immutable run/configuration/candidate metadata before GPU work. Register raw responses with source/configuration identities and checksum-verify each whole batch in Drive before starting another. Restore only matching verified artifacts after replacement of a Pod. Model caches may be reacquired; credentials remain protected outside source and experimental artifacts. On an intentional pause, drain the current whole batch or training update and verify preservation. On a stopped generation worker, reuse saved compatible responses and retry pending uploads before new generation; never resample ordinary rejected answers. Pod billing ends only when the authorized account operator stops it. Jupyter HTTPS provides access to the existing Pods; the PI account does not permit RunPod API keys.",
+      "subject": "Drive-only permanent storage and account access"
+    },
+    {
+      "page": 54,
+      "rect": [
+        69,
+        494,
+        545,
+        724
+      ],
+      "text": "The Python utilities read a single config.yaml containing model names, intended immutable model and dataset revisions, generation settings, SFT/GRPO hyperparameters, opacity levels, evaluation sizes, storage root, and spending warnings. The implementation refuses certain inconsistent configurations (for example, a different accepted-training count, a missing ten-level grid, or an incorrect effective SFT batch). A cryptographic SHA-256 digest of canonicalized configuration or artifact contents is used for stable identity; a digest establishes that bytes agree with a recorded value, not that their scientific contents are correct. In production, all dataset, tokenizer, model, KaziText-profile and dependency revisions must also be pinned, since a version-agnostic model name is insufficient for exact reruns [1, 20].\n\nThe SFT corpus engine has a separate environment: vLLM 0.11.0, Transformers 4.57.3 and Torch 2.8.0+cu128; the native Torch 2.9 training lock does not describe it. Save actual package inventories and hashes per model. Backend settings are BF16, max_model_len=4096, max_num_seqs=128, max_num_batched_tokens=8192, GPU memory utilization 0.9 and prefix caching disabled. The scheduler token budget is processing capacity, not a shared response-length budget. Generation source is frozen at dc520cb73bf43b59a9566404dd4a7aa8358f1cc3, configuration hash 3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54, run ID vllm_fresh_dc520cb. Later documentation commits do not silently change active workers.",
+      "subject": "Separate engine environment and immutable generation provenance"
+    },
+    {
+      "page": 58,
+      "rect": [
+        69,
+        74,
+        545,
+        242
+      ],
+      "text": "Current execution status (11 October 2026). Licensed LMSYS source acquisition and the complete one-million-row audit are verified; 407,214 eligible candidates are frozen. The 1,233-item capability panel and nested 200-item legibility subset are prepared and backed up. The shared 800-question GSM8K RL manifest is selected and Drive-verified. Fresh 7B and 14B SFT raw generation uses the approved vLLM workers.\n\nValidation evidence. The vLLM benchmark exercised generation, formatting, token limits and GPU memory. Matched 14B chunks of 32 took approximately 40.53 seconds versus 342.78 seconds natively; a 128-request sample took 52.64 seconds without OOM. These generation-only measurements do not prove quality equivalence. Every production batch undergoes Drive integrity verification. At the user's request, the full suite and full launch preflights were not repeated for this migration. Final paired acceptance, refills, all transformations, training and actual model evaluations remain pending.",
+      "subject": "Current completed work and validation limits"
+    },
+    {
+      "page": 58,
+      "rect": [
+        68,
+        250,
+        546,
+        394
+      ],
+      "text": "Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model, tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v) shared 10,000 training and 100 validation IDs and every transformed variant passing acceptance; (vi) valid live judge schemas, error pauses and optimizer-boundary recovery; (vii) a secure MBPP executor and complete evaluation interfaces; and (viii) actual funding and billing controls. These are engineering gates, not extra scientific replicates. Reuse valid compatible evidence; do not claim unexecuted checks passed.\n\nProspective statistical validation has two failed scenarios out of 36. This generation-engine change does not waive the training/confirmatory launch blocker.",
+      "subject": "Unchanged launch gates and statistical failures"
+    },
+    {
+      "page": 68,
+      "rect": [
+        61,
+        93,
+        554,
+        164
+      ],
+      "text": "Status. The implementation decisions supplied on 10 October 2026 are integrated with the approved 11 October procedure updates. SFT corpus generation now uses separate fresh vLLM model workers and Drive-only permanent storage. Shared evaluation panels and the 800-question RL selection are prepared and backed up. This document does not claim completed paired SFT datasets, training, model evaluation or passing prospective statistical validation.",
+      "subject": "Current decision scope"
+    },
+    {
+      "page": 68,
+      "rect": [
+        59,
+        269,
+        554,
+        365
+      ],
+      "text": "Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and diagram labels. Appendix G retains authority over the construction thresholds and scope except where this appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in force. The original 67-page source is retained unchanged in spec/archive/experiment_original.pdf. The active protocol incorporates the approved operational changes within the relevant sections. Earlier descriptions such as \"correct clean reasoning,\" the unavailable pilot-profile requirement, and the former two-call evaluation total remain as historical text; the provisions below state exactly how they are to be interpreted or superseded.",
+      "subject": "Active edition and archived source precedence"
+    },
+    {
+      "page": 71,
+      "rect": [
+        60,
+        616,
+        554,
+        730
+      ],
+      "text": "Generate each candidate once per model, cache ordinary failures and their reasons, and accept only jointly valid IDs. Use the existing fixed candidate order and deficit-refill procedure until the accepted pool contains exactly 10,000 training IDs and 100 separate validation IDs. Ordinary unsuccessful generations are rejections. They are not opportunities to resample the same prompt until it passes. Infrastructure retries remain separately governed by the recovery contract.\n\nBoth model caches must contain only matching fresh vLLM production outputs. Model-specific refill workers retain this backend and provenance; the engine does not load both models in one process. Refill orchestration and final pairing are still pending. Freeze shared accepted IDs only after all checks, then construct all forty condition datasets and verify their Drive copies. Monitoring reports raw generation plus Drive replication; its ETA excludes these subsequent stages.",
+      "subject": "Refill boundary and no mixed-engine corpus"
+    },
+    {
+      "page": 77,
+      "rect": [
+        60,
+        373,
+        554,
+        430
+      ],
+      "text": "Retain the existing temperature 1.0, maximum 2,048 new tokens, LoRA rank/alpha 32/32, learning rate 5 \u00d7 10\u22126, reference KL coefficient 0.01, 100 logical updates per model, and snapshots at steps 10, 20, . . . , 100. The standard Transformers choice, use_vllm=False, applies to GRPO rollouts. SFT corpus generation uses the separately approved vLLM engine; RL sampling and optimization remain unchanged.",
+      "subject": "GRPO engine scope"
+    },
+    {
+      "page": 81,
+      "rect": [
+        61,
+        681,
+        554,
+        738
+      ],
+      "text": "Preservation and reproducibility. The historical 67-page source remains unchanged in the archive. The active 81-page protocol integrates current corpus, storage, runtime, RL-selection and readiness procedures directly into their existing sections. spec/protocol_page_updates.json is the editable replacement text; scripts/build_protocol_pdf.py applies it without adding pages. docs/protocol_reference.md is regenerated from the active PDF. Frozen worker and dataset identities remain distinct from later documentation commits.",
+      "subject": "Integrated PDF source and reproduction"
+    }
+  ]
+}

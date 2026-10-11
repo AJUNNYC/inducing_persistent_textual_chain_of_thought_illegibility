@@ -23,7 +23,7 @@ Fixed scientific choices below are copied from the supplied PDF and diagrams. Ar
 | Confirmatory statistics | G.10 plus H.8: full 216-window/scalar family; specified maximum-standardized bootstrap subject to mandatory prospectively fixed simulation validation |
 | Historical code status | E.2 describes a prior scaffold and old CPU checks. Those are source history, not tests that have been run on this new blank repository |
 
-Sources: [H.1–H.9](../spec/experiment.pdf#page=68), [G](../spec/experiment.pdf#page=65), [E.2](../spec/experiment.pdf#page=53). The original PDF pages are copied unchanged, not silently edited to make earlier wording disappear.
+Sources: [H.1–H.9](../spec/experiment.pdf#page=68), [G](../spec/experiment.pdf#page=65), [E.2](../spec/experiment.pdf#page=53). The original source PDF is preserved in the archive; approved procedure changes are integrated into the active PDF and recorded in the procedure documentation.
 
 ## Source details requiring explicit handling, not silent correction
 
@@ -68,6 +68,6 @@ Do not change models, datasets, accepted counts, panel IDs/counts, training epoc
 
 All choices were implemented before any trained experimental outcomes existed. Scientific configuration hashes retain code/dependency/model/data/prompt/parser/trainer/sandbox identities. Full operational snapshots separately retain paths, funding and quota evidence. Production runtime requires the actual committed source SHA and lock hash; an unversioned development source cannot authorize paid work. An implementation repair versions affected evidence and derivatives. Historical or wrong-population simulation evidence cannot certify the actual frozen panel. Failed mandatory coverage or reference-executor checks remain launch blockers.
 
-## Procedure amendment: 11 October 2026
+## Current procedure: 11 October 2026
 
-The [current procedure amendment](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
+The [current procedure](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

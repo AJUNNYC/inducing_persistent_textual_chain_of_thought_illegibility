@@ -60,6 +60,6 @@ The main panel requires 76,446 generations. Four extra baseline-repeatability pa
 
 Stop affected launches on failed mandatory preflights. Preserve completed artifacts and honest failed, incomplete, paused or indeterminate states. Do not fabricate scores, checkpoints, funding authorization or successful validation. The original PDF's references to an earlier CPU-validated scaffold describe historical work; current implementation evidence is recorded separately in validation_report.md. [E.2.1,E.2.8](../spec/experiment.pdf#page=53), [H.9](../spec/experiment.pdf#page=80).
 
-## Procedure amendment: 11 October 2026
+## Current procedure: 11 October 2026
 
-The [current procedure amendment](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
+The [current procedure](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

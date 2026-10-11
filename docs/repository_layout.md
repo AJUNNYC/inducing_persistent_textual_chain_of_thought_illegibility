@@ -248,7 +248,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
   scripts/
     authorize_google_drive.py
     benchmark_vllm_generation.py
-    build_procedure_update_pdf.py
+    build_protocol_pdf.py
     create_google_consent_notebook.py
     freeze_runtime_config.py
     manage_runpod.py
@@ -386,7 +386,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             sft_training.mmd
           training.mmd
     module_manifest.json
-    procedure_update.pdf
+    protocol_page_updates.json
     repository_manifest.json
     requirements_manifest.json
     source_provenance.json

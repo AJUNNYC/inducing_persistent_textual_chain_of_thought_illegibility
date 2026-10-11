@@ -14,6 +14,6 @@ The charts are editable Mermaid source. The hierarchy now maps implemented sourc
 
 [Modular execution graph](workflows/operations/modular_execution.mmd) records actual stage dependency order. [Extension inventory](repository/implementation_extensions.mmd) maps every added implementation/deployment/evidence path. Operational module cards mirror each `workflows/operations/<module>.mmd` path under `docs/modules/operations/`. These extend the preserved scientific workflows without replacing their constraints.
 
-## Procedure amendment: 11 October 2026
+## Current procedure: 11 October 2026
 
-The [current procedure amendment](../../docs/procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
+The [current procedure](../../docs/procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

@@ -96,6 +96,6 @@ flowchart TD
 %% Source sections: 3.1; B.1; E.2.2–E.2.4; H.2.3,H.3
 ```
 
-## Current procedure amendment
+## Current procedure
 
-The approved vLLM corpus migration, Drive-only preservation, frozen RL selection, and remaining validation boundaries are documented in `docs/procedure_update.md` and PDF H.11.
+The approved vLLM corpus migration, Drive-only preservation, frozen RL selection, and remaining validation boundaries are documented in `docs/procedure_update.md` and the integrated protocol PDF.

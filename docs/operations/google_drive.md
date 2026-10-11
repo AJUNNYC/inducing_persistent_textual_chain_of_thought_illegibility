@@ -60,6 +60,6 @@ The command validates descriptor identities, safe paths and current remote metad
 
 The validated native recovery record at `artifacts/state/collection_recovery.json` permits scoped native collection under the same immutable inputs and current externally anchored GPU spending authorization. Native collection invokes no provider APIs. This command imports no provider spending or training state; later training/provider recovery still requires compatible coherent ledgers and checkpoint state.
 
-## Procedure amendment: 11 October 2026
+## Current procedure: 11 October 2026
 
-The [current procedure amendment](../procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
+The [current procedure](../procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance/refills, transformations, training, and evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.

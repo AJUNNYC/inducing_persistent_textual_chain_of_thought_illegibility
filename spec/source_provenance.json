@@ -1,10 +1,10 @@
 {
   "title": "Inducing Persistent Textual Chain-of-Thought Illegibility",
-  "source_policy": "Scientific content derived solely from the supplied controlling PDF and revised Mermaid files; file layout and ownership are explicit organizational conventions.",
+  "source_policy": "Historical scientific source and approved user procedure decisions; active changes integrated directly into existing sections.",
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "160a88b33fd7e970aa0dfc6bac20c729115f4bab75178f89c488e97c6fb15e69"
+    "sha256": "d34d58408968a45b0bb825e926a960ae8fd9d5f0a2705b9619104e3e34713850"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -15,5 +15,13 @@
   "source_archive": "spec/archive/mermaid_source.json",
   "full_original_latex_available": false,
   "scientific_results_included": false,
-  "live_integrations_validated": false
+  "live_integrations_validated": false,
+  "active_procedure_edition": "2026-10-11",
+  "procedure_update_source": "spec/protocol_page_updates.json",
+  "validated_live_scope": [
+    "vLLM generation benchmark",
+    "whole-batch Drive integrity",
+    "evaluation panel preparation",
+    "shared RL question selection"
+  ]
 }

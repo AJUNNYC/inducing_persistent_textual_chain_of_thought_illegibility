@@ -1,6 +1,6 @@
-# Procedure update: 11 October 2026
+# Current procedure: 11 October 2026
 
-This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It amends the earlier native Transformers SFT generation procedure. Training recipes, GRPO rollout generation, evaluation settings, acceptance rules, and statistical gates retain their existing definitions.
+This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It replaces the earlier native Transformers SFT generation procedure for corpus construction. Training recipes, GRPO rollout generation, evaluation settings, acceptance rules, and statistical gates retain their existing definitions.
 
 ## SFT corpus generation
 
@@ -52,8 +52,8 @@ At the user's request, the full test suite and full launch preflights were not r
 
 The active generation source remains frozen even when documentation or the monitor is pushed to newer GitHub commits. Repeated test counts and transient generation totals are not presented as completed scientific results.
 
-## Updated workflow sources and PDFs
+## Integrated protocol and workflow sources
 
 The active [clean collection diagram](../spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/clean_trace_collection.mmd), [candidate batch diagram](../spec/mermaid/workflows/data_generation_collection/sft_data/clean_trace_collection/candidate_batch/clean_trace_batch.mmd), and [RL preparation diagram](../spec/mermaid/workflows/data_generation_collection/rl_data/rl_data_preparation.mmd) describe the updated procedure. Their module documents mirror the Mermaid sources.
 
-[procedure_update.pdf](../spec/procedure_update.pdf) is the standalone H.11 amendment generated from this document. The same amendment is appended to [experiment.pdf](../spec/experiment.pdf), preserving the preceding 81 pages and existing page citations. The 67-page historical source in `spec/archive/experiment_original.pdf` remains unchanged. Rebuild both active PDFs with `python scripts/build_procedure_update_pdf.py` using ReportLab and pypdf.
+The active [experiment.pdf](../spec/experiment.pdf) incorporates these procedures directly into Sections 3.1, C.3.2, E.1.3, E.2.3, E.2.8, H.1, H.3, H.7 and H.10. It has 81 pages, with no appended procedure amendment or separate amendment PDF. Existing page citations remain valid. The historical source in `spec/archive/experiment_original.pdf` remains unchanged. Editable replacement text lives in `spec/protocol_page_updates.json`; rebuild the active PDF, extraction and provenance with `python scripts/build_protocol_pdf.py` using PyMuPDF.

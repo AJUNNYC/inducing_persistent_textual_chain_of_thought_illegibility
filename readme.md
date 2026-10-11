@@ -2,7 +2,7 @@
 
 Implemented first-stage research software for paired clean-trace construction,40 independent SFT fits, two GRPO trajectories, native evaluation of62states and prospective construction analysis. No trained experimental outcomes are supplied. Mandatory live launch gates remain enforced.
 
-The controlling scientific source is [the protocol PDF](spec/experiment.pdf). AppendixH governs its explicit amendments; AppendixG retains the construction criteria. The [complete source extraction](docs/protocol_reference.md), [scientific overview](docs/overview.md), [contracts](docs/contracts.md) and [decisions](docs/decisions.md) explain the design. The historical source PDF remains byte-for-byte preserved; the active PDF retains its original 81 pages and appends the [11 October procedure amendment](docs/procedure_update.md).
+The controlling scientific source is [the protocol PDF](spec/experiment.pdf). AppendixH governs its explicit amendments; AppendixG retains the construction criteria. The [complete source extraction](docs/protocol_reference.md), [scientific overview](docs/overview.md), [contracts](docs/contracts.md) and [decisions](docs/decisions.md) explain the design. The historical source PDF remains byte-for-byte preserved; the active 81-page PDF integrates the [current procedure](docs/procedure_update.md) directly into its relevant sections.
 
 ## Install and inspect
 
@@ -25,4 +25,4 @@ python3.12 scripts/setup_environment.py --profile cpu --venv .venv
 
 ## Current procedure
 
-See [the procedure amendment](docs/procedure_update.md) and [standalone PDF](spec/procedure_update.pdf) for fresh two-Pod vLLM SFT generation, whole-batch Drive verification, archived native outputs, and the verified shared 800-question RL selection. Training and evaluation retain their original recipes and required gates.
+See [the current procedure](docs/procedure_update.md) and [integrated protocol PDF](spec/experiment.pdf) for fresh two-Pod vLLM SFT generation, whole-batch Drive verification, archived native outputs, and the verified shared 800-question RL selection. Training and evaluation retain their original recipes and required gates.

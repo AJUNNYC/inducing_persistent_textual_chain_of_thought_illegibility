@@ -2622,14 +2622,14 @@
       "blank": false
     },
     {
-      "path": "scripts/build_procedure_update_pdf.py",
+      "path": "scripts/build_protocol_pdf.py",
       "kind": "implementation_extension",
       "entry_type": "file",
       "owner": "coordinator",
       "source": "User implementation assignment; operational H9 conventions",
-      "display_path": "scripts/build_procedure_update_pdf.py",
+      "display_path": "scripts/build_protocol_pdf.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
-      "node": "p_daff3c81f69e50",
+      "node": "p_b883603a139fb0",
       "blank": false
     },
     {
@@ -4099,14 +4099,14 @@
       "blank": false
     },
     {
-      "path": "spec/procedure_update.pdf",
+      "path": "spec/protocol_page_updates.json",
       "kind": "implementation_extension",
       "entry_type": "file",
       "owner": "coordinator",
       "source": "User implementation assignment; operational H9 conventions",
-      "display_path": "spec/procedure_update.pdf",
+      "display_path": "spec/protocol_page_updates.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
-      "node": "p_12fe97960463b2",
+      "node": "p_8b8ebeac4a6dd4",
       "blank": false
     },
     {
