@@ -71,7 +71,17 @@ def main():
     os.environ.update(DATA_ROOT=str(data), ARTIFACT_ROOT=str(artifacts),
                       MODEL_CACHE_ROOT=a.cache_root, TOKENIZERS_PARALLELISM='false')
     experiment = Experiment(config, config_path=a.config)
-    tokenizers = experiment.tokenizers()
+    # Use verified local snapshot paths, avoiding Transformers' unneeded remote
+    # model-info probe even when all tokenizer bytes are already cached.
+    from transformers import AutoTokenizer
+    from operations.assets import model_load_kwargs
+    tokenizers = {}
+    for model, spec in config['models'].items():
+        model_load_kwargs(spec['id'], spec['tokenizer_revision'], a.cache_root,
+                          tokenizer_only=True, offline=True)
+        snapshot = Path(a.cache_root)/'hub'/('models--'+spec['id'].replace('/','--'))/'snapshots'/spec['tokenizer_revision']
+        tokenizers[model] = AutoTokenizer.from_pretrained(str(snapshot),
+                            trust_remote_code=False, local_files_only=True)
     commit = subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip()
     store = DriveStore(drive_service(os.environ['GOOGLE_OAUTH_TOKEN_FILE']),
                       os.environ['GOOGLE_DRIVE_FOLDER_ID'], state_root=artifacts/'state/drive')
