@@ -76,7 +76,7 @@ def main():
     protocol = build_evaluation_protocol({'items':old_protocol['items']}, old_protocol['legibility_ids'],
         analysis_plan=old_protocol.get('analysis_plan'),
         preflight_reports=old_protocol['preflight_reports'],
-        configuration_hash=experiment.hash, generation_backend='vllm')
+        configuration_hash=old_protocol['specifications'].get('configuration_hash'), generation_backend='vllm')
     validate_scoring_only_revision(old_protocol['specifications'], protocol['specifications'])
     sandbox = experiment.sandbox()
     if sandbox.identity != protocol['specifications']['sandbox']['identity'] or sandbox.available()['status'] != 'passed':
