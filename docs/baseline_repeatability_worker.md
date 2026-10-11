@@ -15,7 +15,9 @@ provider environment bindings and is never registered or included in artifacts.
 Set `HF_HOME`, `HF_HUB_CACHE` and `HF_DATASETS_CACHE` to the provisioned cache
 before starting Python, along with the existing Drive credential-file and project
 folder bindings. This prevents SDK imports from retaining a different cache
-location. Use the native GPU environment; do not substitute the vLLM generation
+location. Allow the Hub SDK metadata lookup even with cached weights: forcing
+`HF_HUB_OFFLINE=1` blocked the native loader before inference in this deployment.
+Model payload loads still use the pinned, checksum-verified local cache. Use the native GPU environment; do not substitute the vLLM generation
 lock. Keep the original sandbox control configuration identity in the draft
 measurement protocol; output state provenance records the actual consumer.
 

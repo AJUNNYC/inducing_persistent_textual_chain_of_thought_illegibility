@@ -1,3 +1,9 @@
+## Baseline repeatability running — 2026-10-11
+
+The [live launch receipt](evidence/baseline_repeatability_launch.json) records actual 7B seed-42 native inference and independent Drive readback of its first raw response and scored item. The worker schedules both untouched models with seeds 42, 43 and 44 on all 1,233 fixed items (7,398 outputs). Completed artifacts are replicated to Drive before advancing. Startup failures were retained; JSON numeric loading and control identity handling were fixed in GitHub before redeployment, and the native cache environment/metadata lookup was corrected. No full suite, transformation or GPU control suite was repeated.
+
+The baseline gate is **pending**, not passed; SFT has not started. The worker pauses safely at the existing 2026-10-11 20:20 UTC deadline if unfinished. See the [worker instructions](baseline_repeatability_worker.md). Scientific native decoder settings and acceptance thresholds are unchanged.
+
 ## SFT data handoff — 2026-10-11
 
 The [producer-to-consumer certificate](evidence/sft_data_handoff_certificate.json) passed for all 40 conditions and 404,000 records. All 122 current corpus artifact hashes and sizes match the completed independent Drive readback. Production worklist validation checked exact 10,000/100 splits, ordered shared IDs, model-specific clean traces, immutable revisions, whole assistant targets and exact ordered record hashes. Original producer configuration and record bytes remain unchanged. The current consumer is frozen at `a50de2c`; its source files and native lock are bound separately. Scientific settings match with only implementation/dependency identities separated.
