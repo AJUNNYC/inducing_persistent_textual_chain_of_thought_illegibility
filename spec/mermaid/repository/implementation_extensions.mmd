@@ -77,6 +77,12 @@ flowchart TD
     EXT --> p_3e660b8bc1cabb
     p_001d320e5e46f7["docs/evidence/sft_launch_readiness.json"]
     EXT --> p_001d320e5e46f7
+    p_7cc5ebe7d64af8["docs/evidence/sft_optimization_benchmark_plan.json"]
+    EXT --> p_7cc5ebe7d64af8
+    p_0a7fc08836f4a2["docs/evidence/sft_optimization_cpu_audit.json"]
+    EXT --> p_0a7fc08836f4a2
+    p_ce99ae4bc9643f["docs/evidence/sft_optimization_drive_index.json"]
+    EXT --> p_ce99ae4bc9643f
     p_91473f1dafff64["docs/evidence/sft_runtime_checks_report.json"]
     EXT --> p_91473f1dafff64
     p_2b1dd057414f7e["docs/evidence/sft_training_launch.json"]
@@ -163,6 +169,8 @@ flowchart TD
     EXT --> p_de016ee20fc087
     p_ecdcb9a3a86066["docs/sft_data_handoff.md"]
     EXT --> p_ecdcb9a3a86066
+    p_572dc95a63086d["docs/sft_optimizations.md"]
+    EXT --> p_572dc95a63086d
     p_d39631a8c666ef["docs/statistical_concentration_guard.md"]
     EXT --> p_d39631a8c666ef
     p_cea225e9d407b6["requirements-vllm.txt"]
@@ -173,6 +181,8 @@ flowchart TD
     EXT --> p_8a45d762e01608
     p_e39d38d904b1f3["scripts/authorize_google_drive.py"]
     EXT --> p_e39d38d904b1f3
+    p_4b0ed3d43d8ac8["scripts/benchmark_sft_optimizations.py"]
+    EXT --> p_4b0ed3d43d8ac8
     p_528a8aed23a776["scripts/benchmark_vllm_generation.py"]
     EXT --> p_528a8aed23a776
     p_b883603a139fb0["scripts/build_protocol_pdf.py"]
@@ -285,6 +295,8 @@ flowchart TD
     EXT --> p_0bf58f6d84853c
     p_778c8e7e5819d4["src/training/sft/data_handoff.py"]
     EXT --> p_778c8e7e5819d4
+    p_2b763b344f6f0e["src/training/sft/execution_profile.py"]
+    EXT --> p_2b763b344f6f0e
     p_8ab948fe4b8f2d["tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_vllm_generation.py"]
     EXT --> p_8ab948fe4b8f2d
     p_10e350a8a391f4["tests/unit/operations/"]
@@ -311,10 +323,14 @@ flowchart TD
     EXT --> p_189e3ce34ad176
     p_f39b81f9d94d4f["tests/unit/operations/test_runpod.py"]
     EXT --> p_f39b81f9d94d4f
+    p_160e24d100aebd["tests/unit/operations/test_sft_optimization_benchmark.py"]
+    EXT --> p_160e24d100aebd
     p_65b1fadd69d228["tests/unit/test_overview_lifecycle.py"]
     EXT --> p_65b1fadd69d228
     p_73d74fd82a388f["tests/unit/training/sft/test_data_handoff.py"]
     EXT --> p_73d74fd82a388f
+    p_6c5a258a3484b2["tests/unit/training/sft/test_execution_profile.py"]
+    EXT --> p_6c5a258a3484b2
     p_f9d35d43770d39["tools/"]
     EXT --> p_f9d35d43770d39
     p_9c55b809c42834["tools/mermaid/"]

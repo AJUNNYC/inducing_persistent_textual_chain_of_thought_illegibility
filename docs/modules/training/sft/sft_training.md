@@ -1,6 +1,6 @@
 # sft_training.md
 
-**Owner:** `sft`. **Implementation status:** implemented and verified over declared full-count dataset/runner fixtures; actual forty-fit GPU execution remains unstarted; the current certified 7B ROT13 launch is ready.
+**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass; first 7B ROT13 fit paused at step 214 with verified Drive recovery. The forty-fit study remains incomplete; new execution candidates require current source bindings and target-GPU evidence.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -46,7 +46,7 @@ The following source comments retain the procedural detail of the supplied diagr
 
 Implement and test `src/training/sft/sft_training.py` against its specified behavior in `tests/unit/training/sft/test_sft_training.py`. Validate every emitted artifact and preserve its source/configuration identity. Do not claim completeness from a placeholder or passing import. Propagate required child failures and maintain ordinary model outcomes separately from infrastructure faults. Mandatory real preflights and permission gates remain in force. Unspecified allowed conventions must be documented/frozen before outcomes; new scientific choices are not silently authorized.
 
-The [certified launch handoff](../../../sft_data_handoff.md) binds the original producer to consumer `773cfd3`, reuses compatible controls and requires all thirteen gates. Its actual H100 validation returned READY; no optimizer training has started. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
+The [certified launch handoff](../../../sft_data_handoff.md) binds the original producer to consumer `773cfd3`, whose first fit is paused at step 214. New [execution candidates](../../../sft_optimizations.md) need source recertification and affected GPU controls; compatible upstream evidence remains reusable. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
 
 ## Exact path-synchronized diagram
 
@@ -70,7 +70,7 @@ flowchart TD
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["40 verified condition datasets"]
     CERT["Bind original producer to certified consumer<br/>40-condition worklist and exact dataset hashes"]
-    GATES["All 13 mandatory gates passed<br/>Preserved baselines rescored without regeneration"]
+    GATES["Require source-compatible launch evidence<br/>Reuse unchanged baselines and upstream controls"]
     PLAN["Two independent family queues<br/>Select 7B ROT13 first on the current single GPU"]
     ROT["ROT13 queue: assigned GPU<br/>20 independent fits; 10 per model"]
     KAZ["KaziText queue: when a GPU is available<br/>20 independent fits; 10 per model"]
@@ -80,7 +80,9 @@ flowchart TD
     KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
+    BENCH["New source or hardware: measure explicit candidates<br/>Least effect on results first; baseline stays default"]
     INPUT --> CERT --> GATES --> PLAN
+    CERT -.->|Migration| BENCH --> GATES
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT
     PLAN --> KAZ --> KAZFIT --> KAZDONE --> WAIT
     WAIT --> OUT

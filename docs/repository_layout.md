@@ -111,6 +111,9 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_launch_pod_validation.json
       sft_launch_preflight_report.json
       sft_launch_readiness.json
+      sft_optimization_benchmark_plan.json
+      sft_optimization_cpu_audit.json
+      sft_optimization_drive_index.json
       sft_runtime_checks_report.json
       sft_training_launch.json
       sft_training_launch_drive.json
@@ -246,6 +249,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     requirements.md
     runbook.md
     sft_data_handoff.md
+    sft_optimizations.md
     source_map.md
     statistical_concentration_guard.md
     validation.md
@@ -279,6 +283,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
   scripts/
     audit_sft_drive.py
     authorize_google_drive.py
+    benchmark_sft_optimizations.py
     benchmark_vllm_generation.py
     build_protocol_pdf.py
     certify_sft_handoff.py
@@ -566,6 +571,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft/
         __init__.py
         data_handoff.py
+        execution_profile.py
         individual_fit/
           __init__.py
           sft_fit.py
@@ -659,6 +665,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_operations.py
         test_protocol_provenance.py
         test_runpod.py
+        test_sft_optimization_benchmark.py
       shared_procedures/
         test_checkpointing.py
         test_configuration.py
@@ -691,6 +698,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           individual_fit/
             test_sft_fit.py
           test_data_handoff.py
+          test_execution_profile.py
           test_sft_training.py
         test_training.py
   tools/

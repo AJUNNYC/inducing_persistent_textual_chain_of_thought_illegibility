@@ -26,7 +26,7 @@ source commit and dependency lock hash must match `requirements.lock`. Store the
 certificate and worklist in Drive. Compatibility certification does not satisfy
 baseline repeatability or authorize a scientific fit by itself.
 
-The current certificate, worklist, consumer configuration and launch evidence are in the [verified Drive launch folder](https://drive.google.com/drive/folders/1x7_brQz7cCutiTZ42adyQ4C5ilZQsrGV). The consumer source is frozen at `773cfd3cc6a776262e9ca65ca10667aaad456b69`; later documentation commits do not redefine it. The prior `a50de2c` handoff remains historical in its original folder. The [current certificate](evidence/sft_data_handoff_773cfd3_certificate.json) retains the same original corpus and training settings.
+The certificate, worklist, consumer configuration and launch evidence for the paused fit are in the [verified Drive launch folder](https://drive.google.com/drive/folders/1x7_brQz7cCutiTZ42adyQ4C5ilZQsrGV). Its consumer source remains frozen at `773cfd3cc6a776262e9ca65ca10667aaad456b69`. The [certificate](evidence/sft_data_handoff_773cfd3_certificate.json) retains the original corpus and training settings. The newer [optimization implementation](sft_optimizations.md) changes training source bytes and requires a fresh consumer certificate plus affected target-GPU evidence; it is not covered by this original certificate. The prior `a50de2c` handoff remains historical in its original folder.
 
 
 ## Certified single-GPU launch
@@ -55,7 +55,7 @@ inference. Capability-only repeatability does not complete legibility judging.
 
 ## Validated launch on 11 October 2026
 
-The repaired baseline gate passed for all four domains of both models using the exact 7,398 preserved outputs. The [launch reconciliation receipt](evidence/sft_launch_readiness.json) records all thirteen mandatory training gates passed, and the [actual H100 validation](evidence/sft_launch_pod_validation.json) returned READY with forty certified conditions and ten selected 7B ROT13 fits. The [verified Drive launch index](evidence/sft_launch_drive_index.json) records preserved report, protocol and validation files. No training has started. Compatible GPU and full statistical controls were reused with their original evidence and explicit current source/recipe bindings.
+The repaired baseline gate passed for all four domains of both models using the exact 7,398 preserved outputs. The [launch reconciliation receipt](evidence/sft_launch_readiness.json) records all thirteen mandatory training gates passed for consumer `773cfd3`, and the [actual H100 validation](evidence/sft_launch_pod_validation.json) returned READY with forty certified conditions and ten selected 7B ROT13 fits. This snapshot preceded the first fit, now paused at step214. Compatible GPU and statistical controls retained their original evidence and explicit source/recipe bindings. These receipts do not authorize new execution profiles or replacement hardware.
 
 From the pinned Git archive `/workspace/sft_launch_773cfd3` on the existing H100, the tested launch validation is:
 
@@ -82,3 +82,5 @@ The [launch receipt](evidence/sft_training_launch.json) records 7B ROT13 level 1
 ## Safe pause and resumption
 
 The first 7B ROT13 fit is now [paused at step 214](evidence/sft_training_pause_214.json), with the whole optimizer boundary and full recovery state preserved in Drive. To resume after replacing a Pod, restore the registered `full_state.pt` and `manifest.json` into their original checkpoint directory using their exact provenance; restore the certified corpus, config, certificate and worklist from the existing Drive indices. Execute pinned source `773cfd3` with the same consumer identity and a new authorized future deadline. The fit automatically restores its latest matching verified full checkpoint, including optimizer, scheduler, RNG and sampler position. The previous 20:20 UTC deadline is historical and must not be extended implicitly. Stopping the training process does not stop provider billing; the PI account operator stops the Pod through the console.
+
+Replacement hardware must additionally pass the affected runtime checks and record an explicit migration. Changing source, attention kernels or execution profile is not an exact continuation under the old certificate. The optimization benchmark starts fresh adapters in an isolated namespace and never consumes or overwrites this checkpoint.

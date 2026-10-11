@@ -1,0 +1,139 @@
+{
+  "status": "passed",
+  "environment": {
+    "device": "cpu",
+    "gpu_available": false,
+    "torch_version": "2.9.0+cpu",
+    "python_version": "3.12.14",
+    "threads": 1,
+    "platform": "x86_64"
+  },
+  "fixture": {
+    "description": "tiny declared CPU Embedding+Linear model with dropout .05, unequal completion lengths,16 ordered microbatches, real AdamW, clipping and scheduler",
+    "scientific_training": false
+  },
+  "validation": {
+    "focused_tests_passed": 17,
+    "focused_tests_deselected": 6,
+    "cpu_loss_gradient_weights_optimizer_scheduler_rng_bitwise_equal": true,
+    "partial_final_update_progress_equal_excluding_profile": true,
+    "nonfinite_rejected_before_clipping_or_optimizer_or_scheduler": true,
+    "resume_profile_mismatch_rejected": true,
+    "legacy_baseline_progress_resume_bitwise_equal": true
+  },
+  "measurements": [
+    {
+      "profile": {
+        "attention_implementation": "eager",
+        "validated_loss_counts": false,
+        "defer_finite_checks": false
+      },
+      "host_scalar_extractions": 36,
+      "cross_entropy_calls": 16,
+      "backward_calls": 16,
+      "losses": [
+        2.3632187843322754,
+        2.8375236988067627,
+        2.699244260787964,
+        2.627974033355713,
+        2.311969518661499,
+        2.1482667922973633,
+        2.180507183074951,
+        2.2588603496551514,
+        2.843564033508301,
+        2.8832383155822754,
+        3.8526952266693115,
+        3.5828514099121094,
+        3.979226589202881,
+        3.0942656993865967,
+        2.6927075386047363,
+        2.6262664794921875
+      ],
+      "timings_seconds": [
+        0.006371915998897748,
+        0.005664165997586679,
+        0.006607593000808265,
+        0.00580133699986618,
+        0.008842620998620987,
+        0.008555204000003869,
+        0.0058438389969524,
+        0.0059463709985720925,
+        0.006333829998766305,
+        0.005306610000843648,
+        0.0059295459977875,
+        0.007725605002633529
+      ],
+      "median_update_seconds": 0.006140100498669199
+    },
+    {
+      "profile": {
+        "attention_implementation": "eager",
+        "validated_loss_counts": true,
+        "defer_finite_checks": true
+      },
+      "host_scalar_extractions": 5,
+      "cross_entropy_calls": 16,
+      "backward_calls": 16,
+      "losses": [
+        2.3632187843322754,
+        2.8375236988067627,
+        2.699244260787964,
+        2.627974033355713,
+        2.311969518661499,
+        2.1482667922973633,
+        2.180507183074951,
+        2.2588603496551514,
+        2.843564033508301,
+        2.8832383155822754,
+        3.8526952266693115,
+        3.5828514099121094,
+        3.979226589202881,
+        3.0942656993865967,
+        2.6927075386047363,
+        2.6262664794921875
+      ],
+      "timings_seconds": [
+        0.0055310500029008836,
+        0.0057155110007443,
+        0.006239351001568139,
+        0.005359307000617264,
+        0.011968392002017936,
+        0.009855786000116495,
+        0.0053738290007459,
+        0.005195606998313451,
+        0.005667158999131061,
+        0.005584518999967258,
+        0.006633339999098098,
+        0.007466023998858873
+      ],
+      "median_update_seconds": 0.0059532550003496
+    }
+  ],
+  "baseline_over_candidate_cpu_fixture_ratio": 1.0313854350785623,
+  "limitations": [
+    "CPU fixture timing is not a GPU or LLM training-speed estimate.",
+    "No CUDA device was available; CUDA throughput and numerical validation remain pending.",
+    "SDPA attention is not exercised by this exact eager-profile comparison."
+  ],
+  "implementation_commit": "94e2fb7ee1c171c13274648717647789a5a065fd",
+  "source_file_sha256": {
+    "src/training/sft/execution_profile.py": "a244c45ce5a973e5432230351fcce1952598b6ea55ce1fa8eace74ee14e61249",
+    "src/training/sft/individual_fit/sft_fit.py": "0c0882bc920b4420846d14cd4b6c6fe27ab21e562e375d02a0ae534dfaa6a91c",
+    "scripts/benchmark_sft_optimizations.py": "dc151074101885f635525c914fcb8c6dbb1ba29da5e55eb8161c8870c61e72c0",
+    "tests/unit/training/sft/test_execution_profile.py": "719c3b3529b99008ff4f55dff6050751302094f0d884e87cf96ae2c734f932d4",
+    "tests/unit/training/sft/individual_fit/test_sft_fit.py": "9f6f69c730a598d4ca24cd02696bd9d276ca7cae7691594d59bd6bb6a6692975",
+    "tests/unit/operations/test_sft_optimization_benchmark.py": "cc0925cb6fcf29022d1667a4694f578c5343b1d6142b212e3726dd0ba4930706"
+  },
+  "consolidated_focused_verification": {
+    "command": "/workspace/illegibility_env/bin/python -m pytest -q tests/unit/training/sft/individual_fit/test_sft_fit.py tests/unit/training/sft/test_execution_profile.py tests/unit/operations/test_sft_optimization_benchmark.py",
+    "passed": 36,
+    "elapsed_seconds": 4.88,
+    "full_suite_run": false
+  },
+  "target_gpu": {
+    "name": "RTX PRO 6000 Blackwell",
+    "vram_gb": 96,
+    "pod_available": false,
+    "benchmark_status": "PENDING_GPU"
+  }
+}

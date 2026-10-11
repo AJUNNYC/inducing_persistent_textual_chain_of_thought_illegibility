@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 493,
+  "files": 501,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1152,6 +1152,39 @@
       "display_path": "docs/evidence/sft_launch_readiness.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_001d320e5e46f7",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_optimization_benchmark_plan.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_optimization_benchmark_plan.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7cc5ebe7d64af8",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_optimization_cpu_audit.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_optimization_cpu_audit.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_0a7fc08836f4a2",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_optimization_drive_index.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_optimization_drive_index.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_ce99ae4bc9643f",
       "blank": false
     },
     {
@@ -2602,6 +2635,17 @@
       "blank": false
     },
     {
+      "path": "docs/sft_optimizations.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/sft_optimizations.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_572dc95a63086d",
+      "blank": false
+    },
+    {
       "kind": "documentation",
       "owner": "coordinator",
       "source": "PDF H.9 and Mermaid reuse/handoffs; requested repository responsibility assignments",
@@ -2959,6 +3003,17 @@
       "display_path": "scripts/authorize_google_drive.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_e39d38d904b1f3",
+      "blank": false
+    },
+    {
+      "path": "scripts/benchmark_sft_optimizations.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/benchmark_sft_optimizations.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_4b0ed3d43d8ac8",
       "blank": false
     },
     {
@@ -6042,6 +6097,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/execution_profile.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/execution_profile.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_2b763b344f6f0e",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -7035,6 +7101,17 @@
       "blank": false
     },
     {
+      "path": "tests/unit/operations/test_sft_optimization_benchmark.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_sft_optimization_benchmark.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_160e24d100aebd",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -7373,6 +7450,17 @@
       "display_path": "tests/unit/training/sft/test_data_handoff.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_73d74fd82a388f",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_execution_profile.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_execution_profile.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_6c5a258a3484b2",
       "blank": false
     },
     {

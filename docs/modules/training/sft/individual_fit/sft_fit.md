@@ -1,6 +1,6 @@
 # sft_fit.md
 
-**Owner:** `sft`. **Implementation status:** implemented and verified with actual CPU tensor/PEFT fixtures and both pinned official tokenizers; full selected-model CUDA execution remains gated.
+**Owner:** `sft`. **Implementation status:** original H100 execution started and paused at step 214; new explicit execution candidates pass focused CPU controls and remain gated on target-GPU measurement and current source certification.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -49,6 +49,8 @@ Use the common [artifact contracts](../../../../contracts.md), [frozen prompt in
 | `RECOVER` | `src/shared_procedures/recovery_procedure.py` | [recovery_procedure](../../../shared_procedures/recovery_procedure.md) |
 
 ## Implemented interface and evidence
+
+`SFTExecutionProfile` separates explicit execution candidates from the frozen `SFTRecipe`. Baseline remains eager attention with original checks. The redundant-check candidate validates supervised counts on CPU with tensor identity/mutation guards and checks all detached microbatch losses once before clipping or updating. Its CE/reduction/update order and RNG are unchanged on bitwise CPU comparisons. `one_optimizer_update` is shared by the real loop and isolated benchmark; resume progress rejects a different execution profile. SDPA is an explicit benchmark candidate with expected numerical differences. See [optimization precedent and empirical limits](../../../../sft_optimizations.md). Neither CPU tests nor the old H100 receipt approve new profiles on RTX PRO 6000.
 
 `SFTFitSpec(family, model_id, level, model_revision, tokenizer_revision, configuration_hash, dataset_hash)` freezes an exact fit. `run_sft_fit(spec, train_records, validation_records, output_dir, config, *, resume=None, preflight_report=None, should_pause=None)` runs the actual Transformers/PEFT/BitsAndBytes engine. `verify_fit_result(output_dir, expected_identity)` reopens the final checkpoint and verifies adapter tensors against it. Heavy GPU imports occur only in the actual engine.
 
@@ -148,7 +150,10 @@ flowchart TD
     AUDIT -->|Known artifact repair| FINAL
     RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover verified state before resuming"]
     STOP["Stop fit and preserve partial results"]
-    INPUT --> SETUP --> DONE
+    PROFILE["Bind explicit execution profile and source<br/>Baseline eager remains default"]
+    MEASURE["Candidates require precedent and empirical evidence<br/>Target-GPU timing, gradients, updates and RNG"]
+    INPUT --> PROFILE --> SETUP --> DONE
+    PROFILE -.->|New source or hardware| MEASURE --> PROFILE
     DONE -->|Yes| FINAL
     SETUP -.->|Failure| RECOVER
     STEP -.->|Failure| RECOVER

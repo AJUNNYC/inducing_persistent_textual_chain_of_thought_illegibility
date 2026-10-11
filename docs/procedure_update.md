@@ -2,7 +2,11 @@
 
 This records the user's approved change to SFT corpus generation and the executed storage and RL preparation steps. It replaces the earlier native Transformers SFT generation procedure for corpus construction. Training recipes, GRPO rollout generation, scientific success floors and validation acceptance rules remain unchanged. The later approved evaluation migration uses batched vLLM for both rebuilt baselines and trained states, as described below. The subsequently approved evaluation-only concentration guard is documented in [the statistical method specification](statistical_concentration_guard.md).
 
-## Current SFT launch readiness
+## Current SFT execution and optimization
+
+The first 7B ROT13 fit is [paused at optimizer step 214](evidence/sft_training_pause_214.json), with verified full recovery state in Drive. The intended replacement is RTX PRO 6000 Blackwell 96GB; no replacement Pod is available yet. [Training optimizations](sft_optimizations.md) implement explicit redundant-check and SDPA candidates in least-result-impact order. Production still defaults to baseline eager execution. Exact CPU loss/gradient/update/RNG comparisons support the first candidate; target-GPU performance/parity and new-source certification remain pending. Preserve compatible corpus, transformation, judge and statistical evidence; revalidate the affected execution controls before activation.
+
+## Original consumer launch readiness
 
 All eight model/domain repeatability gates passed after the [versioned final-field scoring repair](final_field_scoring.md) rescored the same 7,398 saved baseline responses. No response was regenerated, no success threshold changed, and the original failed baseline evidence remains retained. The [source-bound launch receipt](evidence/sft_launch_readiness.json) records all thirteen mandatory gates passed for consumer `773cfd3` and certificate `e8b47049…`. Compatible completed controls and the original Drive-audited corpus were reused with their original identities preserved.
 

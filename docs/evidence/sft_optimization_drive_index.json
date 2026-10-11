@@ -1,0 +1,102 @@
+{
+  "status": "VERIFIED",
+  "project_folder_id": "176a8Tm6l4WhfakY_0nCOo4ICeT7KPSmx",
+  "folder_id": "1p2MxgaoO4utvdMEO_D6ijH4g8vrfgjN4",
+  "folder_path": "reports/sft_optimizations/94e2fb7",
+  "implementation_commit": "94e2fb7ee1c171c13274648717647789a5a065fd",
+  "full_plan_hash": "90cbe2ce8a1edb42b4b31b7a61c3637d51c21beea615adc0794fcfd3abdfaa35",
+  "gpu_work_started": false,
+  "production_profile_activated": false,
+  "official_training_state_modified": false,
+  "verification_scope": "current remote metadata, size, MD5 and SHA256 application provenance",
+  "artifacts": [
+    {
+      "relative_path": "docs/evidence/sft_optimization_cpu_audit.json",
+      "drive_file_id": "1xInZjCHAkTVCeMACWHGQjzlhiW3WI1mo",
+      "sha256": "da581849aa76156ab5d1b8bc8e5895067c7bae74558b0ca6428608c5722700e3",
+      "md5": "d6efb73cb1a7a457fd1b3b1f2af0fae4",
+      "size": 4871,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "docs/evidence/sft_optimization_benchmark_plan.json",
+      "drive_file_id": "1Xt8auzcC5Xmg91UOxiuO4Myr1KG0N6WR",
+      "sha256": "cbb80bafe94b3fdda77bb37c9eed42bb4ad00f9dcfb295e6d0d9df7054f8bdb5",
+      "md5": "9e75aab91eb0969eaca62ac869e1d41a",
+      "size": 20621,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "full_benchmark_plan.json",
+      "drive_file_id": "18Citk9kzOjULjuPMBzj81MA4Bj2ZwGJh",
+      "sha256": "f21d50b90071b7e494e5c82cf1fb8ed11e54029af824cc5858a1fcd2c3da1333",
+      "md5": "1baf8bbb4605e68ad1a8bd72de6a7d38",
+      "size": 525380,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "docs/sft_optimizations.md",
+      "drive_file_id": "1RTCZPrd4Q_T_ThGQJWeapygaUNXVekKn",
+      "sha256": "8bd5a67a0a177bdf9ff1b42a0074a211edf6ce10baa2de23347ec23518404ab0",
+      "md5": "d6e904c249bdb648e876b6189b506534",
+      "size": 10702,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "spec/experiment.pdf",
+      "drive_file_id": "1OegDI9SWeNpymu-MAX8a-lOc6O3maHYX",
+      "sha256": "7ec4d718f2bf4376a5fc2e0c1329b7d9a6d872b10a86485858baad4ee42f4ef3",
+      "md5": "01d4cbfcd534da55f4af8495a57ce6aa",
+      "size": 1296371,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "docs/decisions.md",
+      "drive_file_id": "1LCo-OhEL0YphziWPM7cZssk1uQizhTVd",
+      "sha256": "daa7095fe48346bb7bdf997fab55f511605516a5f9688850f3f62f5ef6158d3d",
+      "md5": "057b4fa9202ee90c91e935ade317e7c0",
+      "size": 14797,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "docs/sft_data_handoff.md",
+      "drive_file_id": "1GFXMVsbm0R2Iez4EB6kyyKIRSanUeC69",
+      "sha256": "8a46b3ffc36a0c409af6558076d3e9277c5e3a063952541e616ce2f76da9ae8a",
+      "md5": "3c81690145f93ae74bf9ea79536585ea",
+      "size": 7677,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "docs/procedure_update.md",
+      "drive_file_id": "1Nhtlw-_JpelgiTLEUShAevXKZkPqJHhJ",
+      "sha256": "7d58b1c93a7d9035e00db29be26cda189a8e4a6bc970f4cbff237f46681b8080",
+      "md5": "322ea64f30170c9f773cadd34ff8ccb5",
+      "size": 18249,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "docs/validation_report.md",
+      "drive_file_id": "1jeMRBufYQg4ekfp6R3xK4M7PmGynHdWG",
+      "sha256": "e6188550ac2a2a13a0cccb0372b848ad4e3c6852a400c09cfab74f87003aec88",
+      "md5": "9e6790c63ec0866ec1acc9355702ad0f",
+      "size": 41555,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "spec/protocol_page_updates.json",
+      "drive_file_id": "1zhbv2S81vTvPIYdF70_nFT6cU94K6fbs",
+      "sha256": "cc9f448c0e6861ba9d98c64dff250b9fe636092168d7757fb33553402c8ac4b8",
+      "md5": "635a7cb0da1e02bb00f7dca8bc97b1d8",
+      "size": 21364,
+      "status": "VERIFIED"
+    },
+    {
+      "relative_path": "spec/source_provenance.json",
+      "drive_file_id": "1lLM0SGu96RECfbwlGJyS7qILIqwDeBKy",
+      "sha256": "30d17789ef4b09f53cf36025dead482282e92884a353dc2ae576d9968dd5061b",
+      "md5": "cc6bee4107f770ad990376ce326d4545",
+      "size": 1320,
+      "status": "VERIFIED"
+    }
+  ]
+}
