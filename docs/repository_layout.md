@@ -164,6 +164,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       operations/
         artifacts.md
         assets.md
+        collection_inputs.md
         drive.md
         hardware.md
         reporting.md
@@ -204,6 +205,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         training.md
     operations/
       artifacts.md
+      collection_inputs.md
       environment.md
       google_drive.md
       jupyter_consent.md
@@ -247,6 +249,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     freeze_runtime_config.py
     manage_runpod.py
     refresh_dependency_locks.py
+    revalidate_collection_inputs.py
+    run_collection_until.py
     run_experiment.py
     run_preflight.py
     setup_environment.py
@@ -333,6 +337,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         operations/
           artifacts.mmd
           assets.mmd
+          collection_inputs.mmd
           drive.mmd
           hardware.mmd
           modular_execution.mmd
@@ -457,6 +462,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       __init__.py
       artifacts.py
       assets.py
+      collection_inputs.py
       drive.py
       hardware.py
       reporting.py
@@ -583,6 +589,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_experiment_overview.py
       operations/
         test_assets.py
+        test_collection_deadline.py
+        test_collection_input_revalidation.py
         test_consent_notebook.py
         test_drive.py
         test_operations.py
