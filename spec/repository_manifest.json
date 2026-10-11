@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 450,
+  "files": 451,
   "directories_including_root": 202,
   "entries": [
     {
@@ -2728,6 +2728,17 @@
       "display_path": "scripts/create_google_consent_notebook.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_33cb887cb01d59",
+      "blank": false
+    },
+    {
+      "path": "scripts/diagnose_statistical_coverage.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/diagnose_statistical_coverage.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d7098c4f513225",
       "blank": false
     },
     {

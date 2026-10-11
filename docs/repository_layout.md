@@ -258,6 +258,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     coordinate_vllm_sft_preparation.py
     coordinator_topology.py
     create_google_consent_notebook.py
+    diagnose_statistical_coverage.py
     freeze_runtime_config.py
     manage_runpod.py
     monitor_vllm_generation.py
