@@ -226,6 +226,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     repository_layout.md
     requirements.md
     runbook.md
+    sft_data_handoff.md
     source_map.md
     statistical_concentration_guard.md
     validation.md
@@ -261,6 +262,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     authorize_google_drive.py
     benchmark_vllm_generation.py
     build_protocol_pdf.py
+    certify_sft_handoff.py
     coordinate_verification_shard.py
     coordinate_vllm_sft_preparation.py
     coordinator_topology.py
@@ -535,6 +537,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             rollout_collection.py
       sft/
         __init__.py
+        data_handoff.py
         individual_fit/
           __init__.py
           sft_fit.py
@@ -657,6 +660,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         sft/
           individual_fit/
             test_sft_fit.py
+          test_data_handoff.py
           test_sft_training.py
         test_training.py
   tools/

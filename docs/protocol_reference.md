@@ -3002,14 +3002,15 @@ change both the text being transformed and the transformation strength. Paired p
 the base models’ own generated targets.
 E.2.3 Machine-readable configuration and exact artifact contracts
 54
-The Python utilities read a single config.yaml containing model names, intended immutable model and
-dataset revisions, generation settings, SFT/GRPO hyperparameters, opacity levels, evaluation sizes,
-storage root, and spending warnings. The implementation refuses certain inconsistent configurations (for
-example, a different accepted-training count, a missing ten-level grid, or an incorrect effective SFT batch).
-A cryptographic SHA-256 digest of canonicalized configuration or artifact contents is used for stable
-identity; a digest establishes that bytes agree with a recorded value, not that their scientific contents are
-correct. In production, all dataset, tokenizer, model, KaziText-profile and dependency revisions must also
-be pinned, since a version-agnostic model name is insufficient for exact reruns [1, 20].
+The resolved configuration pins model, tokenizer, dataset, intervention and dependency identities,
+generation and training settings, evaluation sizes and storage requirements. SHA-256 establishes
+agreement with recorded bytes, not scientific correctness. A later training implementation consumes the
+original corpus through an explicit producer-to-consumer handoff certificate: retain every original record
+configuration hash, verify the complete Drive-readback artifact bytes and all forty ordered train/validation
+conditions, and compare scientific settings with only code/dependency identities separated. Bind the
+certificate to actual consumer source files, native training lock and exact per-condition dataset hashes.
+Recheck it during scheduling and before fitting; checkpoints retain both identities. This certificate does not
+replace baseline repeatability or launch gates [1, 20].
 The SFT corpus engine has a separate environment: vLLM 0.11.0, Transformers 4.57.3 and Torch
 2.8.0+cu128; the native Torch 2.9 training lock does not describe it. Save actual package inventories and
 hashes per model. Backend settings are BF16, max_model_len=4096, max_num_seqs=128,

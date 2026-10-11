@@ -84,6 +84,8 @@ class SFTFitSpec:
     tokenizer_revision: str
     configuration_hash: str
     dataset_hash: str
+    producer_configuration_hash: str | None = None
+    handoff_certificate_hash: str | None = None
 
     def __post_init__(self) -> None:
         if self.family not in LEVELS or self.model_id not in MODELS or type(self.level) is not int or not 1 <= self.level <= 10:
@@ -92,6 +94,11 @@ class SFTFitSpec:
             value = getattr(self, key)
             if len(value) != 40 or any(c not in "0123456789abcdef" for c in value):
                 raise SFTInputError(f"{key} must be an immutable model commit SHA")
+        if bool(self.producer_configuration_hash) != bool(self.handoff_certificate_hash):
+            raise SFTInputError("Producer identity requires a handoff certificate")
+        for value in (self.producer_configuration_hash, self.handoff_certificate_hash):
+            if value is not None and (len(value) != 64 or any(c not in "0123456789abcdef" for c in value)):
+                raise SFTInputError("Invalid producer/handoff digest")
         for key in ("configuration_hash", "dataset_hash"):
             value = getattr(self, key)
             if len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
@@ -116,7 +123,7 @@ class SFTFitSpec:
 
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> "SFTFitSpec":
-        return cls(**{field: value[field] for field in cls.__dataclass_fields__})
+        return cls(**{field: value[field] for field in cls.__dataclass_fields__ if field in value})
 
 
 def _hash(value: Any) -> str:
@@ -152,7 +159,7 @@ def validate_datasets(spec: SFTFitSpec, train_records: Sequence[Mapping[str, Any
                 raise SFTInputError("Frozen prompt content hash mismatch")
             if (record.get("model_revision"), record.get("tokenizer_revision")) != (spec.model_revision, spec.tokenizer_revision):
                 raise SFTInputError("SFT source model/tokenizer revision mismatch")
-            if record.get("config_hash") != spec.configuration_hash:
+            if record.get("config_hash") != (spec.producer_configuration_hash or spec.configuration_hash):
                 raise SFTInputError("SFT source configuration mismatch")
             if record.get("seed") != 42:
                 raise SFTInputError("Transformation seed mismatch")
@@ -323,7 +330,8 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
                             examples: Sequence[Mapping[str, Any]], pad_token_id: int,
                             *, progress: Mapping[str, Any] | None = None,
                             save: Callable[[dict[str, Any]], None] | None = None,
-                            should_pause: Callable[[], bool] | None = None) -> dict[str, Any]:
+                            should_pause: Callable[[], bool] | None = None,
+                handoff_certificate: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Real optimizer loop, shared by GPU production and tiny CPU fixtures.
 
     Pause happens only after one complete logical optimizer update. Exceptions
@@ -591,6 +599,9 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
     if not preflight_report or preflight_report.get("configuration_hash") != spec.configuration_hash:
         raise SFTRuntimeBlocked("Matching real preflight report is required")
     require_preflights(dict(preflight_report), ["model_runtime", "clean_data", "loss_mask_gradients", "full_checkpoint_resume", "durable_storage", "spending_authorization", "baseline_repeatability", "statistical_validation"])
+    if spec.producer_configuration_hash:
+        from training.sft.data_handoff import validate_handoff
+        validate_handoff(handoff_certificate, config, spec)
     data_evidence = validate_datasets(spec, train_records, validation_records)
     identity = {**spec.identity(), "code_revision": config.get("runtime", {}).get("implementation_revision"),
                 "dependency_hash": config.get("runtime", {}).get("dependency_lock_hash")}

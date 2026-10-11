@@ -10,7 +10,7 @@ from .individual_fit.sft_fit import (
 )
 
 
-def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, Any]], *, handoff_certificate=None) -> list[dict[str, Any]]:
     """Bind every verified condition exactly once to its untouched immutable base.
 
     Datasets contain train_path/validation_path JSONL and optionally already
@@ -19,6 +19,11 @@ def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, An
     """
     from shared_procedures.configuration import configuration_hash
     config_hash = configuration_hash(dict(config))
+    producer_hash = config_hash
+    if handoff_certificate is not None:
+        from .data_handoff import validate_handoff
+        validate_handoff(handoff_certificate, config)
+        producer_hash = handoff_certificate["producer_configuration_hash"]
     if len(datasets) != 40:
         raise SFTInputError("The SFT worklist requires all forty verified datasets")
     conditions: dict[tuple[str, str, int], Mapping[str, Any]] = {}
@@ -30,7 +35,7 @@ def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, An
         key = (bundle.get("family"), bundle.get("model_id"), bundle.get("level"))
         if key in conditions or key[0] not in LEVELS or key[1] not in MODELS or type(key[2]) is not int or not 1 <= key[2] <= 10:
             raise SFTInputError("Duplicate or unknown dataset condition")
-        if bundle.get("status") not in ("verified", "complete") or bundle.get("config_hash", bundle.get("configuration_hash")) != config_hash:
+        if bundle.get("status") not in ("verified", "complete") or bundle.get("config_hash", bundle.get("configuration_hash")) != producer_hash:
             raise SFTInputError("Dataset bundle is unverified or has changed configuration")
         train, validation = load_dataset_bundle(bundle)
         model_config = config["models"][key[1]]
@@ -38,6 +43,11 @@ def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, An
             raise SFTInputError("Construction model substitution is forbidden")
         spec = SFTFitSpec(key[0], key[1], key[2], model_config["revision"],
                           model_config["tokenizer_revision"], config_hash, dataset_hash(train, validation))
+        if handoff_certificate is not None:
+            from dataclasses import replace
+            spec = replace(spec, producer_configuration_hash=producer_hash,
+                           handoff_certificate_hash=handoff_certificate["certificate_hash"])
+            validate_handoff(handoff_certificate, config, spec)
         validate_datasets(spec, train, validation)
         source = {record["example_id"]: (record["prompt"], record["clean_trace_hash"], record["final_answer"])
                   for record in [*train, *validation]}
@@ -96,7 +106,8 @@ def run_family_queue(family: str, worklist: Sequence[Mapping[str, Any]], output_
                      config: Mapping[str, Any], *, preflight_report: Mapping[str, Any] | None = None,
                      fit_runner: Callable[..., dict[str, Any]] = run_sft_fit,
                      release_gpu: Callable[[str], None] | None = None,
-                     should_pause: Callable[[], bool] | None = None) -> dict[str, Any]:
+                     should_pause: Callable[[], bool] | None = None,
+                     handoff_certificate=None) -> dict[str, Any]:
     """Sequential queue: a failed fit stops only its own family.
 
     A custom runner is an explicit dependency-injection boundary for declared
@@ -122,8 +133,9 @@ def run_family_queue(family: str, worklist: Sequence[Mapping[str, Any]], output_
             output = Path(output_root) / family / spec.model_id / f"level_{spec.level:02d}"
             train, validation = load_dataset_bundle(task["dataset"])
             try:
+                handoff_args = {"handoff_certificate": handoff_certificate} if handoff_certificate is not None else {}
                 result = fit_runner(spec, train, validation, output, config,
-                                    preflight_report=preflight_report, should_pause=should_pause)
+                                    preflight_report=preflight_report, should_pause=should_pause, **handoff_args)
                 if result.get("status") == "paused":
                     outcomes.append(result)
                     status = "paused"

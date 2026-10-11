@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 459,
+  "files": 463,
   "directories_including_root": 202,
   "entries": [
     {
@@ -2382,6 +2382,17 @@
       "blank": false
     },
     {
+      "path": "docs/sft_data_handoff.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/sft_data_handoff.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_ecdcb9a3a86066",
+      "blank": false
+    },
+    {
       "kind": "documentation",
       "owner": "coordinator",
       "source": "PDF H.9 and Mermaid reuse/handoffs; requested repository responsibility assignments",
@@ -2761,6 +2772,17 @@
       "display_path": "scripts/build_protocol_pdf.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_b883603a139fb0",
+      "blank": false
+    },
+    {
+      "path": "scripts/certify_sft_handoff.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/certify_sft_handoff.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_2a2c7ae36f8de7",
       "blank": false
     },
     {
@@ -5701,6 +5723,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/data_handoff.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/data_handoff.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_778c8e7e5819d4",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -6999,6 +7032,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/unit_tests_layout.mmd",
       "node": "p_83bf7f7d220e95",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_data_handoff.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_data_handoff.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_73d74fd82a388f",
       "blank": false
     },
     {
