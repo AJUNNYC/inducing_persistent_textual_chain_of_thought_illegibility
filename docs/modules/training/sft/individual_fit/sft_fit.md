@@ -1,6 +1,6 @@
 # sft_fit.md
 
-**Owner:** `sft`. **Implementation status:** original H100 execution remains paused at step 214. Actual source fd23db9 Blackwell measurements rejected both candidate technical screens; neither is activated. Production migration remains separate.
+**Owner:** `sft`. **Implementation status:** source `05f42b0` has accepted no-recomputation evidence and READY affected-runtime controls for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB. Original H100 state remains preserved at step 214; the continuation worker launched from inherited step 214 with verified Drive child state. CUDA input caching and earlier fd23db9 candidates remain rejected.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -19,7 +19,7 @@
 |---|---|
 | Objective | Completion-only SFT on full assistant target: transformed reasoning plus unchanged final answer |
 | Quantization | 4-bit NF4 with double quantization |
-| Compute | BF16; gradient checkpointing enabled |
+| Compute | BF16; original activation-checkpointing default enabled; an accepted explicit execution profile may override recomputation |
 | LoRA | rank 8, scaling alpha 16, dropout 0.05 |
 | Projection targets | `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` |
 | Embeddings/LM head | frozen |
@@ -50,9 +50,13 @@ Use the common [artifact contracts](../../../../contracts.md), [frozen prompt in
 
 ## Implemented interface and evidence
 
+Source `05f42b0` adds `cache_collated_inputs` and `gradient_checkpointing` execution controls, defaulting to false and true respectively. The protocol describes checkpointing as a memory-saving execution setting. Identical base freezing, FP32 parameter preparation and LoRA setup precede an explicit no-recomputation override. Immutable CUDA caching retains exact IDs, masks, labels and microbatch shapes with mutation guards, but failed the speed gate and remains disabled. The actual two-repetition step-214 recovery screen accepted only no recomputation for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB: 1.2695x and 1.2806x median throughput ratios, with bitwise loss, gradient, update, final adapter/optimizer/scheduler and RNG agreement. The 3,190-token worst-case probe used 89.13 GiB reserved memory, so this approval is not portable to other conditions. Source/GPU/condition-bound launch evidence and explicit parent-preserving lineage remain required. Learning rate, exposure, dropout, loss weighting and Drive checkpoint cadence stay fixed.
+
+`runtime_migration.py` verifies immutable scientific fields and parent checkpoint bytes, creates separate child provenance and inherits full optimizer/scheduler/sampler/RNG progress. It does not relabel the original checkpoint as an exact new-source resume. The official parent is read-only during paired recovery measurements and migration.
+
 `SFTExecutionProfile` separates explicit execution candidates from the frozen `SFTRecipe`. Baseline remains eager attention with original checks. The redundant-check candidate validates supervised counts on CPU with tensor identity/mutation guards and checks all detached microbatch losses once before clipping or updating. Its CE/reduction/update order and RNG are unchanged on bitwise CPU comparisons. `one_optimizer_update` is shared by the real loop and isolated benchmark; resume progress rejects a different execution profile. The [actual Blackwell comparison](../../../../evidence/sft_optimization_pro6000_benchmark.json) retained bitwise losses, gradients, adapter updates and final RNG for deferred checks, but its 1.0020x speed ratio failed the 5% screen. SDPA was 0.9937x and failed the numerical screen; the selected kernel was not independently observed. Neither candidate is activated. See [precedent and empirical limits](../../../../sft_optimizations.md). A short fresh-state benchmark and the old H100 receipt do not approve a production checkpoint migration.
 
-`SFTFitSpec(family, model_id, level, model_revision, tokenizer_revision, configuration_hash, dataset_hash)` freezes an exact fit. `run_sft_fit(spec, train_records, validation_records, output_dir, config, *, resume=None, preflight_report=None, should_pause=None)` runs the actual Transformers/PEFT/BitsAndBytes engine. `verify_fit_result(output_dir, expected_identity)` reopens the final checkpoint and verifies adapter tensors against it. Heavy GPU imports occur only in the actual engine.
+`SFTFitSpec(family, model_id, level, model_revision, tokenizer_revision, configuration_hash, dataset_hash)` freezes an exact fit. `run_sft_fit(spec, train_records, validation_records, output_dir, config, *, resume=None, preflight_report=None, should_pause=None, handoff_certificate=None, execution_profile=None, execution_benchmark=None)` runs the actual Transformers/PEFT/BitsAndBytes engine. `verify_fit_result(output_dir, expected_identity)` reopens the final checkpoint and verifies adapter tensors against it. Heavy GPU imports occur only in the actual engine.
 
 `render_sft_completion(prompt, completion, tokenizer)` is the shared training renderer used by source length validation and fitting. Both official R1 tokenizer templates remove historical assistant reasoning before `</think>`; this renderer obtains their native role/end wrappers with a sentinel and inserts the complete target without a system message. Native evaluation generation retains the published template. The prospective H.9 convention is `native_training_template_v1`; reduction is the supervised-token mean per example, then the mean across examples. Continuous accumulation across the two seeded epoch permutations gives exactly 20,000 presentations and 1,250 optimizer updates. The 3% warmup rounds upward to 38 updates.
 
@@ -108,12 +112,17 @@ title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 flowchart TD
 %% Individual SFT fit
 %% Edit quoted node labels directly; this is native Mermaid.
+%% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
+%% CUDA input caching failed speed; other conditions retain the original execution defaults.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
 %% Individual SFT fit
 %% No warm-start from another level; only an exact-fit full checkpoint may resume training.
 %% SFT setup and resumption
-%% NF4 double quantization, BF16, gradient checkpointing.
+%% NF4 double quantization, BF16; original activation-checkpointing default is enabled.
+%% A measured explicit profile may override activation recomputation after identical PEFT preparation.
+%% Immutable CUDA input caching preserves per-example tensors, sampler order and microbatch shapes.
+%% Source/hardware/profile migration preserves parent full state and writes separate verified lineage.
 %% LoRA rank 8 / alpha 16 / dropout .05; attention and MLP targets.
 %% LR 2e-4; paged AdamW32; cosine schedule; warmup 3%; weight decay 0.
 %% Microbatch 1; gradient accumulation 16; effective batch 16; max length 4096; seed 42.
@@ -150,10 +159,14 @@ flowchart TD
     AUDIT -->|Known artifact repair| FINAL
     RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover verified state before resuming"]
     STOP["Stop fit and preserve partial results"]
-    PROFILE["Bind explicit execution profile and source<br/>Baseline eager remains default"]
-    MEASURE["Candidates require precedent and empirical evidence<br/>Target-GPU timing, gradients, updates and RNG"]
+    PROFILE["Bind explicit profile, source and condition<br/>Eager attention; baseline recomputation default"]
+    MEASURE["Freeze prospective paired target-GPU screen<br/>Losses, gradients, updates, speed and RNG"]
+    ACCEPT{"Source / GPU / condition evidence passes?"}
+    MIGRATE["If continuing: preserve parent checkpoint<br/>Inherit full state and publish child lineage"]
     INPUT --> PROFILE --> SETUP --> DONE
-    PROFILE -.->|New source or hardware| MEASURE --> PROFILE
+    PROFILE -.->|Candidate or migration| MEASURE --> ACCEPT
+    ACCEPT -->|Yes| MIGRATE --> SETUP
+    ACCEPT -->|No| STOP
     DONE -->|Yes| FINAL
     SETUP -.->|Failure| RECOVER
     STEP -.->|Failure| RECOVER

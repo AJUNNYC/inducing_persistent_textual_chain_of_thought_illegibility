@@ -115,7 +115,12 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_optimization_cpu_audit.json
       sft_optimization_drive_index.json
       sft_optimization_pro6000_benchmark.json
+      sft_optimization_pro6000_checkpoint_recovery.json
       sft_optimization_pro6000_drive_index.json
+      sft_optimization_pro6000_readiness.json
+      sft_optimization_pro6000_recovery_drive_index.json
+      sft_optimization_pro6000_selected_profile.json
+      sft_optimization_pro6000_training_resume.json
       sft_runtime_checks_report.json
       sft_training_launch.json
       sft_training_launch_drive.json

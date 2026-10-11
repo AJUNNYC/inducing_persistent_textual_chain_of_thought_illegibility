@@ -1598,9 +1598,6 @@ sistent with QLoRA-scale train-
 ing practice [43].
 Microbatch / accumulation
 1 / 16
-Fixed memory/concurrency pol-
-icy; hardware feasibility not yet
-benchmarked.
 Maximum sequence length
 4,096 tokens
 Fixed context/memory budget;
@@ -1613,9 +1610,6 @@ Maximum gradient norm
 0.3
 Practical QLoRA precedent [43].
 Gradient checkpointing
-Enabled
-Memory-saving execution setting,
-not a behavioral intervention.
 Seed
 42
 Predeclared reproducibility con-
@@ -1646,6 +1640,13 @@ tokens or examples, but must fix and log the reduction rule. Both training arms 
 entire assistant target, not just on the altered words; prompt tokens receive no loss. This is standard
 completion-only SFT rather than free-generation-and-grading [44].
 29
+Enabled by default;
+profile override
+Memory saving only; override
+requires measured evidence.
+Fixed physical-batch policy;
+capacity evidence required
+for each condition.
 ```
 
 ## page_030
@@ -3005,13 +3006,13 @@ E.2.3 Machine-readable configuration and exact artifact contracts
 Freeze model, tokenizer, dataset, intervention, source and dependency identities. SHA-256 checks agreement with recorded bytes,
 not scientific correctness. The forty-condition SFT handoff retains producer hashes and verifies ordered records against Drive. Paused
 consumer 773cfd3 passed thirteen launch gates and actual H100 validation; those receipts keep their original scope.
-Execution candidates follow precedent and least-result-impact ordering. Current source fd23db9 was recertified against the
-unchanged forty-condition handoff. On RTX PRO 6000 Blackwell 96GB, baseline, deferred checks and SDPA each completed one
-warmup and two measured updates. Median seconds were 11.899, 11.875 and 11.974. Deferred checks preserved bitwise losses,
-gradients, adapter updates and RNG but missed the preset speed threshold. SDPA failed numerical and speed bounds. Neither
-candidate is approved; baseline eager remains default. Short timings do not establish full-fit duration or final-result equivalence.
-Preserve paused step 214 under its old identity; any hardware/profile migration remains explicit. The frozen data and recipe stay
-unchanged.
+Execution candidates follow precedent and least-result-impact ordering. Historical fd23db9 rejected deferred checks and SDPA.
+Source 05f42b0 restored step 214 for two paired repetitions of one warmup plus five measured updates on RTX PRO 6000 Blackwell
+96GB. Cache matched bitwise state but failed speed. No recomputation passed: 1.2695x/1.2806x median throughput, bitwise losses,
+gradients, adapter/optimizer/scheduler and RNG. Accepted-profile and READY controls bind only 7B ROT13 level 1. Eager attention
+and scientific settings stay fixed. The 3190-token probe reserved 89.13 GiB. Continuation launched with inherited full state and verified
+Drive child checkpoint; parent bytes remain unchanged. Other levels and 14B are not approved. Short timings do not establish
+final-result equivalence or full-fit duration.
 Generation uses vLLM 0.11.0, Transformers 4.57.3, Torch 2.8+cu128 separately from native Torch 2.9 training. Save actual
 inventories. BF16 context 4096, sequences 128, scheduler 8192, GPU fraction 0.9, no prefix caching; every response keeps 3072
 new tokens. Producer dc520cb and configuration 3757493e stay frozen.
@@ -3210,20 +3211,20 @@ changes and intervention artifacts; the audit is intended to protect that infere
 manufacture a stronger scientific result [41, 54, 59].
 58
 Current execution status (11 October 2026). Licensed LMSYS acquisition and the one-million-row audit are verified; 407,214
-eligible candidates are frozen. The 1,233-item capability panel, nested 200-item legibility subset and shared 800-question RL
-manifest are backed up. Fresh vLLM generation/refills yielded 10,100 accepted pairs and 1,539 rejections from 11,639 IDs. All
-40 transformed conditions (404,000 records) and their download index are Drive-verified.
-Validation evidence. Independent CPU-only Drive readback verified all 122 artifacts without a Pod. Both models passed all
-four unchanged repeatability gates after final-field rescoring of 7,398 saved outputs; no response was regenerated. All thirteen
-launch gates and actual H100 launch validation passed for frozen consumer 773cfd3. The first 7B ROT13 fit passed actual
-gradients and paused at optimizer step 214 of 1,250; full recovery state is verified in Drive.
-Optimization status. Least-result-impact candidates were measured on RTX PRO 6000 Blackwell 96GB under recertified
-source fd23db9, native Torch 2.9/CUDA 12.8 and the frozen recipe. Each profile used one warmup and two measured
-updates. Baseline, deferred checks and SDPA medians were 11.899, 11.875 and 11.974 seconds. Deferred checks preserved
-bitwise loss/gradient/update/RNG equality but failed the preset speed screen; SDPA failed numerical and speed bounds.
-Neither is approved. Actual reports are Drive-verified; the first cache-lock attempt is separately preserved. Baseline eager and
-paused step 214 remain unchanged. Short measurements do not establish final-result equivalence, a full-fit ETA or checkpoint
-migration. Compatible completed evidence remains reusable. Training completion and full legibility judging are pending.
+eligible candidates are frozen. The capability panel, nested legibility subset and shared 800-question RL manifest are backed
+up. Fresh vLLM generation/refills yielded 10,100 accepted pairs and 1539 rejections from 11,639 IDs. All 40 transformed
+conditions (404,000 records) and their download index are Drive-verified.
+Validation evidence. Independent CPU-only Drive readback verified all 122 artifacts. Both models passed all four unchanged
+repeatability gates after rescoring 7398 saved outputs; no response was regenerated. Original consumer 773cfd3 passed
+thirteen launch gates and actual H100 validation. Its step 214 of 1250 full recovery state remains preserved.
+Optimization status. Source 05f42b0 passed 69 focused checks and paired step-214 recovery measurements on RTX PRO
+6000 Blackwell 96GB. Each of two repetitions used one warmup plus five measured updates per profile. Cache matched
+bitwise state but failed speed. Disabling recomputation passed: median throughput ratios 1.2695x and 1.2806x (about 21-22%
+less update time), identical losses, gradients, adapter, optimizer, scheduler and RNG. Accepted evidence and READY runtime
+controls authorize only 7B ROT13 level 1; eager attention and scientific settings remain fixed. The 3190-token probe reserved
+89.13 GiB. Reports and launch inputs are Drive-verified. The continuation worker launched from inherited step 214 with a
+verified child checkpoint and separate lineage; original parent bytes remain unchanged. Full-suite, matrix and statistical checks
+were not repeated. Historical failures remain archived; final training and full evaluation remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3715,12 +3716,12 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status (11 October 2026). The fresh vLLM corpus and forty transformed conditions are Drive-verified; both
-models passed all four baseline gates. Consumer 773cfd3 passed thirteen launch gates; its first fit remains
-paused at step 214 with full Drive recovery. Recertified source fd23db9 measured baseline, deferred checks
-and SDPA on RTX PRO 6000 Blackwell 96GB. Deferred checks matched exact results but missed speed
-bounds; SDPA failed numerical and speed bounds. Neither is approved. Baseline eager remains default.
-Reports are saved to Drive. Training completion and full evaluation remain pending.
+Status (11 October 2026). Fresh vLLM data and all 40 conditions are Drive-verified; both models passed
+baseline gates. Parent consumer 773cfd3 is preserved at step 214. Source 05f42b0 paired recovery accepted
+disabling recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB: 1.2695x/1.2806x
+median throughput, bitwise numerical/state/RNG agreement. Cache failed speed. READY controls bind the
+selected condition. Its continuation worker launched from inherited step 214 with verified Drive child state;
+parent bytes remain unchanged. Training completion and full evaluation remain pending.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in

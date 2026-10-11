@@ -1,6 +1,8 @@
 # sft_training.md
 
-**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass; first 7B ROT13 fit remains paused at step 214 with verified Drive recovery. Actual Blackwell comparisons rejected both faster-execution candidates; the forty-fit study and production migration remain incomplete.
+**Owner:** `sft`. **Implementation status:** full-count queue fixtures pass. The source 05f42b0 continuation runs 7B ROT13 level 1 from inherited step 214 on RTX PRO 6000 Blackwell 96GB, with accepted no-recomputation evidence and Drive-verified child state. Parent bytes remain preserved; the forty-fit study is incomplete.
+
+Source `05f42b0` has accepted no-recomputation evidence and READY affected-runtime controls for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB; the continuation worker launched from inherited step 214 with verified Drive child state. CUDA input caching failed the speed gate and remains disabled. Activation evidence is scoped to this model/family/level. Explicit continuation lineage inherits full step-214 state while preserving parent bytes; a passing first-fit screen does not authorize the entire forty-fit matrix.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -15,7 +17,7 @@
 
 Create two independent family queues, one for ROT13 and one for KaziText, each covering both models at ten fixed levels: twenty independent fits per queue and forty total. Both call the same `sft_fit` implementation. Every level initializes from its untouched base; a previous level is not a warm start. Only an exact-fit matching full checkpoint may resume a fit.
 
-Each queue runs its fits sequentially on its assigned GPU. With the currently available single GPU, the certified launcher selects 7B ROT13 first and runs its ten levels sequentially; the full forty-fit matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
+Each queue runs its fits sequentially on its assigned GPU. The launcher can serialize selected levels on one GPU. The current source 05f42b0 acceptance selects only 7B ROT13 level 1; remaining levels require their condition-specific affected evidence before activation. The full forty-fit scientific matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
 
 ## Interfaces and dependent procedures
 
@@ -46,7 +48,7 @@ The following source comments retain the procedural detail of the supplied diagr
 
 Implement and test `src/training/sft/sft_training.py` against its specified behavior in `tests/unit/training/sft/test_sft_training.py`. Validate every emitted artifact and preserve its source/configuration identity. Do not claim completeness from a placeholder or passing import. Propagate required child failures and maintain ordinary model outcomes separately from infrastructure faults. Mandatory real preflights and permission gates remain in force. Unspecified allowed conventions must be documented/frozen before outcomes; new scientific choices are not silently authorized.
 
-The [certified launch handoff](../../../sft_data_handoff.md) binds the original producer to consumer `773cfd3`, whose first fit is paused at step 214. The [source fd23db9 Blackwell comparison](../../../evidence/sft_optimization_pro6000_benchmark.json) used isolated fresh adapters and rejected both candidate technical screens; production still defaults to baseline. It does not authorize checkpoint migration or complete a scientific fit. Current source certification and affected production controls remain required, while compatible upstream evidence remains reusable. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
+The [certified launch handoff](../../../sft_data_handoff.md) retains original consumer `773cfd3` and its parent checkpoint at step 214. The historical [fd23db9 comparison](../../../evidence/sft_optimization_pro6000_benchmark.json) rejected deferred checks and SDPA. The later [paired recovery screen](../../../evidence/sft_optimization_pro6000_checkpoint_recovery.json), [accepted profile](../../../evidence/sft_optimization_pro6000_selected_profile.json) and [READY controls](../../../evidence/sft_optimization_pro6000_readiness.json) authorize only the current 7B ROT13 level-1 continuation; other conditions retain original execution defaults. Compatible upstream evidence is reused explicitly. Full checkpoints and final payloads are Drive-verified. Trained adapter measurements explicitly reuse the frozen vLLM protocol.
 
 ## Exact path-synchronized diagram
 
@@ -59,12 +61,16 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 flowchart TD
 %% SFT training schedule
 %% Edit quoted node labels directly; this is native Mermaid source.
+%% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
+%% CUDA input caching failed speed; other conditions retain the original execution defaults.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
 %% Within each queue, select the next unfinished fit until all 20 are verified.
 %% Current certified launcher serializes selected model/levels on one GPU.
 %% Whole optimizer updates and full checkpoints must pass verified Drive barriers.
 %% Later adapter evaluation explicitly reuses the frozen vLLM measurement contract.
+%% Accepted execution evidence is scoped to one model/family/level; do not release the whole matrix from one screen.
+%% Migration inherits verified full-state progress and preserves parent checkpoint bytes.
 %% A failed fit stops that queue and yields a partial report; the other queue may finish valid work.
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
@@ -80,7 +86,7 @@ flowchart TD
     KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
     WAIT["Wait for both verified queues"]
     OUT["Release all 40 final adapters"]
-    BENCH["New source or hardware: measure explicit candidates<br/>Least effect on results first; baseline stays default"]
+    BENCH["New source or hardware: paired candidate measurements<br/>Condition-scoped acceptance and full-state lineage"]
     INPUT --> CERT --> GATES --> PLAN
     CERT -.->|Migration| BENCH --> GATES
     PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT

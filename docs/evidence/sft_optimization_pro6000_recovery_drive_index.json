@@ -1,0 +1,176 @@
+{
+  "status": "VERIFIED",
+  "source_commit": "05f42b00b0bbac030e9393f4806430956bfff526",
+  "configuration_hash": "691e0bf9d24a5f222caa9be082d376dfbffb443ca02223874d2aa758169c5c77",
+  "folder_id": "1MPZAIU9kj53i3uzFxhXG35OCtdMXuiYj",
+  "artifacts": [
+    {
+      "path": "sft_execution_configuration_05f42b0.json",
+      "drive_file_id": "1datxqCvnJMdho0y9Ds0pnUCXqU4E0QoK",
+      "sha256": "d8e41ad366c4bb19bd60609893d8a8b2be8325b149e4e6bd2b918190e9e76115",
+      "size": 15869,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "sft_execution_source_05f42b0.tar.gz",
+      "drive_file_id": "19l_MgEkJ_n4aRPcupI341eX6xRmajdmX",
+      "sha256": "37f77a54a6b9a11d8c1b514ded638f609f51daec318d5494511b8d7cd23a4236",
+      "size": 3824873,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "handoff/certificate.json",
+      "drive_file_id": "1m1stHyC5tgPu-056Bx8UDD3fCFR1Iy2J",
+      "sha256": "838520e57efb487eb058d3f94d0ad0fd85d54ca303a718715ac023c980a1c08e",
+      "size": 55019,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "handoff/worklist.json",
+      "drive_file_id": "1-LeIgcdeIx2OjVK7BEUKbq2bcG4XVmTQ",
+      "sha256": "29a21652f7438ba35bc4d64692cf4e3401a09db29717bdccfdee9851776a9722",
+      "size": 16655344,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/cuda_input_cache_repeat_01_baseline.json",
+      "drive_file_id": "1NpsGkLRBJiYIPoaLsZ0J7hq8x7F0CIhz",
+      "sha256": "64686e2055654042467dc4ec6dd5ca7318594b4d2f6dfc331f81898bddd1b333",
+      "size": 54644,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/cuda_input_cache_repeat_01_cuda_input_cache.json",
+      "drive_file_id": "1XvlNlgSNuMfzMAEazL_ML-2nhyn0m5CK",
+      "sha256": "e0809fd1c3aac1317bb67e26b1c21a7ac714f956285db0f41deb1eb641fc1c9c",
+      "size": 54666,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/cuda_input_cache_repeat_02_baseline.json",
+      "drive_file_id": "1kfhUET-jjmTuIP_hWnypEsknbsDIKKj6",
+      "sha256": "4baea393fbcddbe527fae2bd08ca4d1f272f222a60e526866f793cf300a24363",
+      "size": 54641,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/cuda_input_cache_repeat_02_cuda_input_cache.json",
+      "drive_file_id": "1UTrqF4LizjBhRyneU53j23oeE6X43jRz",
+      "sha256": "443433a59b86614e6f9b7107ece12b1217daf4586a2a0cff890c8e04f8b9701b",
+      "size": 54672,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/no_gradient_checkpointing_repeat_01_baseline.json",
+      "drive_file_id": "1eTNt0cVrcRv45lKiLOlnGHwgMZMPFwUl",
+      "sha256": "0c92a4f97a28e7739dd37ddd12bc05838259adc2b4bd68c84bb8ff41d26dfb8b",
+      "size": 54648,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/no_gradient_checkpointing_repeat_01_no_gradient_checkpointing.json",
+      "drive_file_id": "1Gp6d-QdDppJoqT56ciMUhaWkZIBpIHVF",
+      "sha256": "50c8a7e12eb5071c4c7c483727647410fe200c01df54dc270dc9cb048ea94f94",
+      "size": 54660,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/no_gradient_checkpointing_repeat_02_baseline.json",
+      "drive_file_id": "1c0AKHEDz6ZbcPDYUrfQvBgpiu706xYvK",
+      "sha256": "466c05eab8aa540775d66d1162f683830f98ee7840c1364bc2b4d16b743f1c47",
+      "size": 54643,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/no_gradient_checkpointing_repeat_02_no_gradient_checkpointing.json",
+      "drive_file_id": "1WzNZNXK_agZ5NZ5VT8PFdFIS_FQr-VSh",
+      "sha256": "c84e43658f548287f5dd080741437f3ca22ec16db22fa21736e05d58e75df24c",
+      "size": 54659,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/plan.json",
+      "drive_file_id": "17FTIbzYknCucemQHjnkGGf0LgkHncWps",
+      "sha256": "ac7bdb1aaffb021307daf517b5e64d2d810dbc2ec803d05101556a872ef3fe0b",
+      "size": 531657,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "gpu_benchmark_01/report.json",
+      "drive_file_id": "1c8A3vJqRtiORfH9EvN7A7gUYVUec4n4x",
+      "sha256": "e2620b99e61d1a7ee68fe5a19966c2bb2219b0065af264618e6d9b8f6274e41a",
+      "size": 1732273,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/measurement_protocol.json",
+      "drive_file_id": "1g0NXGBBLsCqwbf5fj0MXkZydeNy7OYYQ",
+      "sha256": "fad80060932d5e0d8edfb398f41ce0499dca7343fe0f7f1b2c0298476b2bf5ff",
+      "size": 4988050,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/migrated_checkpoint_000214_manifest.json",
+      "drive_file_id": "1z4lvpTFc8rcwQfGPwVMGdApGSigBJUg6",
+      "sha256": "ff07f84cb4a46336290e5c5a8abd0a5d397d1ccae65ced3e48d3d5c5c48121bf",
+      "size": 2377,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/preflight/report.json",
+      "drive_file_id": "1RUQnY4Mz6qSx_aLjH4s19bzR96MhAkMI",
+      "sha256": "7dfeadc801373296efdbd0579da54a390446676de0cf9a08d7ce5d857ba524b2",
+      "size": 48392,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/readiness_receipt.json",
+      "drive_file_id": "17KvyvBpRMJk3TroIAKOsyo58VXdZndEw",
+      "sha256": "8450dc5976b46be724a96e8331645b44d4a8a4c51cfe3aaa6e293b449db7140b",
+      "size": 13023,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/run_identity.json",
+      "drive_file_id": "1xlhQ9clfd_ufyp_JZ7N8nh1mMmr_B7Ks",
+      "sha256": "6fabb09f9d76e6759d531faaa0ec486c4b4d9a8807c4e33e86418d1f4b063dc3",
+      "size": 1621,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/runtime_evidence.json",
+      "drive_file_id": "1ef_X_GZD8mviQTF5UIBg4ucXFyc9NdRV",
+      "sha256": "0dec0ea8ee304dcb6a88adde1cdc20ce9d4da4691b7d741bb4316537cfb5324c",
+      "size": 34390,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/runtime_migration.json",
+      "drive_file_id": "1YW_Gp0sbla8MmcpTmPpOe6qtxw-9MXBO",
+      "sha256": "45a3b08dad524ffb3bf0d41cd4a633ff82685018f680237d2ae2d90c57435743",
+      "size": 9284,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/selected_profile.json",
+      "drive_file_id": "1knQxB1H5knaw8PADzsshXjsuYaGdIyvf",
+      "sha256": "e9d9e7ce9748376de0bf8ae915cf8e7aaaa5e0a4844b323e59f077fd29eff825",
+      "size": 10043,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/training_resume.json",
+      "drive_file_id": "1Dv4BDyTKjYyPV2le7lBtckLnJTQ44OBn",
+      "sha256": "862b0652273c6567593d4d38671263b1e7ae28e0716b667d3b9db3bbb18e2ffe",
+      "size": 4592,
+      "status": "VERIFIED"
+    },
+    {
+      "path": "launch/training_worker_launch.json",
+      "drive_file_id": "1ufpKlenQiGqEdDrt6ASaB2AFUHT4vij5",
+      "sha256": "8ea0ef05b08625707177b7150d81ca46d0687dacca70f717ce12a45f0c5f1822",
+      "size": 255,
+      "status": "VERIFIED"
+    }
+  ]
+}

@@ -3,25 +3,30 @@
 The decision rule is to change execution in order of least expected effect on the
 trained result, require established precedent, and measure correctness and speed
 on the intended GPU before enabling a candidate in production. The current
-production default remains eager attention with the original loss checks. An
-isolated comparison on RTX PRO 6000 Blackwell Server Edition 96GB measured both
-candidates; neither cleared the frozen technical screen, so neither is activated.
-The short comparison does not establish full-fit throughput or training duration.
+production default remains eager attention with the original loss checks. The
+first Blackwell comparison rejected redundant-check removal and SDPA. The later
+source `05f42b0` paired recovery screen rejected CUDA input caching on speed and
+accepted `no_gradient_checkpointing` for **7B ROT13 level 1** on RTX PRO 6000
+Blackwell Server Edition 96GB. Activation requires the separately bound launch
+controls; this approval does not extend to other levels or 14B.
 
 The frozen recipe remains two epochs over the same 10,000 examples, logical batch
 16, NF4 with double quantization, BF16 computation, FP32 cross-entropy, the same
 LoRA targets and dropout, optimizer, scheduler, clipping, sequence limits and
 completion masks. Optimization does not shorten responses, remove examples,
 change the loss weighting, reorder the exposure sequence or reduce Drive saves.
+Activation checkpointing is the original default. Disabling recomputation is an
+explicit execution-profile override, permitted only after its measured screen
+and production migration gates pass; it is not concealed as unchanged execution.
 
 ## Ordered candidates
 
 | Order | Change | Evidence and effect on results | Status |
 |---|---|---|---|
 | 1 | Validate supervised-token counts on CPU and consolidate loss-finiteness checks before clipping and the optimizer update. | Removes redundant host decisions while retaining the same FP32 logits, cross-entropy, per-example denominator and reduction. Nonfinite losses still reject the whole update before either optimizer or scheduler advances. PyTorch recommends avoiding CUDA-dependent Python control flow. | Implemented and measured as `deferred_checks`. Actual GPU losses, gradients, adapter updates and final RNG agreed bitwise, but median speedup was only 1.0020x and failed the 5% speed screen. Not activated. |
-| 2 | Prepare immutable CPU tensors and transfers in advance; investigate compact supervised-position cross-entropy. | Preloading has official precedent. Ignored CE targets contribute no gradient, so their loss work can be omitted mathematically. Keep all prompt tokens in model attention and retain a full-vocabulary denominator for each supervised token. A changed reduction or projection shape can change rounding. | Investigations only; neither is enabled in production. Require identical inputs/masks/order and empirical loss and update comparisons. |
+| 2 | Cache this fit's exact collated input IDs, attention masks and labels as immutable CUDA tensors. | Removes repeated host preparation/transfers. Tensor contents, microbatch shapes, sample order and RNG remain unchanged; ownership and tensor-version guards reject mutation or substitution. | Measured as `cuda_input_cache` in source `05f42b0`. Paired numerical/state comparisons were bitwise identical, but the minimum matched-update speed ratio was 0.9692x, failing the 1.05x requirement. Not activated. CPU preloading and compact supervised-position CE remain future investigations. |
 | 3 | Replace eager attention with built-in SDPA. | Transformers supports this for Qwen2 and recommends it for efficient training. It retains the attention definition, but fused floating-point kernels can produce different numerical results. | Implemented and measured as `sdpa`. Median speedup was 0.9937x; the numerical screen failed. No fused kernel was independently observed. Not activated. |
-| 4 | Disable activation checkpointing if worst-case examples fit in VRAM. | Removes recomputation. Transformers documents a training-speed cost around 20% for checkpointing; this is general guidance, not a measurement of this fit. Preserve dropout and RNG behavior and compare actual gradients/updates. | Deferred. Original non-reentrant checkpointing and RNG preservation remain enabled. |
+| 4 | Disable activation checkpointing if worst-case examples fit in VRAM. | Removes recomputation after identical PEFT preparation, base freezing, parameter casting and LoRA setup. Original protocol page29 calls checkpointing a memory-saving execution setting, not a behavioral intervention. Compare actual losses, gradients, updates and RNG. | Accepted as `no_gradient_checkpointing` for source `05f42b0`, RTX PRO 6000 Blackwell 96GB, 7B ROT13 level 1. Two paired repetitions measured 1.2695x and 1.2806x median throughput ratios, with bitwise numerical/state/RNG agreement. Other conditions retain the original checkpointing default. |
 | 5 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
 
 Epoch count, training exposure, BF16 versus NF4 construction, optimizer precision,
@@ -34,6 +39,59 @@ The objective is **mean supervised-token loss within each example, then mean
 across examples**. Stock model loss or token-global averaging must not silently
 replace it. A faster implementation must preserve the current weighting, causal
 shift and assistant-end supervision.
+
+## Current continuation screen
+
+Source `05f42b0` adds explicit cache and recomputation controls while preserving
+eager attention, NF4/BF16, original finite-loss checks, physical microbatch 1,
+logical batch 16 and the optimizer recipe. Sixty-nine focused checks passed; the
+full suite was not repeated. Cache tensors are prepared once for the selected
+fit and checked against their exact tokenized example, device, shape and version.
+No other condition may reuse that fit's cache.
+
+The [actual GPU recovery screen](evidence/sft_optimization_pro6000_checkpoint_recovery.json)
+used two paired repetitions, each with one warmup
+and five measured logical updates per profile. A continuation comparison restores
+the same verified step 214 adapter, optimizer, scheduler, sampler and RNG into
+each isolated profile; the official checkpoint remains read-only. The frozen
+speed rule requires at least 5% improvement on every corresponding measured
+update pair, alongside numerical and identical-RNG requirements. A combined
+cache/no-recomputation profile also requires the separate cache and recomputation
+comparisons and was not selected after the cache candidate failed.
+
+| Candidate | Baseline / candidate median seconds, repetitions 1 and 2 | Minimum matched-update speed ratio | Decision |
+|---|---|---:|---|
+| CUDA input cache | 11.9242 / 11.7858; 11.9491 / 12.0956 | 0.9692x | Bitwise state agreement; failed speed gate |
+| No activation recomputation | 11.9095 / 9.3814; 11.9435 / 9.3264 | 1.2344x | Passed numerical, RNG and speed gates |
+
+For the accepted candidate, the median throughput ratios were 1.2695x and
+1.2806x, corresponding to about 21–22% less measured update time. Every matched
+update met the frozen 5% improvement rule. Each paired 96-example continuation
+sequence had identical losses, clipped-gradient and adapter-delta hashes, final
+adapter, optimizer and scheduler hashes, and final RNG state. This is direct
+evidence for the measured continuation, not a guarantee of identical final model
+behavior or a full-fit ETA.
+
+The longest native example in this condition was 3,190 tokens and passed the
+actual finite-loss/nonzero-adapter-gradient probe. Without recomputation its
+probe allocated 86.09 GiB and reserved 89.13 GiB of the GPU's 94.97 GiB; memory
+headroom is narrow. This result does not establish that 14B or other levels fit.
+Eager attention, original loss checks, physical microbatch 1, accumulation 16,
+and every scientific recipe field remain unchanged. No attention-kernel change
+or combined cache profile was selected.
+
+The [accepted profile](evidence/sft_optimization_pro6000_selected_profile.json)
+has acceptance hash
+`578a7eed0b174017882649a3fb0d0c0d831866012e94bbbb0a1f861325c4d963`
+and binds the unmodified report hash
+`11c055bf2edf87738d0e31eb24eb7cbb9a79279670679a797fa3738401a39417`.
+The [current readiness receipt](evidence/sft_optimization_pro6000_readiness.json)
+is `READY` for this one condition after affected GPU controls; the entire matrix
+and statistical simulations were not repeated. The benchmark itself retains
+`approved_for_production=false`: selection is a separate hash-validated decision,
+not automatic benchmark approval. The [verified Drive index](evidence/sft_optimization_pro6000_recovery_drive_index.json)
+preserves source, inputs, reports and launch evidence in the
+[recovery folder](https://drive.google.com/drive/folders/1MPZAIU9kj53i3uzFxhXG35OCtdMXuiYj).
 
 ## What the empirical checks establish
 
@@ -49,7 +107,7 @@ focused tests and 31 fewer host scalar extractions per 16-example update (36
 versus 5). The [earlier plan-only receipt](evidence/sft_optimization_benchmark_plan.json)
 retains its original pending GPU/consumer bindings as historical planning evidence.
 
-### Actual RTX PRO 6000 comparison
+### Historical first RTX PRO 6000 comparison
 
 The [measured receipt](evidence/sft_optimization_pro6000_benchmark.json) binds
 source `fd23db9`, the pinned 7B ROT13 level-1 corpus, and the actual Blackwell
@@ -81,8 +139,9 @@ The official step-214 state was neither read nor modified by these fresh runs.
 
 The isolated benchmark in
 [benchmark_sft_optimizations.py](../scripts/benchmark_sft_optimizations.py) runs
-the baseline and each candidate in separate processes from the same pinned base
-and fresh seed. It uses certified production records, whole logical updates,
+the baseline and each candidate in separate processes from the same pinned base.
+Fresh comparisons share a seed; continuation comparisons restore the same
+verified full checkpoint. It uses certified production records, whole logical updates,
 unchanged rendering and masks, warmup, synchronized GPU timing, peak memory,
 losses, adapter gradients and parameter updates. It never advances or replaces
 the paused production fit. The plan freezes comparison bounds before running;
@@ -100,8 +159,9 @@ python scripts/benchmark_sft_optimizations.py \
   --bundle CERTIFIED_BUNDLE.json \
   --worklist CURRENT_WORKLIST.json \
   --model 7b --family rot13 --level 1 \
-  --profiles baseline deferred_checks sdpa \
-  --warmup-updates 1 --updates 2 \
+  --profiles baseline cuda_input_cache no_gradient_checkpointing \
+  --warmup-updates 1 --updates 5 --repetitions 2 \
+  --recovery-checkpoint VERIFIED_ORIGINAL_CHECKPOINT_DIRECTORY \
   --output NEW_BENCHMARK_DIRECTORY --plan-only
 ```
 
@@ -112,7 +172,15 @@ does not substitute for this GPU comparison. Hardware details and actual
 dependency versions must accompany the report; an SDPA setting alone does not
 prove a fused kernel was selected.
 
-## Paused fit and migration
+## Preserved parent fit and migration
+
+The [actual continuation launch](evidence/sft_optimization_pro6000_training_resume.json)
+records the worker running from inherited step 214 with a Drive-verified child
+checkpoint. The child records source `05f42b0`, the accepted profile and hardware
+migration; the parent checkpoint remains unchanged. The launch snapshot does
+not claim a later completed optimizer step. Child serialized checkpoint bytes
+may differ because lineage and execution metadata are updated; exact inherited
+adapter, optimizer, scheduler, sampler and RNG state is the preserved contract.
 
 The verified step-214 checkpoint, original source, configuration and Drive
 evidence remain preserved. A hardware, source or execution-profile change must
@@ -121,10 +189,16 @@ identity. Restore full adapter, optimizer, scheduler, sampler and RNG state when
 resuming an accepted continuation, and document any numerical execution change.
 
 A new consumer source needs a current handoff certificate and evidence for the
-affected GPU/runtime controls. Unchanged corpus, transformation, judging and
-statistical evidence can be reused with explicit compatibility bindings. This
-does not require repeating every unrelated test or regenerating the datasets.
-Google Drive remains the permanent store for checkpoint and migration evidence.
+affected GPU/runtime controls. The launcher requires accepted, hash-verified
+source/hardware/condition/profile-bound benchmark evidence before selecting an
+optimization. A continuation additionally requires the original pause receipt,
+verified full checkpoint and paired recovery measurements. Migration creates a
+separate lineage record and consumer checkpoint; it preserves parent bytes and
+inherits full training state without repeating completed presentations. This is
+an explicitly declared continuation, not an exact resume under the old identity.
+Unchanged corpus, transformation, judging and statistical evidence can be reused
+with explicit compatibility bindings. Google Drive remains the permanent store;
+unrelated suites and datasets need not be repeated.
 
 Verified reports and the integrated protocol are preserved in the central project at
 [reports/sft_optimizations/94e2fb7](https://drive.google.com/drive/folders/1p2MxgaoO4utvdMEO_D6ijH4g8vrfgjN4).
@@ -137,12 +211,15 @@ Verified reports and the integrated protocol are preserved in the central projec
 - [Qwen2 v4.57.3 implementation](https://raw.githubusercontent.com/huggingface/transformers/v4.57.3/src/transformers/models/qwen2/modeling_qwen2.py): declares SDPA support and provides selected-position `logits_to_keep`. Changing LM-head projection shape remains a separate candidate requiring empirical comparison.
 - [PyTorch v2.9.0 SDPA documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/nn/functional.py): fused floating-point operations can make output differ with the selected backend. [Numerical accuracy guidance](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/docs/source/notes/numerical_accuracy.rst) likewise warns that batched and individual computations need not be bitwise identical.
 - [PyTorch v2.9.0 checkpoint documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/docs/source/checkpoint.md): RNG preservation makes dropout outputs agree with non-checkpointed passes. Keep `preserve_rng_state=True`; [non-reentrant checkpointing is recommended](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/utils/checkpoint.py) and already used.
+- [PEFT v0.18.0 preparation](https://raw.githubusercontent.com/huggingface/peft/v0.18.0/src/peft/utils/other.py): preparation freezes the base and casts nonquantized BF16/FP16 parameters to FP32. The recomputation candidate performs identical preparation first, then disables only activation checkpointing. The [original protocol page29](../spec/experiment.pdf#page=29) describes that setting as a memory-saving execution choice.
 - [PyTorch transfer tutorial](https://raw.githubusercontent.com/pytorch/tutorials/main/intermediate_source/pinmem_nonblock.py): calling `pin_memory()` synchronously immediately before transfer can be slower. Preloading requires a measured implementation rather than adding that call to the hot loop.
 - [Liger v0.4.0](https://raw.githubusercontent.com/linkedin/Liger-Kernel/v0.4.0/README.md): reports throughput and memory improvements and convergence testing, with benchmark conditions including LLaMA3-8B BF16/FSDP on eight A100s. This is empirical precedent for later fused-kernel investigation, not direct validation of single-GPU QLoRA here.
 - [bitsandbytes 0.48.2 installation table](https://raw.githubusercontent.com/bitsandbytes-foundation/bitsandbytes/0.48.2/docs/source/installation.mdx): Linux x86-64 CUDA 12.8–12.9 builds include `sm120`. This supports the Blackwell compatibility investigation; it does not establish training throughput or replace actual hardware checks.
 
 No published source above directly measures this frozen 7B/14B recipe on an RTX
-PRO 6000 Blackwell 96GB. The actual short 7B comparison now supplies local
-empirical evidence and rejected both candidates. It does not certify the full
-7B/14B matrix, an exact production-checkpoint migration, final-result equivalence
-or an H100-versus-Blackwell training-time ratio.
+PRO 6000 Blackwell 96GB. The actual short 7B comparisons now supply local empirical
+evidence: the earlier two candidates failed, while the paired step-214 recovery
+screen accepted only disabling recomputation for the selected condition. They
+do not certify the full 7B/14B matrix, final-result equivalence or an
+H100-versus-Blackwell training-time ratio. The current readiness receipt separately
+binds the declared continuation; it does not change the parent's identity.
