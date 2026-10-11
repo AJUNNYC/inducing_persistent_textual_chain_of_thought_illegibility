@@ -1,3 +1,11 @@
+## Batched baseline capability verification finished — 2026-10-11
+
+All six live 7B/14B seed passes completed: **7,398 raw outputs and scored items**, with verified Drive bundles, packages and final report. The unchanged [repeatability gate failed](evidence/vllm_baseline_repeatability.json); `ready_for_training` is false. [Completion and recovery evidence](evidence/vllm_baseline_completion.json) distinguishes frozen measurement source from operational driver revisions. No training was started; legibility judgments remain deferred.
+
+Strict final-answer formatting dominates failures: seed-42 GSM8K rejected 300/300 7B answers and 299/300 14B answers as malformed final fields. Saved examples contain correct boxed answers alongside explanatory text, which the current exact-format scorer rejects. This is not evidence of semantic inability or proven vLLM quality degradation. Preserve these failed measurements; do not weaken acceptance rules or resample ordinary outputs silently. Any measurement revision requires its own frozen protocol and affected baseline validation.
+
+The monitor recorded completion automatically. Pod Docker absence was repaired by scoring exact saved outputs in the already validated cloud sandbox. Duplicate recovery folders were merged without deleting payloads, paths were precreated before concurrent producers, and the old failed GPU process was released. Final workers release their engines on exit. Existing source data, SFT recipe and scientific success thresholds were retained.
+
 ## Baseline repeatability backend replacement — 2026-10-11
 
 The [live launch receipt](evidence/baseline_repeatability_launch.json) records actual 7B seed-42 native inference and independent Drive readback of its first raw response and scored item. The worker schedules both untouched models with seeds 42, 43 and 44 on all 1,233 fixed items (7,398 outputs). Completed artifacts are replicated to Drive before advancing. Startup failures were retained; JSON numeric loading and control identity handling were fixed in GitHub before redeployment, and the native cache environment/metadata lookup was corrected. No full suite, transformation or GPU control suite was repeated.

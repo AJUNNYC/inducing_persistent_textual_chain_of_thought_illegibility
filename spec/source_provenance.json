@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "b4d64ef72d4d45e125c70af272b9d174f29f2debb43068bf45ecb8e9f157cce8"
+    "sha256": "ac82c3e762b6fd39f851047182b29b23884e7b8229e96035abfdef60d9aab294"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,5 +27,5 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "c1e9ac31d14d6a2be948bd19b671f2e45d696329631bc29678fc5f380fe6efbc"
+  "procedure_update_sha256": "a5a324dd40b9401d62d628c02e1fdacf2361eeb750e035c0a2fdb1211518b781"
 }

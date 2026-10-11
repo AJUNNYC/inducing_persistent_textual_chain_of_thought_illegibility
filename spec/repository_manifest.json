@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 475,
+  "files": 477,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1243,6 +1243,17 @@
       "blank": false
     },
     {
+      "path": "docs/evidence/vllm_baseline_completion.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/vllm_baseline_completion.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d20e39710d911a",
+      "blank": false
+    },
+    {
       "path": "docs/evidence/vllm_baseline_launch.json",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -1251,6 +1262,17 @@
       "display_path": "docs/evidence/vllm_baseline_launch.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_c03bce4b75ae81",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/vllm_baseline_repeatability.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/vllm_baseline_repeatability.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_4922617bb3d146",
       "blank": false
     },
     {

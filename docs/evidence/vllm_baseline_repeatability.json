@@ -1,0 +1,820 @@
+{
+  "checks": [
+    {
+      "detail": "Real untouched model seed diagnostics",
+      "evidence": {
+        "live": true,
+        "panel_hash": "c8e3de419ddb776221fecd737eb41a28d9a6512f60d03eaf8fc2ad4265df68ae"
+      },
+      "name": "baseline_repeatability",
+      "required": true,
+      "status": "failed"
+    }
+  ],
+  "evidence": {
+    "live": true,
+    "panel_hash": "c8e3de419ddb776221fecd737eb41a28d9a6512f60d03eaf8fc2ad4265df68ae"
+  },
+  "evidence_type": "live_baseline_diagnostics",
+  "limitation": "Three passes flag gross instability, not a precise repeatability estimate.",
+  "main_baseline_seed": 42,
+  "models": [
+    {
+      "domains": {
+        "arc": {
+          "baseline_correct_count": 47,
+          "common_correct_count": 10,
+          "common_correct_ids": [
+            "arc_AIMS_2008_4_6",
+            "arc_Mercury_7027265",
+            "arc_Mercury_7245158",
+            "arc_Mercury_7267540",
+            "arc_Mercury_7267838",
+            "arc_Mercury_SC_405164",
+            "arc_Mercury_SC_413632",
+            "arc_NYSEDREGENTS_2012_8_30",
+            "arc_TIMSS_2003_8_pg44",
+            "arc_TIMSS_2011_4_pg14"
+          ],
+          "common_retention": 0.2127659574468085,
+          "correct_counts": {
+            "42": 47,
+            "43": 47,
+            "44": 50
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [
+              "arc_ACTAAP_2007_7_2",
+              "arc_FCAT_2008_5_7",
+              "arc_LEAP__8_10368",
+              "arc_MDSA_2008_8_38",
+              "arc_MSA_2012_5_22",
+              "arc_Mercury_192990",
+              "arc_Mercury_407053",
+              "arc_Mercury_416414",
+              "arc_Mercury_417464",
+              "arc_Mercury_7017798",
+              "arc_Mercury_7029313",
+              "arc_Mercury_7030450",
+              "arc_Mercury_7037678",
+              "arc_Mercury_7056473",
+              "arc_Mercury_7056735",
+              "arc_Mercury_7068670",
+              "arc_Mercury_7113890",
+              "arc_Mercury_7135853",
+              "arc_Mercury_SC_401120",
+              "arc_Mercury_SC_401673",
+              "arc_Mercury_SC_401781",
+              "arc_Mercury_SC_402079",
+              "arc_Mercury_SC_405004",
+              "arc_Mercury_SC_408434",
+              "arc_Mercury_SC_416134",
+              "arc_Mercury_SC_416530",
+              "arc_NCEOGA_2013_8_13",
+              "arc_NYSEDREGENTS_2010_8_34",
+              "arc_NYSEDREGENTS_2013_4_14",
+              "arc_NYSEDREGENTS_2013_4_23",
+              "arc_TAKS_2009_5_21",
+              "arc_TIMSS_2011_4_pg24"
+            ],
+            "44": [
+              "arc_ACTAAP_2007_7_2",
+              "arc_FCAT_2008_5_7",
+              "arc_LEAP__8_10368",
+              "arc_MDSA_2008_5_23",
+              "arc_MSA_2012_5_22",
+              "arc_Mercury_192990",
+              "arc_Mercury_407053",
+              "arc_Mercury_412298",
+              "arc_Mercury_416414",
+              "arc_Mercury_417464",
+              "arc_Mercury_7017798",
+              "arc_Mercury_7030450",
+              "arc_Mercury_7037678",
+              "arc_Mercury_7056473",
+              "arc_Mercury_7056735",
+              "arc_Mercury_7068670",
+              "arc_Mercury_7113890",
+              "arc_Mercury_7135853",
+              "arc_Mercury_7235673",
+              "arc_Mercury_SC_401120",
+              "arc_Mercury_SC_401673",
+              "arc_Mercury_SC_402079",
+              "arc_Mercury_SC_405004",
+              "arc_Mercury_SC_408344",
+              "arc_Mercury_SC_416530",
+              "arc_NYSEDREGENTS_2010_8_34",
+              "arc_NYSEDREGENTS_2013_4_14",
+              "arc_NYSEDREGENTS_2013_4_23",
+              "arc_TAKS_2009_5_21",
+              "arc_TIMSS_2007_8_pg85",
+              "arc_TIMSS_2011_4_pg24"
+            ]
+          },
+          "newly_correct_ids": {
+            "43": [
+              "arc_LEAP_2012_8_10442",
+              "arc_MCAS_1999_4_32",
+              "arc_MCAS_2000_8_20",
+              "arc_MCAS_2000_8_24",
+              "arc_MCAS_2001_5_15",
+              "arc_MCAS_2001_8_19",
+              "arc_MDSA_2009_4_24",
+              "arc_MEA_2010_8_19",
+              "arc_MEA_2016_8_18",
+              "arc_MSA_2013_5_5",
+              "arc_Mercury_175280",
+              "arc_Mercury_400089",
+              "arc_Mercury_405943",
+              "arc_Mercury_7015925",
+              "arc_Mercury_7017185",
+              "arc_Mercury_7018060",
+              "arc_Mercury_7041335",
+              "arc_Mercury_7074900",
+              "arc_Mercury_7090563",
+              "arc_Mercury_7239138",
+              "arc_Mercury_7268030",
+              "arc_Mercury_SC_400035",
+              "arc_Mercury_SC_400040",
+              "arc_Mercury_SC_400361",
+              "arc_Mercury_SC_400595",
+              "arc_Mercury_SC_402040",
+              "arc_Mercury_SC_407227",
+              "arc_Mercury_SC_409676",
+              "arc_Mercury_SC_413302",
+              "arc_NYSEDREGENTS_2010_8_12",
+              "arc_NYSEDREGENTS_2013_4_22",
+              "arc_NYSEDREGENTS_2015_4_12"
+            ],
+            "44": [
+              "arc_ACTAAP_2007_7_33",
+              "arc_MCAS_1999_4_32",
+              "arc_MCAS_2000_8_20",
+              "arc_MCAS_2001_5_15",
+              "arc_MCAS_2006_9_14",
+              "arc_MCAS_2006_9_5",
+              "arc_MCAS_2011_8_17692",
+              "arc_MDSA_2009_4_24",
+              "arc_MDSA_2010_8_43",
+              "arc_MSA_2013_5_5",
+              "arc_Mercury_175280",
+              "arc_Mercury_400089",
+              "arc_Mercury_404096",
+              "arc_Mercury_406786",
+              "arc_Mercury_416405",
+              "arc_Mercury_7008260",
+              "arc_Mercury_7015925",
+              "arc_Mercury_7074900",
+              "arc_Mercury_7083598",
+              "arc_Mercury_7186935",
+              "arc_Mercury_7211628",
+              "arc_Mercury_7220010",
+              "arc_Mercury_7283710",
+              "arc_Mercury_SC_400361",
+              "arc_Mercury_SC_400380",
+              "arc_Mercury_SC_401777",
+              "arc_Mercury_SC_405074",
+              "arc_Mercury_SC_413302",
+              "arc_Mercury_SC_414130",
+              "arc_Mercury_SC_LBS10272",
+              "arc_NYSEDREGENTS_2008_4_25",
+              "arc_NYSEDREGENTS_2008_8_12",
+              "arc_OHAT_2008_5_30",
+              "arc_TIMSS_2003_4_pg20"
+            ]
+          },
+          "panel_count": 331,
+          "repeat_retention": {
+            "43": 0.3191489361702128,
+            "44": 0.3404255319148936
+          },
+          "status": "failed"
+        },
+        "gsm8k": {
+          "baseline_correct_count": 0,
+          "common_correct_count": 0,
+          "common_correct_ids": [],
+          "common_retention": null,
+          "correct_counts": {
+            "42": 0,
+            "43": 0,
+            "44": 0
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [],
+            "44": []
+          },
+          "newly_correct_ids": {
+            "43": [],
+            "44": []
+          },
+          "panel_count": 300,
+          "repeat_retention": {
+            "43": null,
+            "44": null
+          },
+          "status": "indeterminate"
+        },
+        "mbpp": {
+          "baseline_correct_count": 1,
+          "common_correct_count": 0,
+          "common_correct_ids": [],
+          "common_retention": 0.0,
+          "correct_counts": {
+            "42": 1,
+            "43": 1,
+            "44": 0
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [],
+            "44": [
+              "mbpp_629"
+            ]
+          },
+          "newly_correct_ids": {
+            "43": [],
+            "44": []
+          },
+          "panel_count": 203,
+          "repeat_retention": {
+            "43": 1.0,
+            "44": 0.0
+          },
+          "status": "failed"
+        },
+        "mmlu": {
+          "baseline_correct_count": 43,
+          "common_correct_count": 6,
+          "common_correct_ids": [
+            "mmlu_global_facts_66",
+            "mmlu_high_school_us_history_81",
+            "mmlu_human_sexuality_47",
+            "mmlu_philosophy_15",
+            "mmlu_security_studies_17",
+            "mmlu_us_foreign_policy_90"
+          ],
+          "common_retention": 0.13953488372093023,
+          "correct_counts": {
+            "42": 43,
+            "43": 39,
+            "44": 33
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [
+              "mmlu_astronomy_1",
+              "mmlu_business_ethics_74",
+              "mmlu_college_medicine_29",
+              "mmlu_electrical_engineering_95",
+              "mmlu_high_school_biology_17",
+              "mmlu_high_school_european_history_30",
+              "mmlu_high_school_geography_58",
+              "mmlu_high_school_macroeconomics_13",
+              "mmlu_high_school_macroeconomics_38",
+              "mmlu_high_school_macroeconomics_43",
+              "mmlu_high_school_us_history_36",
+              "mmlu_human_aging_99",
+              "mmlu_international_law_91",
+              "mmlu_jurisprudence_69",
+              "mmlu_management_41",
+              "mmlu_miscellaneous_55",
+              "mmlu_miscellaneous_85",
+              "mmlu_moral_disputes_3",
+              "mmlu_moral_disputes_85",
+              "mmlu_prehistory_81",
+              "mmlu_professional_accounting_72",
+              "mmlu_professional_law_30",
+              "mmlu_professional_law_84",
+              "mmlu_public_relations_16",
+              "mmlu_security_studies_35",
+              "mmlu_us_foreign_policy_34",
+              "mmlu_virology_49",
+              "mmlu_world_religions_88"
+            ],
+            "44": [
+              "mmlu_astronomy_1",
+              "mmlu_business_ethics_74",
+              "mmlu_college_medicine_29",
+              "mmlu_global_facts_64",
+              "mmlu_high_school_biology_17",
+              "mmlu_high_school_european_history_30",
+              "mmlu_high_school_geography_58",
+              "mmlu_high_school_government_and_politics_59",
+              "mmlu_high_school_macroeconomics_13",
+              "mmlu_high_school_macroeconomics_38",
+              "mmlu_high_school_macroeconomics_43",
+              "mmlu_high_school_us_history_36",
+              "mmlu_international_law_91",
+              "mmlu_jurisprudence_30",
+              "mmlu_jurisprudence_69",
+              "mmlu_logical_fallacies_25",
+              "mmlu_miscellaneous_55",
+              "mmlu_miscellaneous_85",
+              "mmlu_moral_disputes_3",
+              "mmlu_philosophy_58",
+              "mmlu_philosophy_87",
+              "mmlu_professional_accounting_72",
+              "mmlu_professional_law_30",
+              "mmlu_professional_law_84",
+              "mmlu_security_studies_35",
+              "mmlu_security_studies_49",
+              "mmlu_sociology_32",
+              "mmlu_sociology_81",
+              "mmlu_us_foreign_policy_34",
+              "mmlu_virology_49",
+              "mmlu_world_religions_88"
+            ]
+          },
+          "newly_correct_ids": {
+            "43": [
+              "mmlu_anatomy_34",
+              "mmlu_astronomy_87",
+              "mmlu_business_ethics_66",
+              "mmlu_clinical_knowledge_13",
+              "mmlu_high_school_computer_science_17",
+              "mmlu_high_school_european_history_76",
+              "mmlu_high_school_geography_32",
+              "mmlu_high_school_geography_45",
+              "mmlu_high_school_government_and_politics_31",
+              "mmlu_high_school_world_history_0",
+              "mmlu_international_law_33",
+              "mmlu_jurisprudence_23",
+              "mmlu_jurisprudence_60",
+              "mmlu_machine_learning_93",
+              "mmlu_marketing_61",
+              "mmlu_moral_disputes_56",
+              "mmlu_moral_disputes_78",
+              "mmlu_moral_disputes_87",
+              "mmlu_nutrition_62",
+              "mmlu_philosophy_10",
+              "mmlu_prehistory_5",
+              "mmlu_professional_medicine_5",
+              "mmlu_public_relations_88",
+              "mmlu_sociology_48"
+            ],
+            "44": [
+              "mmlu_business_ethics_60",
+              "mmlu_business_ethics_66",
+              "mmlu_business_ethics_69",
+              "mmlu_clinical_knowledge_13",
+              "mmlu_college_medicine_72",
+              "mmlu_computer_security_93",
+              "mmlu_global_facts_65",
+              "mmlu_high_school_biology_76",
+              "mmlu_high_school_biology_91",
+              "mmlu_high_school_geography_14",
+              "mmlu_high_school_geography_15",
+              "mmlu_high_school_microeconomics_6",
+              "mmlu_high_school_statistics_39",
+              "mmlu_high_school_us_history_75",
+              "mmlu_international_law_33",
+              "mmlu_jurisprudence_15",
+              "mmlu_moral_disputes_78",
+              "mmlu_moral_disputes_87",
+              "mmlu_professional_psychology_24",
+              "mmlu_public_relations_15",
+              "mmlu_security_studies_36"
+            ]
+          },
+          "panel_count": 399,
+          "repeat_retention": {
+            "43": 0.3488372093023256,
+            "44": 0.27906976744186046
+          },
+          "status": "failed"
+        }
+      },
+      "model": "7b",
+      "status": "failed"
+    },
+    {
+      "domains": {
+        "arc": {
+          "baseline_correct_count": 48,
+          "common_correct_count": 7,
+          "common_correct_ids": [
+            "arc_Mercury_406786",
+            "arc_Mercury_7043680",
+            "arc_Mercury_7122973",
+            "arc_Mercury_SC_401774",
+            "arc_Mercury_SC_413302",
+            "arc_NYSEDREGENTS_2008_8_14",
+            "arc_NYSEDREGENTS_2013_4_19"
+          ],
+          "common_retention": 0.14583333333333334,
+          "correct_counts": {
+            "42": 48,
+            "43": 51,
+            "44": 55
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [
+              "arc_MCAS_2000_4_24",
+              "arc_MCAS_2012_8_23643",
+              "arc_MDSA_2008_8_38",
+              "arc_MDSA_2009_8_29",
+              "arc_MDSA_2009_8_32",
+              "arc_Mercury_400089",
+              "arc_Mercury_7018393",
+              "arc_Mercury_7074900",
+              "arc_Mercury_7083458",
+              "arc_Mercury_7115098",
+              "arc_Mercury_7174003",
+              "arc_Mercury_7267838",
+              "arc_Mercury_7268030",
+              "arc_Mercury_SC_400361",
+              "arc_Mercury_SC_400380",
+              "arc_Mercury_SC_402079",
+              "arc_Mercury_SC_405004",
+              "arc_Mercury_SC_408746",
+              "arc_Mercury_SC_408857",
+              "arc_Mercury_SC_408984",
+              "arc_NYSEDREGENTS_2010_8_18",
+              "arc_NYSEDREGENTS_2010_8_34",
+              "arc_NYSEDREGENTS_2013_4_29",
+              "arc_NYSEDREGENTS_2013_8_35",
+              "arc_TIMSS_2003_4_pg20",
+              "arc_TIMSS_2007_4_pg64",
+              "arc_TIMSS_2007_8_pg85",
+              "arc_TIMSS_2011_4_pg14",
+              "arc_TIMSS_2011_4_pg24"
+            ],
+            "44": [
+              "arc_MCAS_2012_8_23643",
+              "arc_MDSA_2009_8_29",
+              "arc_MDSA_2009_8_32",
+              "arc_MEA_2010_8_19",
+              "arc_MSA_2012_5_34",
+              "arc_Mercury_400089",
+              "arc_Mercury_7018393",
+              "arc_Mercury_7027265",
+              "arc_Mercury_7038850",
+              "arc_Mercury_7056473",
+              "arc_Mercury_7075215",
+              "arc_Mercury_7083458",
+              "arc_Mercury_7115098",
+              "arc_Mercury_7137445",
+              "arc_Mercury_7174003",
+              "arc_Mercury_7219713",
+              "arc_Mercury_7267838",
+              "arc_Mercury_7268030",
+              "arc_Mercury_SC_400380",
+              "arc_Mercury_SC_405935",
+              "arc_Mercury_SC_408746",
+              "arc_Mercury_SC_408857",
+              "arc_Mercury_SC_408984",
+              "arc_NYSEDREGENTS_2013_4_22",
+              "arc_NYSEDREGENTS_2013_8_12",
+              "arc_NYSEDREGENTS_2013_8_35",
+              "arc_TIMSS_2003_4_pg20",
+              "arc_TIMSS_2007_4_pg64",
+              "arc_TIMSS_2011_4_pg14",
+              "arc_TIMSS_2011_4_pg24",
+              "arc_WASL_2003_5_8"
+            ]
+          },
+          "newly_correct_ids": {
+            "43": [
+              "arc_ACTAAP_2007_7_2",
+              "arc_ACTAAP_2007_7_33",
+              "arc_ACTAAP_2013_7_13",
+              "arc_MCAS_2010_5_14",
+              "arc_MEAP_2005_8_33",
+              "arc_MSA_2013_5_5",
+              "arc_Mercury_184328",
+              "arc_Mercury_400808",
+              "arc_Mercury_412298",
+              "arc_Mercury_7008103",
+              "arc_Mercury_7008698",
+              "arc_Mercury_7017798",
+              "arc_Mercury_7029313",
+              "arc_Mercury_7030450",
+              "arc_Mercury_7068600",
+              "arc_Mercury_7092190",
+              "arc_Mercury_7113890",
+              "arc_Mercury_7141733",
+              "arc_Mercury_7162558",
+              "arc_Mercury_7214428",
+              "arc_Mercury_7228305",
+              "arc_Mercury_7239435",
+              "arc_Mercury_7264163",
+              "arc_Mercury_7267943",
+              "arc_Mercury_SC_402251",
+              "arc_Mercury_SC_402627",
+              "arc_Mercury_SC_409676",
+              "arc_Mercury_SC_413632",
+              "arc_NYSEDREGENTS_2008_8_2",
+              "arc_NYSEDREGENTS_2010_8_15",
+              "arc_NYSEDREGENTS_2012_8_14",
+              "arc_NYSEDREGENTS_2013_4_14"
+            ],
+            "44": [
+              "arc_ACTAAP_2007_7_2",
+              "arc_AIMS_2008_4_6",
+              "arc_MCAS_1999_4_32",
+              "arc_MCAS_2001_5_15",
+              "arc_MCAS_2006_9_2",
+              "arc_Mercury_178553",
+              "arc_Mercury_400808",
+              "arc_Mercury_405461",
+              "arc_Mercury_412298",
+              "arc_Mercury_416405",
+              "arc_Mercury_7030450",
+              "arc_Mercury_7034825",
+              "arc_Mercury_7034895",
+              "arc_Mercury_7077578",
+              "arc_Mercury_7081655",
+              "arc_Mercury_7092190",
+              "arc_Mercury_7098053",
+              "arc_Mercury_7141733",
+              "arc_Mercury_7162558",
+              "arc_Mercury_7174895",
+              "arc_Mercury_7214428",
+              "arc_Mercury_7264163",
+              "arc_Mercury_7267943",
+              "arc_Mercury_7268783",
+              "arc_Mercury_7283710",
+              "arc_Mercury_SC_401781",
+              "arc_Mercury_SC_402040",
+              "arc_Mercury_SC_405164",
+              "arc_Mercury_SC_405999",
+              "arc_Mercury_SC_408250",
+              "arc_Mercury_SC_413632",
+              "arc_Mercury_SC_416134",
+              "arc_NYSEDREGENTS_2010_4_16",
+              "arc_NYSEDREGENTS_2010_8_15",
+              "arc_NYSEDREGENTS_2012_8_27",
+              "arc_NYSEDREGENTS_2015_4_12",
+              "arc_TAKS_2009_5_21",
+              "arc_TIMSS_2003_4_pg13"
+            ]
+          },
+          "panel_count": 331,
+          "repeat_retention": {
+            "43": 0.3958333333333333,
+            "44": 0.3541666666666667
+          },
+          "status": "failed"
+        },
+        "gsm8k": {
+          "baseline_correct_count": 1,
+          "common_correct_count": 0,
+          "common_correct_ids": [],
+          "common_retention": 0.0,
+          "correct_counts": {
+            "42": 1,
+            "43": 0,
+            "44": 1
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [
+              "gsm8k_378"
+            ],
+            "44": [
+              "gsm8k_378"
+            ]
+          },
+          "newly_correct_ids": {
+            "43": [],
+            "44": [
+              "gsm8k_784"
+            ]
+          },
+          "panel_count": 300,
+          "repeat_retention": {
+            "43": 0.0,
+            "44": 0.0
+          },
+          "status": "failed"
+        },
+        "mbpp": {
+          "baseline_correct_count": 0,
+          "common_correct_count": 0,
+          "common_correct_ids": [],
+          "common_retention": null,
+          "correct_counts": {
+            "42": 0,
+            "43": 0,
+            "44": 0
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [],
+            "44": []
+          },
+          "newly_correct_ids": {
+            "43": [],
+            "44": []
+          },
+          "panel_count": 203,
+          "repeat_retention": {
+            "43": null,
+            "44": null
+          },
+          "status": "indeterminate"
+        },
+        "mmlu": {
+          "baseline_correct_count": 46,
+          "common_correct_count": 18,
+          "common_correct_ids": [
+            "mmlu_business_ethics_74",
+            "mmlu_college_medicine_72",
+            "mmlu_conceptual_physics_20",
+            "mmlu_global_facts_65",
+            "mmlu_global_facts_66",
+            "mmlu_high_school_macroeconomics_13",
+            "mmlu_human_sexuality_41",
+            "mmlu_human_sexuality_47",
+            "mmlu_machine_learning_82",
+            "mmlu_machine_learning_88",
+            "mmlu_medical_genetics_78",
+            "mmlu_miscellaneous_85",
+            "mmlu_moral_disputes_45",
+            "mmlu_moral_scenarios_12",
+            "mmlu_moral_scenarios_63",
+            "mmlu_nutrition_22",
+            "mmlu_philosophy_42",
+            "mmlu_sociology_81"
+          ],
+          "common_retention": 0.391304347826087,
+          "correct_counts": {
+            "42": 46,
+            "43": 57,
+            "44": 47
+          },
+          "invalid_or_unavailable_ids": {
+            "42": [],
+            "43": [],
+            "44": []
+          },
+          "lost_ids": {
+            "43": [
+              "mmlu_clinical_knowledge_13",
+              "mmlu_clinical_knowledge_67",
+              "mmlu_college_biology_16",
+              "mmlu_global_facts_64",
+              "mmlu_global_facts_94",
+              "mmlu_high_school_biology_76",
+              "mmlu_high_school_biology_91",
+              "mmlu_high_school_geography_48",
+              "mmlu_human_aging_33",
+              "mmlu_jurisprudence_15",
+              "mmlu_medical_genetics_57",
+              "mmlu_nutrition_73",
+              "mmlu_philosophy_10",
+              "mmlu_philosophy_15",
+              "mmlu_prehistory_99",
+              "mmlu_professional_medicine_90",
+              "mmlu_professional_psychology_16",
+              "mmlu_professional_psychology_24",
+              "mmlu_public_relations_15",
+              "mmlu_sociology_52",
+              "mmlu_us_foreign_policy_18",
+              "mmlu_world_religions_74",
+              "mmlu_world_religions_90"
+            ],
+            "44": [
+              "mmlu_business_ethics_66",
+              "mmlu_clinical_knowledge_13",
+              "mmlu_college_biology_16",
+              "mmlu_global_facts_64",
+              "mmlu_global_facts_94",
+              "mmlu_high_school_biology_76",
+              "mmlu_high_school_biology_91",
+              "mmlu_high_school_geography_48",
+              "mmlu_human_aging_33",
+              "mmlu_human_aging_43",
+              "mmlu_human_sexuality_59",
+              "mmlu_human_sexuality_87",
+              "mmlu_medical_genetics_57",
+              "mmlu_nutrition_73",
+              "mmlu_philosophy_15",
+              "mmlu_philosophy_87",
+              "mmlu_professional_medicine_90",
+              "mmlu_professional_psychology_16",
+              "mmlu_public_relations_15",
+              "mmlu_sociology_52",
+              "mmlu_us_foreign_policy_18",
+              "mmlu_world_religions_74",
+              "mmlu_world_religions_90"
+            ]
+          },
+          "newly_correct_ids": {
+            "43": [
+              "mmlu_anatomy_19",
+              "mmlu_astronomy_8",
+              "mmlu_business_ethics_69",
+              "mmlu_college_biology_63",
+              "mmlu_computer_security_93",
+              "mmlu_econometrics_45",
+              "mmlu_high_school_european_history_12",
+              "mmlu_high_school_european_history_47",
+              "mmlu_high_school_geography_45",
+              "mmlu_high_school_microeconomics_0",
+              "mmlu_high_school_microeconomics_33",
+              "mmlu_high_school_us_history_87",
+              "mmlu_human_aging_58",
+              "mmlu_human_sexuality_20",
+              "mmlu_human_sexuality_78",
+              "mmlu_international_law_25",
+              "mmlu_jurisprudence_30",
+              "mmlu_jurisprudence_69",
+              "mmlu_machine_learning_85",
+              "mmlu_management_39",
+              "mmlu_marketing_61",
+              "mmlu_medical_genetics_74",
+              "mmlu_moral_disputes_3",
+              "mmlu_moral_disputes_78",
+              "mmlu_moral_disputes_85",
+              "mmlu_nutrition_69",
+              "mmlu_prehistory_84",
+              "mmlu_prehistory_94",
+              "mmlu_professional_accounting_33",
+              "mmlu_public_relations_81",
+              "mmlu_public_relations_88",
+              "mmlu_sociology_32",
+              "mmlu_virology_21",
+              "mmlu_world_religions_61"
+            ],
+            "44": [
+              "mmlu_abstract_algebra_99",
+              "mmlu_business_ethics_69",
+              "mmlu_clinical_knowledge_19",
+              "mmlu_conceptual_physics_65",
+              "mmlu_conceptual_physics_80",
+              "mmlu_high_school_biology_26",
+              "mmlu_high_school_computer_science_18",
+              "mmlu_high_school_computer_science_90",
+              "mmlu_high_school_government_and_politics_33",
+              "mmlu_jurisprudence_30",
+              "mmlu_machine_learning_85",
+              "mmlu_machine_learning_93",
+              "mmlu_management_39",
+              "mmlu_medical_genetics_44",
+              "mmlu_miscellaneous_7",
+              "mmlu_moral_disputes_85",
+              "mmlu_moral_scenarios_21",
+              "mmlu_prehistory_81",
+              "mmlu_prehistory_84",
+              "mmlu_prehistory_94",
+              "mmlu_professional_psychology_65",
+              "mmlu_security_studies_49",
+              "mmlu_virology_47",
+              "mmlu_world_religions_88"
+            ]
+          },
+          "panel_count": 399,
+          "repeat_retention": {
+            "43": 0.5,
+            "44": 0.5
+          },
+          "status": "failed"
+        }
+      },
+      "model": "14b",
+      "status": "failed"
+    }
+  ],
+  "ready_for_training": false,
+  "report_hash": "879a4733da76c60d6af34dccbdec00749f79e6e00dbe9feb3a083fe74df116f9",
+  "retention_measurement": "uncalibrated",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "status": "failed"
+}

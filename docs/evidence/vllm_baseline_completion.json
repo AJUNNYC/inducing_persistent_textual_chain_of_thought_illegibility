@@ -1,0 +1,71 @@
+{
+  "status": "GATE_FAILED",
+  "completed_outputs": 7398,
+  "models": [
+    "7b",
+    "14b"
+  ],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "measurement_source_commit": "0941ce5f3c8d00d03b27a480f21d14b8beab5452",
+  "handoff_driver_commit": "24cac5c3e38cc075ed070d7e47a2e6b892560270",
+  "simulation": false,
+  "protocol_hash": "fa1ac79e167a982fd23ee8af4cbdc83da94c7ffe4ecae99ee37340bff106efcf",
+  "drive_report": {
+    "drive_file_id": "1V1BbN3bmb5y1-r3mhoXoToCVLV42Hvn_",
+    "sync_status": "VERIFIED",
+    "sha256": "23334a0da123d058b1f807b9e8582c43f4a74e3d8ed4856ef440e601e86b6672",
+    "size": 16358
+  },
+  "seed_42_scoring_reasons": {
+    "7b": {
+      "gsm8k": {
+        "malformed_answer": 300
+      },
+      "mmlu": {
+        "malformed_answer": 309,
+        "truncated_output": 22,
+        "correct": 43,
+        "incorrect": 25
+      },
+      "arc": {
+        "correct": 47,
+        "malformed_answer": 279,
+        "incorrect": 3,
+        "truncated_output": 2
+      },
+      "mbpp": {
+        "malformed_answer": 172,
+        "truncated_output": 30,
+        "passed": 1
+      }
+    },
+    "14b": {
+      "gsm8k": {
+        "malformed_answer": 299,
+        "correct": 1
+      },
+      "mmlu": {
+        "malformed_answer": 328,
+        "truncated_output": 14,
+        "correct": 46,
+        "incorrect": 11
+      },
+      "arc": {
+        "malformed_answer": 283,
+        "correct": 48
+      },
+      "mbpp": {
+        "malformed_answer": 156,
+        "truncated_output": 47
+      }
+    }
+  },
+  "judging": "deferred",
+  "training_started": false,
+  "diagnostic": "Exact final-answer formatting failures dominate. Saved outputs contain explanatory final text; the unchanged strict scorer rejects it. This does not establish that the models cannot solve the questions.",
+  "recovery": "Pod Docker absence resolved through the validated cloud sandbox; original failed GPU process released. Original response identities retained; no ordinary outputs resampled."
+}

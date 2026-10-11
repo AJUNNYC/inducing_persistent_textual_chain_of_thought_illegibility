@@ -3207,18 +3207,19 @@ changes and intervention artifacts; the audit is intended to protect that infere
 manufacture a stronger scientific result [41, 54, 59].
 58
 Current execution status (11 October 2026). Licensed LMSYS source acquisition and the complete
-one-million-row audit are verified; 407,214 eligible candidates are frozen. The 1,233-item capability panel
-and nested 200-item legibility subset are prepared and backed up. The shared 800-question GSM8K RL
-manifest is selected and Drive-verified. Fresh vLLM generation and refills are complete: 11,639 candidate
-IDs yielded 10,100 accepted pairs and 1,539 rejections. All 40 transformed conditions (80 JSONLs;
-404,000 records) and the download index are Drive-verified.
+one-million-row audit are verified; 407,214 eligible candidates are frozen. The 1,233-item capability panel and
+nested 200-item legibility subset are prepared and backed up. The shared 800-question GSM8K RL manifest
+is selected and Drive-verified. Fresh vLLM generation and refills are complete: 11,639 candidate IDs yielded
+10,100 accepted pairs and 1,539 rejections. All 40 transformed conditions (80 JSONLs; 404,000 records) and
+the download index are Drive-verified.
 Validation evidence. The vLLM benchmark exercised generation, formatting, token limits and GPU memory.
-Matched 14B chunks of 32 took approximately 40.53 seconds versus 342.78 seconds natively; a
-128-request sample took 52.64 seconds without OOM. These generation-only measurements do not prove
-quality equivalence. Every production batch undergoes Drive integrity verification. At the user's request, the
-full suite and full launch preflights were not repeated for this migration. Native validators passed.
-Independent CPU-only Drive readback verified all 122 artifacts and 404,000 records without connecting to a
-Pod. Training and actual model evaluations remain pending.
+Matched 14B chunks of 32 took approximately 40.53 seconds versus 342.78 seconds natively; a 128-request
+sample took 52.64 seconds without OOM. These generation-only measurements do not prove quality
+equivalence. Every production batch undergoes Drive integrity verification. At the user's request, the full suite
+and full launch preflights were not repeated for this migration. Native validators passed. Independent
+CPU-only Drive readback verified all 122 artifacts and 404,000 records without connecting to a Pod. Six
+baseline capability passes (7398 outputs) completed, but repeatability failed; exact answer-format failures
+dominate. Raw/scored outputs and reports are Drive-verified. Legibility judging and training remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3710,12 +3711,12 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status. The implementation decisions supplied on 10 October 2026 are integrated with the approved 11 October
-procedure updates. SFT corpus generation now uses separate fresh vLLM model workers and Drive-only permanent
-storage. Shared evaluation panels and the 800-question RL selection are prepared and backed up. All forty paired SFT
-conditions are complete and independently verified from Drive. Training and model evaluation remain unexecuted. The
-approved concentration-guard revision changes evaluation confidence bounds only; full prospective validation passed all
-seven scenarios (700/700 covered repetitions). Other mandatory training launch gates remain separate.
+Status. The implementation decisions supplied on 10 October 2026 are integrated with the approved 11 October procedure
+updates. SFT corpus generation now uses separate fresh vLLM model workers and Drive-only permanent storage. Shared
+evaluation panels and the 800-question RL selection are prepared and backed up. All forty paired SFT conditions are complete and
+independently verified from Drive. Baseline capability runs are complete, but repeatability failed. Full legibility evaluation and
+training remain pending. The approved concentration-guard revision changes evaluation confidence bounds only; full prospective
+validation passed all seven scenarios (700/700 covered repetitions). Other mandatory training launch gates remain separate.
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in
