@@ -60,8 +60,11 @@ def main():
     signal.signal(signal.SIGINT,stop)
     package=read_json(args.evaluation_package)
     panel=package['capability_panel']
+    # Keep the original control receipt configuration identity. The draft
+    # protocol validates its exact sandbox source and selected panel binding;
+    # native state/output provenance separately names this executed consumer.
     protocol=build_evaluation_protocol(panel,package['legibility_subset'],
-                configuration_hash=experiment.hash,preflight_reports={'mbpp_sandbox':read_json(args.mbpp_evidence)})
+                preflight_reports={'mbpp_sandbox':read_json(args.mbpp_evidence)})
     output=experiment.artifacts/'evaluation'
     output.mkdir(parents=True,exist_ok=True)
     status_path=experiment.artifacts/'baseline_status.json'
