@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 466,
+  "files": 467,
   "directories_including_root": 202,
   "entries": [
     {
@@ -835,6 +835,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/docs_layout.mmd",
       "node": "p_140eef3ba41bdc",
+      "blank": false
+    },
+    {
+      "path": "docs/baseline_repeatability_worker.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/baseline_repeatability_worker.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_adbb9f98ebd907",
       "blank": false
     },
     {

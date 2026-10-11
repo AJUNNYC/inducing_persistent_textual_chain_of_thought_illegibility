@@ -82,6 +82,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft.md
       shared_infrastructure.md
     architecture.md
+    baseline_repeatability_worker.md
     contracts.md
     decisions.md
     delegation.md
