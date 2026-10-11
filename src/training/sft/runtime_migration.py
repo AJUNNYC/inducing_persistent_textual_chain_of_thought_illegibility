@@ -32,7 +32,12 @@ LOSS_HELPER_FILES = {
     "fused_ce": "src/training/sft/fused_loss.py",
     "spatial_fused_backward": "src/training/sft/spatial_loss.py",
     "spatial_scheduled_ce": "src/training/sft/scheduled_spatial_loss.py",
+    "causal_contiguous_gradient_ce": "src/training/sft/causal_gradient_loss.py",
 }
+# The final layout candidate must measure an unchanged, already accepted
+# scheduled reference. This is its published a6e3295 module SHA, not a timing
+# or scientific-equivalence claim for the new candidate.
+ACCEPTED_SCHEDULED_HELPER_SHA256 = "3c4f83625d6f87f15205b691d7951e2ca0cc3c0a1c0acebe5da46d517c0cdb40"
 
 
 class MigrationError(ValueError):
@@ -86,8 +91,10 @@ def _source_bindings(plan: Mapping[str, Any]) -> None:
         helper = LOSS_HELPER_FILES.get(loss_implementation)
         if helper is not None:
             required.add(helper)
-        if loss_implementation == "spatial_scheduled_ce":
+        if loss_implementation in ("spatial_scheduled_ce", "causal_contiguous_gradient_ce"):
             required.add(LOSS_HELPER_FILES["spatial_fused_backward"])
+        if loss_implementation == "causal_contiguous_gradient_ce":
+            required.add(LOSS_HELPER_FILES["spatial_scheduled_ce"])
     if not isinstance(hashes, Mapping) or required - hashes.keys():
         raise MigrationError("Benchmark lacks executed source-file bindings")
     for name, digest in hashes.items():
@@ -106,10 +113,34 @@ def _loss_execution_binding(row: Mapping[str, Any], settings: Mapping[str, Any],
         evidence = row.get(field, {})
         if not isinstance(evidence, Mapping) or evidence.get("loss_implementation", "spatial_ce") != expected:
             raise MigrationError("Actual benchmark loss execution evidence differs")
-        if expected in ("spatial_fused_backward", "spatial_scheduled_ce"):
+        if expected in ("spatial_fused_backward", "spatial_scheduled_ce", "causal_contiguous_gradient_ce"):
             digest = (source_hashes or {}).get(LOSS_HELPER_FILES[expected])
             if not digest or evidence.get("loss_helper_sha256") != digest:
                 raise MigrationError("Actual loaded spatial-loss helper differs from frozen source")
+
+
+def _exact_layout_comparison(comparison: Mapping[str, Any], reference: Mapping[str, Any],
+                             candidate: Mapping[str, Any]) -> None:
+    """The copy-only candidate must preserve actual sampled states exactly."""
+    import math
+
+    flags = ("exact_state_comparison_passed", "final_optimizer_states_identical",
+             "final_scheduler_states_identical", "losses_exactly_identical", "final_adapters_identical")
+    vectors = (comparison.get("gradients", {}), comparison.get("adapter_updates", {}))
+    losses = reference.get("losses")
+    hashes = ("initial_adapter_hash", "initial_rng_hash", "initial_optimizer_state_hash", "initial_scheduler_state_hash",
+              "clipped_gradient_hash", "adapter_delta_hash", "final_adapter_hash",
+              "final_optimizer_state_hash", "final_scheduler_state_hash", "final_rng_hash")
+    if (any(comparison.get(flag) is not True for flag in flags)
+            or any(vector.get("bitwise_equal") is not True or vector.get("relative_l2") != 0.0
+                   for vector in vectors)
+            or comparison.get("maximum_loss_absolute_difference") != 0.0
+            or not isinstance(losses, list) or not losses or losses != candidate.get("losses")
+            or any(type(value) not in (int, float) or not math.isfinite(value) for value in losses)
+            or any(not isinstance(reference.get(field), str) or len(reference[field]) != 64
+                   or any(char not in "0123456789abcdef" for char in reference[field])
+                   or reference[field] != candidate.get(field) for field in hashes)):
+        raise MigrationError("Causal gradient layout did not preserve exact sampled losses and training states")
 
 
 def validate_execution_benchmark(report: Mapping[str, Any], source: str,
@@ -155,6 +186,17 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
             or any(chosen[key] != value for key, value in reference_profile.items()
                    if key != "loss_implementation")):
         raise MigrationError("Scheduled spatial CE requires the unchanged accepted spatial-backward reference")
+    exact_causal_layout = chosen["loss_implementation"] == "causal_contiguous_gradient_ce"
+    if exact_causal_layout and plan.get("technical_tolerances", {}).get("require_exact_state_comparison") is not True:
+        raise MigrationError("Causal gradient layout requires the predeclared exact-state comparison")
+    if exact_causal_layout and (
+            reference_profile["loss_implementation"] != "spatial_scheduled_ce"
+            or reference_profile["gradient_checkpointing"] is not False
+            or any(chosen[key] != value for key, value in reference_profile.items()
+                   if key != "loss_implementation")
+            or plan["source_file_hashes"].get(LOSS_HELPER_FILES["spatial_scheduled_ce"])
+                != ACCEPTED_SCHEDULED_HELPER_SHA256):
+        raise MigrationError("Causal gradient layout requires the unchanged accepted scheduled reference")
     measured = report.get("profiles", {})
     comparison = report.get("comparisons", {}).get(profile_name, {})
     if comparison.get("reference_profile", "baseline") != reference_name:
@@ -181,6 +223,8 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
             or baseline.get("initial_rng_hash") != candidate.get("initial_rng_hash")
             or baseline.get("final_rng_hash") != candidate.get("final_rng_hash")):
         raise MigrationError("Benchmark numerical, speed or RNG screen did not pass")
+    if exact_causal_layout:
+        _exact_layout_comparison(comparison, baseline, candidate)
     tolerances = plan.get("technical_tolerances", {})
     limits = {"loss_atol": 1e-5, "loss_rtol": 1e-4,
               "gradient_relative_l2": 1e-3, "update_relative_l2": 1e-3}
@@ -234,6 +278,8 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
             raise MigrationError("Paired measurements changed execution inputs or hardware")
         _loss_execution_binding(reference_run, reference_profile, plan["source_file_hashes"])
         _loss_execution_binding(candidate_run, chosen, plan["source_file_hashes"])
+        if exact_causal_layout:
+            _exact_layout_comparison(repeat, reference_run, candidate_run)
         first, second = reference_run.get("wall_seconds_per_update"), candidate_run.get("wall_seconds_per_update")
         if (not isinstance(first, list) or not isinstance(second, list)
                 or len(first) != plan["measured_updates"] or len(second) != len(first)
@@ -259,6 +305,8 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
                   "target_hardware": candidate.get("hardware"), "hardware": candidate.get("hardware"),
                   "packages": candidate.get("packages"), "recovery_validated": False,
                   "scientific_equivalence_established": False}
+    if exact_causal_layout:
+        acceptance.update(exact_state_comparison_required=True, exact_state_comparison_passed=True)
     recovery = validate_recovery_evidence(report, plan, recovery_report=recovery_report)
     if (recovery.get("recovery_validated") is True
             and _profile(recovery["original_checkpoint_identity"].get("execution_profile")).to_dict() != reference_profile):

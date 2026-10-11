@@ -196,6 +196,108 @@ return losses
     return bindings
 
 
+def causal_gradient_layout_contract():
+    """Protect accepted FP32 forward, causal targets and complete gradient."""
+    from training.sft.runtime_migration import ACCEPTED_SCHEDULED_HELPER_SHA256
+    bindings = scheduled_spatial_forward_contract()
+    if bindings['scheduled_spatial_loss_module'] != ACCEPTED_SCHEDULED_HELPER_SHA256:
+        raise ValueError('Causal gradient layout changed the previously accepted scheduled helper')
+    path = ROOT/'src/training/sft/causal_gradient_loss.py'
+    tree = ast.parse(path.read_text())
+    functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+    loader = functions.get('_load_gradient_kernels')
+    kernels = {} if loader is None else {node.name: node for node in loader.body if isinstance(node, ast.FunctionDef)}
+    autograd = functions.get('_autograd_function')
+    classes = [] if autograd is None else [node for node in autograd.body if isinstance(node, ast.ClassDef)]
+    methods = {} if len(classes) != 1 else {node.name: node for node in classes[0].body if isinstance(node, ast.FunctionDef)}
+    if set(kernels) != {'backward', 'zero_last_row'} or set(methods) != {'forward', 'backward'}:
+        raise ValueError('Causal gradient layout lacks explicit forward, backward and zero-tail kernels')
+    expected = {
+        'forward_delegation': (methods['forward'], '''
+ctx.full_shape = tuple(logits.shape)
+shifted_logits = logits[:, :-1, :].float()
+return _scheduled_autograd_function().forward(ctx, shifted_logits.transpose(1, 2), targets, ignore_index)
+'''),
+        'tiled_backward': (kernels['backward'], '''
+batch = tl.program_id(0).to(tl.int64)
+classes = (tl.program_id(1) * class_tile + tl.arange(0, class_tile))[:, None]
+times = (tl.program_id(2) * time_tile + tl.arange(0, time_tile))[None, :]
+present = (classes < n_columns) & (times < n_times)
+source_offset = (batch * n_columns + classes) * n_times + times
+token_offset = batch * n_times + times
+log_probability = tl.load(values + source_offset, present, other=0.0)
+if reconstruct:
+    maximum = tl.load(maxima + token_offset, times < n_times, other=0.0)
+    log_sum = tl.load(log_sums + token_offset, times < n_times, other=0.0)
+    log_probability = log_probability - maximum - log_sum
+target = tl.load(targets + token_offset, times < n_times, other=ignore_index)
+row_scale = tl.load(row_scales + token_offset, times < n_times, other=0.0)
+summed_gradient = tl.where(target == ignore_index, 0.0, -row_scale)
+target_gradient = tl.where(classes == target, summed_gradient, 0.0)
+derivative = target_gradient - libdevice.exp(log_probability) * summed_gradient
+destination_offset = (batch * full_times + times) * n_columns + classes
+tl.store(output + destination_offset, derivative, present)
+'''),
+        'zero_tail': (kernels['zero_last_row'], '''
+batch = tl.program_id(0).to(tl.int64)
+classes = tl.program_id(1) * block_size + tl.arange(0, block_size)
+offsets = (batch * full_times + full_times - 1) * n_columns + classes
+tl.store(output + offsets, 0.0, classes < n_columns)
+'''),
+        'full_gradient_dispatch': (methods['backward'], '''
+saved = ctx.saved_tensors
+values, targets = saved[:2]
+row_scales = row_scales.contiguous()
+output = torch.empty(ctx.full_shape, dtype=torch.float32, device=values.device)
+reconstruct = ctx.route == "serial_token_blocks"
+maxima, log_sums = saved[2:] if reconstruct else (row_scales, row_scales)
+kernel, zero_last_row = _load_gradient_kernels()
+with torch.cuda.device(values.device):
+    kernel[(values.shape[0], (values.shape[1] + CLASS_TILE_SIZE - 1) // CLASS_TILE_SIZE, (values.shape[2] + TIME_TILE_SIZE - 1) // TIME_TILE_SIZE)](
+        values, targets, maxima, log_sums, row_scales, output,
+        values.shape[2], ctx.full_shape[1], values.shape[1], ctx.ignore_index, reconstruct,
+        class_tile=CLASS_TILE_SIZE, time_tile=TIME_TILE_SIZE, num_warps=4, enable_fp_fusion=True)
+    zero_last_row[(values.shape[0], (values.shape[1] + 1023) // 1024)](
+        output, ctx.full_shape[1], values.shape[1], block_size=1024, num_warps=4, enable_fp_fusion=False)
+return output, None, None
+'''),
+        'input_contract': (functions.get('_validate_inputs'), '''
+import torch
+if (logits.ndim != 3 or targets.ndim != 2 or logits.shape[1] < 2
+        or targets.shape != (logits.shape[0], logits.shape[1] - 1)):
+    raise ValueError("Causal gradient CE requires full logits [batch,time,vocabulary] and shifted targets [batch,time-1]")
+with torch.no_grad():
+    _validate_spatial_inputs(logits[:, :-1, :].transpose(1, 2), targets, ignore_index)
+'''),
+        'public_dispatch': (functions.get('causal_gradient_token_cross_entropy'), '''
+_validate_inputs(logits, targets, ignore_index)
+return _autograd_function().apply(logits, targets, ignore_index)
+'''),
+    }
+    for name, (function, source) in expected.items():
+        body = [] if function is None else [node for node in function.body
+            if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
+                    and isinstance(node.value.value, str))]
+        actual = [ast.dump(node, include_attributes=False) for node in body]
+        wanted = [ast.dump(node, include_attributes=False) for node in ast.parse(source).body]
+        if actual != wanted:
+            raise ValueError('Causal gradient layout changed its protected '+name+' contract')
+        bindings['causal_gradient_'+name] = content_hash(actual)
+    imports = [ast.dump(node, include_attributes=False) for node in tree.body if isinstance(node, ast.ImportFrom)]
+    wanted_imports = ast.parse('''
+from .scheduled_spatial_loss import _autograd_function as _scheduled_autograd_function
+from .spatial_loss import SpatialLossUnsupported, _validate_inputs as _validate_spatial_inputs
+''').body
+    if any(ast.dump(node, include_attributes=False) not in imports for node in wanted_imports):
+        raise ValueError('Causal gradient layout changed its accepted helper delegation')
+    constants = {target.id: node.value.value for node in tree.body if isinstance(node, ast.Assign)
+        and isinstance(node.value, ast.Constant) for target in node.targets if isinstance(target, ast.Name)}
+    if constants.get('CLASS_TILE_SIZE') != 32 or constants.get('TIME_TILE_SIZE') != 32:
+        raise ValueError('Causal gradient layout changed its declared tiles')
+    bindings['causal_gradient_loss_module'] = file_hash(path)
+    return bindings
+
+
 def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
     """Preserve the original masking, CE and reduction beneath new guards.
 
@@ -256,7 +358,8 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
         if set(selected) != required:
             raise ValueError('Cannot establish the original SFT mask/loss contract')
         return selected
-    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce', 'spatial_fused_backward', 'spatial_scheduled_ce'):
+    if loss_implementation not in ('spatial_ce', 'flat_ce', 'fused_ce', 'spatial_fused_backward', 'spatial_scheduled_ce',
+                                 'causal_contiguous_gradient_ce'):
         raise ValueError('No accepted scientific loss contract for this execution mode')
     previous, current = contract(old), contract(new)
     if previous != current:
@@ -278,9 +381,13 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
         scheduled_expression = ast.parse('token_losses = scheduled_spatial_token_cross_entropy('
             'shifted_logits.transpose(1, 2), shifted_labels, ignore_index=-100)').body[0]
         scheduled_contract = ast.dump(scheduled_expression, include_attributes=False)
+        causal_expression = ast.parse('token_losses = causal_gradient_token_cross_entropy('
+            'logits.float(), shifted_labels, ignore_index=-100)').body[0]
+        causal_contract = ast.dump(causal_expression, include_attributes=False)
         dispatches = {'flat_ce': flat_contract, 'fused_ce': fused_contract,
                       'spatial_fused_backward': spatial_contract,
-                      'spatial_scheduled_ce': scheduled_contract}
+                      'spatial_scheduled_ce': scheduled_contract,
+                      'causal_contiguous_gradient_ce': causal_contract}
         wrapper_contract, ce_dispatch = {}, []
         for node in ast.walk(wrapper):
             if isinstance(node, ast.Assign):
@@ -310,6 +417,8 @@ def compatible_sft_numerics(commit, *, loss_implementation='spatial_ce'):
             bindings.update(spatial_native_forward_contract())
         elif loss_implementation == 'spatial_scheduled_ce':
             bindings.update(scheduled_spatial_forward_contract())
+        elif loss_implementation == 'causal_contiguous_gradient_ce':
+            bindings.update(causal_gradient_layout_contract())
     return bindings
 
 

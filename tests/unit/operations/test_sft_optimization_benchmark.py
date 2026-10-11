@@ -92,7 +92,7 @@ def test_scheduled_plan_requires_both_loaded_helper_sources_before_gpu_work(tmp_
     plan, _, _ = MODULE.build_plan(MODULE.arguments(argv))
     assert plan["consumer_bindings_valid"] is True
     assert all(relative in plan["source_file_hashes"] for relative in MODULE.LOSS_HELPER_FILES.values())
-    assert len({plan["source_file_hashes"][relative] for relative in MODULE.LOSS_HELPER_FILES.values()}) == 2
+    assert len({plan["source_file_hashes"][relative] for relative in MODULE.LOSS_HELPER_FILES.values()}) == len(MODULE.LOSS_HELPER_FILES)
 
 
 def measured_fixture():
@@ -101,9 +101,10 @@ def measured_fixture():
             "actual_execution_policy": {"gradient_checkpointing": True, "cache_collated_inputs": False,
                 "attention_implementation": "eager", "use_cache": False, "checkpoint_rng_preserved": True},
             "tokenized_records_hash": "exact mask and token IDs", "data": {"dataset_hash": "frozen"},
-            "initial_adapter_hash": "initial", "initial_rng_hash": "rng0", "final_rng_hash": "rng1",
-            "initial_optimizer_state_hash": "opt0", "initial_scheduler_state_hash": "sched0",
-            "final_optimizer_state_hash": "opt1", "final_scheduler_state_hash": "sched1",
+            "initial_adapter_hash": "a" * 64, "initial_rng_hash": "0" * 64, "final_rng_hash": "1" * 64,
+            "initial_optimizer_state_hash": "2" * 64, "initial_scheduler_state_hash": "3" * 64,
+            "final_optimizer_state_hash": "4" * 64, "final_scheduler_state_hash": "5" * 64,
+            "final_adapter_hash": "b" * 64, "clipped_gradient_hash": "c" * 64, "adapter_delta_hash": "d" * 64,
             "losses": [1.0, 2.0], "median_update_seconds": 10.0, "wall_seconds_per_update": [10.0] * 5}
 
 
@@ -140,6 +141,23 @@ def test_noisy_median_speedup_is_not_sufficient_for_a_pass():
     assert result["observed_minimum_speedup"] < 1.0
     assert result["technical_gate"] == "FAILED"
     assert result["full_fit_time_extrapolation_supported"] is False
+
+
+@pytest.mark.parametrize("field,value", [("losses", [1.000001, 2.0]),
+    ("final_adapter_hash", "e" * 64), ("clipped_gradient_hash", "e" * 64),
+    ("adapter_delta_hash", "e" * 64), ("final_optimizer_state_hash", "e" * 64)])
+def test_final_copy_gate_rejects_tolerated_losses_or_any_different_state_hash(field, value):
+    reference = measured_fixture()
+    candidate = {**reference, "median_update_seconds": 8.0, "wall_seconds_per_update": [8.0] * 5, field: value}
+    state = state_fixture()
+    legacy = MODULE.compare_profiles(reference, candidate, state, state, declared_bounds())
+    assert legacy["losses_within_declared_tolerance"] is True
+    assert legacy["numerical_screen_passed"] is True
+    exact = MODULE.compare_profiles(reference, candidate, state, state,
+                                    {**declared_bounds(), "require_exact_state_comparison": True})
+    assert exact["technical_gate"] == "FAILED"
+    assert exact["exact_state_comparison_required"] is True
+    assert exact["exact_state_comparison_passed"] is False
 
 
 def test_speed_gate_pairs_corresponding_inputs_instead_of_mixing_sequence_lengths():
@@ -204,6 +222,7 @@ def test_loss_candidates_require_an_explicit_current_reference_first():
                      ["baseline", "fused_ce_no_gradient_checkpointing"],
                      ["baseline", "spatial_fused_backward_no_gradient_checkpointing"],
                      ["baseline", "spatial_scheduled_ce_no_gradient_checkpointing"],
+                     ["baseline", "causal_contiguous_gradient_ce_no_gradient_checkpointing"],
                      ["baseline", "cached_no_gradient_checkpointing"]):
         with pytest.raises(SystemExit):
             MODULE.arguments([*argv, "--profiles", *profiles])
@@ -223,19 +242,29 @@ def test_loss_candidates_require_an_explicit_current_reference_first():
     scheduled = MODULE.arguments([*argv, "--reference-profile", "spatial_fused_backward_no_gradient_checkpointing", "--profiles",
                                   "spatial_fused_backward_no_gradient_checkpointing", "spatial_scheduled_ce_no_gradient_checkpointing"])
     assert scheduled.reference_profile == "spatial_fused_backward_no_gradient_checkpointing"
+    for wrong_reference in ("no_gradient_checkpointing", "spatial_fused_backward_no_gradient_checkpointing"):
+        with pytest.raises(SystemExit):
+            MODULE.arguments([*argv, "--reference-profile", wrong_reference, "--profiles", wrong_reference,
+                              "causal_contiguous_gradient_ce_no_gradient_checkpointing"])
+    causal = MODULE.arguments([*argv, "--reference-profile", "spatial_scheduled_ce_no_gradient_checkpointing", "--profiles",
+                               "spatial_scheduled_ce_no_gradient_checkpointing", "causal_contiguous_gradient_ce_no_gradient_checkpointing"])
+    assert causal.reference_profile == "spatial_scheduled_ce_no_gradient_checkpointing"
 
 
 @pytest.mark.parametrize("candidate_name", ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing",
-    "spatial_fused_backward_no_gradient_checkpointing", "spatial_scheduled_ce_no_gradient_checkpointing"])
+    "spatial_fused_backward_no_gradient_checkpointing", "spatial_scheduled_ce_no_gradient_checkpointing",
+    "causal_contiguous_gradient_ce_no_gradient_checkpointing"])
 def test_loss_mode_is_an_intended_change_but_missing_actual_dispatch_evidence_fails(candidate_name):
     reference = measured_fixture()
     reference.update(profile="no_gradient_checkpointing", settings=dict(MODULE.PROFILE_SETTINGS["no_gradient_checkpointing"]))
     reference["actual_execution_policy"] = {**reference["actual_execution_policy"], "gradient_checkpointing": False}
-    if candidate_name == "spatial_scheduled_ce_no_gradient_checkpointing":
-        reference.update(profile="spatial_fused_backward_no_gradient_checkpointing",
-                         settings=dict(MODULE.PROFILE_SETTINGS["spatial_fused_backward_no_gradient_checkpointing"]))
+    reference_name = {"spatial_scheduled_ce_no_gradient_checkpointing": "spatial_fused_backward_no_gradient_checkpointing",
+                      "causal_contiguous_gradient_ce_no_gradient_checkpointing": "spatial_scheduled_ce_no_gradient_checkpointing"}.get(candidate_name)
+    if reference_name:
+        reference.update(profile=reference_name, settings=dict(MODULE.PROFILE_SETTINGS[reference_name]))
         reference["runtime"] = {"loss_helper_sha256": "e" * 64}
-        reference["actual_execution_policy"].update(loss_implementation="spatial_fused_backward", loss_helper_sha256="e" * 64)
+        reference["actual_execution_policy"].update(loss_implementation=reference["settings"]["loss_implementation"],
+                                                   loss_helper_sha256="e" * 64)
     settings = dict(MODULE.PROFILE_SETTINGS[candidate_name])
     candidate = {**reference, "profile": candidate_name, "settings": settings,
         "actual_execution_policy": {**reference["actual_execution_policy"], "loss_implementation": settings["loss_implementation"]},
@@ -257,7 +286,7 @@ def test_loss_mode_is_an_intended_change_but_missing_actual_dispatch_evidence_fa
 
 @pytest.mark.parametrize("helper_hash", [None, "invalid", "e" * 64])
 @pytest.mark.parametrize("candidate_name", ["spatial_fused_backward_no_gradient_checkpointing",
-    "spatial_scheduled_ce_no_gradient_checkpointing"])
+    "spatial_scheduled_ce_no_gradient_checkpointing", "causal_contiguous_gradient_ce_no_gradient_checkpointing"])
 def test_spatial_backward_policy_cannot_omit_or_misrepresent_loaded_helper(helper_hash, candidate_name):
     reference = measured_fixture()
     reference.update(profile="no_gradient_checkpointing", settings=dict(MODULE.PROFILE_SETTINGS["no_gradient_checkpointing"]))
@@ -368,14 +397,15 @@ def test_paired_launch_order_and_all_repetition_gates_are_recorded(tmp_path, mon
     ("no_gradient_checkpointing", ["flat_ce_no_gradient_checkpointing"]),
     ("no_gradient_checkpointing", ["flat_ce_no_gradient_checkpointing", "fused_ce_no_gradient_checkpointing"]),
     ("no_gradient_checkpointing", ["spatial_fused_backward_no_gradient_checkpointing"]),
-    ("spatial_fused_backward_no_gradient_checkpointing", ["spatial_scheduled_ce_no_gradient_checkpointing"])])
+    ("spatial_fused_backward_no_gradient_checkpointing", ["spatial_scheduled_ce_no_gradient_checkpointing"]),
+    ("spatial_scheduled_ce_no_gradient_checkpointing", ["causal_contiguous_gradient_ce_no_gradient_checkpointing"])])
 def test_loss_candidates_measure_incremental_gain_against_current_accepted_reference_only(tmp_path, monkeypatch, reference, candidate_names):
     torch = pytest.importorskip("torch")
     from types import SimpleNamespace
     argv = static_inputs(tmp_path, monkeypatch)
     worklist = json.loads((tmp_path / "worklist.json").read_text())
     monkeypatch.setattr(MODULE, "certified_tasks", lambda *a, **k: worklist)
-    if reference == "spatial_fused_backward_no_gradient_checkpointing":
+    if reference in ("spatial_fused_backward_no_gradient_checkpointing", "spatial_scheduled_ce_no_gradient_checkpointing"):
         source_root = tmp_path / "declared_source_fixture"
         monkeypatch.setattr(MODULE, "ROOT", source_root)
         for name, relative in MODULE.LOSS_HELPER_FILES.items():
@@ -409,11 +439,14 @@ def test_loss_candidates_measure_incremental_gain_against_current_accepted_refer
     assert "baseline" not in launched
     report = json.loads((tmp_path / "benchmark" / "report.json").read_text())
     assert report["plan"]["reference_profile"] == reference
+    require_exact = "causal_contiguous_gradient_ce_no_gradient_checkpointing" in candidate_names
+    assert report["plan"]["technical_tolerances"]["require_exact_state_comparison"] is require_exact
     assert len(report["profile_runs"]) == len(candidate_names) * 4
     for candidate in candidate_names:
         comparison = report["comparisons"][candidate]
         assert comparison["reference_profile"] == reference
         assert comparison["technical_gate"] == "PASSED"
+        assert comparison["exact_state_comparison_required"] is require_exact
         assert comparison["minimum_paired_update_speedup"] == 1.25
         assert all(pair["reference_profile"] == reference for pair in comparison["repetitions"])
         assert comparison["intended_execution_policy_changes"] == {"loss_implementation": {

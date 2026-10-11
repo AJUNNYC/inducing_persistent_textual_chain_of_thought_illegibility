@@ -91,11 +91,12 @@ def test_execution_profile_is_explicit_and_baseline_default_is_unchanged():
 @pytest.mark.parametrize('family', ['rot13', 'kazitext'])
 @pytest.mark.parametrize('model_id', ['7b', '14b'])
 @pytest.mark.parametrize('level', range(1, 11))
-def test_scheduled_spatial_profile_leaves_each_frozen_fit_recipe_and_condition_identity_unchanged(family, model_id, level):
+@pytest.mark.parametrize('implementation', ['spatial_scheduled_ce', 'causal_contiguous_gradient_ce'])
+def test_scheduled_spatial_profile_leaves_each_frozen_fit_recipe_and_condition_identity_unchanged(family, model_id, level, implementation):
     from training.sft.individual_fit.sft_fit import SFTFitSpec
     fit = SFTFitSpec(family, model_id, level, 'a' * 40, 'b' * 40, 'c' * 64, 'd' * 64)
     before = fit.identity()
-    profile = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce')
+    profile = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation=implementation)
     assert SFTExecutionProfile.from_dict(profile.to_dict()) == profile
     assert fit.identity() == before
     assert fit.identity()['recipe'] == {

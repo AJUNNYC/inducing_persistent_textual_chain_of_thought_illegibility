@@ -12,6 +12,8 @@ flowchart TD
 %% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
 %% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
 %% New source a6e3295 continuation runs from restored step 509; parent bytes remain unchanged.
+%% Pending causal_contiguous_gradient_ce owns causal shift and writes full contiguous BTV gradients.
+%% Reuse accepted scheduled forward; compare incrementally without changing science or RNG.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.

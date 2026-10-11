@@ -588,6 +588,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             rollout_collection.py
       sft/
         __init__.py
+        causal_gradient_loss.py
         data_handoff.py
         execution_profile.py
         fused_loss.py
@@ -720,6 +721,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         sft/
           individual_fit/
             test_sft_fit.py
+          test_causal_gradient_loss.py
           test_data_handoff.py
           test_execution_profile.py
           test_fused_loss.py

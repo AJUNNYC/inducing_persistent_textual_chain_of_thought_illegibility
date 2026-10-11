@@ -60,6 +60,7 @@ def backward():
 '''
 
 SCHEDULED_HELPER_FIXTURE = (SCRIPT.parents[1]/'src/training/sft/scheduled_spatial_loss.py').read_text()
+CAUSAL_HELPER_FIXTURE = (SCRIPT.parents[1]/'src/training/sft/causal_gradient_loss.py').read_text()
 
 
 def scheduled_wrapper():
@@ -76,6 +77,20 @@ def set_scheduled_helpers(tmp_path, source=SCHEDULED_HELPER_FIXTURE):
     helper = tmp_path/'src/training/sft/scheduled_spatial_loss.py'
     helper.write_text(source)
     return helper
+
+
+def causal_wrapper():
+    return scheduled_wrapper().replace('    else:\n        token_losses = fused_token_cross_entropy(',
+        '    elif loss_implementation == "causal_contiguous_gradient_ce":\n'
+        '        token_losses = causal_gradient_token_cross_entropy(logits.float(), shifted_labels, ignore_index=-100)\n'
+        '    else:\n        token_losses = fused_token_cross_entropy(')
+
+
+def set_causal_helpers(tmp_path, source=CAUSAL_HELPER_FIXTURE):
+    set_scheduled_helpers(tmp_path)
+    path = tmp_path/'src/training/sft/causal_gradient_loss.py'
+    path.write_text(source)
+    return path
 
 
 def set_numerics(tmp_path, monkeypatch, current):
@@ -197,6 +212,65 @@ def test_scheduled_helper_cannot_override_original_completion_objective(tmp_path
     set_scheduled_helpers(tmp_path)
     with pytest.raises(ValueError, match='frozen shift|mask|weighting'):
         MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_scheduled_ce')
+
+
+def test_full_causal_gradient_layout_preserves_original_loss_and_accepted_reference(tmp_path, monkeypatch):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + causal_wrapper())
+    helper = set_causal_helpers(tmp_path)
+    bindings = MODULE.compatible_sft_numerics('original-source', loss_implementation='causal_contiguous_gradient_ce')
+    assert bindings['replacement_reduction'] == bindings['reduction']
+    assert bindings['causal_gradient_loss_module'] == MODULE.file_hash(helper)
+    assert 'causal_gradient_forward_delegation' in bindings
+    assert 'causal_gradient_zero_tail' in bindings
+    reference = MODULE.compatible_sft_numerics('original-source', loss_implementation='spatial_scheduled_ce')
+    assert reference['replacement_reduction'] == bindings['reduction']
+    assert reference['scheduled_spatial_loss_module'] == bindings['scheduled_spatial_loss_module']
+
+
+@pytest.mark.parametrize('before,after', [
+    ('logits[:, :-1, :]', 'logits[:, 1:, :]'),
+    ('shifted_logits = logits[:, :-1, :].float()', 'shifted_logits = logits[:, :-1, :].bfloat16()'),
+    ('ctx, shifted_logits.transpose(1, 2), targets, ignore_index)',
+     'ctx, shifted_logits.transpose(1, 2), targets[:, 1:], ignore_index)'),
+    ('dtype=torch.float32', 'dtype=torch.bfloat16'),
+    ('log_probability - maximum - log_sum', 'log_probability - (maximum + log_sum)'),
+    ('libdevice.exp(log_probability)', 'tl.exp(log_probability)'),
+    ('full_times - 1', 'full_times - 2'),
+    ('tl.store(output + offsets, 0.0, classes < n_columns)', 'tl.store(output + offsets, 1.0, classes < n_columns)'),
+    ('destination_offset = (batch * full_times + times) * n_columns + classes',
+     'destination_offset = (batch * full_times + times) * n_times + classes'),
+    ('enable_fp_fusion=True', 'enable_fp_fusion=False'),
+    ('CLASS_TILE_SIZE = 32', 'CLASS_TILE_SIZE = 64'),
+    ('from .scheduled_spatial_loss import _autograd_function as _scheduled_autograd_function',
+     'from .spatial_loss import _autograd_function as _scheduled_autograd_function'),
+])
+def test_causal_gradient_source_guard_rejects_changed_shift_tail_dtype_math_or_delegation(tmp_path, monkeypatch, before, after):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + causal_wrapper())
+    assert before in CAUSAL_HELPER_FIXTURE
+    set_causal_helpers(tmp_path, CAUSAL_HELPER_FIXTURE.replace(before, after))
+    with pytest.raises(ValueError, match='Causal gradient layout changed'):
+        MODULE.compatible_sft_numerics('original-source', loss_implementation='causal_contiguous_gradient_ce')
+
+
+def test_causal_gradient_source_guard_requires_byte_identical_accepted_scheduled_helper(tmp_path, monkeypatch):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + causal_wrapper())
+    set_causal_helpers(tmp_path)
+    with (tmp_path/'src/training/sft/scheduled_spatial_loss.py').open('a') as stream:
+        stream.write('\n# Changed reference fixture bytes.\n')
+    with pytest.raises(ValueError, match='previously accepted scheduled helper'):
+        MODULE.compatible_sft_numerics('original-source', loss_implementation='causal_contiguous_gradient_ce')
+
+
+@pytest.mark.parametrize('before,after', [
+    ('/ counts', '/ (counts + 1)'),
+    ('logits.float(), shifted_labels, ignore_index=-100', 'logits.bfloat16(), shifted_labels, ignore_index=-100'),
+    ('logits.float(), shifted_labels, ignore_index=-100', 'logits.float(), labels, ignore_index=-100'),
+])
+def test_causal_gradient_execution_evidence_cannot_override_completion_objective(tmp_path, monkeypatch, before, after):
+    set_numerics(tmp_path, monkeypatch, GUARDED_NUMERICS + causal_wrapper().replace(before, after))
+    set_causal_helpers(tmp_path)
+    with pytest.raises(ValueError, match='frozen shift|mask|weighting'):
+        MODULE.compatible_sft_numerics('original-source', loss_implementation='causal_contiguous_gradient_ce')
 
 
 @pytest.mark.parametrize('before,after', [

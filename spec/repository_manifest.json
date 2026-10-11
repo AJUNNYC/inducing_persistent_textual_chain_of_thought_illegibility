@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 529,
+  "files": 531,
   "directories_including_root": 202,
   "entries": [
     {
@@ -6284,6 +6284,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/causal_gradient_loss.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/causal_gradient_loss.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_610a07065e4b77",
+      "blank": false
+    },
+    {
       "path": "src/training/sft/data_handoff.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -7692,6 +7703,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/unit_tests_layout.mmd",
       "node": "p_83bf7f7d220e95",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_causal_gradient_loss.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_causal_gradient_loss.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_01835ee5fe6d2c",
       "blank": false
     },
     {

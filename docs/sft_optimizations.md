@@ -33,7 +33,8 @@ and production migration gates pass; it is not concealed as unchanged execution.
 | 6 | Fuse only FP32 token cross-entropy with the pinned Triton runtime. | Liger provides online softmax/CE precedent, but changing the forward normalization order exceeded the frozen numerical bounds on this workload. | Source `6d21fff` measured median ratios 1.6751x and 1.7008x, but maximum loss difference was 0.00595903 and gradient/update relative L2 differences were 2.169%/1.922%, above 0.1% bounds. Rejected and not activated. |
 | 7 | Retain stock spatial CE forward and tile only its backward gradient. | Keeps `torch.log_softmax(..., dim=1)` and unreduced `F.nll_loss`; the tiled backward follows the pinned PyTorch epilogue with libdevice exponential and the one nonzero target gradient. | Source `218900d` accepted for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Two paired median ratios were 1.1564x/1.1318x, minimum matched ratio 1.1146x; losses, gradients, updates and final full state/RNG were bitwise identical. |
 | 8 | Schedule the same spatial CE forward over smaller token blocks and retain only target losses/row statistics. | Follow pinned PyTorch's serial FP32 class accumulation and libdevice exp/log sequence; reconstruct log-probabilities during the already validated tiled backward. Scheduling and storage change rather than intentionally changing normalization order. Actual equality must still be checked. | Source `a6e3295` accepted for the selected Blackwell 7B ROT13 level-1 condition. Direct median times fell 8.9243→6.7200 and 8.8950→6.6727 seconds; bitwise numerical/state/RNG agreement, minimum matched ratio 1.31995x. |
-| 9 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
+| 9 | Write the complete causal LM-head gradient directly in contiguous token/vocabulary layout. | Move the causal shift inside custom autograd, reuse the accepted scheduled forward, and write the full `[batch,tokens,vocabulary]` gradient with its unused last row zeroed. This targets separate slice-backward and gradient-layout copies while preserving the same tensor values and arithmetic. Layout can still affect downstream execution, requiring measurement. | `causal_contiguous_gradient_ce` is under construction. The paired reference is the currently accepted scheduled spatial-CE profile; focused checks, GPU numerical/state/memory/speed results and acceptance are pending. |
+| 10 | Increase physical microbatch while keeping logical batch 16. | Official guidance favors larger physical batches over excessive accumulation. However, batching changes floating-point grouping, padding and LoRA dropout RNG assignment even when the logical batch is unchanged. | Deferred. Physical microbatch 1 and accumulation 16 remain fixed. |
 
 Epoch count, training exposure, BF16 versus NF4 construction, optimizer precision,
 learning rate, LoRA rank/dropout and effective batch size are scientific recipe
@@ -47,6 +48,43 @@ The objective is **mean supervised-token loss within each example, then mean
 across examples**. Stock model loss or token-global averaging must not silently
 replace it. A faster implementation must preserve the current weighting, causal
 shift and assistant-end supervision.
+
+## Causal contiguous-gradient candidate — pending
+
+The user authorized the final memory-copy investigation,
+`causal_contiguous_gradient_ce_no_gradient_checkpointing`. The separate helper
+is `src/training/sft/causal_gradient_loss.py`; implementation and validation are
+pending. Current source `a6e3295` training continues on its accepted scheduled
+spatial-CE profile during preparation.
+
+The design passes full FP32 logits `[batch,tokens,vocabulary]` and the same
+shifted targets into custom autograd, which owns the causal logit shift. It
+delegates forward to the accepted scheduled kernel, retaining its coalesced
+`[batch,vocabulary,tokens]` input copy and exact serial FP32 arithmetic. Backward
+uses 32-class by 32-time tiles to write the complete contiguous
+`[batch,tokens,vocabulary]` gradient directly, with only the unused last logit
+row zeroed. This targets the separate `SliceBackward` full-buffer/scatter and
+gradient-layout copy. Head projection, GEMM inputs, full vocabulary, masks,
+per-example loss, dtype, optimizer and RNG remain fixed. Preserving values and
+arithmetic is the design requirement; actual numerical agreement is unmeasured.
+
+[PyTorch's pinned transpose documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/_torch_docs.py)
+states that a strided transpose shares underlying storage.
+[Its contiguous documentation](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.0/torch/_tensor_docs.py)
+describes a contiguous tensor containing the same data, and
+[Triton's pinned matrix tutorial](https://raw.githubusercontent.com/triton-lang/triton/v3.5.0/python/tutorials/03-matrix-multiplication.py)
+demonstrates explicit multi-dimensional pointer/stride arithmetic. These provide
+precedent for changing storage/addressing without changing the represented
+values. They do not certify this custom causal backward or predict a speedup;
+different memory access patterns can improve or worsen execution.
+
+The paired recovery screen will compare against
+`spatial_scheduled_ce_no_gradient_checkpointing` from the same latest preserved
+full state. Any gain must be incremental to the current profile. The original
+numerical, full-state, RNG, speed and longest-example gates remain fixed. A safe
+whole-update pause, verified parent preservation, current source/condition
+bindings and explicit child lineage precede production activation. No new
+candidate approval, speed result or memory saving is claimed.
 
 ## Current scheduled spatial-forward profile
 
@@ -303,10 +341,10 @@ python scripts/benchmark_sft_optimizations.py \
   --bundle CERTIFIED_BUNDLE.json \
   --worklist CURRENT_WORKLIST.json \
   --model 7b --family rot13 --level 1 \
-  --reference-profile spatial_fused_backward_no_gradient_checkpointing \
-  --profiles spatial_fused_backward_no_gradient_checkpointing spatial_scheduled_ce_no_gradient_checkpointing \
+  --reference-profile spatial_scheduled_ce_no_gradient_checkpointing \
+  --profiles spatial_scheduled_ce_no_gradient_checkpointing causal_contiguous_gradient_ce_no_gradient_checkpointing \
   --warmup-updates 1 --updates 5 --repetitions 2 \
-  --recovery-checkpoint VERIFIED_CURRENT_SPATIAL_BACKWARD_CHECKPOINT_DIRECTORY \
+  --recovery-checkpoint VERIFIED_CURRENT_SCHEDULED_CE_CHECKPOINT_DIRECTORY \
   --output NEW_BENCHMARK_DIRECTORY --plan-only
 ```
 

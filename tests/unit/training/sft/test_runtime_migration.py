@@ -163,6 +163,48 @@ def scheduled_spatial_fixture(identity, manifest=None):
     return rehash(report)
 
 
+def causal_gradient_fixture(identity, manifest=None):
+    """Declared exact-state scheduling parent versus causal gradient layout."""
+    report = incremental_fixture(identity, manifest)
+    reference_name = 'spatial_scheduled_ce_no_gradient_checkpointing'
+    candidate_name = 'causal_contiguous_gradient_ce_no_gradient_checkpointing'
+    reference = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='spatial_scheduled_ce').to_dict()
+    candidate = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    helpers = {'spatial_fused_backward': 'src/training/sft/spatial_loss.py',
+               'spatial_scheduled_ce': 'src/training/sft/scheduled_spatial_loss.py',
+               'causal_contiguous_gradient_ce': 'src/training/sft/causal_gradient_loss.py'}
+    report['plan']['reference_profile'] = reference_name
+    report['plan']['profiles'] = {reference_name: reference, candidate_name: candidate}
+    report['plan']['technical_tolerances']['require_exact_state_comparison'] = True
+    for path in helpers.values():
+        report['plan']['source_file_hashes'][path] = file_hash(ROOT/path)
+    for container in (report['profiles'], report['profile_runs']):
+        for row in container.values():
+            is_reference = row['profile'] == 'no_gradient_checkpointing'
+            settings = reference if is_reference else candidate
+            row['profile'] = reference_name if is_reference else candidate_name
+            row['settings'] = settings
+            row['runtime']['execution_profile'] = settings
+            row['losses'] = [1.25] * 96
+            for field in ('initial_optimizer_state_hash', 'initial_scheduler_state_hash', 'clipped_gradient_hash',
+                          'adapter_delta_hash', 'final_adapter_hash', 'final_optimizer_state_hash',
+                          'final_scheduler_state_hash'):
+                row[field] = 'a' * 64
+            for field in ('runtime', 'actual_execution_policy', 'longest_sequence_probe'):
+                row[field]['loss_implementation'] = settings['loss_implementation']
+                row[field]['loss_helper_sha256'] = report['plan']['source_file_hashes'][helpers[settings['loss_implementation']]]
+    report['profiles'] = {reference_name: report['profiles']['no_gradient_checkpointing'],
+                          candidate_name: report['profiles']['flat_ce']}
+    comparison = report['comparisons'].pop('flat_ce')
+    for row in [comparison, *comparison['repetitions']]:
+        row.update(reference_profile=reference_name, exact_state_comparison_passed=True,
+                   final_optimizer_states_identical=True, final_scheduler_states_identical=True,
+                   losses_exactly_identical=True, final_adapters_identical=True,
+                   maximum_loss_absolute_difference=0.0)
+    report['comparisons'][candidate_name] = comparison
+    return rehash(report)
+
+
 @pytest.mark.parametrize("field", IMMUTABLE_IDENTITY_FIELDS)
 def test_scientific_checkpoint_identity_cannot_change(field):
     old, new = identities()
@@ -289,6 +331,92 @@ def test_scheduled_ce_must_compare_only_scheduling_against_the_accepted_profile(
         validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
 
 
+def test_causal_gradient_candidate_requires_exact_actual_states_and_accepted_schedule():
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    result = validate_execution_benchmark(causal_gradient_fixture(new), new['code_revision'], new['execution_profile'])
+    assert result['reference_execution_profile']['loss_implementation'] == 'spatial_scheduled_ce'
+    assert result['exact_state_comparison_required'] is True
+    assert result['exact_state_comparison_passed'] is True
+    assert result['scientific_equivalence_established'] is False
+
+
+@pytest.mark.parametrize('field', ('initial_optimizer_state_hash', 'initial_scheduler_state_hash',
+    'clipped_gradient_hash', 'adapter_delta_hash', 'final_adapter_hash', 'final_optimizer_state_hash',
+    'final_scheduler_state_hash'))
+def test_causal_layout_exact_flag_cannot_hide_different_actual_state_hash(field):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    report = causal_gradient_fixture(new)
+    report['profile_runs']['cuda_cached_2'][field] = 'b' * 64
+    rehash(report)
+    with pytest.raises(MigrationError, match='exact sampled losses and training states'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+@pytest.mark.parametrize('failure', ('aggregate_flag', 'pair_flag', 'bitwise_gradient', 'bitwise_delta', 'actual_loss'))
+def test_causal_layout_cannot_accept_tolerance_only_or_inexact_measurements(failure):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    report = causal_gradient_fixture(new)
+    comparison = report['comparisons']['causal_contiguous_gradient_ce_no_gradient_checkpointing']
+    if failure == 'aggregate_flag':
+        comparison['exact_state_comparison_passed'] = False
+    elif failure == 'pair_flag':
+        comparison['repetitions'][1]['exact_state_comparison_passed'] = False
+    elif failure == 'bitwise_gradient':
+        comparison['repetitions'][1]['gradients']['bitwise_equal'] = False
+    elif failure == 'bitwise_delta':
+        comparison['repetitions'][1]['adapter_updates']['bitwise_equal'] = False
+    else:
+        report['profile_runs']['cuda_cached_2']['losses'][0] += 1e-10
+    rehash(report)
+    with pytest.raises(MigrationError, match='exact sampled losses and training states'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+@pytest.mark.parametrize('helper', ('spatial_loss.py', 'scheduled_spatial_loss.py', 'causal_gradient_loss.py'))
+def test_causal_layout_requires_every_original_and_new_helper_source(helper):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    report = causal_gradient_fixture(new)
+    del report['plan']['source_file_hashes']['src/training/sft/'+helper]
+    rehash(report)
+    with pytest.raises(MigrationError, match='source-file bindings'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+@pytest.mark.parametrize('run', ('baseline_2', 'cuda_cached_2'))
+@pytest.mark.parametrize('field', ('runtime', 'actual_execution_policy', 'longest_sequence_probe'))
+def test_causal_layout_binds_actual_loaded_reference_and_candidate_helper(run, field):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    report = causal_gradient_fixture(new)
+    report['profile_runs'][run][field]['loss_helper_sha256'] = 'b' * 64
+    rehash(report)
+    with pytest.raises(MigrationError, match='loaded spatial-loss helper'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+def test_causal_layout_rejects_a_modified_previously_accepted_reference(tmp_path, monkeypatch):
+    import training.sft.runtime_migration as module
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation='causal_contiguous_gradient_ce').to_dict()
+    report = causal_gradient_fixture(new)
+    for path in report['plan']['source_file_hashes']:
+        destination = tmp_path/path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((ROOT/path).read_bytes())
+    path = 'src/training/sft/scheduled_spatial_loss.py'
+    with (tmp_path/path).open('a') as stream:
+        stream.write('\n# Fixture changes previously accepted reference bytes.\n')
+    report['plan']['source_file_hashes'][path] = file_hash(tmp_path/path)
+    rehash(report)
+    monkeypatch.setattr(module, 'ROOT', tmp_path)
+    with pytest.raises(MigrationError, match='unchanged accepted scheduled reference'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
 def test_legacy_v2_profiles_without_loss_field_keep_spatial_default():
     _, new = identities(); report = measured_fixture(new)
     for settings in report["plan"]["profiles"].values():
@@ -368,7 +496,7 @@ def test_stale_source_weakened_bounds_and_lying_paired_speed_reject():
         validate_execution_benchmark(report, new["code_revision"], new["execution_profile"])
 
 
-@pytest.mark.parametrize('incremental_loss', [None, 'flat_ce', 'spatial_scheduled_ce'])
+@pytest.mark.parametrize('incremental_loss', [None, 'flat_ce', 'spatial_scheduled_ce', 'causal_contiguous_gradient_ce'])
 def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(tmp_path, incremental_loss):
     torch.manual_seed(42)
     model = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.Dropout(0.2), torch.nn.Linear(2, 1))
@@ -379,7 +507,8 @@ def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(
     update(model, optimizer, scheduler)
     old, new = identities()
     if incremental_loss:
-        reference_loss = 'spatial_fused_backward' if incremental_loss == 'spatial_scheduled_ce' else 'spatial_ce'
+        reference_loss = ('spatial_scheduled_ce' if incremental_loss == 'causal_contiguous_gradient_ce'
+                          else 'spatial_fused_backward' if incremental_loss == 'spatial_scheduled_ce' else 'spatial_ce')
         old['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation=reference_loss).to_dict()
         new['execution_profile'] = SFTExecutionProfile(gradient_checkpointing=False, loss_implementation=incremental_loss).to_dict()
     original = tmp_path / "original" / "checkpoint_000001"
@@ -389,7 +518,8 @@ def test_actual_full_state_migration_preserves_next_optimizer_update_and_parent(
                      "processed_tokens": 112, "total_optimizer_steps": 1250, "exposure_order_hash": "9" * 64},
         "runtime": {"gpu_name": "H100_DECLARED_FIXTURE"}})
     parent_hashes = {path.name: file_hash(path) for path in original.iterdir()}
-    report = (scheduled_spatial_fixture(new, saved) if incremental_loss == 'spatial_scheduled_ce'
+    report = (causal_gradient_fixture(new, saved) if incremental_loss == 'causal_contiguous_gradient_ce'
+              else scheduled_spatial_fixture(new, saved) if incremental_loss == 'spatial_scheduled_ce'
               else incremental_fixture(new, saved) if incremental_loss else measured_fixture(new, saved))
     target = tmp_path / "migrated" / "checkpoint_000001"
     receipt = migrate_checkpoint(original, target, old, new, new["execution_profile"], report,

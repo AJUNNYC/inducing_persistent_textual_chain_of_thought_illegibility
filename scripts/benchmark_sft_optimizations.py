@@ -69,6 +69,10 @@ PROFILE_SETTINGS = {
         "attention_implementation": "eager", "validated_loss_counts": False,
         "defer_finite_checks": False, "cache_collated_inputs": False,
         "gradient_checkpointing": False, "loss_implementation": "spatial_scheduled_ce"},
+    "causal_contiguous_gradient_ce_no_gradient_checkpointing": {
+        "attention_implementation": "eager", "validated_loss_counts": False,
+        "defer_finite_checks": False, "cache_collated_inputs": False,
+        "gradient_checkpointing": False, "loss_implementation": "causal_contiguous_gradient_ce"},
 }
 for settings in PROFILE_SETTINGS.values():
     settings.setdefault("cache_collated_inputs", False)
@@ -77,6 +81,7 @@ for settings in PROFILE_SETTINGS.values():
 LOSS_HELPER_FILES = {
     "spatial_fused_backward": "src/training/sft/spatial_loss.py",
     "spatial_scheduled_ce": "src/training/sft/scheduled_spatial_loss.py",
+    "causal_contiguous_gradient_ce": "src/training/sft/causal_gradient_loss.py",
 }
 
 
@@ -138,6 +143,9 @@ def arguments(argv=None):
     if ("spatial_scheduled_ce_no_gradient_checkpointing" in args.profiles[1:]
             and args.reference_profile != "spatial_fused_backward_no_gradient_checkpointing"):
         parser.error("Scheduled spatial CE requires the accepted spatial_fused_backward_no_gradient_checkpointing reference")
+    if ("causal_contiguous_gradient_ce_no_gradient_checkpointing" in args.profiles[1:]
+            and args.reference_profile != "spatial_scheduled_ce_no_gradient_checkpointing"):
+        parser.error("Contiguous causal gradient CE requires the accepted spatial_scheduled_ce_no_gradient_checkpointing reference")
     return args
 
 
@@ -263,6 +271,8 @@ def build_plan(args):
             "update_relative_l2": args.update_relative_l2,
             "gradient_cosine_floor": args.gradient_cosine_floor,
             "minimum_speedup": args.minimum_speedup, "require_identical_rng_states": True,
+            "require_exact_state_comparison": any(PROFILE_SETTINGS[name]["loss_implementation"] == "causal_contiguous_gradient_ce"
+                                                   for name in args.profiles),
             "speedup_rule": "minimum speedup across corresponding logical update pairs in every repetition"},
         "profile_timeout_seconds": args.profile_timeout_seconds,
         "official_training_state_read": bool(args.recovery_checkpoint), "official_training_state_modified": False,
@@ -557,6 +567,16 @@ def compare_profiles(baseline, candidate, first, second, bounds):
     gradient = vector_comparison(first["gradients"], second["gradients"])
     update = vector_comparison(first["deltas"], second["deltas"])
     rng_equal = baseline["final_rng_hash"] == candidate["final_rng_hash"]
+    exact_state = (gradient.get("bitwise_equal") and update.get("bitwise_equal") and rng_equal
+        and baseline.get("final_optimizer_state_hash") == candidate.get("final_optimizer_state_hash")
+        and baseline.get("final_scheduler_state_hash") == candidate.get("final_scheduler_state_hash"))
+    exact_hash_fields = ("initial_adapter_hash", "initial_rng_hash", "initial_optimizer_state_hash",
+        "initial_scheduler_state_hash", "clipped_gradient_hash", "adapter_delta_hash", "final_adapter_hash",
+        "final_optimizer_state_hash", "final_scheduler_state_hash", "final_rng_hash")
+    complete_exact_state = (exact_state and losses[0] == losses[1]
+        and all(isinstance(baseline.get(key), str) and re.fullmatch(r"[0-9a-f]{64}", baseline[key]) is not None
+                and baseline.get(key) == candidate.get(key) for key in exact_hash_fields))
+    require_exact = bounds.get("require_exact_state_comparison", False)
     policy_failures = []
     for receipt in (baseline, candidate):
         actual = dict(receipt.get("actual_execution_policy", {}))
@@ -581,7 +601,8 @@ def compare_profiles(baseline, candidate, first, second, bounds):
                  and within(gradient, bounds["gradient_relative_l2"])
                  and within(update, bounds["update_relative_l2"])
                  and gradient["cosine"] >= bounds["gradient_cosine_floor"]
-                 and (rng_equal or not bounds["require_identical_rng_states"]))
+                 and (rng_equal or not bounds["require_identical_rng_states"])
+                 and (complete_exact_state or not require_exact))
     speedup = baseline["median_update_seconds"] / candidate["median_update_seconds"]
     first_times, second_times = baseline.get("wall_seconds_per_update", []), candidate.get("wall_seconds_per_update", [])
     valid_times = (bool(first_times) and len(first_times) == len(second_times)
@@ -601,9 +622,10 @@ def compare_profiles(baseline, candidate, first, second, bounds):
         "gradients": gradient, "adapter_updates": update, "final_rng_states_identical": rng_equal,
         "final_optimizer_states_identical": baseline.get("final_optimizer_state_hash") == candidate.get("final_optimizer_state_hash"),
         "final_scheduler_states_identical": baseline.get("final_scheduler_state_hash") == candidate.get("final_scheduler_state_hash"),
-        "exact_state_comparison_passed": (gradient.get("bitwise_equal") and update.get("bitwise_equal") and rng_equal
-            and baseline.get("final_optimizer_state_hash") == candidate.get("final_optimizer_state_hash")
-            and baseline.get("final_scheduler_state_hash") == candidate.get("final_scheduler_state_hash")),
+        "losses_exactly_identical": losses[0] == losses[1],
+        "final_adapters_identical": baseline.get("final_adapter_hash") == candidate.get("final_adapter_hash"),
+        "exact_state_comparison_required": require_exact,
+        "exact_state_comparison_passed": complete_exact_state if require_exact else exact_state,
         "measured_speedup": speedup, "observed_minimum_speedup": observed_minimum_speedup,
         "paired_update_speedups": paired_speedups, "minimum_paired_update_speedup": paired_minimum,
         "speedup_threshold_passed": speed_screen,
@@ -624,7 +646,7 @@ def aggregate_comparisons(values, reference):
     result = dict(values[0])
     for field in ("numerical_screen_passed", "losses_within_declared_tolerance", "final_rng_states_identical",
                   "speedup_threshold_passed", "final_optimizer_states_identical", "final_scheduler_states_identical",
-                  "exact_state_comparison_passed"):
+                  "exact_state_comparison_passed", "losses_exactly_identical", "final_adapters_identical"):
         result[field] = all(row[field] for row in values)
     for field in ("invariant_failures", "execution_policy_failures"):
         result[field] = sorted({entry for row in values for entry in row[field]})

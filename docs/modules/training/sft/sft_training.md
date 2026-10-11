@@ -30,6 +30,8 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 
 ## Implemented interface and evidence
 
+The final contiguous-gradient memory-copy candidate remains pending. Its paired reference is the active scheduled spatial-CE profile, with unchanged full science and latest recovery state. Existing source a6e3295 training continues during preparation. Only actual source/GPU/condition-bound numerical, state, RNG, speed and memory evidence plus parent-preserving migration may activate the new helper; previous approval and other conditions do not authorize it.
+
 Source `a6e3295` passed the counterbalanced scheduled spatial-CE screen: two step-509 recovery pairs measured 24.70–24.98% less median update time versus accepted spatial-forward/tiled-backward, with bitwise numerical/state/RNG agreement and minimum matched ratio 1.31995x. Source/GPU/condition-bound READY controls and 236 focused CPU checks approve only 7B ROT13 level 1 on Blackwell96GB. Parent-preserving full-state migration and the unchanged science remain mandatory; unrelated suites, provider/statistical controls and the remaining matrix were not repeated. Prior flat/fused forward failures remain rejected.
 
 Both flat-layout and fully fused forward CE failed the frozen numerical screen despite faster timing and remain rejected. Source `218900d` passed two paired recoveries for stock spatial forward plus tiled backward, with bitwise numerical/state/RNG agreement and 11.65–13.52% less median update time versus the already accepted no-recomputation profile. The new source/profile/condition-bound READY controls and explicit step-401 child lineage authorize only this 7B ROT13 level-1 continuation. The original science and latest full state are preserved; remaining fits require their own affected evidence. A total of 165 affected CPU checks passed without repeating unrelated suites or simulations.
@@ -73,6 +75,8 @@ flowchart TD
 %% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
 %% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
 %% New source a6e3295 continuation runs from restored step 509; parent bytes remain unchanged.
+%% Pending causal_contiguous_gradient_ce owns causal shift and writes full contiguous BTV gradients.
+%% Reuse accepted scheduled forward; compare incrementally without changing science or RNG.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
 %% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.

@@ -203,6 +203,8 @@ def test_fused_execution_failure_propagates_without_spatial_or_flat_fallback(mon
 
 def spatial_helper_module(implementation):
     from importlib import import_module
+    if implementation == 'causal_contiguous_gradient_ce':
+        return import_module('training.sft.causal_gradient_loss'), 'causal_gradient_token_cross_entropy'
     if implementation == 'spatial_scheduled_ce':
         return import_module('training.sft.scheduled_spatial_loss'), 'scheduled_spatial_token_cross_entropy'
     return import_module('training.sft.spatial_loss'), 'spatial_token_cross_entropy'
@@ -217,9 +219,13 @@ def install_native_spatial_forward_stub(monkeypatch, implementation='spatial_fus
     def native_forward(logits, targets, *, ignore_index=-100):
         assert logits.dtype == torch.float32 and logits.ndim == 3
         assert targets.dtype == torch.long and targets.ndim == 2
-        assert targets.shape == (logits.shape[0], logits.shape[2])
         assert ignore_index == -100
         calls.append((logits.detach().clone(), targets.detach().clone()))
+        if implementation == 'causal_contiguous_gradient_ce':
+            assert targets.shape == (logits.shape[0], logits.shape[1] - 1)
+            logits = logits[:, :-1, :].transpose(1, 2)
+        else:
+            assert targets.shape == (logits.shape[0], logits.shape[2])
         return functional.nll_loss(torch.log_softmax(logits, dim=1, dtype=logits.dtype),
                                    targets, ignore_index=ignore_index, reduction='none')
     monkeypatch.setattr(spatial_loss, function_name, native_forward)
@@ -228,7 +234,7 @@ def install_native_spatial_forward_stub(monkeypatch, implementation='spatial_fus
 
 @pytest.mark.parametrize('dtype_name', ['float32', 'bfloat16'])
 @pytest.mark.parametrize('bound_counts', [False, True])
-@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce'])
+@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce', 'causal_contiguous_gradient_ce'])
 def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_weighting(monkeypatch, dtype_name, bound_counts, implementation):
     import torch
     calls = install_native_spatial_forward_stub(monkeypatch, implementation)
@@ -252,13 +258,14 @@ def test_spatial_backward_dispatch_retains_original_forward_layout_masks_and_wei
     assert not torch.count_nonzero(candidate_logits.grad[:, -1])
     for row in range(3):
         assert not torch.count_nonzero(candidate_logits.grad[row, :-1][batch['labels'][row, 1:] == -100])
-    assert len(calls) == 1 and calls[0][0].shape == (3, 13, 5)
-    assert torch.equal(calls[0][0], values[:, :-1].float().transpose(1, 2))
+    expected_input = values.float() if implementation == 'causal_contiguous_gradient_ce' else values[:, :-1].float().transpose(1, 2)
+    assert len(calls) == 1 and calls[0][0].shape == expected_input.shape
+    assert torch.equal(calls[0][0], expected_input)
     assert torch.equal(calls[0][1], batch['labels'][:, 1:])
     assert torch.equal(before, torch.get_rng_state())
 
 
-@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce'])
+@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce', 'causal_contiguous_gradient_ce'])
 def test_spatial_backward_update_probe_and_validation_keep_native_forward_rng_and_receipt(monkeypatch, tmp_path, implementation):
     import hashlib
     import torch
@@ -309,7 +316,7 @@ def test_spatial_backward_update_probe_and_validation_keep_native_forward_rng_an
     assert len(calls) == 20  # 16 training microbatches, one probe and three validation examples.
 
 
-@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce'])
+@pytest.mark.parametrize('implementation', ['spatial_fused_backward', 'spatial_scheduled_ce', 'causal_contiguous_gradient_ce'])
 def test_spatial_backward_failure_propagates_and_count_guards_precede_kernel(monkeypatch, implementation):
     import torch
     spatial_loss, function_name = spatial_helper_module(implementation)

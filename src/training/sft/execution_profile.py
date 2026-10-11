@@ -20,8 +20,8 @@ class SFTExecutionProfile:
     def __post_init__(self) -> None:
         if self.attention_implementation not in ("eager", "sdpa"):
             raise ValueError("Supported SFT attention candidates are eager and sdpa")
-        if self.loss_implementation not in ("spatial_ce", "flat_ce", "fused_ce", "spatial_fused_backward", "spatial_scheduled_ce"):
-            raise ValueError("Supported completion-loss candidates are spatial_ce, flat_ce, fused_ce, spatial_fused_backward and spatial_scheduled_ce")
+        if self.loss_implementation not in ("spatial_ce", "flat_ce", "fused_ce", "spatial_fused_backward", "spatial_scheduled_ce", "causal_contiguous_gradient_ce"):
+            raise ValueError("Supported completion-loss candidates are spatial_ce, flat_ce, fused_ce, spatial_fused_backward, spatial_scheduled_ce and causal_contiguous_gradient_ce")
         if any(type(value) is not bool for value in (
                 self.validated_loss_counts, self.defer_finite_checks,
                 self.cache_collated_inputs, self.gradient_checkpointing)):
