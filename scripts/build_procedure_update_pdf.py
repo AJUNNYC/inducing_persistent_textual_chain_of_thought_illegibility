@@ -26,7 +26,7 @@ def inline(value):
             path = (ROOT / 'docs' / target).resolve().relative_to(ROOT)
             target = 'https://github.com/AJUNNYC/inducing_persistent_textual_chain_of_thought_illegibility/blob/main/' + path.as_posix()
         return f'<link href="{target}" color="#235a90">{match.group(1)}</link>'
-    value = re.sub(r'\[([^\]]+)\]\([^)]+\)', link, value)
+    value = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', link, value)
     value = re.sub(r'`([^`]+)`', r'<font face="Courier">\1</font>', value)
     return re.sub(r'\*\*([^*]+)\*\*', r'<b>\1</b>', value)
 
