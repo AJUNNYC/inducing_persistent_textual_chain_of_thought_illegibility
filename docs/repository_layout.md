@@ -114,6 +114,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_runtime_checks_report.json
       sft_training_launch.json
       sft_training_launch_drive.json
+      sft_training_pause_214.json
+      sft_training_pause_214_drive.json
       shared_infrastructure_validation.json
       statistical_failure_diagnosis.json
       statistical_guard_v2_analysis_plan.json

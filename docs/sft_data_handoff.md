@@ -77,3 +77,8 @@ For training, remove `--validate-only` and provide the existing private `GOOGLE_
 ## Live first fit
 
 The [launch receipt](evidence/sft_training_launch.json) records 7B ROT13 level 1 training on the existing H100, after native model initialization and successful actual completion-loss/adapter-gradient verification. The original ten independent levels remain queued. The launch-only `HF_HUB_OFFLINE` flag was removed after it blocked a tokenizer metadata request; model revisions and cached weights are unchanged. Verified Drive checkpoints occur every 100 optimizer updates, and the authorized 20:20 UTC deadline pauses after a whole update and preserved full checkpoint. The readiness snapshot above predates this launch.
+
+
+## Safe pause and resumption
+
+The first 7B ROT13 fit is now [paused at step 214](evidence/sft_training_pause_214.json), with the whole optimizer boundary and full recovery state preserved in Drive. To resume after replacing a Pod, restore the registered `full_state.pt` and `manifest.json` into their original checkpoint directory using their exact provenance; restore the certified corpus, config, certificate and worklist from the existing Drive indices. Execute pinned source `773cfd3` with the same consumer identity and a new authorized future deadline. The fit automatically restores its latest matching verified full checkpoint, including optimizer, scheduler, RNG and sampler position. The previous 20:20 UTC deadline is historical and must not be extended implicitly. Stopping the training process does not stop provider billing; the PI account operator stops the Pod through the console.

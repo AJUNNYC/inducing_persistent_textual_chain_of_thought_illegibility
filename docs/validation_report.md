@@ -1,3 +1,7 @@
+## Current SFT state: safely paused — 2026-10-11, 14:18 Eastern
+
+At the user's request, 7B ROT13 level 1 paused at completed optimizer step **214 of 1,250**, preserving 3,424 example presentations. The worker exited and released the GPU. Both full-state checkpoint files were independently checked against current Drive metadata and checksums. The [pause receipt](evidence/sft_training_pause_214.json) preserves adapter, optimizer, scheduler, RNG and sampler identity through the checkpoint manifest, plus complete registered Drive recovery records. [Permanent pause evidence](evidence/sft_training_pause_214_drive.json) records the verified Drive copy. The Pod itself has not been stopped; the account operator must stop it in RunPod to end billing. The launch/running observations below are historical.
+
 ## Live SFT launch — 2026-10-11, 17:36 UTC
 
 The [live launch receipt](evidence/sft_training_launch.json) records the first 7B ROT13 fit running on the existing H100 at level 1. The model initialized, all 10,000 training and 100 validation records were tokenized, and actual finite completion loss with nonzero adapter gradients passed. GPU utilization was 100%. The unchanged ten-level queue uses source `773cfd3`; checkpoints are saved at 100-step intervals and verified in Drive. No completed optimizer-step count or first full training checkpoint was yet observed at this launch snapshot. A read-only monitor polls every 30 seconds.

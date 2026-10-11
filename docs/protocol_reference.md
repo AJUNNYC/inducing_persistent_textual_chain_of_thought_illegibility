@@ -3222,8 +3222,9 @@ Native validators passed. Independent CPU-only Drive readback verified all 122 a
 connecting to a Pod. Six baseline capability passes (7398 outputs) were rescored under versioned designated-final-field rules
 after an answer-extraction defect. Both models passed all four unchanged repeatability gates. Zero responses were
 regenerated; original failed evidence is retained. The repaired scored bundles and reports are Drive-verified. All thirteen
-mandatory training gates are ready and the actual H100 certified launcher returned READY. The first 7B ROT13 fit is now
-training with verified actual adapter gradients. Legibility judging and training completion remain pending.
+mandatory training gates are ready and the actual H100 certified launcher returned READY. The first 7B ROT13 fit passed
+actual adapter-gradient checks and paused at optimizer step 214; full recovery state is verified in Drive. Legibility judging and
+training completion remain pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3719,9 +3720,9 @@ Status (11 October 2026). Fresh vLLM SFT generation and Drive-only storage are c
 800-question RL selection are backed up. All forty SFT conditions passed independent Drive readback. Both models passed all
 four unchanged baseline repeatability gates after versioned final-field rescoring of 7398 preserved outputs, with zero regeneration.
 All thirteen training gates and actual H100 SFT launch validation passed; the consumer is pinned at 773cfd3. Compatible controls
-retain original evidence and current source bindings. The first 7B ROT13 fit is running; full evaluation and training completion
-remain pending. The approved concentration guard changes evaluation bounds only and passed seven full scenarios (700/700
-covered repetitions).
+retain original evidence and current source bindings. The first 7B ROT13 fit paused at step 214 with verified full Drive recovery; full
+evaluation and training completion remain pending. The approved concentration guard changes evaluation bounds only and
+passed seven full scenarios (700/700 covered repetitions).
 Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
 diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
 appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in
