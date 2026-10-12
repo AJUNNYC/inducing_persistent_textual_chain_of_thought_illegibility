@@ -91,6 +91,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       runpod.md
     evidence/
       baseline_repeatability_launch.json
+      colab_a100_connection.json
       coordinator_validation.json
       data_preparation.json
       documentation_consistency_audit.json

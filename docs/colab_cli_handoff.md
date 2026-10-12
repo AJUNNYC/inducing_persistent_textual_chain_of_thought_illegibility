@@ -12,13 +12,17 @@ supports runtime provisioning, Python/notebook execution, file transfers, and
 SSH over WebSocket. Version **0.7.4** was installed in an isolated cloud venv at
 `/workspace/colab_cli_env`; its version and SSH help completed successfully.
 After an age-encrypted transfer authorized by the user, the cloud CLI login was
-installed privately with mode 0600. Authenticated session listing succeeded and
-found the existing CPU, High-RAM session. No Colab runtime was allocated, and
-remote execution has not yet been verified. The runtime content request was
-blocked by the network allowlist: Colab assigns dynamic runtime hosts under
-`prod.colab.dev`, so `*.prod.colab.dev` is a required additional allowed domain
-for this automation route. Never put the credential cache or session state
-(which includes runtime tokens) in Git or public artifacts.
+installed privately with mode 0600. Authenticated session listing succeeded.
+The user then authorized an A100 runtime, allocated as `sft_a100`. After
+`*.prod.colab.dev` was added to the network allowlist, runtime file access and
+remote Python execution both succeeded. The [connection receipt](evidence/colab_a100_connection.json)
+records an NVIDIA A100-SXM4-40GB (39.49 GiB, SM80), Python 3.13.15,
+PyTorch 2.11.0+cu130, and CUDA 13.0 in the stock runtime. Training has not
+started: the stock software environment and a memory-compatible A100 execution
+profile still need qualification against the pinned training recipe. The
+accepted PRO 6000 no-checkpointing profile must not be assumed to fit 40GB.
+Never put the credential cache or session state (which includes runtime tokens)
+in Git or public artifacts.
 The upstream README currently supports Linux and macOS; use a Linux
 environment such as WSL on Windows, subject to verifying that environment.
 
@@ -76,8 +80,8 @@ Drive filesystem mount is unattended.
   deadline rather than silently extending it.
 - Google Drive is the sole durable checkpoint store. Verify uploaded bytes
   before treating a checkpoint as recoverable or releasing a runtime.
-- No additional GPU workers or A100 training profiles have been deployed or
-  measured. The fast Triton helpers were qualified for SM120 with Triton 3.5.0;
+- An A100 runtime is allocated and command access is verified, but no
+  additional training workers or A100 training profiles have been deployed or measured. The fast Triton helpers were qualified for SM120 with Triton 3.5.0;
   do not assume those helpers work on an A100. Qualify a compatible execution
   profile while preserving the scientific recipe, starting with changes least
   likely to alter results. Reuse completed checks and run only affected checks.
