@@ -84,6 +84,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     architecture.md
     baseline_repeatability_worker.md
     colab_cli_handoff.md
+    colab_sft_restart.md
     contracts.md
     decisions.md
     delegation.md
@@ -324,6 +325,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     prepare_batched_collection.py
     prepare_vllm_sft_data.py
     produce_vllm_baseline_raw.py
+    qualify_sft_baseline_runtime.py
     reconcile_sft_launch.py
     refresh_dependency_locks.py
     rescore_vllm_baselines.py
@@ -686,6 +688,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       operations/
         test_assets.py
         test_baseline_rescoring.py
+        test_baseline_runtime_qualification.py
         test_batched_restart.py
         test_collection_deadline.py
         test_collection_input_revalidation.py

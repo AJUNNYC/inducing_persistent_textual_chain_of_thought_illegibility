@@ -467,6 +467,56 @@ def accepted_execution_controls(report_path, profile_name, config, certificate, 
     return accepted, checks
 
 
+def baseline_runtime_controls(path, config, commit):
+    """Bind fresh native baseline controls without weakening optimization gates."""
+    report = checked_report(path)
+    models = report.get('model_ids')
+    if (report.get('schema_version') != 'sft_baseline_runtime_controls_v1'
+            or report.get('status') != 'PASSED'
+            or report.get('source_code_commit') != commit
+            or report.get('consumer_configuration_hash') != configuration_hash(config)
+            or report.get('execution_profile') != SFTExecutionProfile().to_dict()
+            or report.get('dependency_hash') != file_hash(ROOT/'requirements.lock')
+            or not isinstance(models, list) or len(models) != 1
+            or models[0] not in config['models']
+            or report.get('models') != {models[0]:config['models'][models[0]]}
+            or report.get('training_started') is not False
+            or report.get('optimization_activated') is not False):
+        raise ValueError('Fresh baseline runtime control identity differs')
+    if report.get('control_configuration_hash') != configuration_hash(config):
+        raise ValueError('Native controls changed the frozen production config')
+    hashes = report.get('source_file_hashes', {})
+    expected = {str(p.relative_to(ROOT)) for p in (ROOT/'src/training/sft').rglob('*.py')}
+    expected.update(('src/shared_procedures/preflight.py','src/shared_procedures/checkpointing.py',
+                     'requirements.lock','scripts/qualify_sft_baseline_runtime.py'))
+    if set(hashes) != expected or any(file_hash(ROOT/name) != digest for name,digest in hashes.items()):
+        raise ValueError('Measured native baseline source differs')
+    checks = {}
+    for name in ('model_runtime','loss_mask_gradients','full_checkpoint_resume'):
+        row = report.get('checks', {}).get(name, {})
+        evidence = row.get('evidence', {})
+        if (row.get('name') != name or row.get('status') != 'passed'
+                or evidence.get('live') is not True or evidence.get('simulation') is not False
+                or evidence.get('control_preflight') is not True
+                or evidence.get('scientific_results') is not False
+                or not isinstance(evidence.get('models'), list) or len(evidence['models']) != 1):
+            raise ValueError('Native baseline runtime check did not actually pass: '+name)
+        measured = evidence['models'][0]
+        if name == 'model_runtime':
+            if measured.get('model') != config['models'][models[0]]:
+                raise ValueError('Measured native model differs from the pinned construction model')
+            if measured.get('runtime', {}).get('execution_profile') != SFTExecutionProfile().to_dict():
+                raise ValueError('Measured runtime was not the published baseline')
+        elif measured.get('model') != models[0]:
+            raise ValueError('Measured native control model scope differs')
+        copied = deepcopy(row)
+        copied['evidence']['native_baseline_binding'] = {
+            'report_hash':report['report_hash'], 'model_ids':models,
+            'consumer_commit':commit, 'hardware':report['hardware']}
+        checks[name] = CheckResult(**copied)
+    return report, checks
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('config','certificate','control-config','baseline-root','output'):
@@ -474,11 +524,14 @@ def main(argv=None):
     parser.add_argument('--execution-benchmark')
     parser.add_argument('--execution-profile')
     parser.add_argument('--recovery-benchmark')
+    parser.add_argument('--baseline-runtime-controls', help='Fresh model-scoped native baseline controls on replacement hardware.')
     args = parser.parse_args(argv)
     if bool(args.execution_benchmark) != bool(args.execution_profile):
         parser.error('--execution-benchmark and --execution-profile must be supplied together')
     if args.recovery_benchmark and not args.execution_benchmark:
         parser.error('--recovery-benchmark requires the execution benchmark')
+    if args.baseline_runtime_controls and args.execution_benchmark:
+        parser.error('Native baseline controls cannot authorize an optimization profile')
     config = validate_configuration(read_json(args.config),runtime=True)
     certificate = validate_handoff(read_json(args.certificate),config)
     commit = subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
@@ -495,22 +548,30 @@ def main(argv=None):
     accepted, execution_checks = (accepted_execution_controls(args.execution_benchmark,
         args.execution_profile, config, certificate, commit, args.recovery_benchmark)
         if args.execution_benchmark else (None, {}))
+    native_baseline = None
+    if args.baseline_runtime_controls:
+        native_baseline, execution_checks = baseline_runtime_controls(args.baseline_runtime_controls, config, commit)
     functions = (['render_sft_completion','tokenize_completion','capture_rng','restore_rng','exposure_order',
-                  'SFTRecipe','TARGET_MODULES','LOSS_REDUCTION','MODELS','LEVELS'] if accepted else
+                  'SFTRecipe','TARGET_MODULES','LOSS_REDUCTION','MODELS','LEVELS'] if accepted or native_baseline else
                  ['_runtime','render_sft_completion','tokenize_completion','verify_mask_gradients','collate_completion',
                   'completion_loss','capture_rng','restore_rng','train_optimizer_updates','SFTRecipe',
                   'TARGET_MODULES','LOSS_REDUCTION','MODELS','LEVELS'])
     bindings = {'gpu_functions':compatible_functions(gpu_source,
         'src/training/sft/individual_fit/sft_fit.py',
         functions),
-        'gpu_control':compatible_functions(gpu_source,'src/shared_procedures/preflight.py',['_run_model_checks']),
+        'gpu_control':({'native_source_sha256':native_baseline['source_file_hashes']['src/shared_procedures/preflight.py']}
+                       if native_baseline else compatible_functions(gpu_source,'src/shared_procedures/preflight.py',['_run_model_checks'])),
         'checkpoint':identical_files(gpu_source,['src/shared_procedures/checkpointing.py',
             'requirements.lock','src/operations/assets.py','src/shared_procedures/identity.py',
             'src/shared_procedures/response_parsing.py','src/shared_procedures/storage.py'])}
-    if accepted:
+    if accepted or native_baseline:
         bindings['scientific_sft_numerics'] = compatible_sft_numerics(gpu_source,
-            loss_implementation=accepted['execution_profile'].get('loss_implementation', 'spatial_ce'))
-        bindings['accepted_execution'] = accepted
+            loss_implementation=accepted['execution_profile'].get('loss_implementation', 'spatial_ce') if accepted else 'spatial_ce')
+        if accepted:
+            bindings['accepted_execution'] = accepted
+        else:
+            bindings['native_baseline'] = {'report_hash':native_baseline['report_hash'],
+                                         'model_ids':native_baseline['model_ids']}
     rl_files = [str(path.relative_to(ROOT)) for path in sorted((ROOT/'src/training/rl_grpo').rglob('*.py'))]
     bindings['grpo'] = identical_files(gpu_source,rl_files)
     judge = checked_report(ROOT/'docs/evidence/judge_profile_guard_live_report.json')
@@ -567,6 +628,10 @@ def main(argv=None):
          'certificate_hash':certificate['certificate_hash'],
          'original_drive_readback_sha256':certificate['drive_readback_report_sha256']})
     report = run_preflights(config,checks,output_dir=Path(args.output)/'preflight',scope='training')
+    if native_baseline:
+        report['ready_models'] = native_baseline['model_ids']
+        report['baseline_only'] = True
+        report['study_ready'] = False
     if accepted:
         report['ready_scope'] = accepted['condition']
         report['study_ready'] = False

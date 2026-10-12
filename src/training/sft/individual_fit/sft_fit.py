@@ -858,6 +858,9 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
     if not preflight_report or preflight_report.get("configuration_hash") != spec.configuration_hash:
         raise SFTRuntimeBlocked("Matching real preflight report is required")
     require_preflights(dict(preflight_report), ["model_runtime", "clean_data", "loss_mask_gradients", "full_checkpoint_resume", "durable_storage", "spending_authorization", "baseline_repeatability", "statistical_validation"])
+    if preflight_report.get("ready_models") is not None:
+        if spec.model_id not in preflight_report["ready_models"] or profile != SFTExecutionProfile():
+            raise SFTRuntimeBlocked("Model-scoped native baseline controls do not authorize this model or execution profile")
     if spec.producer_configuration_hash:
         from training.sft.data_handoff import validate_handoff
         validate_handoff(handoff_certificate, config, spec)

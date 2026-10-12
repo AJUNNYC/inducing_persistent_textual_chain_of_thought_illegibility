@@ -108,6 +108,9 @@ def main():
             raise ValueError('Original pause receipt integrity differs')
     preflight = load_preflight_evidence(args.preflight,config)
     require_preflights(preflight,preflight_requirements('training'),expected_configuration_hash=experiment.hash)
+    if preflight.get('ready_models') is not None:
+        if args.model not in preflight['ready_models'] or execution_profile is not None or migration is not None:
+            raise ValueError('Model-scoped baseline controls cannot authorize another model, an optimization, or runtime migration')
     if preflight.get('ready_scope') is not None:
         expected_scope = {'family':args.family,'model':args.model,'level':args.level}
         if (len(tasks) != 1 or preflight['ready_scope'] != expected_scope

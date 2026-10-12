@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 538,
+  "files": 541,
   "directories_including_root": 202,
   "entries": [
     {
@@ -857,6 +857,17 @@
       "display_path": "docs/colab_cli_handoff.md",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_f42055da784280",
+      "blank": false
+    },
+    {
+      "path": "docs/colab_sft_restart.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/colab_sft_restart.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_b6907899229b00",
       "blank": false
     },
     {
@@ -3454,6 +3465,17 @@
       "display_path": "scripts/produce_vllm_baseline_raw.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_21a022ced4ee2f",
+      "blank": false
+    },
+    {
+      "path": "scripts/qualify_sft_baseline_runtime.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/qualify_sft_baseline_runtime.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_4b11b3279503db",
       "blank": false
     },
     {
@@ -7329,6 +7351,17 @@
       "display_path": "tests/unit/operations/test_baseline_rescoring.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_e1421003124fdb",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_baseline_runtime_qualification.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_baseline_runtime_qualification.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_176f7d74565bfe",
       "blank": false
     },
     {

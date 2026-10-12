@@ -172,8 +172,9 @@ def load_preflight_evidence(path: str | Path,config: dict) -> dict:
     return report
 
 
-def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,CheckResult]:
-    """Exercise both selected models on distinct nonexperimental native controls."""
+def _run_model_checks(config: dict,*,include_training: bool=True,
+                      model_ids: Sequence[str] | None=None) -> dict[str,CheckResult]:
+    """Exercise selected models without changing the frozen production config."""
     names=('model_runtime','loss_mask_gradients','full_checkpoint_resume')
     try:
         import torch
@@ -185,6 +186,11 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
     if not spending.get('authorized') or not spending.get('authorization_evidence'):
         return {n:CheckResult(n,'blocked','Current compute spending authorization required.',{'live':False}) for n in names}
     validate_configuration(config,runtime=True)
+    selected_models = config['models'] if model_ids is None else {
+        name:config['models'][name] for name in model_ids if name in config['models']}
+    if not selected_models or model_ids is not None and (len(set(model_ids)) != len(model_ids)
+                                                        or set(selected_models) != set(model_ids)):
+        raise ValueError('Native model control scope is unavailable or duplicated')
     if not include_training:
         from data_generation_collection.sft_data.clean_trace_collection.candidate_batch import clean_trace_batch
         from .response_parsing import parse_native_output
@@ -194,11 +200,11 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
         control_prompt='A notebook has three blank pages. One more blank page is added. How many blank pages are there now?'
         control_hash=content_hash({'kind':'nonexperimental_native_clean_control_v1','prompt':control_prompt})
         root=Path(config['runtime'].get('artifact_root','artifacts'))/'preflight'/'model_runtime'
-        generator=clean_trace_batch.NativeCleanGenerator(config['models'],device_map='auto',torch_dtype='bfloat16',
+        generator=clean_trace_batch.NativeCleanGenerator(selected_models,device_map='auto',torch_dtype='bfloat16',
                                                          cache_root=config['runtime'].get('cache_root'))
         records=[]
         try:
-            for size,model_spec in config['models'].items():
+            for size,model_spec in selected_models.items():
                 candidate={'example_id':'control_native_clean_'+size+'_'+control_hash[:16],
                            'prompt':control_prompt,'source_content_hash':content_hash(control_prompt)}
                 responses=list(generator.generate_many(size,[candidate]))
@@ -292,7 +298,7 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
     control_hash=content_hash({'kind':'nonexperimental_live_runtime_control_v1','prompt':control_prompt,'completion':control_completion})
     root=Path(config['runtime'].get('artifact_root','artifacts'))/'preflight'/'model_runtime'
     evidence={n:[] for n in names}
-    for size,model_spec in config['models'].items():
+    for size,model_spec in selected_models.items():
         model=tokenizer=optimizer=scheduler=None
         try:
             spec=SFTFitSpec('rot13',size,1,model_spec['revision'],model_spec['tokenizer_revision'],configuration_hash(config),control_hash)
@@ -354,7 +360,7 @@ def _run_model_checks(config: dict,*,include_training: bool=True) -> dict[str,Ch
         finally:
             model=tokenizer=optimizer=scheduler=None
             gc.collect();torch.cuda.empty_cache()
-    return {n:CheckResult(n,'passed' if n=='model_runtime' or include_training else 'skipped','Both actual selected-model control preflights passed.' if n=='model_runtime' or include_training else 'Training microstate control is outside generation scope.',
+    return {n:CheckResult(n,'passed' if n=='model_runtime' or include_training else 'skipped','Actual selected-model control preflights passed.' if n=='model_runtime' or include_training else 'Training microstate control is outside generation scope.',
              {'live':True,'simulation':False,'control_preflight':True,'scientific_results':False,'models':evidence[n]}) for n in names}
 
 

@@ -58,6 +58,10 @@ Drive filesystem mount is unattended.
 
 ## Context for the continuing Codex agent
 
+The user's latest instruction supersedes the earlier resume plan: restart both
+7B family queues from untouched bases on the two A100s, retaining the old
+checkpoint as an archive. See [the two-A100 restart](colab_sft_restart.md).
+
 - Repository: `AJUNNYC/inducing_persistent_textual_chain_of_thought_illegibility`.
 - Last publication before this handoff: `0d713be02a84f406c0fc820f6d69faf54afbb6dd`.
 - Data generation and the certified 7B SFT handoff have already been completed;
