@@ -212,3 +212,109 @@ def test_redirect_strips_bearer_token_before_leaving_hub_origin():
 def test_repository_paths_cannot_escape_cache(name):
     with pytest.raises(RuntimeError,match='Unsafe'):
         assets._relative_name(name)
+
+
+def test_explicit_private_receipt_reuses_full_checksum_only_while_files_unchanged(tmp_path, monkeypatch):
+    import os
+    install_upstream(monkeypatch)
+    assets.provision_asset(asset(), tmp_path)
+    selected = tmp_path / 'models' / '7b' / REVISION / 'full'
+    receipts = tmp_path / 'private_receipts'
+    original = assets.file_hash
+    calls = []
+    def counted(path):
+        calls.append(Path(path))
+        return original(path)
+    monkeypatch.setattr(assets, 'file_hash', counted)
+    first = assets.validate_asset_cached(selected, receipts)
+    assert len(calls) == len(first['files'])
+    receipt = next(receipts.glob('*.json'))
+    assert receipts.stat().st_mode & 0o777 == 0o700
+    assert receipt.stat().st_mode & 0o777 == 0o600
+    assert assets.validate_asset_cached(selected, receipts) == first
+    assert len(calls) == len(first['files'])
+    payload = selected / 'model.safetensors'
+    old = payload.stat()
+    payload.write_bytes(b'x' * old.st_size)
+    os.utime(payload, ns=(old.st_atime_ns, old.st_mtime_ns))
+    with pytest.raises(RuntimeError, match='checksum'):
+        assets.validate_asset_cached(selected, receipts)
+
+
+def test_cached_runtime_snapshot_reuses_verified_hardlink_inodes_without_rehash(tmp_path, monkeypatch):
+    install_upstream(monkeypatch)
+    assets.model_load_kwargs('fixture/model', REVISION, tmp_path, offline=False)
+    receipts = tmp_path / 'private_receipts'
+    expected = assets.model_load_kwargs('fixture/model', REVISION, tmp_path, offline=True, verification_receipts=receipts)
+    monkeypatch.setattr(assets, 'file_hash', lambda path: pytest.fail('Unchanged verified payload must not be rehashed'))
+    monkeypatch.setattr(assets, '_verify_upstream', lambda *a: pytest.fail('Unchanged verified snapshot must not be rehashed'))
+    assert assets.model_load_kwargs('fixture/model', REVISION, tmp_path, offline=True, verification_receipts=receipts) == expected
+
+
+def test_cached_receipt_metadata_change_requires_actual_reverification(tmp_path, monkeypatch):
+    import os
+    install_upstream(monkeypatch)
+    assets.provision_asset(asset(), tmp_path)
+    selected = tmp_path / 'models' / '7b' / REVISION / 'full'
+    receipts = tmp_path / 'private_receipts'
+    assets.validate_asset_cached(selected, receipts)
+    payload = selected / 'model.safetensors'
+    os.chmod(payload, 0o600)
+    calls = []
+    original = assets.file_hash
+    monkeypatch.setattr(assets, 'file_hash', lambda path: (calls.append(Path(path)), original(path))[1])
+    assets.validate_asset_cached(selected, receipts)
+    assert len(calls) == 4
+
+
+def test_cached_receipt_rejects_unsafe_permissions_and_symlink(tmp_path, monkeypatch):
+    import os
+    install_upstream(monkeypatch)
+    assets.provision_asset(asset(), tmp_path)
+    selected = tmp_path / 'models' / '7b' / REVISION / 'full'
+    receipts = tmp_path / 'private_receipts'
+    assets.validate_asset_cached(selected, receipts)
+    receipt = next(receipts.glob('*.json'))
+    os.chmod(receipt, 0o644)
+    with pytest.raises(RuntimeError, match='0600'):
+        assets.validate_asset_cached(selected, receipts)
+    os.chmod(receipt, 0o600)
+    target = selected / 'tokenizer.json'
+    copy = selected / 'copied_tokenizer.json'
+    copy.write_bytes(target.read_bytes())
+    target.unlink()
+    target.symlink_to(copy.name)
+    with pytest.raises(RuntimeError, match='non-symlink'):
+        assets.validate_asset_cached(selected, receipts)
+
+
+def test_asset_mutation_during_full_hash_cannot_publish_reusable_receipt(tmp_path, monkeypatch):
+    install_upstream(monkeypatch)
+    assets.provision_asset(asset(), tmp_path)
+    selected = tmp_path / 'models' / '7b' / REVISION / 'full'
+    receipts = tmp_path / 'private_receipts'
+    original = assets.validate_asset
+    def racing(path):
+        result = original(path)
+        payload = Path(path) / 'model.safetensors'
+        payload.write_bytes(payload.read_bytes())
+        return result
+    monkeypatch.setattr(assets, 'validate_asset', racing)
+    with pytest.raises(RuntimeError, match='metadata changed'):
+        assets.validate_asset_cached(selected, receipts)
+    assert not list(receipts.glob('*.json'))
+
+
+def test_modified_manifest_cannot_reuse_old_checksum_receipt(tmp_path, monkeypatch):
+    install_upstream(monkeypatch)
+    assets.provision_asset(asset(), tmp_path)
+    selected = tmp_path / 'models' / '7b' / REVISION / 'full'
+    receipts = tmp_path / 'private_receipts'
+    assets.validate_asset_cached(selected, receipts)
+    marker = selected / 'asset_manifest.json'
+    manifest = read_json(marker)
+    manifest['files']['model.safetensors']['sha256'] = '0' * 64
+    manifest['manifest_hash'] = assets._manifest_hash(manifest)
+    atomic_write_json(marker, manifest)
+    with pytest.raises(RuntimeError, match='checksum'):
+        assets.validate_asset_cached(selected, receipts)

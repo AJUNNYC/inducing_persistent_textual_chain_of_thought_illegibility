@@ -656,14 +656,16 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
     np.random.seed(42)
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
-    from operations.assets import model_load_kwargs
+    from operations.assets import model_load_kwargs, _cache_root
+    verification_receipts = _cache_root(cache_root) / "private_verification_receipts"
     tokenizer = AutoTokenizer.from_pretrained(spec.model_name, revision=spec.tokenizer_revision, use_fast=True, trust_remote_code=False,
-        **model_load_kwargs(spec.model_name, spec.tokenizer_revision, cache_root, tokenizer_only=True))
+        **model_load_kwargs(spec.model_name, spec.tokenizer_revision, cache_root, tokenizer_only=True,
+                            verification_receipts=verification_receipts))
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
         spec.model_name, revision=spec.model_revision, trust_remote_code=False,
-        **model_load_kwargs(spec.model_name, spec.model_revision, cache_root),
+        **model_load_kwargs(spec.model_name, spec.model_revision, cache_root, verification_receipts=verification_receipts),
         quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16),
         torch_dtype=torch.bfloat16, device_map={"": device}, attn_implementation=profile.attention_implementation)
     model.config.use_cache = False
@@ -681,7 +683,9 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
     optimizer = bnb.optim.PagedAdamW32bit([parameter for parameter in model.parameters() if parameter.requires_grad],
                                          lr=2e-4, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.0)
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=math.ceil(1250 * 0.03), num_training_steps=1250)
-    runtime = {"device": device, "gpu_name": torch.cuda.get_device_name(torch.device(device)),
+    runtime = {"asset_integrity_policy": "full_sha256_then_private_manifest_and_file_identity_receipts",
+               "asset_verification_receipt_root": str(verification_receipts),
+               "device": device, "gpu_name": torch.cuda.get_device_name(torch.device(device)),
                "vram_bytes": torch.cuda.get_device_properties(torch.device(device)).total_memory,
                "cuda_version": torch.version.cuda, "attention_implementation": profile.attention_implementation,
                "execution_profile": profile.to_dict(), "use_reentrant": False,

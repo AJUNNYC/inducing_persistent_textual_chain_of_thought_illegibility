@@ -15,6 +15,7 @@ import os
 import re
 import shutil
 import socket
+import stat
 import tempfile
 import urllib.error
 import urllib.parse
@@ -177,6 +178,111 @@ def validate_asset(path: str | Path) -> dict:
     return manifest
 
 
+def _asset_fingerprint(path: Path) -> dict:
+    """Bind exact regular-file identity, including change time and permissions."""
+    if path.is_symlink() or path.resolve(strict=True) != path.absolute():
+        raise RuntimeError("Verification receipt requires a non-symlink asset path")
+    value = path.stat()
+    if not stat.S_ISREG(value.st_mode):
+        raise RuntimeError("Verification receipt asset is not a regular file")
+    return {"resolved_path": str(path.resolve()), "st_dev": value.st_dev, "st_ino": value.st_ino,
+            "size": value.st_size, "mtime_ns": value.st_mtime_ns, "ctime_ns": value.st_ctime_ns,
+            "owner": value.st_uid, "permissions": stat.S_IMODE(value.st_mode)}
+
+
+def _protected_receipt_directory(path: str | Path) -> Path:
+    root = Path(path).expanduser().absolute()
+    root.mkdir(parents=True, mode=0o700, exist_ok=True)
+    if root.is_symlink() or root.resolve() != root:
+        raise RuntimeError("Unsafe verification receipt directory")
+    value = root.stat()
+    if value.st_uid != os.geteuid() or stat.S_IMODE(value.st_mode) != 0o700:
+        raise RuntimeError("Verification receipt directory must be privately owned mode 0700")
+    return root
+
+
+def validate_asset_cached(path: str | Path, verification_receipts: str | Path) -> dict:
+    """Reuse an explicit private receipt only while every verified inode is unchanged.
+
+    First use and metadata changes still call unchanged validate_asset and its
+    SHA-256 checks. This is local filesystem verification reuse, not an upstream
+    trust bypass; adversarial privileged mutation is outside its threat model.
+    """
+    root = Path(path).absolute()
+    marker = root / "asset_manifest.json"
+    receipt_root = _protected_receipt_directory(verification_receipts)
+    receipt_path = receipt_root / (content_hash(str(root)) + ".json")
+    with file_lock(receipt_path.with_suffix(".lock")):
+        manifest = read_json(marker)
+        if (manifest.get("manifest_hash") != _manifest_hash(manifest)
+                or not REVISION.fullmatch(manifest.get("revision", ""))
+                or not isinstance(manifest.get("files"), dict) or not manifest["files"]):
+            raise RuntimeError("Verification receipt manifest integrity differs")
+        def snapshot():
+            result = {"asset_manifest.json": _asset_fingerprint(marker)}
+            for name, expected in manifest["files"].items():
+                selected = root / _relative_name(name)
+                if not selected.resolve().is_relative_to(root.resolve()):
+                    raise RuntimeError("Verification receipt asset escapes cache root")
+                result[name] = {**_asset_fingerprint(selected), "sha256": expected["sha256"]}
+            return result
+        before = snapshot()
+        if receipt_path.exists() or receipt_path.is_symlink():
+            metadata = _asset_fingerprint(receipt_path)
+            if metadata["owner"] != os.geteuid() or metadata["permissions"] != 0o600:
+                raise RuntimeError("Verification receipt must be privately owned mode 0600")
+            receipt = read_json(receipt_path)
+            if (receipt.get("receipt_hash") == content_hash({k: v for k, v in receipt.items() if k != "receipt_hash"})
+                    and receipt.get("schema_version") == "local_verified_asset_receipt_v1"
+                    and receipt.get("manifest_hash") == manifest["manifest_hash"]
+                    and receipt.get("files") == before and snapshot() == before):
+                return manifest
+        verified = validate_asset(root)
+        after = snapshot()
+        if before != after or verified != manifest:
+            raise RuntimeError("Asset metadata changed during full checksum verification")
+        receipt = {"schema_version": "local_verified_asset_receipt_v1", "manifest_hash": manifest["manifest_hash"],
+                   "files": after, "initial_verification": "full_validate_asset_sha256"}
+        receipt["receipt_hash"] = content_hash(receipt)
+        descriptor, temporary = tempfile.mkstemp(prefix=".verification_", dir=receipt_root)
+        try:
+            with os.fdopen(descriptor, "w") as handle:
+                json.dump(receipt, handle, sort_keys=True)
+                handle.write("\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary, receipt_path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+        return verified
+
+
+def _cached_existing_asset(canonical, public, repository, expected_identity, asset, variant, verification_receipts):
+    """The standard Hub snapshot must point at the same checksum-verified inode."""
+    if not (canonical / "asset_manifest.json").is_file() or not (public / "asset_manifest.json").is_file():
+        return None
+    frozen = validate_asset_cached(canonical, verification_receipts)
+    if frozen.get("manifest_version") != 2 or any(frozen.get(k) != v for k, v in expected_identity.items()):
+        raise RuntimeError("Canonical asset cache identity mismatch")
+    manifest = validate_asset_cached(public, verification_receipts)
+    if (manifest.get("manifest_version") != 2 or any(manifest.get(k) != v for k, v in asset.items())
+            or manifest.get("variant") != variant or manifest.get("canonical_manifest_hash") != frozen["manifest_hash"]
+            or manifest.get("files") != frozen["files"]):
+        raise RuntimeError("Public asset cache identity mismatch")
+    for name, expected in frozen["files"].items():
+        blob = repository / "blobs" / expected["upstream_hash"]
+        snapshot = repository / "snapshots" / expected_identity["revision"] / name
+        source = _asset_fingerprint(canonical / _relative_name(name))
+        target = _asset_fingerprint(blob)
+        if ({k: v for k, v in source.items() if k != "resolved_path"}
+                != {k: v for k, v in target.items() if k != "resolved_path"}):
+            return None
+        if not snapshot.is_symlink() or snapshot.resolve() != blob.resolve():
+            return None
+    return manifest
+
+
 def _cache_root(value: str | Path | None) -> Path:
     return Path(value or os.environ.get("MODEL_CACHE_ROOT") or os.environ.get("HF_HOME") or "/workspace/model_cache").expanduser().resolve()
 
@@ -290,7 +396,7 @@ def _snapshot_link(blob: Path, destination: Path, expected: dict) -> None:
             temporary.unlink()
 
 
-def provision_asset(asset: dict, cache_root: str | Path, *, authorization: dict | None = None, offline: bool = False, tokenizer_only: bool = False) -> dict:
+def provision_asset(asset: dict, cache_root: str | Path, *, authorization: dict | None = None, offline: bool = False, tokenizer_only: bool = False, verification_receipts: str | Path | None = None) -> dict:
     if asset.get("license_authorization_required") and not (authorization or {}).get(asset["asset_id"], False):
         raise RuntimeError(f"Explicit source/license authorization required for {asset['asset_id']}")
     root = _cache_root(cache_root)
@@ -312,6 +418,10 @@ def provision_asset(asset: dict, cache_root: str | Path, *, authorization: dict 
     root.mkdir(parents=True, exist_ok=True)
     with file_lock(repository / "provision.lock"):
         expected_identity = {"repo_id": asset["repo_id"], "repo_type": asset["repo_type"], "revision": selected_revision, "variant": variant}
+        if verification_receipts is not None:
+            cached = _cached_existing_asset(canonical, public, repository, expected_identity, asset, variant, verification_receipts)
+            if cached is not None:
+                return cached
         if (canonical / "asset_manifest.json").is_file():
             frozen = validate_asset(canonical)
             if frozen.get("manifest_version") != 2 or any(frozen.get(k) != v for k, v in expected_identity.items()):
@@ -376,7 +486,7 @@ def provision_asset(asset: dict, cache_root: str | Path, *, authorization: dict 
         return validate_asset(public)
 
 
-def model_load_kwargs(model_id: str, revision: str, cache_root: str | Path | None = None, *, tokenizer_only: bool = False, offline: bool = False) -> dict:
+def model_load_kwargs(model_id: str, revision: str, cache_root: str | Path | None = None, *, tokenizer_only: bool = False, offline: bool = False, verification_receipts: str | Path | None = None) -> dict:
     """Provision/verify one pinned runtime payload, then prohibit SDK networking."""
     root = _cache_root(cache_root)
     _repository_name(model_id, "model")
@@ -385,5 +495,5 @@ def model_load_kwargs(model_id: str, revision: str, cache_root: str | Path | Non
     asset = {"asset_id": "runtime_" + model_id.replace("/", "--"), "repo_id": model_id, "repo_type": "model",
              "revision": revision, "tokenizer_revision": revision,
              "destination": "models/by_repository/" + model_id.replace("/", "--"), "license_authorization_required": False}
-    provision_asset(asset, root, offline=offline, tokenizer_only=tokenizer_only)
+    provision_asset(asset, root, offline=offline, tokenizer_only=tokenizer_only, verification_receipts=verification_receipts)
     return {"cache_dir": str(root / "hub"), "local_files_only": True}

@@ -61,6 +61,69 @@ def identical_files(commit, names):
     return result
 
 
+def asset_verification_compatibility(commit):
+    """Retain every original checksum/provision operation behind an opt-in cache.
+
+    Only the explicit private-receipt early return and default-None keyword are
+    normalized away. All old function bodies/constants remain exact AST matches;
+    new receipt helpers are source-bound separately for measured execution.
+    """
+    name = 'src/operations/assets.py'
+    old = ast.parse(original_file(commit, name))
+    new = ast.parse((ROOT / name).read_text())
+    old_nodes = {node.name: node for node in old.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+    new_nodes = {node.name: node for node in new.body if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
+    wrappers = {'provision_asset', 'model_load_kwargs'}
+    old_functions = sorted(set(old_nodes) - wrappers)
+    unchanged = compatible_functions(commit, name, old_functions + ['REVISION', 'SHA256', 'TOKENIZER_FILES'])
+    expected_branch = ast.parse('''
+if verification_receipts is not None:
+    cached = _cached_existing_asset(canonical, public, repository, expected_identity, asset, variant, verification_receipts)
+    if cached is not None:
+        return cached
+''').body[0]
+    branch_hash = ast.dump(expected_branch, include_attributes=False)
+    for wrapper in wrappers:
+        node = deepcopy(new_nodes[wrapper])
+        positions = [index for index, arg in enumerate(node.args.kwonlyargs) if arg.arg == 'verification_receipts']
+        if len(positions) != 1 or not isinstance(node.args.kw_defaults[positions[0]], ast.Constant) or node.args.kw_defaults[positions[0]].value is not None:
+            raise ValueError('Asset verification cache is not explicit default-None')
+        del node.args.kwonlyargs[positions[0]]
+        del node.args.kw_defaults[positions[0]]
+        if wrapper == 'provision_asset':
+            removed = []
+            class RemoveReceiptBranch(ast.NodeTransformer):
+                def visit_If(self, selected):
+                    if ast.dump(selected, include_attributes=False) == branch_hash:
+                        removed.append(True)
+                        return None
+                    return self.generic_visit(selected)
+            node = RemoveReceiptBranch().visit(node)
+            if len(removed) != 1:
+                raise ValueError('Asset provisioning has an undeclared receipt branch')
+        else:
+            calls = [call for call in ast.walk(node) if isinstance(call, ast.Call)
+                     and isinstance(call.func, ast.Name) and call.func.id == 'provision_asset']
+            if len(calls) != 1:
+                raise ValueError('Runtime asset provisioning dispatch changed')
+            selected = [item for item in calls[0].keywords if item.arg == 'verification_receipts']
+            if len(selected) != 1 or not isinstance(selected[0].value, ast.Name) or selected[0].value.id != 'verification_receipts':
+                raise ValueError('Runtime asset receipt dispatch is not explicit')
+            calls[0].keywords = [item for item in calls[0].keywords if item.arg != 'verification_receipts']
+        if ast.dump(node, include_attributes=False) != ast.dump(old_nodes[wrapper], include_attributes=False):
+            raise ValueError('Original strict asset provisioning semantics changed: ' + wrapper)
+        unchanged[wrapper + '_strict_default'] = content_hash(ast.dump(node, include_attributes=False))
+    helpers = ['_asset_fingerprint', '_protected_receipt_directory', 'validate_asset_cached', '_cached_existing_asset']
+    if any(helper not in new_nodes for helper in helpers):
+        raise ValueError('Private asset verification receipt helper is absent')
+    return {'original_strict_functions': unchanged, 'receipt_schema': 'local_verified_asset_receipt_v1',
+            'default_verification': 'unchanged_full_checksums', 'receipt_mode': '0600', 'receipt_directory_mode': '0700',
+            'reuse_binding': ['resolved_path', 'st_dev', 'st_ino', 'size', 'mtime_ns', 'ctime_ns', 'owner', 'permissions'],
+            'first_use_and_metadata_change': 'full_validate_asset_sha256_with_identical_before_after_metadata',
+            'receipt_helper_functions': {helper: content_hash(ast.dump(new_nodes[helper], include_attributes=False)) for helper in helpers},
+            'source_sha256': file_hash(ROOT / name)}
+
+
 def spatial_native_forward_contract():
     """Bind the original spatial native forward and explicit backward source."""
     path = ROOT/'src/training/sft/spatial_loss.py'
@@ -574,8 +637,9 @@ def main(argv=None):
         'gpu_control':({'native_source_sha256':native_baseline['source_file_hashes']['src/shared_procedures/preflight.py']}
                        if native_baseline else compatible_functions(gpu_source,'src/shared_procedures/preflight.py',['_run_model_checks'])),
         'checkpoint':identical_files(gpu_source,['src/shared_procedures/checkpointing.py',
-            'requirements.lock','src/operations/assets.py','src/shared_procedures/identity.py',
+            'requirements.lock','src/shared_procedures/identity.py',
             'src/shared_procedures/response_parsing.py','src/shared_procedures/storage.py'])}
+    bindings['asset_verification'] = asset_verification_compatibility(gpu_source)
     if accepted or native_baseline:
         bindings['scientific_sft_numerics'] = compatible_sft_numerics(gpu_source,
             loss_implementation=accepted['execution_profile'].get('loss_implementation', 'spatial_ce') if accepted else 'spatial_ce')

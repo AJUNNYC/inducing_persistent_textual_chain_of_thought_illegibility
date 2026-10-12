@@ -68,3 +68,14 @@ level, publishes full benchmark/launch evidence to Drive, and starts each
 accepted fit from the untouched base. It never treats a level-1 timing result
 as permission for other levels. Rejected candidates retain their failed evidence
 and use the qualified baseline; acceptance thresholds are not relaxed.
+
+The comparison setup exposed redundant full reads of already verified local
+model shards. Native SFT now requests private local verification receipts:
+first use retains full SHA-256 verification, and reuse requires the same bound
+manifest and unchanged file path/device/inode/size/timestamps/owner/permissions.
+Hub snapshots must resolve to the verified blob inodes. Changes trigger full
+verification or a failure. This reduces setup work; it changes no model tensor,
+loss, RNG operation or training setting. The strict uncached API remains the
+default for callers that do not request receipts. Unchanged corpus handoffs may
+also reuse certified identities after all 122 actual hashes and source/metadata
+checks, avoiding repeated parsing of all 404,000 records.

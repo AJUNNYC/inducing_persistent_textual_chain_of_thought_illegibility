@@ -700,6 +700,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_optimized_sft_queue.py
         test_protocol_provenance.py
         test_runpod.py
+        test_sft_handoff_reuse.py
         test_sft_optimization_benchmark.py
         test_sft_reconcile_execution.py
       shared_procedures/
