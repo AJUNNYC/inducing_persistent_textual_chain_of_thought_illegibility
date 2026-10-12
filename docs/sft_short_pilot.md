@@ -1,0 +1,45 @@
+# Final efficient SFT recipe for each selected level
+
+`efficient_one_epoch_v1` is the finalized default recipe. Each fit uses all 10,000 certified training examples and the same 100 validation examples. All forty 7B/14B × ROT13/KaziText × level 1–10 conditions remain available. No condition is selected and training remains paused.
+
+This is an explicitly declared scientific amendment. It changes exposure and numerical execution; identical eventual results have not been established. The choices below prioritize preserving the data, objective and adaptation capacity while removing avoidable computation. No new optimization benchmark campaign was run.
+
+## Decisions and justification
+
+| Decision | Why it reduces computation | What is preserved; practical limit |
+| --- | --- | --- |
+| One complete epoch: 625 updates, 19 warmup updates, full cosine schedule | Halves example presentations and optimizer updates relative to two epochs. | All examples are retained. Less exposure can change convergence; this is the largest learning uncertainty. |
+| Frozen unquantized BF16 backbone and BF16 output head | Uses ordinary dense BF16 matrix products and avoids repeated NF4 dequantization. Mixed-precision LoRA is established practice. | Same pretrained model/revision and adapter placement. More VRAM is required, and representation/head arithmetic differ from historical NF4/FP32-head training. |
+| SDPA, preferring Flash then memory-efficient attention | Efficient attention reduces attention-memory traffic and quadratic intermediate storage. | Same causal attention and dropout semantics; floating-point ordering may differ. The runtime may use its math fallback, so no particular fused kernel is claimed observed. |
+| Published full-gradient Cut Cross-Entropy | Fuses vocabulary projection and loss without storing the full sequence-by-vocabulary logits tensor. This targets a substantial memory/bandwidth cost in a large-vocabulary model. | Same shifted targets, completion mask and per-example weighting. Gradient filtering is disabled. BF16 head arithmetic is explicit; it is not equivalent to the old FP32 head. |
+| Disable activation checkpoint recomputation when the full longest example fits | Avoids recomputing decoder activations during backward. | Same example and loss. On CUDA OOM only, ordinary nonreentrant checkpointing is enabled with RNG preservation; neither response length nor sample count is reduced. |
+| Plain AdamW with FP32 adapter parameters and optimizer states | Avoids quantization/paging machinery when full-state adapter training fits. | Same LR, beta defaults, epsilon, zero weight decay and clipping. Do not infer a measured speed gain solely from this substitution. |
+| Reuse certified handoff, prepared tokenization and private verified asset receipts | Removes repeated setup and file hashing under unchanged identity proofs. | Existing corpus bytes, source identities and completion masks remain strict. Drive publication and full recovery remain mandatory. |
+
+Mixed precision is supported by [Mixed Precision Training](https://huggingface.co/papers/1710.03740). [LoRA](https://huggingface.co/papers/2106.09685) supports frozen-backbone low-rank adaptation. [FlashAttention](https://huggingface.co/papers/2205.14135) supports the attention computation strategy. [Cut Your Losses in Large-Vocabulary Language Models](https://huggingface.co/papers/2411.09009) establishes fused classifier/loss computation that avoids materializing logits. These sources support the mechanisms, not measured speed or outcome equivalence in this experiment.
+
+[LIMA](https://huggingface.co/papers/2305.11206) supports the broader observation that curated SFT can teach formats using limited data. It does not establish that one epoch is sufficient here. [QLoRA](https://huggingface.co/papers/2305.14314) motivates the retained historical memory-saving recipe; removing quantization here is a compute/memory tradeoff, not a claim that QLoRA is scientifically invalid.
+
+## Fixed settings that protect interpretation
+
+Keep learning rate `2e-4`, seed 42, physical microbatch 1, accumulation 16 and effective batch 16. Keep rank-8 LoRA, alpha 16 and dropout 0.05 in every original layer, targeting all seven original projection types. Keep clipping at 0.3, the full 4096-token eligibility limit, complete response text and the original completion-only mask. The scalar objective remains the mean supervised-token loss per example, averaged over examples.
+
+Do not pack examples across boundaries, drop samples, truncate completions, train only upper layers, lower adapter rank, increase learning rate, filter small gradients, or choose checkpoints from the final evaluation set. These could save compute but add uncertainty to adaptation capacity, stochastic training or scientific interpretation. Validation remains diagnostic, with no adaptive stopping: the final endpoint is update 625.
+
+Full recovery states are saved at initialization, every 100 updates and the final update. Completed scientific/recovery outputs must be verified on Google Drive before their local copies are relied upon. The existing final-evaluation thresholds are unchanged; this redesign does not assert that they have been met.
+
+## Exact published execution policy
+
+The backend is [published_execution.py](../src/training/sft/published_execution.py). Frozen weights and decoder/head computation use BF16; adapters, AdamW state, loss and CCE gradient accumulation use FP32. The head dot product accumulates in FP32 but logits are rounded to BF16 before FP32 loss arithmetic. Global TF32 is disabled.
+
+Cut Cross-Entropy is installed from immutable upstream commit [`3de376c106a1916bc5e1b619f9c77c87a461ee1c`](https://github.com/apple/ml-cross-entropy/tree/3de376c106a1916bc5e1b619f9c77c87a461ee1c), through [requirements_sft_published.lock](../requirements_sft_published.lock). The direct API uses `impl="cce_exact"`, `filter_eps=None`, `filter_e_grad=False`, `filter_c_grad=False`, `accum_e_fp32=True` and `accum_c_fp32=True`. Published approximate-gradient speedups are not assigned to this full-gradient mode. The PyPI 25.1.1 release alone lacks this API; the upstream Transformers extra also conflicts with the repository's pinned Transformers version. Neither is substituted for the immutable direct-API pin.
+
+Install with `python scripts/setup_environment.py --profile gpu-published --skip-tests`. The original hash-locked GPU dependencies are retained, with the VCS pin installed separately without dependency resolution. Runtime startup verifies its actual installed commit/API and supplemental lock hash.
+
+The published-method reconciler uses `--published-method`, reuses only compatible external evidence, and records `READY_TO_INITIALIZE` with native runtime/mask/recovery still pending. A normal non-updating longest-example backward and checkpoint save/load occur before the first optimizer update. These are ordinary startup guards, not an optimization timing campaign. Old NF4 or two-epoch checkpoints cannot seed this recipe; exact recovery is permitted only within the new recipe identity.
+
+## Notebook evidence and timing limits
+
+The uploaded `Untitled9.ipynb` completed its 7B training cell in **58.7 minutes** on an A100 80GB: one epoch over 10,000 examples, BF16 and SDPA, 428 updates, mean 1113.9 and maximum 2824 sequence tokens. Its LR, prompt-and-response supervision, batch accumulation and seed differ from this recipe. The notebook shows a short adaptation run was feasible; it does not establish this recipe's runtime, 14B runtime, or verified encoding efficacy. Its later 197/200 encoding candidates were explicitly unverified, and its explicit-final GSM8K accuracy was 154/200 versus the base's 169/200 under that extractor.
+
+One epoch guarantees half as many example presentations; it does not guarantee half the total wall time because setup, validation and Drive publication remain. No one-hour guarantee is made. Native throughput, compatibility and eventual result equivalence for this finalized execution policy have not been measured. The machine-readable decision record is [sft_short_pilot_design.json](evidence/sft_short_pilot_design.json).

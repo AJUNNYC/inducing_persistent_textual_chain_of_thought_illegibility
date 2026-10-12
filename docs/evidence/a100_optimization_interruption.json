@@ -1,0 +1,25 @@
+{
+  "status": "BLOCKED_NO_A100_ASSIGNMENTS",
+  "observed_at_utc": "2026-10-12T02:31:06.283798+00:00",
+  "observed_at_new_york": "2026-10-11T22:31:06.284211-04:00",
+  "colab_compute_units": 0.0,
+  "a100_allocation_attempt": "BACKEND_REJECTED_QUOTA_OR_ENTITLEMENT",
+  "active_original_cpu_session_untouched": true,
+  "implementation_commit": "8a0f853a5e34291b0d25fead2b43fb14719e316b",
+  "interrupted_measurement_commit": "53a9c889555d558493fc4de65c4c55abfc15347c",
+  "paused_baseline_updates": {
+    "rot13": 28,
+    "kazitext": 30
+  },
+  "paused_checkpoint_drive_status": "VERIFIED_BY_NATIVE_WORKERS_BEFORE_VM_LOSS",
+  "official_optimized_fits_started": 0,
+  "native_optimization_acceptance_complete": false,
+  "gpu_candidates_approved": [],
+  "observed_partial_baseline_median_seconds": {
+    "rot13": 20.751943538999512,
+    "kazitext": 21.583158866000304
+  },
+  "timing_limit": "One baseline repetition observed; candidate comparison and acceptance did not complete. Raw per-profile receipts were not archived before VM loss. These values cannot authorize optimized execution.",
+  "science_or_acceptance_bounds_changed": false,
+  "user_imposed_time_cutoff": false
+}

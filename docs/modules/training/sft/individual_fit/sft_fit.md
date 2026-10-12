@@ -1,13 +1,22 @@
 # sft_fit.md
 
-## Current session: two A100 queues started on 12 October 2026
+## Active redesign: efficient one-epoch SFT; all training paused
 
-The user authorized fresh 7B ROT13 and KaziText queues, levels 1–10 each, on separate Colab A100-SXM4-40GB runtimes. Both native 7B controls and all thirteen launch gates passed; GitHub source `05f47f4` runs the eager baseline with gradient checkpointing enabled. Both queues completed their first optimizer update and verified full checkpoints in Google Drive, then resumed those exact new-run states to remove the temporary operator cutoff. There is no user-imposed wall-clock deadline. Each later level starts from the untouched pinned base. The previous PRO 6000 step-987 checkpoint is archived and is not the parent of these fresh queues. No fits or final validations are yet reported complete; 14B training has not started. See [the restart record](../../../../colab_sft_restart.md) for scope and provenance.
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](../../../../sft_short_pilot.md).
 
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+## Archived interruption: A100 comparison stopped on 11 October 2026
+
+Both Colab A100 assignments ended; the account reports 0.00 compute units and rejects a new A100 allocation. ROT13 and KaziText baseline attempts are safely paused at updates 28 and 30, with full state verified in Drive before runtime loss. Source `8a0f853` implements checkpointed A100 loss candidates, per-level empirical qualification and verified setup reuse. Native candidate comparisons remain incomplete: no optimized fit has started and no A100 speedup is approved. The user requested fresh optimized restarts from untouched bases; archived partial fits are benchmark evidence only. There is no user-imposed wall-clock deadline. See [the interruption record](../../../../evidence/a100_optimization_interruption.json) and [restart procedure](../../../../colab_sft_restart.md).
 
 ## Prior implementation and evidence scope
 
-The following implementation details and dated measurements retain their original scope; the current A100 deployment is described above.
+The following implementation details and dated measurements retain their original scope; the paused execution and efficient recipe amendment are described above.
 
 **Owner:** `sft`. **Implementation status:** source `a6e3295` remains accepted only for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Its existing lineage is running from verified step 673 with passed native gradients, verified Drive recovery and the original deadline. The final memory-copy candidate failed speed despite bitwise agreement. All parent checkpoints and science remain unchanged; optimization rounds are closed.
 
@@ -22,44 +31,36 @@ The following implementation details and dated measurements retain their origina
 
 ## Responsibility and controlling details
 
-## Fixed recipe
+## Default efficient recipe and runtime
 
-| Setting | Source value |
+| Setting | `efficient_one_epoch_v1` value |
 |---|---|
-| Objective | Completion-only SFT on full assistant target: transformed reasoning plus unchanged final answer |
-| Quantization | 4-bit NF4 with double quantization |
-| Compute | BF16; original activation-checkpointing default enabled; an accepted explicit execution profile may override recomputation |
-| LoRA | rank 8, scaling alpha 16, dropout 0.05 |
-| Projection targets | `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` |
-| Embeddings/LM head | frozen |
-| Learning rate | `2e-4` |
-| Optimizer | paged AdamW, 32-bit state |
-| Schedule | cosine, 3% warmup |
-| Weight decay | 0 |
-| Max gradient norm | 0.3 |
-| Exposure | two epochs, no early stopping |
+| Objective | Completion-only full assistant target; mean supervised-token loss per example, then mean across examples |
+| Base precision | Unquantized frozen BF16 weights; no NF4 quantization |
+| Head precision / loss | Frozen BF16 head; CCE FP32 loss and hidden-gradient accumulation |
+| Loss implementation | Direct `cce_exact`, pinned upstream; `filter_eps=None`, both gradient-filter flags false |
+| Attention | Standard SDPA, with efficient-kernel preference; no observed-kernel claim |
+| LoRA | Rank 8, alpha 16, dropout 0.05; all seven attention/MLP projection targets |
+| Optimizer / LR | Plain AdamW, FP32 states, learning rate `2e-4`, zero weight decay |
+| Schedule | One complete epoch; 625-update cosine horizon, 19 warmup updates |
 | Microbatch / accumulation / effective batch | 1 / 16 / 16 |
-| Max total sequence length | 4096 |
-| Seed | 42 |
-| Full-state checkpoint | every 100 optimizer steps and at completion |
+| Max gradient norm / sequence length / seed | 0.3 / 4096, no truncation / 42 |
+| Activation checkpointing | Prefer off; ordinary non-updating startup capacity probe may enable recomputation on OOM |
+| Checkpoints | Full state at every 100 updates and final 625; verified in Drive |
 
-Prompt and padding positions receive no loss. Supervise the entire assistant target, not only encoded/degraded tokens. Freeze the permitted loss-reduction rule and runtime defaults under H.9; the PDF's displayed sum does not uniquely prescribe a reduction normalization. Do not silently truncate transformed examples or remove their final answer. Real mask correctness and nonzero LoRA gradients require preflight on the selected runtime, not just inspecting parameter names.
+The direct CCE call uses the full vocabulary and full gradients, not a Qwen monkeypatch, pruned gradients or materialized `[tokens, vocabulary]` logits. Native startup checks require valid model identity, causal completion/padding masks, nonzero adapter gradients and recoverable full state before production updates. They are normal operational guards, not another paired optimization campaign, and no current receipt claims they passed for this recipe.
 
-Start fresh from the exact untouched base unless a verified matching full-state checkpoint exists. Invalid claimed checkpoints cannot silently cause overwritten fresh runs. Full recovery requires weights, optimizer/scheduler, completed step, available RNG/sampler/data position, model/tokenizer/code/dependency/configuration and data hashes. Interrupted partially updated state requires rollback; persistent retry counters survive. A restart before the first saved state must preserve recipe/seed and log the replay attempt.
+Install through `scripts/setup_environment.py --profile gpu-published --skip-tests`: the unchanged hash-locked base is installed first, then `requirements_sft_published.lock` pins the upstream CCE revision. PyPI version 25.1.1 lacks the required exact-gradient controls and is not an interchangeable dependency.
 
-After two epochs save the final adapter and compute validation loss on the fixed 100 held-out items. That loss does not select epochs, cause early stopping or authorize extra training. Reopen and verify final artifacts; bounded safe artifact repairs preserve the trained state and valid upstream results. Keep the latest two full recovery points plus the named final adapter. A complete fit is not itself evidence the model meets construction criteria.
+`legacy_two_epoch_v1` retains NF4/double quantization, FP32 head, paged AdamW and 1,250 updates with 38 warmup updates. `one_epoch_pilot_v1` retains that numerical recipe with 625/19. The efficient recipe changes these numerics and is a newly declared baseline, not an approved migration of a previous optimizer state. Start fresh; only an exact efficient-fit full checkpoint may resume its own fit. A second epoch after final 625 requires a separate continuation declaration or a fresh legacy run.
 
-## Interfaces and dependent procedures
+Use the common [artifact contracts](../../../../contracts.md), [prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). The [deployment plan](../../../../sft_multi_gpu_execution_plan.md) currently selects no conditions or devices.
 
-The [proposed four-worker plan](../../../../sft_multi_gpu_execution_plan.md) assigns whole independent fits, without distributing a logical optimizer update across GPUs. Each condition has one owner, separate adapter/optimizer/scheduler/sampler state and immutable verified Drive outputs. The currently owned 7B ROT13 level-1 fit is excluded from new queues. Additional A100/14B capacity and profiles remain unvalidated; the original checkpointed baseline is only a capacity candidate. Current optimized helpers require SM120 and pinned Triton 3.5.0, so a hardware change requires affected source/runtime evidence and any continuation provenance before launch. No additional worker deployment is claimed.
-
-Use the common [artifact contracts](../../../../contracts.md), [frozen prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). Typed signatures/serialization are delegated implementation details; their scientific meaning is not. The named owner defines this module with its consumers before dependent integration.
-
-| Source node | Called procedure (exact path) | Specification |
+| Source node | Called procedure | Specification |
 |---|---|---|
-| `RECOVER` | `src/shared_procedures/recovery_procedure.py` | [recovery_procedure](../../../shared_procedures/recovery_procedure.md) |
+| `RECOVER` | `src/shared_procedures/recovery_procedure.py` | [recovery](../../../shared_procedures/recovery_procedure.md) |
 
-## Implemented interface and evidence
+## Historical NF4 implementation and evidence
 
 The [causal-gradient helper](../../../../../src/training/sft/causal_gradient_loss.py), `causal_gradient_token_cross_entropy(logits, targets, *, ignore_index=-100)`, moves causal shifting inside custom autograd and writes the complete contiguous token/vocabulary gradient, zeroing only the unused last row. Forward reuses accepted scheduled CE and its coalesced input copy; backward removes separate slice/scatter/layout copies. Source 07f8a68 passed 359 affected CPU checks and both bitwise numerical/state/RNG comparisons, but failed the speed gate: 1.93% less median time in one pair, 0.17% more in the other, minimum matched ratio 0.99834x versus required 1.05x. Peak allocated memory did not improve. The helper is rejected; source a6e3295 scheduled CE remains selected. Its exact existing lineage is running from verified step 673 with passed native gradients, verified Drive recovery and the unchanged deadline. No migration to the rejected source occurs, all parents and science are preserved, and optimization rounds are closed.
 
@@ -75,7 +76,7 @@ Source `05f42b0` adds `cache_collated_inputs` and `gradient_checkpointing` execu
 
 `SFTFitSpec(family, model_id, level, model_revision, tokenizer_revision, configuration_hash, dataset_hash)` freezes an exact fit. `run_sft_fit(spec, train_records, validation_records, output_dir, config, *, resume=None, preflight_report=None, should_pause=None, handoff_certificate=None, execution_profile=None, execution_benchmark=None)` runs the actual Transformers/PEFT/BitsAndBytes engine. `verify_fit_result(output_dir, expected_identity)` reopens the final checkpoint and verifies adapter tensors against it. Heavy GPU imports occur only in the actual engine.
 
-`render_sft_completion(prompt, completion, tokenizer)` is the shared training renderer used by source length validation and fitting. Both official R1 tokenizer templates remove historical assistant reasoning before `</think>`; this renderer obtains their native role/end wrappers with a sentinel and inserts the complete target without a system message. Native evaluation generation retains the published template. The prospective H.9 convention is `native_training_template_v1`; reduction is the supervised-token mean per example, then the mean across examples. Continuous accumulation across the two seeded epoch permutations gives exactly 20,000 presentations and 1,250 optimizer updates. The 3% warmup rounds upward to 38 updates.
+`render_sft_completion(prompt, completion, tokenizer)` is the shared training renderer used by source length validation and fitting. Both official R1 tokenizer templates remove historical assistant reasoning before `</think>`; this renderer obtains their native role/end wrappers with a sentinel and inserts the complete target without a system message. Native evaluation generation retains the published template. The prospective H.9 convention is `native_training_template_v1`; reduction is the supervised-token mean per example, then the mean across examples. The explicitly named NF4 pilot single seeded epoch gives exactly 10,000 presentations and 625 optimizer updates; 3% warmup rounds upward to 19. The explicitly named legacy recipe retains two seeded permutations, 20,000 presentations, 1,250 updates and 38 warmup updates. Recipe identity is part of checkpoint compatibility: changing epochs or the scheduler horizon cannot relabel an old checkpoint as a pilot resume.
 
 `tokenize_completion` requires exact offset boundaries, masks prompt and padding positions, supervises the whole target and native end token, and rejects overlength examples without truncation. All records in a fit must bind to one accepted source-pool hash. Checks require exact counts, disjoint unique IDs, prompt-byte hashes, transformation seed, model/tokenizer revisions, configuration and complete target composition.
 
@@ -127,87 +128,46 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
-%% Individual SFT fit
-%% Edit quoted node labels directly; this is native Mermaid.
-%% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
-%% CUDA input caching failed speed; other conditions retain the original execution defaults.
-%% CE defaults to spatial_ce; source 6d21fff flat/fused forward candidates failed numerical bounds.
-%% Source 218900d accepted stock spatial forward/tiled backward only for 7B ROT13 level 1 on Blackwell96GB.
-%% Historical source 218900d inherited step 401 with preserved parent checkpoints and verified Drive state.
-%% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
-%% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
-%% Historical a6e3295 lineage began at step 509 with preserved parent bytes.
-%% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
-%% Resume accepted a6e3295 from step 673 in the same existing lineage; no new migration.
-%% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
-%% PROPOSED only: two PRO 6000 workers for 14B and two Colab A100 workers for remaining 7B fits.
-%% Current 7B ROT13 level 1 stays owned; no duplicate condition, new deployment or A100/14B approval.
-%% Planning source: docs/sft_multi_gpu_execution_plan.md; forecasts are estimates, not benchmarks.
-%% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
-%% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
-%% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
-%% Individual SFT fit
-%% No warm-start from another level; only an exact-fit full checkpoint may resume training.
-%% SFT setup and resumption
-%% NF4 double quantization, BF16; original activation-checkpointing default is enabled.
-%% A measured explicit profile may override activation recomputation after identical PEFT preparation.
-%% Immutable CUDA input caching preserves per-example tensors, sampler order and microbatch shapes.
-%% Source/hardware/profile migration preserves parent full state and writes separate verified lineage.
-%% LoRA rank 8 / alpha 16 / dropout .05; attention and MLP targets.
-%% LR 2e-4; paged AdamW32; cosine schedule; warmup 3%; weight decay 0.
-%% Microbatch 1; gradient accumulation 16; effective batch 16; max length 4096; seed 42.
-%% Known setup failures use shared bounded recovery before this procedure returns STOP.
-%% A corrupt claimed recovery checkpoint must not silently cause a fresh run with overwritten provenance.
-%% SFT optimization
-%% Full checkpoint includes adapter, optimizer, scheduler, RNG and data position.
-%% Interrupted updates roll back to a verified full checkpoint; counters survive rollback.
-%% If interruption occurs before the first checkpoint, an explicitly recorded fresh restart uses the fixed seed.
-%% No early stopping; scientific validation results cannot alter the fixed two-epoch schedule.
-%% SFT final validation and saving
-%% Retain already valid upstream artifacts; retry only the failed save or validation computation.
-%% Validation loss is reported; it does not trigger early stopping or extra training.
-%% SETUP verifies full checkpoint identity/integrity or initializes an untouched base; corrupt existing recovery state is not silently discarded.
-%% SETUP applies masking, gradient and data-identity checks before any update. Effective batch 16 and max length 4096.
-%% AUDIT->FINAL permits only a known safe artifact repair within persistent finite retry budgets. Frozen-input faults stop.
-%% Retry only the failed final save / validation operation; retain valid upstream outputs and trained state.
-%% Interrupted updates require rollback to verified state; replay is recorded and never resets retry counters.
+%% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
+%% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
+%% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
+%% No materialized full token-by-vocabulary logits; no equivalence to historical FP32 head promised.
+%% All 10,000 examples once; 625 updates and 19 warmup; micro 1 / accumulation 16 / effective 16.
+%% Completion-only per-example means; full 4096 eligibility without truncation; seed 42.
+%% LoRA 8 / 16 / .05, all seven projections, LR 2e-4, zero decay, max norm .3.
+%% Checkpoints every 100 updates and final 625; actual Drive verification before retention/completion.
+%% Normal native startup guards unrun; no optimization campaign, no selected job, all training PAUSED.
+%% Prefer checkpointing off; a non-updating longest-record capacity probe may enable recomputation on OOM.
+%% Exact-fit recovery restores the recorded policy; old NF4 states cannot be relabelled.
 %% Child: RECOVER => ../../../shared_procedures/recovery_procedure.mmd
-    INPUT["One model / family / level and frozen dataset"]
-    SETUP["Initialize or resume exact fit<br/>NF4 with LoRA r8 / a16<br/>LR 0.0002 and effective batch 16<br/>Maximum total length 4,096 tokens"]
-    DONE{"Two epochs complete?"}
-    STEP["Perform next optimizer step<br/>No early stopping"]
-    DUE{"Checkpoint due?"}
-    SAVE["Save and verify full checkpoint<br/>Every 100 steps and at the final step"]
+    INPUT["Future selected model / family / level<br/>efficient_one_epoch_v1 and certified records"]
+    SETUP["Untouched BF16 base/head and LoRA<br/>Pinned exact full-gradient CCE; SDPA; AdamW<br/>One epoch; cosine 625; warmup 19"]
+    CAPACITY["Non-updating longest-record startup capacity check<br/>Prefer recomputation off; enable on OOM"]
+    GUARDS["Normal native identity / causal mask / gradient guards<br/>Verify complete-state recovery before updates"]
+    DONE{"625 updates complete?"}
+    STEP["Next complete optimizer update<br/>All examples in fixed seeded order"]
+    DUE{"Save due?<br/>Every 100 updates or final 625"}
+    SAVE["Atomic adapter / optimizer / scheduler / RNG / sampler<br/>Verify actual full state in Drive"]
+    FINAL["Verified final adapter and full state<br/>Loss on all 100 certified validation items<br/>Final panels remain reserved"]
+    AUDIT{"Final outputs and exposure valid?"}
+    OUT["Mark exact selected fit complete"]
+    RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Verified exact-recipe full state only"]
+    STOP["Stop fit; preserve verified partial state"]
+    INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE
     DUE -->|No| DONE
-    FINAL["Save final adapter<br/>Compute loss on 100 fixed validation items"]
-    AUDIT{"Final outputs valid?"}
-    OUT["Mark this fit complete"]
-    FINAL --> AUDIT
+    DONE -->|Yes| FINAL --> AUDIT
     AUDIT -->|Yes| OUT
-    AUDIT -->|Known artifact repair| FINAL
-    RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Recover verified state before resuming"]
-    STOP["Stop fit and preserve partial results"]
-    PROFILE["Bind explicit profile, source and condition<br/>Eager attention; explicit CE/recomputation policy"]
-    MEASURE["Freeze prospective paired target-GPU screen<br/>Losses, gradients, updates, speed and RNG"]
-    ACCEPT{"Source / GPU / condition evidence passes?"}
-    MIGRATE["If continuing: preserve parent checkpoint<br/>Inherit full state and publish child lineage"]
-    PROPOSED["PROPOSED worker assignment<br/>One owner per independent fit<br/>Exclude active 7B ROT13 level 1"]
-    INPUT -.->|Additional workers unvalidated| PROPOSED
-    PROPOSED -.->|Record source, hardware and Drive ownership| PROFILE
-    INPUT --> PROFILE --> SETUP --> DONE
-    PROFILE -.->|Candidate or migration| MEASURE --> ACCEPT
-    ACCEPT -->|Yes| MIGRATE --> SETUP
-    ACCEPT -->|No| STOP
-    DONE -->|Yes| FINAL
-    SETUP -.->|Failure| RECOVER
-    STEP -.->|Failure| RECOVER
-    SAVE -.->|Failure| RECOVER
+    AUDIT -->|Known artifact repair only| FINAL
+    SETUP -.->|Execution failure| RECOVER
+    GUARDS -.->|Execution failure| RECOVER
+    STEP -.->|Execution failure| RECOVER
+    SAVE -.->|Execution failure| RECOVER
     FINAL -.->|Execution failure| RECOVER
-    RECOVER -->|Verified state| SETUP
-    RECOVER -->|Not permitted| STOP
-    AUDIT -.->|Fatal or retry limit| STOP
+    RECOVER -->|Verified matching state| SETUP
+    RECOVER -->|Fatal or retry limit| STOP
+    AUDIT -.->|Invalid inputs or retry limit| STOP
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class RECOVER detail
     classDef stop fill:#fbe9e7,stroke:#b45448
@@ -217,8 +177,5 @@ flowchart TD
 %% Module documentation: docs/modules/training/sft/individual_fit/sft_fit.md
 %% Unit test: tests/unit/training/sft/individual_fit/test_sft_fit.py
 %% Owner: sft
-%% Source sections: C.2.2–C.2.4; E.1.3; E.2.4,E.2.6; H.9
-
-    classDef proposal fill:#fff3d9,stroke:#95733f,stroke-dasharray:5 5
-    class PROPOSED proposal
+%% Source sections: C.2.2-C.2.4; E.1.3; E.2.4,E.2.6; H.9; authorized efficient redesign
 ```

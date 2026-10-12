@@ -91,6 +91,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     deployment/
       runpod.md
     evidence/
+      a100_optimization_interruption.json
       baseline_repeatability_launch.json
       colab_a100_connection.json
       coordinator_validation.json
@@ -140,6 +141,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_scheduled_forward_pro6000_readiness.json
       sft_scheduled_forward_pro6000_selected_profile.json
       sft_scheduled_forward_pro6000_training_resume.json
+      sft_short_pilot_design.json
       sft_training_launch.json
       sft_training_launch_drive.json
       sft_training_pause_214.json
@@ -276,6 +278,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     sft_data_handoff.md
     sft_multi_gpu_execution_plan.md
     sft_optimizations.md
+    sft_short_pilot.md
     source_map.md
     statistical_concentration_guard.md
     validation.md
@@ -295,6 +298,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
   requirements-vllm.txt
   requirements.lock
   requirements_cpu.lock
+  requirements_sft_published.lock
   schemas/
     candidate_prompt.json
     clean_generation.json
@@ -605,6 +609,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         individual_fit/
           __init__.py
           sft_fit.py
+        published_execution.py
         runtime_migration.py
         scheduled_spatial_loss.py
         sft_training.py
@@ -700,6 +705,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_optimized_sft_queue.py
         test_protocol_provenance.py
         test_runpod.py
+        test_sft_budget_reconcile.py
         test_sft_handoff_reuse.py
         test_sft_optimization_benchmark.py
         test_sft_reconcile_execution.py
@@ -734,6 +740,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         sft/
           individual_fit/
             test_sft_fit.py
+            test_training_budget.py
           test_causal_gradient_loss.py
           test_data_handoff.py
           test_execution_profile.py

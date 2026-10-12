@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 544,
+  "files": 551,
   "directories_including_root": 202,
   "entries": [
     {
@@ -935,6 +935,17 @@
       "node": "p_b9671765a5cdf7"
     },
     {
+      "path": "docs/evidence/a100_optimization_interruption.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/a100_optimization_interruption.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_3a94603ed7dd5a",
+      "blank": false
+    },
+    {
       "path": "docs/evidence/baseline_repeatability_launch.json",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -1471,6 +1482,17 @@
       "display_path": "docs/evidence/sft_scheduled_forward_pro6000_training_resume.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_593a2a637631f2",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_short_pilot_design.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_short_pilot_design.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_64a865a58d343a",
       "blank": false
     },
     {
@@ -2932,6 +2954,17 @@
       "blank": false
     },
     {
+      "path": "docs/sft_short_pilot.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/sft_short_pilot.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_aaf6895a23c7a3",
+      "blank": false
+    },
+    {
       "kind": "documentation",
       "owner": "coordinator",
       "source": "PDF H.9 and Mermaid reuse/handoffs; requested repository responsibility assignments",
@@ -3137,6 +3170,17 @@
       "display_path": "requirements_cpu.lock",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_973d39fe9a7d95",
+      "blank": false
+    },
+    {
+      "path": "requirements_sft_published.lock",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "requirements_sft_published.lock",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_6bb18b0e62561c",
       "blank": false
     },
     {
@@ -6470,6 +6514,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/published_execution.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/published_execution.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_dc1d1fb1fc50ba",
+      "blank": false
+    },
+    {
       "path": "src/training/sft/runtime_migration.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -7486,6 +7541,17 @@
       "blank": false
     },
     {
+      "path": "tests/unit/operations/test_sft_budget_reconcile.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_sft_budget_reconcile.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_b2d6a54f4764ea",
+      "blank": false
+    },
+    {
       "path": "tests/unit/operations/test_sft_handoff_reuse.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -7846,6 +7912,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/unit_tests_layout.mmd",
       "node": "p_83bf7f7d220e95",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/individual_fit/test_training_budget.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/individual_fit/test_training_budget.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_cad570ee99bdaf",
       "blank": false
     },
     {

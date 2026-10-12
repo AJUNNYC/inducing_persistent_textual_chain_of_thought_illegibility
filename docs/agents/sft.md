@@ -1,10 +1,14 @@
 # sft.md
 
-> Historical implementation handoff from 10 October 2026. Its test counts and then-blocked integrations describe that handoff, not current execution status. See the [current procedure](../procedure_update.md) and [current validation report](../validation_report.md) for completed generation, Drive verification and remaining training gates.
+## Active redesign: efficient one-epoch SFT; all training paused
 
-Role identifier: `sft`. Reports to: `coordinator`.
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](../sft_short_pilot.md).
 
-Implement one fit engine for forty independent conditions and two sequential family queues, using the fixed QLoRA recipe and no cross-level warm start, early stopping or adaptive exposure. Integrate actual loss-mask, gradient and checkpoint evidence before launch.
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
 
 ## Required reading
 

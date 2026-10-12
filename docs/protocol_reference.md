@@ -72,41 +72,6 @@ text necessarily carries meaningful reasoning, or that RL-induced opacity emerge
 optimization pressure. The protocol controls the text-generation intervention; assessing the resulting
 model’s internal use of that text is a separate phase.
 2 Study design at a glance
-Table 1: The predetermined intervention matrix. All conditions are evaluated with the same frozen
-benchmark IDs.
-Branch
-Model states
-Intervention and progression
-Partial ROT13 SFT
-7B and 14B; 10 levels each
-QLoRA on the model’s own reasoning trace, with
-10%, 20%, . . . , 100% of eligible original words en-
-coded in growing contiguous spans.
-KaziText
-degradation
-SFT
-7B and 14B; 10 levels each
-Same clean traces and QLoRA recipe; ten fixed log-
-arithmically spaced KaziText corruption strengths.
-Direct-opacity RL
-7B and 14B; one trajectory
-each
-Two independent GRPO runs with the same
-correctness-gated Claude Sonnet 5.5 opacity reward;
-10 checkpoints per run (steps 10, 20, . . ., 100).
-Total
-40 SFT adapters + 20
-RL
-checkpoints
-+
-2
-bases
-62 distinct evaluated model states.
-The SFT branches each require 20 independent fits (ten strengths × two model sizes). The RL
-branch has two independent fitted trajectories, one per model, with ten time-indexed measurements
-per trajectory. These are not twenty independent opacity-strength interventions. Both runs use the
-same frozen RL training question IDs and reward settings. No hyperparameter sweep or performance-
-dependent resampling is planned. The models are in a common R1-distill-Qwen lineage but the 7B
 2
 First­stage RL success requires persistent textual CoT illegibility, retained measured capability,
 and cross­domain transfer. Test trained checkpoints on held­out prompts under the frozen native
@@ -120,6 +85,27 @@ Surface­level opacity can satisfy the construction objective without useful hid
 Garbage surrounding a complete readable solution does not establish loss of textual access to
 reasoning; retain the existing readable­solution and padding controls. These distinctions motivate
 mechanism­neutral claims about the model organisms [44, 46, 41, 54, 51].
+Table 1. Available conditions and current recipe default
+Models: DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Qwen-14B, each compared against its own
+untouched base.
+Transformations: ROT13 and official KaziText, each at ten fixed levels.
+Available inventory: 2 model sizes x 2 families x 10 levels = forty independent condition datasets, all verified in
+Drive.
+Selected jobs: none. No model, family or level is scheduled; all training is PAUSED and no GPU is allocated.
+Default per-fit efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine
+horizon and19 warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with
+FP32 loss/hidden-gradient accumulation, SDPA and plain AdamW. It retains completion-only
+masks/per-example weighting, LoRA 8/16/.05,LR 2e-4,effective 16,seed 42 and full 4096 eligibility.
+Checkpoint every 100 and final 625 with verified Drive recovery.
+The user authorizes this published-method baseline without another optimization test/timing campaign. Actual
+native model/mask/gradient/full-state guards execute at startup before updates; no current receipt certifies that
+runtime. This changes exposure and numerical execution and does not guarantee the same trained results or
+one-hour completion.14B throughput/memory remain unmeasured.
+Original NF4 legacy_two_epoch_v1 and intermediate NF4 one_epoch_pilot_v1 remain explicit alternatives.
+The original full-grid design evaluates40 SFT adapters,20 RL snapshots and2 bases (62 states); those counts
+are available legacy scope, not the active queue. Validation diagnostics may precede reserved final tests.
+Original confirmatory thresholds/windows remain unchanged; restricted selections cannot claim unobserved
+levels.
 ```
 
 ## page_003
@@ -1494,77 +1480,40 @@ C.2 Fixed common SFT/QLoRA optimization protocol
 ```text
 CoT Illegibility — Experimental Protocol
 October 2026
-C.2.1 Why use one recipe across mechanisms and model sizes?
-The two supervised branches have different target-text interventions, not different training algorithms.
-To attribute observed changes as cleanly as possible to the intervention, hold the base checkpoint,
-source example IDs, train/validation partition, objective, nominal exposure schedule, adapter targets
-and optimization parameters fixed within each model size; use the same fixed recipe for both R1-
-distill sizes wherever the hardware permits. This is a controlled comparison in the sense of limiting
-adjustable factors; it cannot remove differences due to tokenizer expansion, model initialization, or
-nonidentical 7B/14B pretraining lineages [42, 44].
-Fang and Marks demonstrate the nearest direct encoded-CoT precedent: 4-bit QLoRA on an R1-
-distilled model, targeting attention and MLP projections, with LoRA rank 8, scaling alpha 16, dropout
-0.05, zero weight decay, cosine learning-rate decay, and two epochs. Their dataset was about 85,500
-samples on five H200 GPUs and they warmed up to 10−3 before annealing toward 10−4; copying those
-learning-rate values without accounting for the much smaller model/data/compute regime would
-be unjustified [44]. Dettmers et al. support the general NF4/double-quantization/paged-optimizer
-configuration and report QLoRA learning-rate choices that include 2 × 10−4, but do not validate the
-exact combination below for partial ROT13 or KaziText on R1-Distill-Qwen [43].
-C.2.2 Final fixed hyperparameters
-Parameter
-Value
-Evidence/status
-Training objective
-Completion-only SFT
-Mask loss on user/prompt tokens;
-target is transformed reasoning
-and unmodified answer.
-Quantization
-4-bit NF4
-QLoRA memory precedent [43].
-Double quantization
-Enabled
-QLoRA memory precedent [43].
-Compute precision
-BF16
-Fixed target-GPU policy; ver-
-ify actual hardware support at
-startup.
-Adapter
-LoRA, rank 8
-Direct Fang–Marks setting [44].
-LoRA scaling α
-16
-Direct Fang–Marks setting; not
-KaziText’s noise α [44].
-LoRA dropout
-0.05
-Direct Fang–Marks setting [44].
-LoRA projection targets
-Q, K, V, O, MLP
-q_proj, k_proj, v_proj,
-o_proj, gate_proj, up_proj,
-down_proj;
-direct
-projection-
-family precedent [44].
-Embeddings/LM head
-Frozen
-Follows
-Fang–Marks’s
-attention/MLP-only
-adapta-
-tion [44].
-Learning rate
-2 × 10−4
-From QLoRA’s practical range;
-fixed transfer choice, not vali-
-dated optimum [43].
-Optimizer
-Paged AdamW, 32-bit
-states
-QLoRA optimizer precedent [43].
 28
+C.2.1 Published-method baseline and scientific scope
+The active efficient_one_epoch_v1 recipe is a newly declared scientific baseline, not an exact migration of
+NF4 checkpoints. It applies to any explicitly selected model/family/level. All forty condition datasets remain
+available; no condition is selected and all training is PAUSED. Both families use the same full-target
+completion-only objective and seeded exposure per chosen fit.
+Precedent: LoRA (arxiv.org/abs/2106.09685) supports frozen-base low-rank adaptation. Mixed-precision
+training (1710.03740) supports lower-precision computation with stable accumulation. FlashAttention
+(2205.14135) motivates memory-efficient exact attention, used here through standard PyTorch SDPA
+preference rather than a claimed observed kernel. Cut Cross-Entropy (2411.09009; Apple's upstream
+implementation) avoids the large vocabulary logits matrix. QLoRA (2305.14314) is a memory-saving
+precedent, not evidence that NF4 maximizes training throughput. The uploaded one-epoch notebook
+motivates short exploratory exposure but does not validate 14B runtime or equal final efficacy.
+C.2.2 Declared efficient hyperparameters
+Objective: completion-only supervised loss on transformed reasoning plus the unchanged final answer;
+mean supervised-token loss per example, then mean examples. Prompt/padding tokens receive no direct
+loss.
+Base and head: unquantized frozen BF16 weights; BF16 frozen classifier, FP32 dot accumulation with
+BF16 logits rounding, FP32 loss/hidden-gradient accumulation through exact direct CCE.
+LoRA: rank 8, alpha 16, dropout .05; q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj.
+Embeddings/head remain frozen; adapters and optimizer states FP32.
+Learning rate/optimizer:2e-4, plain AdamW, zero weight decay, maximum gradient norm.3.
+Exposure: one epoch/all 10,000 training records, plus100 distinct validation IDs for diagnostics. Effective16
+from microbatch 1/accumulation 16;625 updates, full cosine horizon 625 and warmup 19.
+Sequence policy: maximum 4096 total tokens, no truncation, packing or omitted targets. Seed42.
+Attention: standard SDPA preferring flash/efficient implementations; math fallback permitted. Actual
+selected kernel is not instrumented or claimed.
+Memory: checkpointing off preferred; a non-updating longest-record capacity probe may enable
+recomputation after OOM. Record actual policy; no paired optimization campaign.
+Checkpoints: every 100 updates and final 625; atomic full state, verified Drive publication.
+This changes epochs, base/head precision, optimizer and execution relative to the historical two-epoch
+NF4 recipe. Numerical accumulation fidelity does not prove identical full-fit outcomes. Legacy recipes
+remain available explicitly and cannot share relabelled checkpoints. Final test panels and original
+construction/evaluation thresholds remain unchanged.
 ```
 
 ## page_029
@@ -1573,58 +1522,6 @@ QLoRA optimizer precedent [43].
 ```text
 CoT Illegibility — Experimental Protocol
 October 2026
-Parameter
-Value
-Evidence/status
-Schedule
-Cosine decay
-Fang–Marks precedent for sched-
-ule family; initial LR differs [44].
-Warmup
-First 3% of steps
-Predeclared engineering conven-
-tion; not literature-established op-
-timum.
-Epochs
-2
-Direct
-Fang–Marks
-precedent
-[44].
-Effective batch
-16 sequences
-Compute-aware fixed choice con-
-sistent with QLoRA-scale train-
-ing practice [43].
-Microbatch / accumulation
-1 / 16
-Maximum sequence length
-4,096 tokens
-Fixed context/memory budget;
-not a proven minimum for coher-
-ent reasoning.
-Weight decay
-0
-Fang–Marks precedent [44].
-Maximum gradient norm
-0.3
-Practical QLoRA precedent [43].
-Gradient checkpointing
-Seed
-42
-Predeclared reproducibility con-
-vention.
-Early stopping
-Disabled
-Equal two-epoch exposure; not
-adapted to each condition’s vali-
-dation loss.
-Recovery checkpoints
-Every 100 optimizer
-steps and at comple-
-tion
-Crash recovery; retain full resume
-state, not just LoRA weights.
 C.2.3 Loss masking, truncation, and comparability safeguards
 Let xi be the prompt and yi the complete assistant response, consisting of the transformed reasoning
 segment followed by the unchanged answer. Training minimizes assistant-token negative log likelihood,
@@ -1636,19 +1533,36 @@ X
 t∈assistant(i)
 log pθ(yit | xi, yi,<t).
 29
-Enabled by default;
-profile override
-Memory saving only; override
-requires measured evidence.
-Fixed physical-batch policy;
-capacity evidence required
-for each condition.
-The displayed sum fixes trained-token positions. Reduction is supervised-token mean within each example, then mean across
-examples. Both arms supervise the full assistant target; prompt/padding tokens receive no loss [44]. Original spatial CE is
-default. Accepted a6e3295 preserves serial FP32 arithmetic, schedules token blocks and stores row statistics for tiled
-backward; shifted sequences up to 64 tokens retain original forward. Final copy removal agreed bitwise but failed the 1.05x
-speed rule; keep the accepted profile. Approval covers only 7B ROT13 level 1 on Blackwell 96GB. Science and source/profile
-lineage remain fixed.
+Parameter / declared value / evidence boundary
+Recipe: efficient_one_epoch_v1; one complete pass through all 10,000 certified records.
+Scheduler: cosine decay over625 updates, warmup 19. No early stopping or validation-driven extra epochs.
+CCE dependency: Apple ml-cross-entropy Git commit 3de376c106a1916bc5e1b619f9c77c87a461ee1c,
+installed separately after the unchanged hash-locked base through requirements_sft_published.lock.
+Direct loss implementation: cce_exact with filter_eps=None, filter_e_grad=False and filter_c_grad=False.
+FP32 hidden/classifier-gradient accumulation is enabled. No gradient pruning, no Qwen monkeypatch, no
+materialized full token-by-vocabulary logits.
+Classifier numerics: frozen BF16 weights/hidden input,FP32 dot accumulation and BF16 logits rounding;
+loss FP32. These differ from the original FP32-head formulation despite the same supervised-token
+objective.
+Native startup: verify model/source identity, causal completion/padding masks, nonzero adapter gradients,
+actual capacity and complete-state recovery before any update. None has passed for the new runtime until
+actually executed. Reuse only compatible upstream data/durability/spending/statistical evidence; historical
+GPU approval is not a fresh receipt.
+Memory policy: prefer recomputation off, ordinary non-updating longest-record OOM fallback may enable it.
+Preserve objective and RNG during the probe and bind the actual policy to state. Exact-fit recovery must
+restore the recorded execution identity.
+User request: no optimization tests, comparative benchmarks or GPU runs during implementation. Static
+document/config/source checks do not establish native execution or speed. No condition selected, no
+resource allocated, all training paused.
+Alternatives: legacy_two_epoch_v1 retains NF4/FP32-head/pagedAdamW and1250/38; intermediate
+one_epoch_pilot_v1 retains those numerics with 625/19. Start fresh across recipe boundaries. Never
+relabel old full state as new baseline state.
+The displayed sum fixes supervised positions. Reduction remains supervised-token mean within each example, then
+mean across examples. Direct full-gradient CCE computes the same full-vocabulary objective without a materialized
+logits matrix; prompt/padding/unused last decoder rows have zero direct loss gradient. Gradient filtering is disabled
+explicitly. BF16 classifier numerics differ from historical FP32-head arithmetic. A previous custom-kernel screen cannot
+prove final equivalence or authorize migration. Source, dependency, recipe, dtype and runtime choices must remain
+recorded.
 ```
 
 ## page_030
@@ -1665,47 +1579,44 @@ omission of high-opacity examples that expand under ROT13. It may reduce the num
 samples and therefore belongs in the final dataset-count decision. Store token distributions separately
 for 7B and 14B and for each transformation strength. Fixed examples and epochs mean fixed nominal
 exposure, not identical token compute or identical optimization dynamics.
-The dataset volume is now fixed at Ntrain = 10,000 accepted training records (Section B.1.4).
-With two epochs and effective batch size 16 this implies approximately ⌈2(10,000)/16⌉= 1,250
-optimizer steps per configuration (modulo batching and distributed implementation details). No
-sample-size sweep, performance-dependent resampling, or training-data increase is permitted after
-seeing model outcomes. The separate validation split and candidate-generation acceptance procedure
-are documented independently; they must not reduce the 10,000 training records or differ among
-conditions.
-C.2.4 One-run accounting, fair comparisons, and resource implications
-Two model sizes times two SFT families times ten predefined levels gives
-2 × 2 × 10 = 40 distinct SFT configurations.
-These can be automated into one pipeline execution, but each still requires optimization of an adapter
-and evaluation of the resulting checkpoint. The RL design fixes two independent jobs (7B and 14B),
-each with ten checkpoints, using one sequentially scheduled RL GPU worker. A time-indexed series
-of RL checkpoints is a training trajectory and only becomes an opacity gradient if observed legibility
-actually changes. A separate ten-configuration RL design must not be silently assumed [54, 60].
-For SFT, keep the source IDs, clean traces, nominal example count, epoch budget, train/validation
-partition, final-answer handling and training objective the same across strengths and both model
-sizes. Only the target-text transformation and unavoidable model-size/memory adaptations should
-differ. In particular, do not vary the number of examples to create an encoding or degradation
-gradient: doing so would confound strength with training-data exposure. Since ROT13 may expand
-the tokenizer length, equal examples and epochs do not necessarily imply equal tokens, attention
-cost or optimizer dynamics; report both original and post-transform token-length distributions and
-the actual number of tokens processed.
-To estimate cost before a paid full run, write
-Ttokens ≈Ntrain ¯L E,
-HGPU ≈
-Ttokens
-3600 veffective
-,
-$cost ≈HGPU $hourly,
-where ¯L is measured processed tokens per training example, E the epoch count, and veffective the
-measured training throughput on the chosen hardware. This is a first-order budget model, not
-a promise about wall time; padding, packing, attention, optimizer steps, loading, restarts, and
-evaluation add overhead.
-LoRA/QLoRA can sharply reduce trainable-parameter and memory
-requirements, but the base model still participates in forward/backward computation [49, 43]. The
-originally reported team allowance of roughly $90/week and the earlier available-credit balance
-were initial planning constraints, not a sufficient full-experiment budget. The user now intends
-to fund additional GPU time as needed and to run one GPU per training branch with persistent
-checkpoints and pause/resume capability; any team-level approval constraints still apply. The 10,000
 30
+All forty certified conditions remain available: both 7B/14B models, ROT13/KaziText and ten levels each.
+No model, family or level has been selected. A prepared data condition is not an active scheduled job. Each
+chosen fit starts from its untouched base with separate source/configuration/recipe, adapter, optimizer,
+scheduler and RNG/sampler identity. All training is PAUSED and no new GPU is allocated.
+C.2.4 Efficient per-fit accounting and resource implications
+The default efficient_one_epoch_v1 processes all 10,000 accepted training records once, plus loss-only
+diagnostics on the separate 100 validation IDs. Microbatch1 x accumulation 16 gives effective 16 and
+exactly 625 updates. Cosine decay uses the complete 625-update horizon; ceil(0.03 x 625) = 19 warmup
+updates. Preserve all full assistant targets and joint 4,096-token eligibility without truncation, packing or
+record removal.
+The scientific baseline changes from NF4 to unquantized frozen BF16 base/head, uses direct exact
+full-gradient Cut Cross-Entropy, standard SDPA and plain AdamW with FP32 optimizer states. FP32 loss
+and hidden-gradient accumulation preserve stable reductions but are not identical to historical FP32
+classifier arithmetic. Gradient filtering is disabled; no Qwen patch or materialized token-by-vocabulary logits
+is used. Keep completion-only masks/per-example weighting, LoRA rank/alpha/dropout8/16/.05, seven
+attention/MLP targets, LR 2e-4, zero decay, max norm .3, effective 16 and seed 42. Save full state every
+100 and final 625; verify actual bytes in Drive before completion or retention advances.
+The user requests final implementation without another optimization test or timing campaign. Model identity,
+causal masks, adapter gradients, longest-example capacity and complete-state recovery are ordinary
+startup guards before updates, not previously passed runtime approval. Prefer checkpointing off; a
+non-updating OOM capacity probe may enable recomputation with the same objective. No one-hour finish,
+measured speedup or 14B memory claim exists.
+Precedent motivates the declared recipe: mixed precision, LoRA, efficient attention and Cut Cross-Entropy
+remove avoidable runtime/memory overhead. The uploaded 58.7-minute notebook motivates a one-pass
+exploratory budget and BF16/SDPA path, but had a different loss and length distribution. It is not a
+validated same-efficacy or 14B timing result. One epoch halves nominal example passes versus the
+same-condition two-epoch recipe; setup, validation and Drive overhead do not halve automatically.
+legacy_two_epoch_v1 retains NF4, FP32 head, paged AdamW,20,000 presentations,1,250 updates/38
+warmup. The intermediate one_epoch_pilot_v1 retains those numerics with 625/19. All recipes have distinct
+identities; PRO987/A10028/A10030 states remain archives, not warm starts. A final 625 cosine schedule
+cannot be extended as an exact1,250-schedule resume. Additional epochs require a separately defined
+continuation or fresh legacy fit.
+Pilot diagnostics use validation IDs and base companions; frozen final tests remain reserved. Original
+capability, opacity, transfer and simultaneous-bound thresholds remain unchanged. A future restricted
+selection cannot claim untrained intermediate levels or minimum-three-contiguous-level construction
+success. Measure actual selected-run throughput, token lengths, peak memory, billed rates and verified
+checkpoint overhead before a dependable runtime forecast.
 ```
 
 ## page_031
@@ -2756,19 +2667,11 @@ Every
 100
 optimizer
 steps; final
-Retain the two latest valid full-state check-
-points for recovery, plus the completed
-named adapter for each condition. With
-roughly 1,250 steps/run, an unexpected in-
-terruption ordinarily loses at most the work
-since the last completed save.
 KaziText SFT
 Every
 100
 optimizer
 steps; final
-Same policy as ROT13; each model–alpha
-condition has a distinct directory and sta-
 tus record.
 GRPO RL
 After
@@ -2784,6 +2687,14 @@ write, flush and basic integrity check succeed; use an atomic final-directory re
 by the filesystem. On resume, choose the latest verified complete checkpoint, not merely the directory
 with the highest step number. On an intentional budget pause, finish the current optimizer step,
 50
+For each efficient fit, save full state at
+updates100,200,300,400,500,600 and final 625.
+Retain latest two verified recovery states and
+every final adapter. Explicit
+legacy_two_epoch_v1 ends at 1,250. Advance
+retention only after verified Drive publication. No
+selected fits or GPUs; all training remains
+paused.
 ```
 
 ## page_051
@@ -3005,28 +2916,26 @@ change both the text being transformed and the transformation strength. Paired p
 the base models’ own generated targets.
 E.2.3 Machine-readable configuration and exact artifact contracts
 54
-Freeze model, tokenizer, dataset, intervention, source and dependency identities. SHA-256 checks agreement with recorded bytes,
-not scientific correctness. The forty-condition SFT handoff retains producer hashes and verifies ordered records against Drive. Paused
-consumer 773cfd3 passed thirteen launch gates and actual H100 validation; those receipts keep their original scope.
-Source 05f47f4 runs fresh 7B ROT13 and KaziText levels 1-10 on two Colab A100-SXM4-40GB GPUs. Native 7B controls passed
-separately; all thirteen launch gates passed, reusing compatible scientific evidence. Each queue completed one update and
-Drive-verified full state, then resumed exactly to remove the operator cutoff. No user-imposed deadline. Later levels start from
-untouched bases. Eager baseline with gradient checkpointing retains the original scientific recipe; Blackwell optimized helpers are
-disabled on A100. Prior PRO source a6e3295 step-987 state stays archived, not inherited. Final copy removal failed speed and stays
-rejected. No fits or final validation complete; twenty 14B fits remain unstarted/unqualified. Forty unique conditions and immutable Drive
-outputs remain required. No measured A100 speed forecast.
-Generation uses vLLM 0.11.0, Transformers 4.57.3, Torch 2.8+cu128 separately from native Torch 2.9 training. Save actual
-inventories. BF16 context 4096, sequences 128, scheduler 8192, GPU fraction 0.9, no prefix caching; every response keeps 3072
-new tokens. Producer dc520cb and configuration 3757493e stay frozen.
-Evaluation uses the same pinned BF16 vLLM engine for untouched bases and SFT/RL adapters: 128 requests, context 8192,
-scheduler 8192, GPU fraction 0.9, no prefix cache, LoRA enabled (maximum rank 32) even for bases. Verify checkpoint bytes.
-Preserve public templates, EOS, per-item seeds, temperature 0.6, top-p 0.95 and 3072 response tokens; never truncate prompts.
-Archive native measurements; different engines can change answers. Run 7B then 14B separately on one GPU. Judges may be
-explicitly deferred for capability repeatability, which does not certify opacity or full evaluation. Judge the same saved seed 42 outputs
-later. Drive-verify raw batches before advancing, and scored bundles/reports after validated Docker scoring. Bind handoff and
-measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or exact code field, without prose inference,
-ambiguity repair or code repair. Rescoring 7398 preserved outputs passed both models and all four unchanged gates; no generation.
-Retain original failures; apply identical field rules to trained evaluations.
+Freeze model/tokenizer, data, source and dependency identities; hashes verify recorded bytes, not correctness. All forty
+condition datasets remain Drive-verified; none is selected for launch.
+Default efficient_one_epoch_v1: all 10,000 examples once per selected fit;625 updates, full cosine horizon 625, warmup
+19. Unquantized BF16 base/head, exact direct full-gradient CCE FP32 loss/hidden accumulation, SDPA and plain AdamW
+replace old NF4 execution. Preserve full-target completion-only weighting, LoRA 8/16/.05,LR 2e-4,effective 16,seed 42
+and4096 eligibility. Save every 100/final 625; verify full state in Drive. This scientific/numerical change does not prove
+equal final results. Legacy recipes/archives remain separate; no warm starts. All training PAUSED, no resources allocated.
+No optimization campaign. Native identity/mask/gradient/recovery guards run at startup before updates, not previously
+passed approval.14B speed/memory unmeasured. Validation diagnostics precede reserved final tests.
+Generation remains vLLM0.11.0,Transformers4.57.3,Torch2.8+cu128, separate from Torch2.9 training. BF16
+context4096,sequences128,scheduler8192,GPUfraction.9,no prefix cache; every response retains3072 new tokens.
+Producer dc520cb/config3757493e stay frozen.
+Evaluation retains the same pinned BF16 vLLM engine for bases and SFT/RL adapters:128
+requests,context8192,scheduler8192,GPUfraction.9,no prefix cache,LoRA enabled(maxrank32) even for bases. Verify
+checkpoint bytes. Preserve public templates,EOS,item seeds,temperature.6,top-p.95 and3072 response tokens; never
+truncate prompts. Archive native outputs; engine changes can change answers. Judge deferred seed 42 outputs later;
+deferral does not certify opacity/full evaluation. Drive-verify raw batches before advancing and scored bundles/reports after
+Docker scoring. Bind handoff/measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or
+exact code field without prose inference,ambiguity or code repair. Rescoring7398 saved outputs passed both bases and
+unchanged gates; no generation. Retain failures and use identical field rules for trained evaluation.
 ```
 
 ## page_055
@@ -3212,21 +3121,21 @@ induction or apparent internal-monitor success subject to judge shortcuts, selec
 changes and intervention artifacts; the audit is intended to protect that inference rather than
 manufacture a stronger scientific result [41, 54, 59].
 58
-Current status (12 October 2026). Licensed LMSYS acquisition and the one-million-row audit are verified; 407,214 eligible candidates
-are frozen. Evaluation panels and the shared 800-question RL manifest are backed up. Fresh vLLM/refills yielded 10,100 accepted
-pairs and 1539 rejections from 11,639 IDs. All 40 transformed conditions (404,000 records) and the download index are Drive-verified.
-CPU-only readback verified 122 corpus artifacts; both models passed repeatability after rescoring 7398 saved outputs.
-Current source 05f47f4 runs two fresh 7B family queues on separate Colab A100-SXM4-40GB GPUs: ROT13 and KaziText levels
-1-10. Actual native 7B controls passed independently on both devices; all thirteen launch gates passed using compatible prior
-scientific evidence. Both queues completed one optimizer update and verified full state in Drive, then resumed that exact new-run
-state to remove the operator cutoff. No user-imposed wall-clock deadline. Each later level starts from the untouched pinned base.
-Eager baseline with gradient checkpointing enabled retains NF4/BF16, FP32 head/CE, masks, LoRA, seed, effective batch 16, two
-epochs and token limits. Blackwell optimized helpers are not enabled on A100. Prior a6e3295 step-987 state remains archived, not
-inherited. No fits/final validation are yet complete; twenty 14B conditions remain unstarted/unqualified. Forty unique scientific
-conditions and immutable Drive outputs remain required. No measured A100 speed estimate.
-Historical PRO optimization measurements retain their original model/family/level and hardware scope. Final copy removal failed
-speed and stays rejected. Compatible corpus, provider and statistical evidence was reused; no unrelated full-suite rerun. New affected
-CPU checks passed and both native GPU controls passed. Full training and evaluation remain pending.
+Corpus: licensed acquisition and one-million-row audit verified; 407,214 eligible candidates frozen. Evaluation panels and
+800-question RL manifest are backed up. Fresh vLLM/refills yielded 10,100 accepted pairs and 1539 rejections from 11,639
+IDs. All forty transformed conditions, 404,000 records and 122 corpus artifacts are Drive-verified. Both bases passed
+repeatability after rescoring 7398 saved outputs.
+Active recipe efficient_one_epoch_v1 applies per chosen fit, not an automatic condition selection. All 10,000 examples once;
+625 updates/19 warmup. Unquantized BF16 base/head, full-gradient direct CCE FP32 loss/hidden accumulation, SDPA and
+plain AdamW are prospectively declared scientific changes. Completion-only full targets, LoRA, LR 2e-4, effective 16 and
+Drive integrity remain fixed. Original NF4 recipes and all forty conditions remain available. No model, family or level is
+selected.
+All training is PAUSED; no new GPU allocation. Prior A100 assignments ended at zero compute units, replacement rejected
+for quota/entitlement; states ROT13 28/KaziText 30 are full Drive archives. Candidate comparisons incomplete: zero A100
+optimizations approved. 14B speed/memory are unmeasured. No optimization test or timing campaign is scheduled. New
+native model/mask/gradient/full-state guards execute during ordinary startup before updates and are not yet passed. No
+efficacy equivalence, fit completion or one-hour promise. Final panels remain reserved; original confirmatory thresholds are
+unchanged.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)
@@ -3718,19 +3627,20 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Status (12 October 2026). Corpus and forty conditions are Drive-verified. Two distinct Colab A100 40GB
-workers run fresh 7B ROT13/KaziText levels 1-10 using qualified eager checkpointed baseline source 05f47f4.
-Both completed one update and Drive-verified full state before exact recovery to remove an operator cutoff. No
-user-imposed wall-clock deadline. Prior PRO step-987 state is archived, not inherited; optimized PRO evidence
-does not authorize A100 kernels. Twenty 14B fits remain unstarted. Science and forty unique conditions stay
-fixed; no fit, final validation or evaluation is yet reported complete.
-Precedence. For the subjects resolved here, Appendix H is authoritative over inconsistent earlier wording and
-diagram labels. Appendix G retains authority over the construction thresholds and scope except where this
-appendix makes the approved evaluation audit operational. All other fixed scientific requirements remain in
-force. The original 67-page source is retained unchanged in spec/archive/experiment_original.pdf. The active
-protocol incorporates the approved operational changes within the relevant sections. Earlier descriptions such
-as "correct clean reasoning," the unavailable pilot-profile requirement, and the former two-call evaluation total
-remain as historical text; the provisions below state exactly how they are to be interpreted or superseded.
+Active default efficient_one_epoch_v1: one epoch/all 10,000 examples per selected fit, 625 updates, full cosine
+horizon, warmup 19. BF16 base/head, exact CCE FP32 loss/hidden accumulation, SDPA and plain AdamW
+replace NF4 execution. All forty conditions available; no model, family or level selected. All training PAUSED;
+no GPUs allocated. No optimization campaign. Native startup guards unrun; 14B speed/memory unmeasured.
+Legacy recipes/Drive archives preserved; final tests and construction thresholds unchanged. No same-result or
+one-hour guarantee.
+Precedence. The explicitly authorized efficient_one_epoch_v1 baseline controls active SFT recipe over earlier
+NF4, FP32-head, paged-optimizer and two-epoch wording/diagrams. It changes scientific exposure and
+numerical execution, not the original construction success thresholds. All forty conditions remain available with
+no active selection. Legacy NF4 two-epoch and intermediate NF4 one-epoch recipes remain explicitly named
+alternatives; old checkpoints cannot be relabelled. Appendix H retains operational authority and Appendix G
+retains its original full-grid/window criteria. Restricted future level selections cannot establish those unobserved
+levels or windows. The original 67-page archive remains unchanged; active changes are integrated into existing
+pages without appended amendments.
 ```
 
 ## page_069

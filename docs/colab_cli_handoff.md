@@ -1,5 +1,18 @@
 # Colab CLI automation handoff
 
+## Active redesign: efficient one-epoch SFT; all training paused
+
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](sft_short_pilot.md).
+
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+## Historical access and deployment evidence
+
+
 ## Purpose and verified tooling
 
 Continue this project from a local Codex CLI session, using the existing consumer
@@ -17,7 +30,7 @@ The user then authorized an A100 runtime, allocated as `sft_a100`. After
 `*.prod.colab.dev` was added to the network allowlist, runtime file access and
 remote Python execution both succeeded. The [connection receipt](evidence/colab_a100_connection.json)
 records an NVIDIA A100-SXM4-40GB (39.49 GiB, SM80), Python 3.13.15,
-PyTorch 2.11.0+cu130, and CUDA 13.0 in the stock runtime. Training has not
+PyTorch 2.11.0+cu130, and CUDA 13.0 in the stock runtime. At that connection receipt, training had not
 started: the stock software environment and a memory-compatible A100 execution
 profile still need qualification against the pinned training recipe. The
 accepted PRO 6000 no-checkpointing profile must not be assumed to fit 40GB.
@@ -67,7 +80,7 @@ checkpoint as an archive. See [the two-A100 restart](colab_sft_restart.md).
 - Data generation and the certified 7B SFT handoff have already been completed;
   inspect [SFT data handoff](sft_data_handoff.md) and its evidence rather than
   restarting collection or repeating completed scientific suites.
-- Current training source is `05f47f48f2cc2bbaaff326bb83b3594e5ae973c5`.
+- Archived two-A100 baseline source was `05f47f48f2cc2bbaaff326bb83b3594e5ae973c5`; it does not authorize the current one-epoch pilot.
   Two A100-SXM4-40GB workers run fresh 7B baseline family queues:
   `sft_a100` ROT13 levels 1–10 and `sft_a100_kazi` KaziText levels 1–10.
   Native 7B controls passed on each device; all thirteen launch gates passed.

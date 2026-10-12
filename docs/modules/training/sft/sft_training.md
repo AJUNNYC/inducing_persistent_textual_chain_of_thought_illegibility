@@ -1,13 +1,22 @@
 # sft_training.md
 
-## Current session: two A100 queues started on 12 October 2026
+## Active redesign: efficient one-epoch SFT; all training paused
 
-The user authorized fresh 7B ROT13 and KaziText queues, levels 1–10 each, on separate Colab A100-SXM4-40GB runtimes. Both native 7B controls and all thirteen launch gates passed; GitHub source `05f47f4` runs the eager baseline with gradient checkpointing enabled. Both queues completed their first optimizer update and verified full checkpoints in Google Drive, then resumed those exact new-run states to remove the temporary operator cutoff. There is no user-imposed wall-clock deadline. Each later level starts from the untouched pinned base. The previous PRO 6000 step-987 checkpoint is archived and is not the parent of these fresh queues. No fits or final validations are yet reported complete; 14B training has not started. See [the restart record](../../../colab_sft_restart.md) for scope and provenance.
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](../../../sft_short_pilot.md).
 
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+## Archived interruption: A100 comparison stopped on 11 October 2026
+
+Both Colab A100 assignments ended; the account reports 0.00 compute units and rejects a new A100 allocation. ROT13 and KaziText baseline attempts are safely paused at updates 28 and 30, with full state verified in Drive before runtime loss. Source `8a0f853` implements checkpointed A100 loss candidates, per-level empirical qualification and verified setup reuse. Native candidate comparisons remain incomplete: no optimized fit has started and no A100 speedup is approved. The user requested fresh optimized restarts from untouched bases; archived partial fits are benchmark evidence only. There is no user-imposed wall-clock deadline. See [the interruption record](../../../evidence/a100_optimization_interruption.json) and [restart procedure](../../../colab_sft_restart.md).
 
 ## Prior implementation and evidence scope
 
-The following implementation details and dated measurements retain their original scope; the current A100 deployment is described above.
+The following implementation details and dated measurements retain their original scope; the paused execution and efficient recipe amendment are described above.
 
 **Owner:** `sft`. **Implementation status:** full-count queue fixtures pass. Accepted source `a6e3295` runs from verified step 673 in its same existing lineage, with passed native gradients and verified Drive recovery. The final memory-copy trial is rejected on speed and optimization rounds are closed. All scientific settings and 40 planned fits remain unchanged; approval covers only 7B ROT13 level 1.
 
@@ -24,11 +33,11 @@ Source `05f42b0` has accepted no-recomputation evidence and READY affected-runti
 
 ## Responsibility and controlling details
 
-The [four-worker plan](../../../sft_multi_gpu_execution_plan.md) is **proposed**: PRO A runs 14B ROT13 after its currently owned 7B fit finishes if using that Pod; PRO B runs 14B KaziText; Colab A runs 7B ROT13 levels 2–10; Colab B runs 7B KaziText levels 1–10. The 39 proposed assignments plus the already owned level-1 fit cover all 40 exactly once. It allocates independent fits rather than changing training batches. A100/14B memory, throughput, profile support and worker coordination are unvalidated; distinct Drive namespaces and affected launch controls remain mandatory. The 150/75/about 50-hour forecasts are conditional planning estimates, not deployed or benchmarked behavior.
+All forty conditions remain available, but **no model, family, level or GPU has been selected**. The default per-fit recipe is `efficient_one_epoch_v1`; consumers must explicitly choose conditions rather than infer level 10, 14B or a two-worker launch from prior conversation examples. Each chosen fit starts from its untouched base in a separate recipe/configuration/source/output identity.
 
-Create two independent family queues, one for ROT13 and one for KaziText, each covering both models at ten fixed levels: twenty independent fits per queue and forty total. Both call the same `sft_fit` implementation. Every level initializes from its untouched base; a previous level is not a warm start. Only an exact-fit matching full checkpoint may resume a fit.
+Each selected fit uses all 10,000 examples once, effective batch 16, 625 updates and a complete cosine horizon with 19 warmup updates. Unquantized BF16 base/head, exact full-gradient CCE, standard SDPA and plain AdamW are a newly declared published-method baseline. They are not migrations of the old NF4 optimizer states or activation under historical 7B kernel receipts. Before updates, normal native startup guards check masks/gradients, recovery and actual capacity, enabling recomputation if the non-updating capacity probe requires it. The user requested no repeated optimization test or timing campaign.
 
-Each queue runs its fits sequentially on its assigned GPU. The launcher can serialize selected levels on one GPU. The current source a6e3295 acceptance selects only 7B ROT13 level 1; remaining levels require their condition-specific affected evidence before activation. The full forty-fit scientific matrix remains unchanged. Concurrent queues require available GPUs. A failed fit stops the affected queue and preserves partial results; another independent queue may complete valid work. Mark a fit complete only after its final adapter, fixed validation loss and provenance have verified. Release each GPU when its own queue is complete. The nominal exposure is 20,000 example presentations per fit and approximately 1250 optimizer updates, not a hardcoded substitute for correct batching/epoch semantics.
+All jobs remain paused. Independent external workers may receive disjoint conditions only after actual selection and resume; no paid resources are provisioned by documentation. A condition completes only after final state, adapter and validation artifacts are verified in Drive. Preserve partial/failed states honestly. Both legacy numerical recipes remain explicitly named alternatives; the corpus inventory does not enqueue all forty conditions automatically.
 
 ## Interfaces and dependent procedures
 
@@ -39,7 +48,7 @@ Use the common [artifact contracts](../../../contracts.md), [frozen prompt instr
 | `ROTFIT` | `src/training/sft/individual_fit/sft_fit.py` | [sft_fit](individual_fit/sft_fit.md) |
 | `KAZFIT` | `src/training/sft/individual_fit/sft_fit.py` | [sft_fit](individual_fit/sft_fit.md) |
 
-## Implemented interface and evidence
+## Historical implemented interface and evidence
 
 The final copy-removal trial retained bitwise numerical/state/RNG agreement but failed the 1.05x per-update speed rule: median time improved 1.93% in one pair and slowed 0.17% in the other; no peak allocated-memory benefit. Source 07f8a68 is rejected, while archived source a6e3295 remains selected. Its worker is running from verified step 673 via --resume-existing, preserving the same lineage and original deadline, with passed native gradients and verified Drive recovery. The older step-509 migration stays historical. A total of 359 affected CPU checks passed; no unrelated suite/provider/statistical repeat occurred. Optimization rounds are closed, with exactly 40 planned fits and unchanged science; current approval remains only 7B ROT13 level 1.
 
@@ -49,7 +58,7 @@ Both flat-layout and fully fused forward CE failed the frozen numerical screen d
 
 `build_worklist(config, datasets, handoff_certificate=certificate)` reads the forty verified JSONL conditions and binds actual ordered record bytes to exact fit specifications. It requires the same ordered train/validation IDs, prompt bytes and common accepted-pool hash across every condition; model-specific clean-trace hashes and final-answer bytes remain identical across that model's families/strengths. Different model traces are never interchangeable. `load_dataset_bundle(bundle)` verifies persisted JSONL content hashes before loading.
 
-`run_family_queue(family, worklist, output_root, config, *, preflight_report=None, fit_runner=run_sft_fit, release_gpu=None, should_pause=None)` runs twenty sequential independent fits. A child failure or pause preserves verified prior fits and an explicit partial queue report. An injected runner is labeled `injected_fixture`, and cannot supply scientific results. `sft_training(..., families=('rot13','kazitext'))`, also exported as `run_sft_training`, runs selected queues with the same reusable engine. The single-process default is sequential; independent external workers may run queues on separately assigned GPUs. A failed family does not erase another family's work. A release callback runs when the queue returns.
+`run_family_queue(family, worklist, output_root, config, *, preflight_report=None, fit_runner=run_sft_fit, release_gpu=None, should_pause=None)` runs the explicitly selected independent fits. The historical full family worklist contains twenty; the active redesigned default specifies a per-fit recipe while selecting no conditions. A child failure or pause preserves verified prior fits and an explicit partial queue report. An injected runner is labeled `injected_fixture`, and cannot supply scientific results. `sft_training(..., families=('rot13','kazitext'))`, also exported as `run_sft_training`, runs selected queues with the same reusable engine. The single-process default is sequential; independent external workers may run queues on separately assigned GPUs. A failed family does not erase another family's work. A release callback runs when the queue returns.
 
 The [queue tests](../../../../tests/unit/training/sft/test_sft_training.py) use all forty full-count dataset conditions to verify the worklist, exact ordered exposure inputs, original-base identities, sequential failure/partial reporting, independent family progress and paused incomplete adapter handling. They do not train the construction models. Exact commands/results and live limitations are recorded in `artifacts/preflight/sft_implementation_report.json`.
 
@@ -76,65 +85,41 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
-%% SFT training schedule
-%% Edit quoted node labels directly; this is native Mermaid source.
-%% Source 05f42b0 recovery accepted no recomputation only for 7B ROT13 level 1 on RTX PRO 6000 Blackwell 96GB.
-%% CUDA input caching failed speed; other conditions retain the original execution defaults.
-%% CE defaults to spatial_ce; source 6d21fff flat/fused forward candidates failed numerical bounds.
-%% Source 218900d accepted stock spatial forward/tiled backward only for 7B ROT13 level 1 on Blackwell96GB.
-%% Historical source 218900d inherited step 401 with preserved parent checkpoints and verified Drive state.
-%% Source a6e3295 accepted spatial_scheduled_ce for the same selected condition; serial FP32 forward order retained.
-%% Two counterbalanced step-509 pairs passed bitwise state/RNG and additional 24.70-24.98% median time reduction.
-%% Historical a6e3295 lineage began at step 509 with preserved parent bytes.
-%% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
-%% Resume accepted a6e3295 from step 673 in the same existing lineage; no new migration.
-%% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
-%% PROPOSED only: two PRO 6000 workers for 14B and two Colab A100 workers for remaining 7B fits.
-%% Current 7B ROT13 level 1 stays owned; no duplicate condition, new deployment or A100/14B approval.
-%% Planning source: docs/sft_multi_gpu_execution_plan.md; forecasts are estimates, not benchmarks.
-%% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
-%% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
-%% Each queue covers 7B and 14B at all 10 levels; fits are independent and start from untouched bases.
-%% Within each queue, select the next unfinished fit until all 20 are verified.
-%% Current certified launcher serializes selected model/levels on one GPU.
-%% Whole optimizer updates and full checkpoints must pass verified Drive barriers.
-%% Later adapter evaluation explicitly reuses the frozen vLLM measurement contract.
-%% Accepted execution evidence is scoped to one model/family/level; do not release the whole matrix from one screen.
-%% Migration inherits verified full-state progress and preserves parent checkpoint bytes.
-%% A failed fit stops that queue and yields a partial report; the other queue may finish valid work.
+%% Default efficient_one_epoch_v1 applies per explicitly selected fit.
+%% All forty conditions remain available; no model, family, level or GPU is selected.
+%% All training is PAUSED. No paid runtime allocation or benchmark campaign is implied.
+%% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
+%% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
+%% Completion-only per-example weighting, full 4096 targets, LoRA and effective batch remain fixed.
+%% Legacy NF4 one/two-epoch recipes retain separate source/configuration/state identities.
+%% Historical PRO/A100 partial checkpoints remain archives, never new-recipe warm starts.
+%% Native startup guards are not yet executed; 14B speed/memory remain unmeasured.
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
-    INPUT["40 verified condition datasets"]
-    CERT["Bind original producer to certified consumer<br/>40-condition worklist and exact dataset hashes"]
-    GATES["Require source-compatible launch evidence<br/>Reuse unchanged baselines and upstream controls"]
-    PLAN["Two independent family queues<br/>Select 7B ROT13 first on the current single GPU"]
-    ROT["ROT13 queue: assigned GPU<br/>20 independent fits; 10 per model"]
-    KAZ["KaziText queue: when a GPU is available<br/>20 independent fits; 10 per model"]
-    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the ROT13 queue"]
-    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the KaziText queue"]
-    ROTDONE["Verify 20 fits<br/>Release assigned GPU"]
-    KAZDONE["Verify 20 fits<br/>Release assigned GPU"]
-    WAIT["Wait for both verified queues"]
-    OUT["Release all 40 final adapters"]
-    BENCH["New source or hardware: paired candidate measurements<br/>Active-profile comparison; scoped acceptance and full-state lineage"]
-    PROPOSED["PROPOSED independent-fit allocation<br/>2 PRO 6000: 14B; 2 Colab A100: 7B"]
-    OWNERS["PROPOSED disjoint condition ownership<br/>Exclude active 7B ROT13 level 1<br/>Distinct verified Drive outputs; same 40 fits"]
-    PLAN -.->|Proposal; target hardware unvalidated| PROPOSED
-    PROPOSED -.-> OWNERS
-    OWNERS -.->|Require affected runtime evidence| GATES
-    INPUT --> CERT --> GATES --> PLAN
-    CERT -.->|Migration| BENCH --> GATES
-    PLAN --> ROT --> ROTFIT --> ROTDONE --> WAIT
-    PLAN --> KAZ --> KAZFIT --> KAZDONE --> WAIT
-    WAIT --> OUT
+    INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
+    PAUSE["PAUSED: no selected conditions or GPU workers"]
+    SELECT["Future explicit condition selection<br/>Default recipe: efficient_one_epoch_v1"]
+    BIND["Bind new recipe / source / dependency / data identity<br/>Reuse compatible upstream evidence"]
+    PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
+    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected ROT13 condition<br/>All 10,000 examples; one epoch"]
+    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected KaziText condition<br/>All 10,000 examples; one epoch"]
+    ROTDONE["Verify final 625 state and adapter in Drive<br/>Release assigned ROT13 worker"]
+    KAZDONE["Verify final 625 state and adapter in Drive<br/>Release assigned KaziText worker"]
+    OUT["Only selected, verified adapters<br/>Validation diagnostics; final panels reserved"]
+    LEGACY["Explicit NF4 alternatives only<br/>legacy_two_epoch_v1 / one_epoch_pilot_v1"]
+    INPUT --> PAUSE
+    PAUSE -.->|Explicit selection and resume| SELECT --> BIND --> PLAN
+    PLAN --> ROTFIT --> ROTDONE --> OUT
+    PLAN --> KAZFIT --> KAZDONE --> OUT
+    INPUT -.->|Separately declared alternative| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class ROTFIT,KAZFIT detail
-    classDef proposal fill:#fff3d9,stroke:#95733f,stroke-dasharray:5 5
-    class PROPOSED,OWNERS proposal
+    classDef stop fill:#fff3d9,stroke:#95733f,stroke-dasharray:5 5
+    class PAUSE,LEGACY stop
 
 %% Repository module: src/training/sft/sft_training.py
 %% Module documentation: docs/modules/training/sft/sft_training.md
 %% Unit test: tests/unit/training/sft/test_sft_training.py
 %% Owner: sft
-%% Source sections: C.2; E.1.1–E.1.3; E.2.2,E.2.5
+%% Source sections: C.2; E.1.1-E.1.3; E.2.2,E.2.5; authorized efficient redesign
 ```

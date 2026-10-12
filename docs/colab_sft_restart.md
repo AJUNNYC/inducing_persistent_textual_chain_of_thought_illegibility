@@ -1,4 +1,24 @@
-# Two-A100 7B SFT restart
+# Archived two-A100 restart and efficient per-fit redesign
+
+## Active redesign: efficient one-epoch SFT; all training paused
+
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](sft_short_pilot.md).
+
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+## Historical two-A100 restart
+
+
+Historical interruption: A100 comparisons were blocked. Both assignments ended, the
+account reports 0.00 compute units, and an attempted A100 replacement was
+rejected for quota or entitlement. Source `8a0f853` is published; no native
+optimization acceptance or optimized official fit is complete. Baseline pause
+states at ROT13 update 28 and KaziText update 30 remain in Drive.
+
 
 The user explicitly requested restarting the ROT13 and KaziText 7B fine-tuning
 queues on two Colab A100s. `sft_a100` owns ROT13 levels 1–10;
@@ -6,7 +26,7 @@ queues on two Colab A100s. `sft_a100` owns ROT13 levels 1–10;
 untouched base model. This is a fresh restart, not continuation of the prior
 step-987 ROT13 fit. Its full checkpoint remains archived and unchanged in Drive.
 
-Both NVIDIA A100-SXM4-40GB runtimes have remote command access and the pinned
+Before assignment loss, both NVIDIA A100-SXM4-40GB runtimes had remote command access and the pinned
 Python 3.12/PyTorch 2.9.0+cu128 environment installed from the hash-locked GitHub
 requirements. Missing Aspell development/system packages were installed before
 retrying the unchanged setup. Setup skipped the already completed development
@@ -38,7 +58,7 @@ passed, and both family queues started on 12 October 2026 using source
 `05f47f48f2cc2bbaaff326bb83b3594e5ae973c5`. Each completed its first optimizer
 update and verified full state in Drive. A whole-update pause then exact recovery
 removed an operator-imposed cutoff; neither queue inherits the old step-987 run.
-Both now have no intentional time limit. The legacy required deadline argument
+Those attempts had no intentional time limit. Neither assignment remains active. The legacy required deadline argument
 uses `9999-12-31T23:59:59.999999+00:00` as an operational sentinel. Colab resource
 limits and explicit stop requests can still interrupt a runtime. No fit or final
 validation is yet reported complete. Only 7B baseline execution is qualified;

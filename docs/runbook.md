@@ -1,5 +1,15 @@
 # runbook.md
 
+## Active redesign: efficient one-epoch SFT; all training paused
+
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](sft_short_pilot.md).
+
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
 ## Executable stage interfaces
 
 Install using [environment instructions](operations/environment.md), then use the single `illegibility` CLI. Discovery commands do not provision paid infrastructure.
@@ -27,11 +37,11 @@ Inspect `plan` for exact IDs before choosing a target. Dependencies run automati
 
 See [RunPod lifecycle](deployment/runpod.md), [Drive authorization](operations/google_drive.md) and [artifact compatibility](operations/artifacts.md). Validation evidence is in [validation_report.md](validation_report.md); trained experimental results remain pending.
 
-## Current certified SFT entrypoint
+## Certified entrypoint and historical receipt scope
 
-The [launch receipt](evidence/sft_launch_readiness.json) records all thirteen mandatory gates passed for frozen consumer `773cfd3`, following [final-field scoring repair](final_field_scoring.md) and reuse of compatible completed controls. The [existing H100 validation](evidence/sft_launch_pod_validation.json) accepted all forty certified conditions and the ten selected ROT13 7B fits. Historical failed baseline and statistical reports remain preserved; they are superseded by the separately versioned passing evidence. No trained adapter is claimed at this readiness handoff.
+The historical NF4 [launch receipt](evidence/sft_launch_readiness.json) records all thirteen mandatory gates passed for frozen consumer `773cfd3`, following [final-field scoring repair](final_field_scoring.md) and reuse of compatible completed controls. The [existing H100 validation](evidence/sft_launch_pod_validation.json) accepted all forty certified conditions and the ten selected ROT13 7B fits. Historical failed baseline and statistical reports remain preserved; they are superseded by the separately versioned passing evidence. No trained adapter is claimed at this readiness handoff.
 
-Use the committed `scripts/run_certified_sft.py` with `--config`, `--certificate`, `--bundle`, `--worklist`, `--preflight` and `--deadline` naming the reconciled handoff files. Select `--family rot13 --model 7b`; add `--level` only to select one independent fit. `--validate-only` verifies the saved launch bindings without GPU work or Drive requests. The production launch verifies Drive storage before model initialization, preserves full checkpoints at the existing cadence, and pauses at a complete optimizer update on deadline or SIGTERM. Compatible controls need not be rerun merely because documentation changed.
+Use the committed `scripts/run_certified_sft.py` with `--config`, `--certificate`, `--bundle`, `--worklist`, `--preflight` and `--deadline` naming the reconciled handoff files. Select `--family rot13 --model 7b`; add `--level` only to select one independent fit. `--validate-only` verifies the saved launch bindings without GPU work or Drive requests. For the efficient recipe, external SFT checks bind certified data, durability, actual spending and compatible statistical evidence; native model/mask/full-state checks execute as ordinary startup before updates and are not previously passed GPU approval. The production launch verifies Drive storage before model initialization, preserves full checkpoints at the existing cadence, and pauses at a complete optimizer update on deadline or SIGTERM. Compatible controls need not be rerun merely because documentation changed.
 
 ## Before real data or paid work
 
@@ -43,19 +53,19 @@ Shared contracts, state/recovery and producer/consumer interfaces are implemente
 
 The actual evaluator, question-aware audit, MBPP sandbox and analysis routines retain their required launch evidence. Source-required baseline repeatability and statistical simulation validation are pre-outcome gates; both now have separately retained passing evidence. Their failures cannot be handled by silently changing retention thresholds or sampling. Actual masks, gradients, grouping, checkpoints, providers, storage and authorization require real compatible preflight evidence.
 
-## Schedule training only after required gates
+## Legacy full-grid scheduling (superseded for the active pilot)
 
 The source allows three GPU queues: ROT13 SFT, KaziText SFT and GRPO. Each SFT queue has twenty independent fits; each uses the shared two-epoch fit engine starting from the corresponding untouched base. The RL queue runs 7B then 14B sequentially, each with its own optimizer state and same ordered 800 questions. On the currently authorized single H100, run one GPU worker at a time; separate hardware may support concurrent queues. The PDF recommends an 80-GB A100/H100-class target but does not establish that all 14B RL configurations fit. The standard Transformers generation path with `use_vllm=False` applies to GRPO. Fresh SFT source generation used the approved separate vLLM workers.
 
 Every run has a separate verified output namespace. Worklist/config locks prevent duplicate writers or reopening completed conditions with changed identities. Save full state at source cadences and final adapters/scientific snapshots; verify actual outputs rather than infer them from intended step counts. End each GPU's billing when that queue ends rather than wait for all branches to finish.
 
-## Evaluate and analyze without changing the question
+## Legacy full-grid evaluation and analysis
 
 Use the same 1233 main capability IDs and nested 200 legibility IDs for all 62 states. Base evaluations are shared across SFT/RL and include the same independent audit. Apply the frozen vLLM measurement protocol and repaired final-field scorer to untouched bases and trained adapters; the generic native evaluation default must not replace it. Per-request generation settings remain identical across domains/states. Cache raw generations before scoring. Grade capability deterministically and generated code only inside the isolated executor. Schedule two unchanged scores and the separate tri-state audit for every assessable selected trace, preserving independent caches and all missingness. Baseline legibility judging remains pending and reuses its saved seed-42 responses.
 
 Produce per-domain capability and raw legibility reports, retention/common sets, full and conditional option-A opacity, all 216 candidate windows and validated simultaneous bounds where supported. Keep main baseline unknown evidence from becoming favorable zero opacity. Preserve padding diagnostics, actual denominators and same-transfer-pair conditions. Separate point-estimate candidates, confirmatory qualification and indeterminate evidence. Do not add another run or panel merely because none qualifies.
 
-## Planned workload ledger
+## Historical full-grid workload ledger
 
 | Work | Source count |
 |---|---:|

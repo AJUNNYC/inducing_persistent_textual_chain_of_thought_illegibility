@@ -37,6 +37,8 @@ flowchart TD
     EXT --> p_ffc0aa76b10d2c
     p_b9671765a5cdf7["docs/evidence/"]
     EXT --> p_b9671765a5cdf7
+    p_3a94603ed7dd5a["docs/evidence/a100_optimization_interruption.json"]
+    EXT --> p_3a94603ed7dd5a
     p_67d97cc6413728["docs/evidence/baseline_repeatability_launch.json"]
     EXT --> p_67d97cc6413728
     p_2b164493b6ae44["docs/evidence/colab_a100_connection.json"]
@@ -135,6 +137,8 @@ flowchart TD
     EXT --> p_f3cd3577d17823
     p_593a2a637631f2["docs/evidence/sft_scheduled_forward_pro6000_training_resume.json"]
     EXT --> p_593a2a637631f2
+    p_64a865a58d343a["docs/evidence/sft_short_pilot_design.json"]
+    EXT --> p_64a865a58d343a
     p_2b1dd057414f7e["docs/evidence/sft_training_launch.json"]
     EXT --> p_2b1dd057414f7e
     p_a5ccf8cd4bb5d8["docs/evidence/sft_training_launch_drive.json"]
@@ -223,12 +227,16 @@ flowchart TD
     EXT --> p_c75807fea5d182
     p_572dc95a63086d["docs/sft_optimizations.md"]
     EXT --> p_572dc95a63086d
+    p_aaf6895a23c7a3["docs/sft_short_pilot.md"]
+    EXT --> p_aaf6895a23c7a3
     p_d39631a8c666ef["docs/statistical_concentration_guard.md"]
     EXT --> p_d39631a8c666ef
     p_cea225e9d407b6["requirements-vllm.txt"]
     EXT --> p_cea225e9d407b6
     p_973d39fe9a7d95["requirements_cpu.lock"]
     EXT --> p_973d39fe9a7d95
+    p_6bb18b0e62561c["requirements_sft_published.lock"]
+    EXT --> p_6bb18b0e62561c
     p_8a45d762e01608["scripts/audit_sft_drive.py"]
     EXT --> p_8a45d762e01608
     p_e39d38d904b1f3["scripts/authorize_google_drive.py"]
@@ -357,6 +365,8 @@ flowchart TD
     EXT --> p_2b763b344f6f0e
     p_80fc4cb188144a["src/training/sft/fused_loss.py"]
     EXT --> p_80fc4cb188144a
+    p_dc1d1fb1fc50ba["src/training/sft/published_execution.py"]
+    EXT --> p_dc1d1fb1fc50ba
     p_99a65f8a3876e4["src/training/sft/runtime_migration.py"]
     EXT --> p_99a65f8a3876e4
     p_c3999400a67b84["src/training/sft/scheduled_spatial_loss.py"]
@@ -393,6 +403,8 @@ flowchart TD
     EXT --> p_189e3ce34ad176
     p_f39b81f9d94d4f["tests/unit/operations/test_runpod.py"]
     EXT --> p_f39b81f9d94d4f
+    p_b2d6a54f4764ea["tests/unit/operations/test_sft_budget_reconcile.py"]
+    EXT --> p_b2d6a54f4764ea
     p_6bcf3a7fba2a76["tests/unit/operations/test_sft_handoff_reuse.py"]
     EXT --> p_6bcf3a7fba2a76
     p_160e24d100aebd["tests/unit/operations/test_sft_optimization_benchmark.py"]
@@ -401,6 +413,8 @@ flowchart TD
     EXT --> p_7063c063a3bb89
     p_65b1fadd69d228["tests/unit/test_overview_lifecycle.py"]
     EXT --> p_65b1fadd69d228
+    p_cad570ee99bdaf["tests/unit/training/sft/individual_fit/test_training_budget.py"]
+    EXT --> p_cad570ee99bdaf
     p_01835ee5fe6d2c["tests/unit/training/sft/test_causal_gradient_loss.py"]
     EXT --> p_01835ee5fe6d2c
     p_73d74fd82a388f["tests/unit/training/sft/test_data_handoff.py"]

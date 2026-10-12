@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "9937f12b1dda26887f515434454895c57a5a0ef49f357fdecbb161bfe8ce73fd"
+    "sha256": "1866342b862487b6ffe8389e9dc787a7f212be4049304b513aa2f34bb15f66e8"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,5 +27,62 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "4986eb55173d5bd54bbc57ab9dbe6b1f9243a4f9ac07ba0b466738c97cf2add7"
+  "procedure_update_sha256": "04f076861489240ecd430226b9e5aa3308694785c3774f86e40a00dccda1031d",
+  "active_sft_design": {
+    "recipe": "efficient_one_epoch_v1",
+    "status": "PAUSED",
+    "available_model_sizes": [
+      "7b",
+      "14b"
+    ],
+    "available_families": [
+      "rot13",
+      "kazitext"
+    ],
+    "available_levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "available_conditions": 40,
+    "selected_conditions": [],
+    "allocated_gpu_workers": 0,
+    "epochs_per_selected_fit": 1,
+    "train_examples": 10000,
+    "validation_examples": 100,
+    "optimizer_updates_per_selected_fit": 625,
+    "warmup_updates": 19,
+    "base_quantization": "none",
+    "base_weights_dtype": "bfloat16",
+    "classifier_weights_dtype": "bfloat16",
+    "loss_dtype": "float32",
+    "hidden_gradient_accumulation_dtype": "float32",
+    "attention": "sdpa",
+    "actual_sdpa_kernel_observed": false,
+    "optimizer": "adamw",
+    "optimizer_states_dtype": "float32",
+    "gradient_checkpointing": "off_preferred_capacity_fallback",
+    "loss_implementation": "direct_cce_exact_full_gradient",
+    "cce_commit": "3de376c106a1916bc5e1b619f9c77c87a461ee1c",
+    "cce_filter_eps": null,
+    "cce_filter_e_grad": false,
+    "cce_filter_c_grad": false,
+    "scientific_amendment": true,
+    "final_result_equivalence_established": false,
+    "legacy_recipe": "legacy_two_epoch_v1",
+    "intermediate_nf4_pilot_recipe": "one_epoch_pilot_v1",
+    "optimization_campaign_requested": false,
+    "native_efficient_runtime_checks_executed": false,
+    "native_14b_throughput_or_memory_measured": false,
+    "final_test_panels_reserved": true,
+    "construction_success_thresholds_changed": false,
+    "design_document": "docs/sft_short_pilot.md"
+  }
 }

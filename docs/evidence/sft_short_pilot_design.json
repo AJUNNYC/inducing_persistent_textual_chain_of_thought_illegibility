@@ -1,0 +1,169 @@
+{
+  "schema_version": "sft_final_efficient_design_v1",
+  "status": "FINALIZED_PENDING_USER_RUN_SELECTION_AND_ORDINARY_NATIVE_STARTUP",
+  "recipe": "efficient_one_epoch_v1",
+  "previous_recipe": "legacy_two_epoch_v1",
+  "level_selection": null,
+  "training_running": false,
+  "available_models": [
+    "7b",
+    "14b"
+  ],
+  "available_families": [
+    "rot13",
+    "kazitext"
+  ],
+  "available_levels": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "unchanged_certified_conditions": 40,
+  "train_count_per_fit": 10000,
+  "validation_count_per_fit": 100,
+  "epochs_per_fit": 1,
+  "effective_batch_size": 16,
+  "microbatch_size": 1,
+  "gradient_accumulation_steps": 16,
+  "optimizer_updates_per_fit": 625,
+  "warmup_updates": 19,
+  "scheduler": "full_cosine_over_625_updates",
+  "learning_rate": 0.0002,
+  "example_presentation_reduction_per_fit": 0.5,
+  "elapsed_time_reduction_measured": false,
+  "checkpoint_interval": 100,
+  "final_full_checkpoint_step": 625,
+  "retained": [
+    "all_certified_examples",
+    "completion_only_masks",
+    "mean_supervised_token_loss_per_example",
+    "full_targets_without_truncation",
+    "max_length_4096",
+    "lora_rank_8_alpha_16_dropout_0.05",
+    "all_original_layers_and_seven_projection_targets",
+    "effective_batch_16",
+    "learning_rate_0.0002",
+    "seed_42",
+    "full_state_drive_verification",
+    "scientific_evaluation_thresholds"
+  ],
+  "notebook_precedent": {
+    "filename": "Untitled9.ipynb",
+    "sha256": "8eecfc02596ca6c292f3e01129c39bef13a68b8e11cd94606bd874ead214e507",
+    "training_cell_zero_based": 20,
+    "model_size": "7b",
+    "train_count": 10000,
+    "epochs": 1,
+    "observed_training_minutes": 58.7,
+    "mean_sequence_tokens": 1113.9,
+    "maximum_sequence_tokens": 2824,
+    "optimizer_updates": 428,
+    "base_precision": "unquantized_bfloat16",
+    "attention": "sdpa",
+    "supervision": "prompt_and_response",
+    "later_encoding_candidates": 197,
+    "later_encoding_sample_count": 200,
+    "later_encoding_verified": false,
+    "later_explicit_final_accuracy_trained": 0.77,
+    "later_explicit_final_accuracy_base": 0.845,
+    "supports": "feasibility_of_a_short_exploratory_adaptation_run",
+    "does_not_establish": [
+      "14b_runtime",
+      "this_recipe_runtime",
+      "verified_encoding_efficacy",
+      "preserved_answer_quality",
+      "equivalence_to_two_epochs"
+    ]
+  },
+  "references": [
+    {
+      "title": "Mixed Precision Training",
+      "url": "https://huggingface.co/papers/1710.03740",
+      "supports": "mixed_precision_training_mechanism_not_outcome_equivalence"
+    },
+    {
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "url": "https://huggingface.co/papers/2106.09685",
+      "supports": "frozen_backbone_low_rank_adaptation"
+    },
+    {
+      "title": "FlashAttention",
+      "url": "https://huggingface.co/papers/2205.14135",
+      "supports": "memory_efficient_attention_mechanism"
+    },
+    {
+      "title": "Cut Your Losses in Large-Vocabulary Language Models",
+      "url": "https://huggingface.co/papers/2411.09009",
+      "supports": "fused_projection_loss_without_materialized_logits"
+    },
+    {
+      "title": "QLoRA",
+      "url": "https://huggingface.co/papers/2305.14314",
+      "supports": "historical_quantized_adapter_training_memory_tradeoff"
+    },
+    {
+      "title": "LIMA: Less Is More for Alignment",
+      "url": "https://huggingface.co/papers/2305.11206",
+      "supports": "limited_curated_sft_can_teach_formats_not_one_epoch_guarantee"
+    }
+  ],
+  "measurement_rules": {
+    "diagnostic_split": "certified_validation",
+    "final_evaluation_used_for_training_selection": false,
+    "fixed_exposure_budget": true,
+    "early_stopping": false
+  },
+  "fresh_native_sft_evidence_required": true,
+  "all_historical_preflights_to_be_repeated": false,
+  "recipe_is_same_as_first_half_of_legacy_schedule": false,
+  "old_two_epoch_checkpoint_can_seed_pilot": false,
+  "eventual_results_equivalence_established": false,
+  "one_hour_14b_runtime_established": false,
+  "gpu_allocations_made_for_redesign": 0,
+  "provider_judging_calls_for_redesign": 0,
+  "base_precision": "unquantized_bfloat16",
+  "classifier_precision": "bfloat16_with_fp32_dot_accumulation_and_bfloat16_logits_rounding",
+  "adapter_precision": "float32",
+  "loss_precision": "float32",
+  "optimizer": "adamw",
+  "optimizer_state_precision": "float32",
+  "attention": "sdpa_prefer_flash_then_efficient_allow_math",
+  "attention_backend_observed": false,
+  "gradient_checkpointing": "off_unless_longest_example_cuda_oom",
+  "loss_implementation": "upstream_cce_exact_full_gradient",
+  "gradient_filtering": false,
+  "global_tf32": false,
+  "cce_repository": "https://github.com/apple/ml-cross-entropy.git",
+  "cce_commit": "3de376c106a1916bc5e1b619f9c77c87a461ee1c",
+  "ordinary_native_startup_required": true,
+  "optimization_benchmark_campaign_run": false,
+  "historical_fp32_head_equivalence": false,
+  "old_checkpoint_can_seed_final_recipe": false,
+  "excluded_to_limit_result_risk": [
+    "dataset_subsampling",
+    "target_truncation",
+    "upper_layers_only",
+    "lower_lora_rank",
+    "higher_learning_rate",
+    "changed_effective_batch",
+    "cross_example_packing",
+    "approximate_gradient_filtering",
+    "final_evaluation_checkpoint_selection"
+  ],
+  "scientific_changes": [
+    "two_epochs_to_one",
+    "nf4_base_to_bfloat16",
+    "fp32_head_to_bfloat16_head",
+    "paged_adamw_to_plain_adamw",
+    "recomputation_only_when_capacity_requires"
+  ],
+  "fresh_native_evidence_method": "ordinary_per_fit_non_updating_runtime_mask_and_checkpoint_startup",
+  "one_hour_7b_runtime_established": false
+}

@@ -940,8 +940,8 @@
     },
     {
       "id": "req_sft_quant",
-      "requirement": "Completion-only NF4 4-bit double quantization, BF16, gradient checkpointing, frozen embeddings/LM head.",
-      "source_sections": "C.2.2",
+      "requirement": "Default efficient_one_epoch_v1: unquantized frozen BF16 base and BF16 head; direct upstream cce_exact full-gradient loss with FP32 loss/hidden-gradient accumulation, filter_eps=None, filter_e_grad=False and filter_c_grad=False; standard SDPA preference. Checkpointing off preferred with ordinary non-updating capacity/OOM fallback. NF4/double quantization and FP32 head remain explicit legacy alternatives; no old checkpoint migration.",
+      "source_sections": "C.2.2; explicitly authorized efficient_one_epoch_v1 redesign",
       "pdf_pages": [
         28,
         29
@@ -952,28 +952,37 @@
       "tests": [
         "tests/unit/training/sft/individual_fit/test_sft_fit.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_native_startup_unrun",
       "implementation_status": "implemented",
       "verification": {
-        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
-        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "local_status": "static_implementation_recorded_no_new_optimization_tests_requested",
+        "local_scope": "The new declared BF16/CCE/SDPA/AdamW recipe is implemented. Historical test mappings retain their original scope; no new test campaign, native startup check, GPU timing or trained efficacy is claimed.",
+        "live_status": "pending_at_native_startup_before_optimizer_updates",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
-          "actual_NF4_BF16_runtime"
+          "actual_selected_model_native_identity_masks_gradients_capacity_and_full_state_recovery"
         ],
         "final_audit": "pending",
         "evidence": [
-          "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
-        ]
+          "docs/sft_short_pilot.md",
+          "docs/evidence/sft_short_pilot_design.json",
+          "docs/validation_report.md"
+        ],
+        "native_speedup_measured": false,
+        "historical_fp32_head_equivalence": false,
+        "training_started": false
       },
       "module_cards": [
         "docs/modules/training/sft/individual_fit/sft_fit.md"
       ],
       "diagrams": [
         "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
+      ],
+      "declared_training_recipe": "efficient_one_epoch_v1",
+      "explicit_legacy_recipes": [
+        "legacy_two_epoch_v1",
+        "one_epoch_pilot_v1"
       ]
     },
     {
@@ -1015,8 +1024,8 @@
     },
     {
       "id": "req_sft_optimization",
-      "requirement": "LR2e-4, paged AdamW32, cosine,3%warmup,zero decay,max grad norm.3,two epochs,micro1/accum16/effective16,4096 cap,seed42.",
-      "source_sections": "C.2.2",
+      "requirement": "Default efficient_one_epoch_v1: all 10,000 examples once, 625 optimizer updates, complete cosine horizon 625 and warmup 19; LR 2e-4, plain AdamW with FP32 states, zero decay, maximum gradient norm 0.3, microbatch 1/accumulation 16/effective 16, full 4096 sequence eligibility without truncation, seed 42. Legacy NF4 two-epoch recipe retains 1250 updates/warmup 38; intermediate NF4 one-epoch recipe retains 625/19. No condition selected or training launched.",
+      "source_sections": "C.2.2; explicitly authorized efficient_one_epoch_v1 redesign",
       "pdf_pages": [
         28,
         29
@@ -1027,28 +1036,37 @@
       "tests": [
         "tests/unit/training/sft/individual_fit/test_sft_fit.py"
       ],
-      "status": "implemented_with_local_tests_live_validation_pending",
+      "status": "implemented_native_startup_unrun",
       "implementation_status": "implemented",
       "verification": {
-        "local_status": "targeted_evidence_available_final_consolidated_suite_pending",
-        "local_scope": "Implemented tests use declared external fixtures and actual CPU/storage operations; mappings are not assertions that every live requirement passed.",
-        "live_status": "pending",
+        "local_status": "static_implementation_recorded_no_new_optimization_tests_requested",
+        "local_scope": "The new declared BF16/CCE/SDPA/AdamW recipe is implemented. Historical test mappings retain their original scope; no new test campaign, native startup check, GPU timing or trained efficacy is claimed.",
+        "live_status": "pending_at_native_startup_before_optimizer_updates",
         "mandatory_statistical_validation": "not_claimed_by_this_requirement",
         "scientific_results": "not_executed",
         "external_dependencies": [
-          "actual_optimizer_gradients_and_full_schedule"
+          "actual_selected_model_native_identity_masks_gradients_capacity_and_full_state_recovery"
         ],
         "final_audit": "pending",
         "evidence": [
-          "docs/validation_report.md",
-          "docs/implementation_acceptance.md"
-        ]
+          "docs/sft_short_pilot.md",
+          "docs/evidence/sft_short_pilot_design.json",
+          "docs/validation_report.md"
+        ],
+        "native_speedup_measured": false,
+        "historical_fp32_head_equivalence": false,
+        "training_started": false
       },
       "module_cards": [
         "docs/modules/training/sft/individual_fit/sft_fit.md"
       ],
       "diagrams": [
         "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
+      ],
+      "declared_training_recipe": "efficient_one_epoch_v1",
+      "explicit_legacy_recipes": [
+        "legacy_two_epoch_v1",
+        "one_epoch_pilot_v1"
       ]
     },
     {
@@ -3788,6 +3806,7 @@
     "partially_implemented_with_local_tests_live_validation_pending": "Local components exist but a named integration gap remains before actual launch.",
     "implemented_with_local_checks_final_audit_pending": "Executable local audit exists; final static/remote/cold-start reconciliation remains pending.",
     "implemented_with_local_tests_mandatory_validation_failed": "Local implementation/contract checks exist, but the actual prospective coverage preflight failed; confirmatory launch is blocked. This is not a failed local unit-test claim.",
-    "implemented_with_live_dataset_validation": "Completed source/dataset or Drive requirement has actual live evidence; training, evaluation and full-study gates are separate."
+    "implemented_with_live_dataset_validation": "Completed source/dataset or Drive requirement has actual live evidence; training, evaluation and full-study gates are separate.",
+    "implemented_native_startup_unrun": "New declared recipe implemented; native identity/mask/gradient/capacity/recovery guards remain pending at startup. No new optimization test campaign, measured speedup or scientific outcome claimed."
   }
 }

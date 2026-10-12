@@ -1,13 +1,38 @@
 # SFT producer-to-consumer data handoff
 
-## Current session: two A100 queues started on 12 October 2026
+## Active redesign: efficient one-epoch SFT; all training paused
 
-The user authorized fresh 7B ROT13 and KaziText queues, levels 1–10 each, on separate Colab A100-SXM4-40GB runtimes. Both native 7B controls and all thirteen launch gates passed; GitHub source `05f47f4` runs the eager baseline with gradient checkpointing enabled. Both queues completed their first optimizer update and verified full checkpoints in Google Drive, then resumed those exact new-run states to remove the temporary operator cutoff. There is no user-imposed wall-clock deadline. Each later level starts from the untouched pinned base. The previous PRO 6000 step-987 checkpoint is archived and is not the parent of these fresh queues. No fits or final validations are yet reported complete; 14B training has not started. See [the restart record](colab_sft_restart.md) for scope and provenance.
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](sft_short_pilot.md).
 
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+## Published-method reconciliation: ready to initialize, native checks pending
+
+After freezing the consumer source/configuration and issuing its matching data certificate, use the committed CPU reconciliation entrypoint with the actual file paths:
+
+```bash
+python scripts/reconcile_sft_launch.py --published-method \
+  --config "$SFT_CONSUMER_CONFIG" \
+  --certificate "$SFT_HANDOFF_CERTIFICATE" \
+  --control-config "$SFT_ORIGINAL_CONTROL_CONFIG" \
+  --output "$SFT_LAUNCH_OUTPUT"
+```
+
+`SFT_ORIGINAL_CONTROL_CONFIG` must be the configuration whose hash matches the preserved `docs/evidence/sft_runtime_checks_report.json`; it supplies provenance for compatible upstream reuse. `--baseline-root`, historical native-control overrides and execution/recovery benchmark arguments are not used in this mode. The efficient configuration must name the executed frozen Git commit and its certificate must bind that same consumer.
+
+A successful reconciliation emits `readiness_receipt.json` with **`READY_TO_INITIALIZE`**, `native_runtime_preflight_status=PENDING_AT_LAUNCH`, `native_checks_passed=false`, `training_ready=false`, `study_ready=false` and `training_started=false`. Its external evidence concerns certified data, durable storage and compatible statistical controls; current spending authorization remains a launch requirement. Native model/mask/gradient/capacity/full-state guards execute normally at actual startup before optimizer updates. Reconciliation does not allocate a GPU, select conditions, run a benchmark or prove training success. All training remains paused.
+
+## Archived interruption: A100 comparison stopped on 11 October 2026
+
+Both Colab A100 assignments ended; the account reports 0.00 compute units and rejects a new A100 allocation. ROT13 and KaziText baseline attempts are safely paused at updates 28 and 30, with full state verified in Drive before runtime loss. Source `8a0f853` implements checkpointed A100 loss candidates, per-level empirical qualification and verified setup reuse. Native candidate comparisons remain incomplete: no optimized fit has started and no A100 speedup is approved. The user requested fresh optimized restarts from untouched bases; archived partial fits are benchmark evidence only. There is no user-imposed wall-clock deadline. See [the interruption record](evidence/a100_optimization_interruption.json) and [restart procedure](colab_sft_restart.md).
 
 ## Prior implementation and evidence scope
 
-The following implementation details and dated measurements retain their original scope; the current A100 deployment is described above.
+The following implementation details and dated measurements retain their original scope; the paused execution and efficient recipe amendment are described above.
 
 The prepared corpus keeps its original generation configuration, source commit,
 model traces and transformed targets. A repaired training implementation has its
@@ -44,15 +69,13 @@ production `transformed/manifest.json`, certified worklist, canonical preflight
 report and UTC deadline. `--family rot13 --model 7b` runs the ten independent
 encoding levels sequentially; `--level 1` selects only the first fit. Each fit
 uses a fresh base or an exact full checkpoint. The fixed optimizer, loss, counts
-and two epochs remain unchanged. Checkpoints and final adapter payloads pass
+remain unchanged within the historical legacy handoff. The final efficient recipe changes exposure, base/head precision, loss implementation, optimizer and execution. No conditions are selected. Bind its own consumer recipe/configuration identities; do not use legacy readiness as efficient-runtime approval. Checkpoints and final adapter payloads pass
 verified Drive barriers. SIGTERM and the deadline pause at a whole optimizer
-update. `--validate-only` checks every launch binding and all thirteen gates
-without loading a model or starting training.
+update. In historical NF4 mode, `--validate-only` checks the original thirteen gates. In efficient published mode it checks only the external initialization bindings; native startup guards remain pending, and no model or training starts.
 
 `scripts/reconcile_sft_launch.py` reuses compatible passed control evidence,
 retaining its original source/configuration hashes and adding verified current
-source/recipe bindings. The newly certified consumer changes implementation
-identity only. It still requires the repaired full baseline gate to pass.
+source/recipe bindings. Historical NF4 reconciliation changed implementation identity only and required its repaired baseline gate. The efficient `--published-method` route above declares a new recipe and does not inherit those native passes.
 Scoring, prompt and GPU controls are not declared passed through fixture tests.
 
 The SFT consumer configuration is separate from the vLLM measurement protocol.

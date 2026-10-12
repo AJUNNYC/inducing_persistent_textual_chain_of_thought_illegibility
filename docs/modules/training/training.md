@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Implementation status:** blank placeholder, not implemented or tested.
+**Owner:** `coordinator`. **Current status:** all training paused. The efficient per-fit redesign is implemented; native startup and training remain unrun. Historical full-grid scope is available, but no model, family or level is selected.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -13,9 +13,11 @@
 
 ## Responsibility and controlling details
 
-Coordinate the forty SFT conditions and the two independent 100-step RL trajectories over verified data and pinned recipes. SFT families call one shared fit procedure and start each level from an untouched base. RL calls the shared Dr. GRPO-normalized setup/cycle and preserves the original Sonnet reward. Retain the two original base identities for the common evaluator, yielding 62 states when all required outputs exist.
+The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. No condition or GPU is selected; all training remains paused. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
 
-The SFT queues run independently on their own GPUs and the two RL model runs are sequential on the RL GPU. Only verified exact-condition full checkpoints may resume; another condition is not a warm start. Preserve valid earlier outputs after failure. No reasoning ablation, extra trajectory or adaptive training setting is introduced. The diagram's join describes a complete matrix; missing required children produce an explicit partial result rather than invented completion.
+The original full matrix comprises forty SFT fits, two independent 100-step RL trajectories with twenty snapshots, and two bases, yielding62 states if every required output exists. This historical accounting is not a current launch instruction. RL and final confirmatory evaluation remain deferred. Preserve the original Sonnet reward, Dr. GRPO semantics and original final evaluation thresholds; this redesign changes only the declared SFT recipe. Never infer completed branches from a join node or relabel old full checkpoints as efficient-run state.
+
+Selected fits start independently from untouched bases, retain disjoint Drive outputs and may run on separate assigned workers after explicit resume. Native model/mask/gradient/capacity/full-state guards execute during normal startup before updates; no benchmark campaign or already-passed runtime receipt is claimed. Preserve partial/failed/deferred states honestly.
 
 ## Interfaces and dependent procedures
 
@@ -53,6 +55,9 @@ title: "spec/mermaid/workflows/training/training.mmd"
 ---
 flowchart TD
 %% Training
+%% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
+%% Forty conditions remain available; no model/family/level selected and all training PAUSED.
+%% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -65,13 +70,13 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>SFT training schedule<br/>40 independent fits<br/>ROT13 and KaziText for 7B and 14B<br/>2 epochs per fit"]
-    SFTOUT["40 final adapters<br/>Every fit starts from its untouched base"]
-    RL["src/training/rl_grpo/rl_training.py<br/>RL training: GRPO with Dr. GRPO normalization; 2 runs of 100 steps; unchanged Sonnet reward"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 conditions available; none selected<br/>Default: efficient one epoch / 625 updates"]
+    SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
+    RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]
     BASE["Retain the 2 untouched base identities"]
-    WAIT["Wait for all verified trained states<br/>and matching base identities"]
-    OUT["62 states: 2 bases + 40 SFT + 20 RL<br/>No reasoning ablations during training"]
+    WAIT["Join verified selected outputs<br/>Record partial and deferred branches explicitly"]
+    OUT["Selected outputs only<br/>Historical full-grid total: 62 states<br/>No claimed completion of deferred jobs"]
     INPUT --> SFT --> SFTOUT --> WAIT
     INPUT --> RL --> RLOUT --> WAIT
     INPUT --> BASE --> WAIT

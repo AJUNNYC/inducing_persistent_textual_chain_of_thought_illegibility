@@ -3,6 +3,9 @@ title: "spec/mermaid/workflows/training/training.mmd"
 ---
 flowchart TD
 %% Training
+%% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
+%% Forty conditions remain available; no model/family/level selected and all training PAUSED.
+%% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -15,13 +18,13 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>SFT training schedule<br/>40 independent fits<br/>ROT13 and KaziText for 7B and 14B<br/>2 epochs per fit"]
-    SFTOUT["40 final adapters<br/>Every fit starts from its untouched base"]
-    RL["src/training/rl_grpo/rl_training.py<br/>RL training: GRPO with Dr. GRPO normalization; 2 runs of 100 steps; unchanged Sonnet reward"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 conditions available; none selected<br/>Default: efficient one epoch / 625 updates"]
+    SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
+    RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]
     BASE["Retain the 2 untouched base identities"]
-    WAIT["Wait for all verified trained states<br/>and matching base identities"]
-    OUT["62 states: 2 bases + 40 SFT + 20 RL<br/>No reasoning ablations during training"]
+    WAIT["Join verified selected outputs<br/>Record partial and deferred branches explicitly"]
+    OUT["Selected outputs only<br/>Historical full-grid total: 62 states<br/>No claimed completion of deferred jobs"]
     INPUT --> SFT --> SFTOUT --> WAIT
     INPUT --> RL --> RLOUT --> WAIT
     INPUT --> BASE --> WAIT

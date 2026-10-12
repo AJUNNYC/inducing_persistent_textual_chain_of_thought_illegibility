@@ -1,13 +1,22 @@
 ## Current SFT optimization evidence — 2026-10-11
 
-## Current session: two A100 queues started on 12 October 2026
+## Active redesign: efficient one-epoch SFT; all training paused
 
-The user authorized fresh 7B ROT13 and KaziText queues, levels 1–10 each, on separate Colab A100-SXM4-40GB runtimes. Both native 7B controls and all thirteen launch gates passed; GitHub source `05f47f4` runs the eager baseline with gradient checkpointing enabled. Both queues completed their first optimizer update and verified full checkpoints in Google Drive, then resumed those exact new-run states to remove the temporary operator cutoff. There is no user-imposed wall-clock deadline. Each later level starts from the untouched pinned base. The previous PRO 6000 step-987 checkpoint is archived and is not the parent of these fresh queues. No fits or final validations are yet reported complete; 14B training has not started. See [the restart record](colab_sft_restart.md) for scope and provenance.
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](sft_short_pilot.md).
 
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+## Archived interruption: A100 comparison stopped on 11 October 2026
+
+Both Colab A100 assignments ended; the account reports 0.00 compute units and rejects a new A100 allocation. ROT13 and KaziText baseline attempts are safely paused at updates 28 and 30, with full state verified in Drive before runtime loss. Source `8a0f853` implements checkpointed A100 loss candidates, per-level empirical qualification and verified setup reuse. Native candidate comparisons remain incomplete: no optimized fit has started and no A100 speedup is approved. The user requested fresh optimized restarts from untouched bases; archived partial fits are benchmark evidence only. There is no user-imposed wall-clock deadline. See [the interruption record](evidence/a100_optimization_interruption.json) and [restart procedure](colab_sft_restart.md).
 
 ## Prior implementation and evidence scope
 
-The following implementation details and dated measurements retain their original scope; the current A100 deployment is described above.
+The following implementation details and dated measurements retain their original scope; the paused execution and efficient recipe amendment are described above.
 
 The [four-worker execution plan](sft_multi_gpu_execution_plan.md) records a **proposal**, not a deployed configuration: two PRO 6000 workers for 14B and two Colab A100 workers for the remaining 7B fits. The currently owned 7B ROT13 level-1 fit is excluded from their queues. All 40 independent fits and scientific settings remain fixed, with distinct verified Drive outputs and no duplicate ownership. Runtime/cost forecasts are estimates; A100/14B capacity, throughput and execution profiles are unvalidated. Current source a6e3295 approval remains limited to the measured 7B ROT13 level-1 condition.
 
@@ -180,7 +189,7 @@ The wording and numbering below follow the master request. `YES` applies only to
 
 The historical publication evidence binds its implementation commit; current publication also includes completed-data and independent audit evidence; final report-only changes are pushed and reconciled by the same path/content checks. Failed and unrun mandatory checks remain visible. No empirical success is inferred from engineering acceptance.
 
-## Current procedure: 11 October 2026
+## Historical procedure and optimization evidence: 11 October 2026
 
 The [current procedure](procedure_update.md) records the user-approved fresh vLLM SFT generation on separate Pods, 128-request chunks with a full 3072-token allowance per request, Drive as permanent storage, archived old responses, and the verified shared RL manifest. Final pair acceptance, exact-deficit refills, all 40 transformed conditions and Drive copies are complete. Training and actual evaluations remain pending. The generation backend change does not alter GRPO rollout or native evaluation settings or waive failed statistical gates.
 
