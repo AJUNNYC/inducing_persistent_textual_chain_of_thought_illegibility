@@ -4,9 +4,9 @@
 
 The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](../../../../sft_short_pilot.md).
 
-The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. It prefers checkpointing off; an ordinary non-updating capacity check may enable recomputation on OOM without changing the objective.
+The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
-Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, microbatch 1/accumulation 16/effective batch 16, seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
+Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, requested microbatch 2/accumulation 8/effective batch 16 (capacity fallback 1/16/16), seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. Each update retains the same ordered 16 examples with per-example weight 1/16; execution grouping, padding, dropout draws and floating-point rounding may differ. No measured batching speedup or bitwise-equivalent outcome is claimed. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
 
 The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
 
@@ -43,9 +43,9 @@ The following implementation details and dated measurements retain their origina
 | LoRA | Rank 8, alpha 16, dropout 0.05; all seven attention/MLP projection targets |
 | Optimizer / LR | Plain AdamW, FP32 states, learning rate `2e-4`, zero weight decay |
 | Schedule | One complete epoch; 625-update cosine horizon, 19 warmup updates |
-| Microbatch / accumulation / effective batch | 1 / 16 / 16 |
+| Microbatch / accumulation / effective batch | Requested 2 / 8 / 16; capacity fallback 1 / 16 / 16 |
 | Max gradient norm / sequence length / seed | 0.3 / 4096, no truncation / 42 |
-| Activation checkpointing | Prefer off; ordinary non-updating startup capacity probe may enable recomputation on OOM |
+| Activation checkpointing | Fresh duplicated-longest-example capacity guard: 2/off → 1/off → 2/on → 1/on; restore recorded mode on resume |
 | Checkpoints | Full state at every 100 updates and final 625; verified in Drive |
 
 The direct CCE call uses the full vocabulary and full gradients, not a Qwen monkeypatch, pruned gradients or materialized `[tokens, vocabulary]` logits. Native startup checks require valid model identity, causal completion/padding masks, nonzero adapter gradients and recoverable full state before production updates. They are normal operational guards, not another paired optimization campaign, and no current receipt claims they passed for this recipe.
@@ -132,20 +132,23 @@ flowchart TD
 %% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
 %% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
 %% No materialized full token-by-vocabulary logits; no equivalence to historical FP32 head promised.
-%% All 10,000 examples once; 625 updates and 19 warmup; micro 1 / accumulation 16 / effective 16.
+%% All 10,000 examples once; 625 updates and 19 warmup; request micro 2 / accumulation 8 / effective 16.
+%% Capacity fallback micro 1 / accumulation 16; same ordered 16 examples/update, per-example weight 1/16.
+%% Execution grouping, padding, dropout draws and rounding differ; no measured batching speedup.
 %% Completion-only per-example means; full 4096 eligibility without truncation; seed 42.
 %% LoRA 8 / 16 / .05, all seven projections, LR 2e-4, zero decay, max norm .3.
 %% Checkpoints every 100 updates and final 625; actual Drive verification before retention/completion.
 %% Normal native startup guards unrun; no optimization campaign, no selected job, all training PAUSED.
-%% Prefer checkpointing off; a non-updating longest-record capacity probe may enable recomputation on OOM.
-%% Exact-fit recovery restores the recorded policy; old NF4 states cannot be relabelled.
+%% Fresh non-updating duplicate-longest capacity guard: 2/off, 1/off, 2/on, 1/on; CUDA-OOM-only fallback.
+%% Exact-fit recovery restores recorded actual batch/accumulation/recomputation, never changes it.
+%% Policy v2 has a distinct execution identity; old NF4 or prior-policy states cannot be relabelled.
 %% Child: RECOVER => ../../../shared_procedures/recovery_procedure.mmd
     INPUT["Future selected model / family / level<br/>efficient_one_epoch_v1 and certified records"]
     SETUP["Untouched BF16 base/head and LoRA<br/>Pinned exact full-gradient CCE; SDPA; AdamW<br/>One epoch; cosine 625; warmup 19"]
-    CAPACITY["Non-updating longest-record startup capacity check<br/>Prefer recomputation off; enable on OOM"]
+    CAPACITY["Non-updating duplicate-longest capacity guard<br/>Fresh: 2/off - 1/off - 2/on - 1/on<br/>Only CUDA OOM permits next mode<br/>Resume: restore recorded actual mode"]
     GUARDS["Normal native identity / causal mask / gradient guards<br/>Verify complete-state recovery before updates"]
     DONE{"625 updates complete?"}
-    STEP["Next complete optimizer update<br/>All examples in fixed seeded order"]
+    STEP["Next complete optimizer update<br/>Same ordered 16 examples; each weight 1/16<br/>Actual 2 x 8 or fallback 1 x 16"]
     DUE{"Save due?<br/>Every 100 updates or final 625"}
     SAVE["Atomic adapter / optimizer / scheduler / RNG / sampler<br/>Verify actual full state in Drive"]
     FINAL["Verified final adapter and full state<br/>Loss on all 100 certified validation items<br/>Final panels remain reserved"]

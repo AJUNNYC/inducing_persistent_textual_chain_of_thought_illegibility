@@ -8,6 +8,8 @@ flowchart TD
 %% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
 %% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
 %% Completion-only per-example weighting, full 4096 targets, LoRA and effective batch remain fixed.
+%% Policy v2 requests physical 2 x 8; capacity fallback 1 x 16 retains effective 16.
+%% Fresh duplicate-longest capacity order: 2/off, 1/off, 2/on, 1/on; exact resume keeps actual mode.
 %% Legacy NF4 one/two-epoch recipes retain separate source/configuration/state identities.
 %% Historical PRO/A100 partial checkpoints remain archives, never new-recipe warm starts.
 %% Native startup guards are not yet executed; 14B speed/memory remain unmeasured.
@@ -16,7 +18,7 @@ flowchart TD
     INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
     PAUSE["PAUSED: no selected conditions or GPU workers"]
     SELECT["Future explicit condition selection<br/>Default recipe: efficient_one_epoch_v1"]
-    BIND["Bind new recipe / source / dependency / data identity<br/>Reuse compatible upstream evidence"]
+    BIND["Bind recipe / published policy v2 / source / data identity<br/>Request 2 x 8; capacity fallback 1 x 16<br/>Reuse compatible upstream evidence"]
     PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
     ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected ROT13 condition<br/>All 10,000 examples; one epoch"]
     KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected KaziText condition<br/>All 10,000 examples; one epoch"]

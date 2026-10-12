@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "1866342b862487b6ffe8389e9dc787a7f212be4049304b513aa2f34bb15f66e8"
+    "sha256": "3a36f6c0beab635b237c88c96a11bf3abead83f8e5f64be567efe3ace6cd4d3d"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -16,7 +16,7 @@
   "full_original_latex_available": false,
   "scientific_results_included": false,
   "live_integrations_validated": false,
-  "active_procedure_edition": "2026-10-11",
+  "active_procedure_edition": "2026-10-12",
   "procedure_update_source": "spec/protocol_page_updates.json",
   "validated_live_scope": [
     "vLLM generation benchmark",
@@ -27,7 +27,7 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "04f076861489240ecd430226b9e5aa3308694785c3774f86e40a00dccda1031d",
+  "procedure_update_sha256": "bf554207ad8fd11307031cea3f9a64df4a3f40ae0ac04719751d3d627cbc61de",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "PAUSED",
@@ -68,7 +68,7 @@
     "actual_sdpa_kernel_observed": false,
     "optimizer": "adamw",
     "optimizer_states_dtype": "float32",
-    "gradient_checkpointing": "off_preferred_capacity_fallback",
+    "gradient_checkpointing": "fresh_2_off_1_off_2_on_1_on_capacity_selection",
     "loss_implementation": "direct_cce_exact_full_gradient",
     "cce_commit": "3de376c106a1916bc5e1b619f9c77c87a461ee1c",
     "cce_filter_eps": null,
@@ -83,6 +83,15 @@
     "native_14b_throughput_or_memory_measured": false,
     "final_test_panels_reserved": true,
     "construction_success_thresholds_changed": false,
-    "design_document": "docs/sft_short_pilot.md"
+    "design_document": "docs/sft_short_pilot.md",
+    "published_execution_policy": "published_bf16_lora_full_gradient_cce_v2",
+    "requested_microbatch_size": 2,
+    "requested_gradient_accumulation_steps": 8,
+    "effective_batch_size": 16,
+    "capacity_fallback_microbatch_size": 1,
+    "capacity_fallback_gradient_accumulation_steps": 16,
+    "actual_execution_mode_fixed_on_resume": true,
+    "physical_batch_speedup_measured": false,
+    "per_example_weight_per_optimizer_update": 0.0625
   }
 }

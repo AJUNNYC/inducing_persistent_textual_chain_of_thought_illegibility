@@ -95,8 +95,8 @@ Selected jobs: none. No model, family or level is scheduled; all training is PAU
 Default per-fit efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine
 horizon and19 warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with
 FP32 loss/hidden-gradient accumulation, SDPA and plain AdamW. It retains completion-only
-masks/per-example weighting, LoRA 8/16/.05,LR 2e-4,effective 16,seed 42 and full 4096 eligibility.
-Checkpoint every 100 and final 625 with verified Drive recovery.
+masks/per-example weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1 x16),effective16,seed 42 and
+full 4096 eligibility. Checkpoint every 100 and final 625 with verified Drive recovery.
 The user authorizes this published-method baseline without another optimization test/timing campaign. Actual
 native model/mask/gradient/full-state guards execute at startup before updates; no current receipt certifies that
 runtime. This changes exposure and numerical execution and does not guarantee the same trained results or
@@ -1503,12 +1503,14 @@ LoRA: rank 8, alpha 16, dropout .05; q_proj,k_proj,v_proj,o_proj,gate_proj,up_pr
 Embeddings/head remain frozen; adapters and optimizer states FP32.
 Learning rate/optimizer:2e-4, plain AdamW, zero weight decay, maximum gradient norm.3.
 Exposure: one epoch/all 10,000 training records, plus100 distinct validation IDs for diagnostics. Effective16
-from microbatch 1/accumulation 16;625 updates, full cosine horizon 625 and warmup 19.
+from requested microbatch2/accumulation8, capacity fallback1/16;625 updates, full cosine horizon 625 and
+warmup 19.
 Sequence policy: maximum 4096 total tokens, no truncation, packing or omitted targets. Seed42.
 Attention: standard SDPA preferring flash/efficient implementations; math fallback permitted. Actual
 selected kernel is not instrumented or claimed.
-Memory: checkpointing off preferred; a non-updating longest-record capacity probe may enable
-recomputation after OOM. Record actual policy; no paired optimization campaign.
+Memory: policy v2 duplicate-longest guard tries2/off,1/off,2/on,1/on; only CUDA OOM permits fallback.
+Record batch/accumulation/recomputation mode; exact resume cannot change it. Each ordered16-example
+update keeps weight1/16 per example; grouping/dropout/rounding differ. No measured gain.
 Checkpoints: every 100 updates and final 625; atomic full state, verified Drive publication.
 This changes epochs, base/head precision, optimizer and execution relative to the historical two-epoch
 NF4 recipe. Numerical accumulation fidelity does not prove identical full-fit outcomes. Legacy recipes
@@ -1548,9 +1550,11 @@ Native startup: verify model/source identity, causal completion/padding masks, n
 actual capacity and complete-state recovery before any update. None has passed for the new runtime until
 actually executed. Reuse only compatible upstream data/durability/spending/statistical evidence; historical
 GPU approval is not a fresh receipt.
-Memory policy: prefer recomputation off, ordinary non-updating longest-record OOM fallback may enable it.
-Preserve objective and RNG during the probe and bind the actual policy to state. Exact-fit recovery must
-restore the recorded execution identity.
+Memory/batch policy v2: requested2 x8, fallback1 x16, effective16. A non-updating duplicate-longest guard
+with Adam-state allowance tries2/off,1/off,2/on,1/on; only CUDA OOM permits fallback. Preserve RNG; bind
+actual batch/accumulation/recomputation to state. Resume restores that mode, never silently changes it.
+Same ordered16/update and each example weight1/16; grouping/dropout/rounding differ. Length bound is
+not a universal memory bound. No measured gain.
 User request: no optimization tests, comparative benchmarks or GPU runs during implementation. Static
 document/config/source checks do not establish native execution or speed. No condition selected, no
 resource allocated, all training paused.
@@ -1586,10 +1590,11 @@ chosen fit starts from its untouched base with separate source/configuration/rec
 scheduler and RNG/sampler identity. All training is PAUSED and no new GPU is allocated.
 C.2.4 Efficient per-fit accounting and resource implications
 The default efficient_one_epoch_v1 processes all 10,000 accepted training records once, plus loss-only
-diagnostics on the separate 100 validation IDs. Microbatch1 x accumulation 16 gives effective 16 and
-exactly 625 updates. Cosine decay uses the complete 625-update horizon; ceil(0.03 x 625) = 19 warmup
-updates. Preserve all full assistant targets and joint 4,096-token eligibility without truncation, packing or
-record removal.
+diagnostics on the separate 100 validation IDs. Request microbatch2 x accumulation8; capacity fallback1
+x16. Both retain effective16 and625 updates, the same ordered16 examples/update and each example
+weight1/16. Cosine decay uses the complete 625-update horizon; ceil(0.03 x 625) = 19 warmup updates.
+Preserve all full assistant targets and joint 4,096-token eligibility without truncation, packing or record
+removal.
 The scientific baseline changes from NF4 to unquantized frozen BF16 base/head, uses direct exact
 full-gradient Cut Cross-Entropy, standard SDPA and plain AdamW with FP32 optimizer states. FP32 loss
 and hidden-gradient accumulation preserve stable reductions but are not identical to historical FP32
@@ -1598,10 +1603,11 @@ is used. Keep completion-only masks/per-example weighting, LoRA rank/alpha/dropo
 attention/MLP targets, LR 2e-4, zero decay, max norm .3, effective 16 and seed 42. Save full state every
 100 and final 625; verify actual bytes in Drive before completion or retention advances.
 The user requests final implementation without another optimization test or timing campaign. Model identity,
-causal masks, adapter gradients, longest-example capacity and complete-state recovery are ordinary
-startup guards before updates, not previously passed runtime approval. Prefer checkpointing off; a
-non-updating OOM capacity probe may enable recomputation with the same objective. No one-hour finish,
-measured speedup or 14B memory claim exists.
+causal masks, adapter gradients, duplicate-longest capacity and complete-state recovery are ordinary
+startup guards before updates, not previously passed runtime approval. Policy v2
+selects2/off,1/off,2/on,1/on at fresh startup through a non-updating duplicate-longest guard; only CUDA
+OOM permits fallback. Restore the recorded mode exactly on resume. Grouping/dropout/rounding differ; no
+measured speedup. No one-hour finish, measured speedup or 14B memory claim exists.
 Precedent motivates the declared recipe: mixed precision, LoRA, efficient attention and Cut Cross-Entropy
 remove avoidable runtime/memory overhead. The uploaded 58.7-minute notebook motivates a one-pass
 exploratory budget and BF16/SDPA path, but had a different loss and length distribution. It is not a
@@ -2918,24 +2924,24 @@ E.2.3 Machine-readable configuration and exact artifact contracts
 54
 Freeze model/tokenizer, data, source and dependency identities; hashes verify recorded bytes, not correctness. All forty
 condition datasets remain Drive-verified; none is selected for launch.
-Default efficient_one_epoch_v1: all 10,000 examples once per selected fit;625 updates, full cosine horizon 625, warmup
-19. Unquantized BF16 base/head, exact direct full-gradient CCE FP32 loss/hidden accumulation, SDPA and plain AdamW
-replace old NF4 execution. Preserve full-target completion-only weighting, LoRA 8/16/.05,LR 2e-4,effective 16,seed 42
-and4096 eligibility. Save every 100/final 625; verify full state in Drive. This scientific/numerical change does not prove
-equal final results. Legacy recipes/archives remain separate; no warm starts. All training PAUSED, no resources allocated.
-No optimization campaign. Native identity/mask/gradient/recovery guards run at startup before updates, not previously
-passed approval.14B speed/memory unmeasured. Validation diagnostics precede reserved final tests.
+Default efficient_one_epoch_v1: all 10,000 examples once per selected fit;625 updates, full cosine horizon 625, warmup 19.
+Unquantized BF16 base/head, exact direct full-gradient CCE FP32 loss/hidden accumulation, SDPA and plain AdamW replace
+old NF4 execution. Preserve full-target completion-only weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1
+x16),effective16,seed 42 and4096 eligibility. Save every 100/final 625; verify full state in Drive. This scientific/numerical
+change does not prove equal final results. Legacy recipes/archives remain separate; no warm starts. All training PAUSED, no
+resources allocated. No optimization campaign. Native identity/mask/gradient/recovery guards run at startup before updates,
+not previously passed approval.14B speed/memory unmeasured. Validation diagnostics precede reserved final tests.
 Generation remains vLLM0.11.0,Transformers4.57.3,Torch2.8+cu128, separate from Torch2.9 training. BF16
-context4096,sequences128,scheduler8192,GPUfraction.9,no prefix cache; every response retains3072 new tokens.
-Producer dc520cb/config3757493e stay frozen.
+context4096,sequences128,scheduler8192,GPUfraction.9,no prefix cache; every response retains3072 new tokens. Producer
+dc520cb/config3757493e stay frozen.
 Evaluation retains the same pinned BF16 vLLM engine for bases and SFT/RL adapters:128
 requests,context8192,scheduler8192,GPUfraction.9,no prefix cache,LoRA enabled(maxrank32) even for bases. Verify
 checkpoint bytes. Preserve public templates,EOS,item seeds,temperature.6,top-p.95 and3072 response tokens; never
-truncate prompts. Archive native outputs; engine changes can change answers. Judge deferred seed 42 outputs later;
-deferral does not certify opacity/full evaluation. Drive-verify raw batches before advancing and scored bundles/reports after
-Docker scoring. Bind handoff/measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or
-exact code field without prose inference,ambiguity or code repair. Rescoring7398 saved outputs passed both bases and
-unchanged gates; no generation. Retain failures and use identical field rules for trained evaluation.
+truncate prompts. Archive native outputs; engine changes can change answers. Judge deferred seed 42 outputs later; deferral
+does not certify opacity/full evaluation. Drive-verify raw batches before advancing and scored bundles/reports after Docker
+scoring. Bind handoff/measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or exact code
+field without prose inference,ambiguity or code repair. Rescoring7398 saved outputs passed both bases and unchanged
+gates; no generation. Retain failures and use identical field rules for trained evaluation.
 ```
 
 ## page_055
@@ -3127,9 +3133,9 @@ IDs. All forty transformed conditions, 404,000 records and 122 corpus artifacts 
 repeatability after rescoring 7398 saved outputs.
 Active recipe efficient_one_epoch_v1 applies per chosen fit, not an automatic condition selection. All 10,000 examples once;
 625 updates/19 warmup. Unquantized BF16 base/head, full-gradient direct CCE FP32 loss/hidden accumulation, SDPA and
-plain AdamW are prospectively declared scientific changes. Completion-only full targets, LoRA, LR 2e-4, effective 16 and
-Drive integrity remain fixed. Original NF4 recipes and all forty conditions remain available. No model, family or level is
-selected.
+plain AdamW are prospectively declared scientific changes. Completion-only full targets, LoRA, LR 2e-4, requested2 x8
+(fallback1 x16),effective16 and Drive integrity remain fixed. Original NF4 recipes and all forty conditions remain available. No
+model, family or level is selected.
 All training is PAUSED; no new GPU allocation. Prior A100 assignments ended at zero compute units, replacement rejected
 for quota/entitlement; states ROT13 28/KaziText 30 are full Drive archives. Candidate comparisons incomplete: zero A100
 optimizations approved. 14B speed/memory are unmeasured. No optimization test or timing campaign is scheduled. New
@@ -3633,14 +3639,14 @@ replace NF4 execution. All forty conditions available; no model, family or level
 no GPUs allocated. No optimization campaign. Native startup guards unrun; 14B speed/memory unmeasured.
 Legacy recipes/Drive archives preserved; final tests and construction thresholds unchanged. No same-result or
 one-hour guarantee.
-Precedence. The explicitly authorized efficient_one_epoch_v1 baseline controls active SFT recipe over earlier
-NF4, FP32-head, paged-optimizer and two-epoch wording/diagrams. It changes scientific exposure and
-numerical execution, not the original construction success thresholds. All forty conditions remain available with
-no active selection. Legacy NF4 two-epoch and intermediate NF4 one-epoch recipes remain explicitly named
-alternatives; old checkpoints cannot be relabelled. Appendix H retains operational authority and Appendix G
-retains its original full-grid/window criteria. Restricted future level selections cannot establish those unobserved
-levels or windows. The original 67-page archive remains unchanged; active changes are integrated into existing
-pages without appended amendments.
+Precedence. The authorized efficient_one_epoch_v1 baseline with published execution policy v2 (requested2 x8,
+fallback1 x16, effective16; fixed recovered mode) controls active SFT recipe over earlier NF4, FP32-head,
+paged-optimizer and two-epoch wording/diagrams. It changes scientific exposure and numerical execution, not the
+original construction success thresholds. All forty conditions remain available with no active selection. Legacy NF4
+two-epoch and intermediate NF4 one-epoch recipes remain explicitly named alternatives; old checkpoints cannot
+be relabelled. Appendix H retains operational authority and Appendix G retains its original full-grid/window criteria.
+Restricted future level selections cannot establish those unobserved levels or windows. The original 67-page
+archive remains unchanged; active changes are integrated into existing pages without appended amendments.
 ```
 
 ## page_069

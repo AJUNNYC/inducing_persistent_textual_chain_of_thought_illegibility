@@ -1,5 +1,5 @@
 {
-  "schema_version": "sft_final_efficient_design_v1",
+  "schema_version": "sft_final_efficient_design_v2",
   "status": "FINALIZED_PENDING_USER_RUN_SELECTION_AND_ORDINARY_NATIVE_STARTUP",
   "recipe": "efficient_one_epoch_v1",
   "previous_recipe": "legacy_two_epoch_v1",
@@ -30,8 +30,8 @@
   "validation_count_per_fit": 100,
   "epochs_per_fit": 1,
   "effective_batch_size": 16,
-  "microbatch_size": 1,
-  "gradient_accumulation_steps": 16,
+  "microbatch_size": 2,
+  "gradient_accumulation_steps": 8,
   "optimizer_updates_per_fit": 625,
   "warmup_updates": 19,
   "scheduler": "full_cosine_over_625_updates",
@@ -136,7 +136,7 @@
   "optimizer_state_precision": "float32",
   "attention": "sdpa_prefer_flash_then_efficient_allow_math",
   "attention_backend_observed": false,
-  "gradient_checkpointing": "off_unless_longest_example_cuda_oom",
+  "gradient_checkpointing": "fresh_2_off_1_off_2_on_1_on_capacity_selection",
   "loss_implementation": "upstream_cce_exact_full_gradient",
   "gradient_filtering": false,
   "global_tf32": false,
@@ -162,8 +162,56 @@
     "nf4_base_to_bfloat16",
     "fp32_head_to_bfloat16_head",
     "paged_adamw_to_plain_adamw",
-    "recomputation_only_when_capacity_requires"
+    "recomputation_only_when_capacity_requires",
+    "requested_microbatch_2_accumulation_8_with_effective_16_and_fixed_capacity_selected_mode"
   ],
   "fresh_native_evidence_method": "ordinary_per_fit_non_updating_runtime_mask_and_checkpoint_startup",
-  "one_hour_7b_runtime_established": false
+  "one_hour_7b_runtime_established": false,
+  "published_execution_policy": "published_bf16_lora_full_gradient_cce_v2",
+  "physical_batch_speedup_measured": false,
+  "physical_batch_bitwise_equivalence_established": false,
+  "physical_batch_policy": {
+    "requested_microbatch_size": 2,
+    "requested_gradient_accumulation_steps": 8,
+    "fallback_microbatch_size": 1,
+    "fallback_gradient_accumulation_steps": 16,
+    "effective_batch_size": 16,
+    "same_ordered_examples_per_optimizer_update": true,
+    "per_example_weight_per_update": 0.0625,
+    "fresh_capacity_selection_order": [
+      {
+        "microbatch_size": 2,
+        "gradient_checkpointing": false
+      },
+      {
+        "microbatch_size": 1,
+        "gradient_checkpointing": false
+      },
+      {
+        "microbatch_size": 2,
+        "gradient_checkpointing": true
+      },
+      {
+        "microbatch_size": 1,
+        "gradient_checkpointing": true
+      }
+    ],
+    "capacity_guard": "duplicate_actual_longest_tokenized_example_non_updating_backward_with_adam_state_allowance",
+    "only_cuda_oom_allows_fallback": true,
+    "rng_preserved_during_probe": true,
+    "actual_mode_recorded_in_full_checkpoint": true,
+    "resume_mode_can_change": false,
+    "ordinary_startup_executed_for_revision": false,
+    "differences": [
+      "execution_grouping",
+      "padding",
+      "dropout_rng_assignment",
+      "floating_point_grouping"
+    ],
+    "actual_microbatch_size": null,
+    "actual_gradient_accumulation_steps": null,
+    "actual_gradient_checkpointing": null,
+    "capacity_bound": "maximum_padded_sequence_length_not_guaranteed_maximum_memory_across_completion_masks",
+    "later_oom_mode_switch_permitted": false
+  }
 }

@@ -4,6 +4,8 @@ title: "spec/mermaid/workflows/training/training.mmd"
 flowchart TD
 %% Training
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
+%% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
+%% Actual batch/accumulation/recomputation mode stays fixed throughout each fit and exact resume.
 %% Forty conditions remain available; no model/family/level selected and all training PAUSED.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
