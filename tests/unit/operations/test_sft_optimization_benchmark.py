@@ -56,6 +56,26 @@ def test_plan_only_reports_stale_certificate_without_reading_corpus_or_starting_
     assert plan["reference_profile"] == "baseline"
 
 
+def test_pilot_plan_binds_one_epoch_order_and_recipe_without_loading_gpu(tmp_path, monkeypatch):
+    argv = static_inputs(tmp_path, monkeypatch)
+    path = tmp_path / 'worklist.json'
+    worklist = json.loads(path.read_text())
+    spec = MODULE.sft_fit.SFTFitSpec.from_dict({**worklist[0]['spec'],
+        'training_budget': 'one_epoch_pilot_v1'})
+    worklist[0]['spec'] = spec.identity()
+    path.write_text(json.dumps(worklist))
+    monkeypatch.setattr(MODULE, 'certified_tasks', lambda *a, **k: worklist)
+    monkeypatch.setattr(MODULE, 'load_dataset_bundle', lambda *a, **k: pytest.fail('Planning must not load a corpus'))
+    plan, _, _ = MODULE.build_plan(MODULE.arguments(argv))
+    order = MODULE.sft_fit.exposure_order(10000, epochs=1)
+    assert len(order) == 10000
+    assert plan['recipe']['epochs'] == 1
+    assert plan['frozen_exposure_order_hash'] == MODULE.content_hash(order)
+    assert plan['selected_record_indices'] == order[:96]
+    assert plan['consumer_bindings_valid'] is True
+    assert plan['approved_for_production'] is False
+
+
 def test_gpu_path_cannot_ignore_stale_source_certificate(tmp_path, monkeypatch):
     argv = static_inputs(tmp_path, monkeypatch)
     monkeypatch.setattr(MODULE.subprocess, "run", lambda *a, **k: pytest.fail("No profile may launch"))

@@ -37,7 +37,7 @@ def arguments(argv=None):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--baseline-preflight", help="Matching model baseline readiness; required only for fallback.")
     parser.add_argument("--family", choices=("rot13", "kazitext"), required=True)
-    parser.add_argument("--model", choices=("7b",), default="7b")
+    parser.add_argument("--model", choices=("7b", "14b"), default="7b")
     parser.add_argument("--deadline", default=datetime.max.replace(tzinfo=timezone.utc).isoformat())
     parser.add_argument("--profiles", nargs="+", default=["spatial_scheduled_ce_checkpointed"])
     parser.add_argument("--initial-checkpoint", help="Immutable baseline parent for level 1 only; never official initialization.")
@@ -79,12 +79,14 @@ def prepare_parent(experiment, task, destination):
         model, tokenizer, optimizer, scheduler, runtime = sft_fit._runtime(
             spec, experiment.config["runtime"].get("sft_device", "cuda:0"),
             cache_root=experiment.config["runtime"].get("cache_root"))
-        order = sft_fit.exposure_order(len(train))
+        recipe = spec.recipe
+        order = sft_fit.exposure_order(len(train), epochs=recipe.epochs, seed=recipe.seed)
         selected = [sft_fit.tokenize_completion(train[index], tokenizer) for index in order[:16]]
         model.train()
-        sft_fit.one_optimizer_update(model, optimizer, scheduler, selected, tokenizer.pad_token_id)
+        sft_fit.one_optimizer_update(model, optimizer, scheduler, selected, tokenizer.pad_token_id, recipe=recipe)
         progress = {"completed_steps": 1, "sampler_position": 16, "example_presentations": 16,
-                    "exposure_order_hash": content_hash(order), "total_optimizer_steps": 1250,
+                    "exposure_order_hash": content_hash(order),
+                    "total_optimizer_steps": len(order) // recipe.effective_batch_size,
                     "processed_tokens": sum(len(row["input_ids"]) for row in selected),
                     "execution_profile": SFTExecutionProfile().to_dict()}
         save_checkpoint(destination, identity, {"adapter": get_peft_model_state_dict(model, save_embedding_layers=False),
@@ -169,6 +171,8 @@ def pause_child(process):
 def main(argv=None):
     args = arguments(argv)
     config = validate_configuration(read_json(args.config), runtime=True)
+    if config['sft'].get('training_budget') == 'efficient_one_epoch_v1':
+        raise ValueError('The finalized published recipe uses run_certified_sft.py with an explicit model and level; no optimization campaign queue')
     experiment = Experiment(config, config_path=args.config)
     if experiment.code != config["runtime"]["implementation_revision"]:
         raise ValueError("Executed source differs from the frozen consumer")

@@ -1,4 +1,4 @@
-"""Forty independent fits in two sequential, separately owned family queues."""
+"""Explicitly selected independent fits over a fully certified forty-condition corpus."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -17,7 +17,7 @@ def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, An
     loaded train_records/validation_records. Actual content is checked before
     scheduling. Complete source IDs must agree across all forty conditions.
     """
-    from shared_procedures.configuration import configuration_hash
+    from shared_procedures.configuration import configuration_hash, sft_training_budget
     config_hash = configuration_hash(dict(config))
     producer_hash = config_hash
     if handoff_certificate is not None:
@@ -42,7 +42,8 @@ def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, An
         if model_config.get("id", model_config.get("name")) != MODELS[key[1]]:
             raise SFTInputError("Construction model substitution is forbidden")
         spec = SFTFitSpec(key[0], key[1], key[2], model_config["revision"],
-                          model_config["tokenizer_revision"], config_hash, dataset_hash(train, validation))
+                          model_config["tokenizer_revision"], config_hash, dataset_hash(train, validation),
+                          training_budget=sft_training_budget(dict(config)))
         if handoff_certificate is not None:
             from dataclasses import replace
             spec = replace(spec, producer_configuration_hash=producer_hash,
@@ -81,7 +82,16 @@ def build_worklist(config: Mapping[str, Any], datasets: Sequence[Mapping[str, An
                     raise SFTInputError("A frozen condition is missing")
                 result.append({**conditions[key], "family": family, "model_id": model_id, "level": level,
                                "run_id": conditions[key]["spec"]["run_id"], "initialization": "untouched_base_or_exact_full_checkpoint"})
-    return result
+    return select_worklist(config, result)
+
+
+def select_worklist(config: Mapping[str, Any], worklist: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Only declared fits may run; all forty conditions remain in the corpus."""
+    from shared_procedures.configuration import sft_execution_selection
+    expected = {(row['family'], row['model_id'], row['level'])
+                for row in sft_execution_selection(dict(config))}
+    return [dict(task) for task in worklist
+            if (task['family'], task['model_id'], task['level']) in expected]
 
 
 def load_dataset_bundle(bundle: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -118,18 +128,23 @@ def run_family_queue(family: str, worklist: Sequence[Mapping[str, Any]], output_
     if family not in LEVELS:
         raise SFTInputError("Unknown SFT queue")
     tasks = [task for task in worklist if task.get("family") == family]
-    expected = {(model, level) for model in MODELS for level in range(1, 11)}
+    from shared_procedures.configuration import sft_execution_selection, sft_training_budget
+    expected = {(row['model_id'], row['level']) for row in sft_execution_selection(dict(config))
+                if row['family'] == family}
     actual = {(task.get("model_id"), task.get("level")) for task in tasks}
-    if len(tasks) != 20 or actual != expected:
-        raise SFTInputError("Each family queue must contain twenty distinct independent fits")
+    if not expected or len(tasks) != len(expected) or actual != expected:
+        raise SFTInputError("Each family queue must contain its declared independent fits (twenty for the historical scope)")
     completed, outcomes = [], []
     status = "complete"
     failure = None
     try:
         for task in tasks:
             spec = SFTFitSpec.from_dict(task["spec"])
-            if (spec.family, spec.model_id, spec.level) != (family, task["model_id"], task["level"]):
+            if ((spec.family, spec.model_id, spec.level) != (family, task["model_id"], task["level"])
+                    or task['spec'] != spec.identity()):
                 raise SFTInputError("Task metadata differs from exact fit identity")
+            if spec.training_budget != sft_training_budget(dict(config)):
+                raise SFTInputError("Task training budget differs from the declared configuration")
             output = Path(output_root) / family / spec.model_id / f"level_{spec.level:02d}"
             train, validation = load_dataset_bundle(task["dataset"])
             try:
@@ -153,7 +168,7 @@ def run_family_queue(family: str, worklist: Sequence[Mapping[str, Any]], output_
     finally:
         if release_gpu is not None:
             release_gpu(family)
-    report = {"family": family, "status": status, "required_fits": 20, "completed_fits": len(completed),
+    report = {"family": family, "status": status, "required_fits": len(expected), "completed_fits": len(completed),
               "completed_run_ids": completed, "outcomes": outcomes, "failure": failure,
               "execution_mode": "production" if fit_runner is run_sft_fit else "injected_fixture"}
     atomic_write_json(Path(output_root) / family / "queue_report.json", report)
@@ -161,7 +176,7 @@ def run_family_queue(family: str, worklist: Sequence[Mapping[str, Any]], output_
 
 
 def sft_training(config: Mapping[str, Any], datasets: Sequence[Mapping[str, Any]], output_root: str | Path,
-                 *, families: Sequence[str] = ("rot13", "kazitext"),
+                 *, families: Sequence[str] | None = None,
                  preflight_report: Mapping[str, Any] | None = None,
                  fit_runner: Callable[..., dict[str, Any]] = run_sft_fit,
                  release_gpu: Callable[[str], None] | None = None,
@@ -171,14 +186,19 @@ def sft_training(config: Mapping[str, Any], datasets: Sequence[Mapping[str, Any]
     Single-process default is sequential and cannot oversubscribe one GPU. Each
     independently failed family preserves its own results while the other runs.
     """
-    if len(set(families)) != len(families) or any(family not in LEVELS for family in families):
+    from shared_procedures.configuration import sft_execution_selection
+    available_families = {row['family'] for row in sft_execution_selection(dict(config))}
+    if families is None:
+        families = tuple(family for family in LEVELS if family in available_families)
+    if len(set(families)) != len(families) or any(family not in available_families for family in families):
         raise SFTInputError("Invalid family selection")
     worklist = build_worklist(config, datasets)
     queues = {family: run_family_queue(family, worklist, output_root, config,
               preflight_report=preflight_report, fit_runner=fit_runner,
               release_gpu=release_gpu, should_pause=should_pause) for family in families}
-    status = "complete" if len(queues) == 2 and all(queue["status"] == "complete" for queue in queues.values()) else "partial"
-    return {"status": status, "required_fits": 40,
+    selected_families = {task['family'] for task in worklist}
+    status = "complete" if set(queues) == selected_families and all(queue["status"] == "complete" for queue in queues.values()) else "partial"
+    return {"status": status, "required_fits": len(worklist),
             "completed_fits": sum(queue["completed_fits"] for queue in queues.values()),
             "queues": queues, "worklist": [{key: task[key] for key in ("family", "model_id", "level", "run_id", "initialization")} for task in worklist]}
 

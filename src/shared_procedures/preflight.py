@@ -15,6 +15,9 @@ LIVE_NAMES=set(NAMES)-{'configuration'}
 PREFLIGHT_SCOPES={
     'generation':('configuration','model_runtime','transformation_runtime','durable_storage','spending_authorization'),
     'training':NAMES,
+    # Published SFT is a declared training recipe. Its native model/mask/full
+    # recovery guards execute during ordinary startup, before the first update.
+    'published_sft':('configuration','clean_data','durable_storage','spending_authorization','statistical_validation'),
 }
 class PreflightBlocked(RuntimeError):
     pass
@@ -90,7 +93,7 @@ def _statistical_validation(config: dict) -> CheckResult:
     return CheckResult('statistical_validation',row['status'],row['detail'],evidence)
 
 def preflight_requirements(scope: str='training') -> tuple[str,...]:
-    if scope not in PREFLIGHT_SCOPES:raise ValueError('preflight scope must be generation or training')
+    if scope not in PREFLIGHT_SCOPES:raise ValueError('unknown preflight scope')
     return PREFLIGHT_SCOPES[scope]
 
 def run_preflights(config: dict,checks: dict[str,Callable[[dict],CheckResult] | CheckResult] | None=None,
@@ -301,7 +304,8 @@ def _run_model_checks(config: dict,*,include_training: bool=True,
     for size,model_spec in selected_models.items():
         model=tokenizer=optimizer=scheduler=None
         try:
-            spec=SFTFitSpec('rot13',size,1,model_spec['revision'],model_spec['tokenizer_revision'],configuration_hash(config),control_hash)
+            spec=SFTFitSpec('rot13',size,1,model_spec['revision'],model_spec['tokenizer_revision'],configuration_hash(config),control_hash,
+                            training_budget=config['sft'].get('training_budget','legacy_two_epoch_v1'))
             model,tokenizer,optimizer,scheduler,runtime=_runtime(spec,config['runtime'].get('sft_device','cuda:0'),cache_root=config['runtime'].get('cache_root'))
             model.eval()
             prompt=tokenizer.apply_chat_template([{'role':'user','content':control_prompt}],tokenize=False,add_generation_prompt=True)

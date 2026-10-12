@@ -127,9 +127,9 @@ interventions:
         - default
         warn: true
 sft:
-  quantization: nf4
-  load_in_4bit: true
-  double_quantization: true
+  quantization: bf16
+  load_in_4bit: false
+  double_quantization: false
   compute_dtype: bfloat16
   lora_rank: 8
   lora_alpha: 16
@@ -143,17 +143,18 @@ sft:
   - up_proj
   - down_proj
   learning_rate: 0.0002
-  optimizer: paged_adamw_32bit
+  optimizer: adamw
   scheduler: cosine
   warmup_ratio: 0.03
-  epochs: 2
+  training_budget: efficient_one_epoch_v1
+  epochs: 1
   effective_batch_size: 16
   microbatch_size: 1
   gradient_accumulation_steps: 16
   max_seq_length: 4096
   weight_decay: 0
   max_grad_norm: 0.3
-  gradient_checkpointing: true
+  gradient_checkpointing: false
   early_stopping: false
   checkpoint_interval: 100
   loss_mask: completion_only
@@ -274,7 +275,7 @@ datasets:
     revision: 4bb6404fdc6cacfda99d4ac4205087b89d32030c
     configuration: sanitized
 runtime:
-  artifact_root: artifacts
+  artifact_root: artifacts/sft_efficient_one_epoch
   data_root: data
   cache_root: /workspace/model_cache
   dependency_lock_hash: null

@@ -26,6 +26,8 @@ def main():
     parser.add_argument('--output', required=True)
     args = parser.parse_args()
     config = validate_configuration(read_json(args.config), runtime=True)
+    if config['sft'].get('training_budget') == 'efficient_one_epoch_v1':
+        raise ValueError('Published execution is prepared with reconcile_sft_launch.py --published-method and initialized by run_certified_sft.py')
     checks = _run_model_checks(config, include_training=True, model_ids=(args.model,))
     import torch
     records = {name: check.to_dict() for name, check in checks.items()}

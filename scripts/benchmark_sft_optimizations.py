@@ -178,9 +178,12 @@ def recovery_binding(path, task, config):
         raise ValueError("Original recovery checkpoint payload bytes changed")
     progress = manifest["progress"]
     position = progress["sampler_position"]
-    if (type(position) is not int or not 0 <= position <= 20000
-            or position != min(progress["completed_steps"] * 16, 20000)
-            or progress.get("exposure_order_hash") != content_hash(sft_fit.exposure_order(10000))):
+    recipe = spec.recipe
+    presentations = 10000 * recipe.epochs
+    order = sft_fit.exposure_order(10000, epochs=recipe.epochs, seed=recipe.seed)
+    if (type(position) is not int or not 0 <= position <= presentations
+            or position != min(progress["completed_steps"] * recipe.effective_batch_size, presentations)
+            or progress.get("exposure_order_hash") != content_hash(order)):
         raise ValueError("Original recovery state is not at the exact frozen optimizer boundary")
     return {"mode": "verified_full_checkpoint", "path": str(root),
             "checkpoint_hash": manifest["checkpoint_hash"], "original_identity": manifest["identity"],
@@ -207,6 +210,8 @@ def source_tree_state():
 
 def build_plan(args):
     config = validate_configuration(read_json(args.config), runtime=True)
+    if config['sft'].get('training_budget') == 'efficient_one_epoch_v1':
+        raise ValueError('The finalized published recipe uses ordinary native startup, not this historical optimization benchmark')
     certificate, bundle, worklist = (read_json(getattr(args, name))
                                      for name in ("certificate", "bundle", "worklist"))
     source_state = source_tree_state()
@@ -226,8 +231,10 @@ def build_plan(args):
         if len(selected) != 1:
             raise ValueError("Benchmark requires one declared frozen SFT condition")
         task = selected[0]
-    count = (args.warmup_updates + args.updates) * 16
-    order = sft_fit.exposure_order(10000)
+    spec = sft_fit.SFTFitSpec.from_dict(task["spec"])
+    recipe = spec.recipe
+    count = (args.warmup_updates + args.updates) * recipe.effective_batch_size
+    order = sft_fit.exposure_order(10000, epochs=recipe.epochs, seed=recipe.seed)
     initialization = {"mode": "fresh_pinned_base", "progress": {"completed_steps": 0, "sampler_position": 0}}
     if args.recovery_checkpoint:
         initialization = recovery_binding(args.recovery_checkpoint, task, config)
@@ -269,7 +276,7 @@ def build_plan(args):
             "identity": initialization["original_identity"], "progress": initialization["progress"],
             "files": initialization["files"], "manifest_file_sha256": initialization["manifest_file_sha256"]}
             if args.recovery_checkpoint else None),
-        "microbatches_per_update": 16, "recipe": sft_fit.SFTRecipe().to_dict(),
+        "microbatches_per_update": recipe.gradient_accumulation_steps, "recipe": recipe.to_dict(),
         "frozen_exposure_order_hash": content_hash(order),
         "selected_record_indices": order[position:position + count],
         "selected_order_hash": content_hash(order[position:position + count]),
@@ -456,7 +463,7 @@ def profile_run(args, plan, config, task):
         wall_start = time.perf_counter()
         start.record()
         values = sft_fit.one_optimizer_update(model, optimizer, scheduler, group, tokenizer.pad_token_id,
-                                             execution_profile=profile,
+                                             recipe=spec.recipe, execution_profile=profile,
                                              prepared_batches=cache[update * 16:(update + 1) * 16] if cache else None)
         end.record()
         torch.cuda.synchronize(device)

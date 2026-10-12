@@ -7,10 +7,12 @@ CONFIG=Path(__file__).resolve().parents[3]/'config.yaml'
 def test_config_fixed_science_and_matrix():
     c=load_configuration(CONFIG)
     assert len(sft_matrix(c))==40
+    assert 'selection' not in c['sft']
+    assert c['sft']['training_budget']=='efficient_one_epoch_v1' and c['sft']['epochs']==1
     assert sum(c['evaluation']['capability_counts'].values())==1233
     assert len(c['interventions']['kazitext']['alphas'])==10
 
-@pytest.mark.parametrize('field,value',[('seed',43),('epochs',1),('panel',1240),('model','Qwen3')])
+@pytest.mark.parametrize('field,value',[('seed',43),('epochs',2),('panel',1240),('model','Qwen3')])
 def test_scientific_mutation_rejected(field,value):
     c=load_configuration(CONFIG)
     if field=='seed':c['seed']=value
@@ -18,6 +20,37 @@ def test_scientific_mutation_rejected(field,value):
     elif field=='panel':c['evaluation']['capability_counts']['arc']=value
     else:c['models']['7b']['id']=value
     with pytest.raises(ConfigurationError):validate_configuration(c)
+
+
+def test_historical_absent_budget_and_scope_keep_two_epochs_and_forty_conditions():
+    config=load_configuration(CONFIG)
+    config['sft'].pop('training_budget');config['sft'].pop('selection',None)
+    config['sft'].update(epochs=2,quantization='nf4',load_in_4bit=True,double_quantization=True,
+        optimizer='paged_adamw_32bit',gradient_checkpointing=True)
+    assert sft_training_budget(config)=='legacy_two_epoch_v1'
+    assert len(sft_matrix(config))==40
+    config['sft']['epochs']=1
+    with pytest.raises(ConfigurationError,match='sft.epochs'):validate_configuration(config)
+
+
+@pytest.mark.parametrize('selection', [None, {}, {'models':['14b'],'families':['rot13'],'levels':[True]},
+    {'models':['14b','14b'],'families':['rot13'],'levels':[10]},
+    {'models':['14b'],'families':['rot13'],'levels':[11]},
+    {'models':['14b'],'families':['rot13'],'levels':[]}])
+def test_invalid_execution_scope_is_rejected(selection):
+    config=load_configuration(CONFIG);config['sft']['selection']=selection
+    with pytest.raises(ConfigurationError,match='sft.selection'):validate_configuration(config)
+
+
+def test_named_budget_and_selection_remain_scientific_identity_fields():
+    config=load_configuration(CONFIG);legacy=deepcopy(config)
+    legacy['sft'].update(training_budget='legacy_two_epoch_v1',epochs=2,quantization='nf4',
+        load_in_4bit=True,double_quantization=True,optimizer='paged_adamw_32bit',gradient_checkpointing=True)
+    assert configuration_hash(config)!=configuration_hash(legacy)
+    wider=deepcopy(config);wider['sft']['selection']={'models':['7b','14b'],'families':['rot13','kazitext'],'levels':[5,10]}
+    assert configuration_hash(config)!=configuration_hash(wider)
+    config['sft']['training_budget']='arbitrary_shorter_recipe'
+    with pytest.raises(ConfigurationError,match='training_budget'):validate_configuration(config)
 
 def test_unresolved_runtime_not_frozen(tmp_path):
     c=load_configuration(CONFIG);c['models']['7b']['revision']=None

@@ -5,6 +5,13 @@ from types import SimpleNamespace
 
 import pytest
 
+
+def test_queue_parser_accepts_14b_without_allocating_a_gpu():
+    args = MODULE.arguments(['--config', 'config', '--certificate', 'certificate',
+        '--bundle', 'bundle', '--worklist', 'worklist', '--control-config', 'controls',
+        '--baseline-root', 'baseline', '--family', 'rot13', '--model', '14b'])
+    assert args.model == '14b'
+
 SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "run_optimized_sft_queue.py"
 SPEC = importlib.util.spec_from_file_location("optimized_sft_queue_guards", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)

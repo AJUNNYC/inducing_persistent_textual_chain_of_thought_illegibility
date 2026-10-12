@@ -7,6 +7,7 @@ control is repeated; incompatible source or scientific settings stop the handoff
 import argparse
 import ast
 from copy import deepcopy
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -59,6 +60,257 @@ def identical_files(commit, names):
             raise ValueError('Passed control source changed: '+name)
         result[name] = file_hash(ROOT/name)
     return result
+
+
+def declared_training_budget_change(config, original_config):
+    """Record the explicit epoch/scope amendment; preserve all other settings.
+
+    This is not a proof that scientific training results remain equivalent.
+    Changed training budgets require fresh native SFT execution evidence.
+    """
+    validate_configuration(config)
+    validate_configuration(original_config)
+    for key in ('models', 'rl'):
+        if config[key] != original_config[key]:
+            raise ValueError('Training settings changed after passed controls: ' + key)
+    before, after = deepcopy(original_config['sft']), deepcopy(config['sft'])
+    changing = ('epochs', 'training_budget', 'selection')
+    if config['sft'].get('training_budget') == 'efficient_one_epoch_v1':
+        # These values are individually enforced by the named configuration
+        # validator. This is an explicit precision/optimizer/budget amendment,
+        # not a claim of numerical identity with the original NF4 recipe.
+        changing += ('quantization', 'load_in_4bit', 'double_quantization',
+                     'optimizer', 'gradient_checkpointing')
+    unchanged_before = {key: value for key, value in before.items() if key not in changing}
+    unchanged_after = {key: value for key, value in after.items() if key not in changing}
+    if unchanged_before != unchanged_after:
+        raise ValueError('Training settings changed beyond the named budget: sft')
+    before_budget = before.get('training_budget', 'legacy_two_epoch_v1')
+    after_budget = after.get('training_budget', 'legacy_two_epoch_v1')
+    if (before_budget, before['epochs'], before.get('selection')) == (
+            after_budget, after['epochs'], after.get('selection')):
+        return None
+    return {'schema_version': 'declared_sft_budget_amendment_v1',
+            'before': {key: before.get(key) for key in changing},
+            'after': {key: after.get(key) for key in changing},
+            'before_budget': before_budget, 'after_budget': after_budget,
+            'other_sft_settings_unchanged': True,
+            'scientific_training_results_equivalent': False,
+            'fresh_native_sft_evidence_required': True}
+
+
+def published_method_bindings(config, certificate, commit, gpu_source):
+    """Authorize the declared literature-backed baseline without fake timings.
+
+    Native model, mask, capacity and recovery checks remain pending until the
+    fit initializes. No old numerical benchmark authorizes this new recipe.
+    """
+    from training.sft.published_execution import PUBLISHED_EXECUTION_POLICY
+    if config['sft'].get('training_budget') != 'efficient_one_epoch_v1':
+        raise ValueError('Published execution requires the finalized named recipe')
+    source_names = [str(path.relative_to(ROOT)) for path in sorted((ROOT / 'src/training/sft').rglob('*.py'))]
+    source_names += ['scripts/run_certified_sft.py', 'scripts/reconcile_sft_launch.py',
+                     'scripts/setup_environment.py', 'requirements_sft_published.lock']
+    source_names = sorted(set(source_names) | set(certificate['implementation_bindings']))
+    source_hashes = {name: file_hash(ROOT / name) for name in source_names}
+    if any(hashlib.sha256(original_file(commit, name)).hexdigest() != digest
+           for name, digest in source_hashes.items()):
+        raise ValueError('Executed published-method source differs from the frozen Git commit')
+    return {
+        'published_method_source_commit': commit,
+        'published_method_source_files': source_hashes,
+        'published_execution_policy': deepcopy(PUBLISHED_EXECUTION_POLICY),
+        'published_execution_policy_hash': content_hash(PUBLISHED_EXECUTION_POLICY),
+        'native_checks_pending': ['model_runtime', 'loss_mask_gradients', 'full_checkpoint_resume'],
+        'original_data_contract': compatible_functions(gpu_source,
+            'src/training/sft/individual_fit/sft_fit.py',
+            ['render_sft_completion', 'tokenize_completion',
+             'TARGET_MODULES', 'LOSS_REDUCTION', 'MODELS', 'LEVELS']),
+        'original_mask_and_weighting_contract': compatible_sft_numerics(gpu_source),
+        'checkpoint': identical_files(gpu_source, ['src/shared_procedures/checkpointing.py',
+            'requirements.lock', 'src/shared_procedures/identity.py', 'src/shared_procedures/storage.py']),
+        'certificate_hash': certificate['certificate_hash'],
+        'native_speedup_measured': False,
+        'historical_fp32_head_equivalence': False,
+    }
+
+
+def prepare_published_method(config, certificate, commit, controls, original_config, output):
+    """Reuse compatible external evidence; leave actual GPU startup pending."""
+    from training.sft.published_execution import PUBLISHED_EXECUTION_POLICY
+    gpu_source = controls['source_revision_for_gpu_checks']
+    bindings = published_method_bindings(config, certificate, commit, gpu_source)
+    bindings['declared_training_budget_amendment'] = declared_training_budget_change(config, original_config)
+    bindings['asset_verification'] = asset_verification_compatibility(gpu_source)
+    transform_files = [str(path.relative_to(ROOT)) for directory in ('rot13', 'kazitext')
+                       for path in sorted((ROOT/'src/data_generation_collection/sft_data'/directory).rglob('*.py'))]
+    bindings['transformations'] = identical_files(certificate['producer_commit'], transform_files)
+    statistical = checked_report(ROOT/'docs/evidence/statistical_guard_v2_report.json')
+    if statistical['implementation_hash'] != implementation_hash():
+        raise ValueError('Validated statistical implementation changed')
+    checks = {}
+    for row in controls['checks']:
+        if row['name'] == 'durable_storage':
+            copied = deepcopy(row)
+            copied['evidence']['compatible_reuse'] = {
+                'original_report_hash': controls['report_hash'],
+                'original_control_configuration_hash': controls['control_configuration_hash'],
+                'original_source_commit': gpu_source, 'consumer_commit': commit,
+                'compatibility_bindings_hash': content_hash(bindings)}
+            checks[row['name']] = CheckResult(**copied)
+    row = deepcopy(statistical['checks'][0])
+    row['evidence']['compatible_reuse'] = {
+        'original_report_hash': statistical['report_hash'], 'consumer_commit': commit,
+        'compatibility_bindings_hash': content_hash(bindings)}
+    checks[row['name']] = CheckResult(**row)
+    checks['clean_data'] = CheckResult('clean_data', 'passed',
+        'Existing independently Drive-audited corpus certified for this consumer; bytes retained.',
+        {'live': True, 'simulation': False, 'record_count': 404000, 'condition_count': 40,
+         'certificate_hash': certificate['certificate_hash'],
+         'original_drive_readback_sha256': certificate['drive_readback_report_sha256']})
+    report = run_preflights(config, checks, output_dir=Path(output)/'preflight', scope='published_sft')
+    report.update(training_budget='efficient_one_epoch_v1',
+        native_runtime_preflight_status='PENDING_AT_LAUNCH',
+        native_startup_required=bindings['native_checks_pending'],
+        published_execution_policy=deepcopy(PUBLISHED_EXECUTION_POLICY),
+        policy_hash=content_hash(PUBLISHED_EXECUTION_POLICY), training_ready=False, study_ready=False)
+    report['report_hash'] = content_hash({key: value for key, value in report.items() if key != 'report_hash'})
+    atomic_write_json(Path(output)/'preflight/report.json', report)
+    require_preflights(report, preflight_requirements('published_sft'),
+                       expected_configuration_hash=configuration_hash(config))
+    receipt = {'status': 'READY_TO_INITIALIZE', 'source_commit': commit,
+        'configuration_hash': configuration_hash(config),
+        'handoff_certificate_hash': certificate['certificate_hash'],
+        'preflight_report_hash': report['report_hash'],
+        'training_budget': 'efficient_one_epoch_v1',
+        'published_execution_policy': deepcopy(PUBLISHED_EXECUTION_POLICY),
+        'policy_hash': content_hash(PUBLISHED_EXECUTION_POLICY),
+        'source_compatibility_bindings': bindings,
+        'native_runtime_preflight_status': 'PENDING_AT_LAUNCH',
+        'native_startup_required': bindings['native_checks_pending'],
+        'native_speedup_measured': False, 'native_checks_passed': False,
+        'training_ready': False, 'study_ready': False,
+        'historical_gpu_controls_used_as_current_passes': False,
+        'statistical_validation_repeated': False, 'training_started': False}
+    receipt['receipt_hash'] = content_hash(receipt)
+    atomic_write_json(Path(output)/'readiness_receipt.json', receipt)
+    print(__import__('json').dumps({key: value for key, value in receipt.items()
+                                  if key != 'source_compatibility_bindings'}), flush=True)
+    return receipt
+
+
+def compatible_recipe_fields(commit):
+    """Bind unchanged historical recipe fields plus the new budget dispatcher.
+
+    Fresh native controls cover the changed scheduler and execution path. This
+    narrower check prevents accidental changes to the old scientific defaults.
+    """
+    name = 'src/training/sft/individual_fit/sft_fit.py'
+    old = ast.parse(original_file(commit, name))
+    new = ast.parse((ROOT / name).read_text())
+    def fields(tree):
+        classes = [node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == 'SFTRecipe']
+        if len(classes) != 1:
+            raise ValueError('Missing exact SFT recipe definition')
+        return {node.target.id: ast.dump(node, include_attributes=False) for node in classes[0].body
+                if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)}
+    if fields(old) != fields(new):
+        raise ValueError('Historical SFT recipe fields changed beyond named budget dispatch')
+    from training.sft.individual_fit.sft_fit import SFTRecipe
+    legacy, pilot = SFTRecipe.for_budget('legacy_two_epoch_v1'), SFTRecipe.for_budget('one_epoch_pilot_v1')
+    legacy.validate()
+    pilot.validate()
+    if {**pilot.to_dict(), 'epochs': 2} != legacy.to_dict():
+        raise ValueError('One-epoch recipe changed more than its training budget')
+    return {'legacy_field_hashes': {key: content_hash(value) for key, value in fields(new).items()},
+            'legacy_recipe': legacy.to_dict(), 'pilot_recipe': pilot.to_dict(),
+            'source_sha256': file_hash(ROOT / name),
+            'native_controls_cover_budget_dispatch': True}
+
+
+def compatible_exposure_order(commit):
+    """Permit only one/two epoch dispatch over the original seeded shuffle.
+
+    The historical default remains two epochs. Removing the exact additional
+    keyword/guard and substituting that default must recover the entire original
+    function AST, including the RNG, seed and continuous concatenation order.
+    """
+    name = 'src/training/sft/individual_fit/sft_fit.py'
+    before = ast.parse(original_file(commit, name))
+    after = ast.parse((ROOT / name).read_text())
+    guard = ast.parse('''if type(epochs) is not int or epochs not in (1, 2):
+    raise SFTInputError("Exposure order requires a declared one- or two-epoch budget")
+''').body[0]
+    keyword = ast.parse('def exposure_order(*, epochs: int = 2): pass').body[0].args
+
+    def normalized(tree):
+        functions = [node for node in tree.body if isinstance(node, ast.FunctionDef)
+                     and node.name == 'exposure_order']
+        if len(functions) != 1:
+            raise ValueError('Missing exact exposure-order definition')
+        function = deepcopy(functions[0])
+        if (function.body and isinstance(function.body[0], ast.Expr)
+                and isinstance(function.body[0].value, ast.Constant)
+                and isinstance(function.body[0].value.value, str)):
+            function.body.pop(0)
+        if function.args.kwonlyargs:
+            if (ast.dump(function.args.kwonlyargs[0], include_attributes=False)
+                    != ast.dump(keyword.kwonlyargs[0], include_attributes=False)
+                    or len(function.args.kwonlyargs) != 1
+                    or len(function.args.kw_defaults) != 1
+                    or ast.dump(function.args.kw_defaults[0], include_attributes=False)
+                    != ast.dump(keyword.kw_defaults[0], include_attributes=False)
+                    or not function.body
+                    or ast.dump(function.body[0], include_attributes=False)
+                    != ast.dump(guard, include_attributes=False)):
+                raise ValueError('Exposure-order dispatch changed beyond the declared one/two epoch budgets')
+            function.args.kwonlyargs = []
+            function.args.kw_defaults = []
+            function.body.pop(0)
+            loops = [node for node in function.body if isinstance(node, ast.For)
+                     and isinstance(node.iter, ast.Call) and isinstance(node.iter.func, ast.Name)
+                     and node.iter.func.id == 'range' and not node.iter.keywords
+                     and len(node.iter.args) == 1 and isinstance(node.iter.args[0], ast.Name)
+                     and node.iter.args[0].id == 'epochs']
+            if len(loops) != 1:
+                raise ValueError('Exposure-order dispatcher is not the original epoch loop')
+            loops[0].iter.args[0] = ast.Constant(value=2)
+            if any(isinstance(node, ast.Name) and node.id == 'epochs' for node in ast.walk(function)):
+                raise ValueError('Exposure-order budget changed the original shuffle algorithm')
+        elif function.args.kw_defaults:
+            raise ValueError('Exposure-order keyword defaults changed')
+        return ast.dump(function, include_attributes=False)
+
+    original, current = normalized(before), normalized(after)
+    if original != current:
+        raise ValueError('Passed seeded exposure order changed beyond declared budget dispatch')
+    return {'historical_default_epochs': 2, 'declared_epochs': [1, 2],
+            'original_seed_and_shuffle_unchanged': True,
+            'historical_function_ast_hash': content_hash(original),
+            'current_source_sha256': file_hash(ROOT / name)}
+
+
+def compatible_model_control_budget(commit):
+    """Allow only the explicit named-budget argument in original model controls."""
+    name = 'src/shared_procedures/preflight.py'
+    old = ast.parse(original_file(commit, name))
+    new = ast.parse((ROOT / name).read_text())
+    wanted = ast.parse("config['sft'].get('training_budget','legacy_two_epoch_v1')", mode='eval').body
+    def function(tree):
+        return next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == '_run_model_checks')
+    before, after = function(old), deepcopy(function(new))
+    removed = 0
+    for call in ast.walk(after):
+        if isinstance(call, ast.Call) and isinstance(call.func, ast.Name) and call.func.id == 'SFTFitSpec':
+            budget = [item for item in call.keywords if item.arg == 'training_budget']
+            if len(budget) == 1 and ast.dump(budget[0].value, include_attributes=False) == ast.dump(wanted, include_attributes=False):
+                call.keywords = [item for item in call.keywords if item.arg != 'training_budget']
+                removed += 1
+    if removed != 1 or ast.dump(before, include_attributes=False) != ast.dump(after, include_attributes=False):
+        raise ValueError('Original model controls changed beyond explicit budget dispatch')
+    return {'original_control_function': content_hash(ast.dump(after, include_attributes=False)),
+            'budget_argument': content_hash(ast.dump(wanted, include_attributes=False)),
+            'source_sha256': file_hash(ROOT / name)}
 
 
 def asset_verification_compatibility(commit):
@@ -538,6 +790,8 @@ def baseline_runtime_controls(path, config, commit, control_config=None):
         from training.sft.data_handoff import compatibility_projection
         if compatibility_projection(config) != compatibility_projection(control_config):
             raise ValueError('Scientific settings changed after measured baseline controls')
+        if config['sft'] != control_config['sft']:
+            raise ValueError('Measured baseline training budget or scope differs')
     measured_commit = measured_config.get('runtime', {}).get('implementation_revision', commit)
     models = report.get('model_ids')
     if (report.get('schema_version') != 'sft_baseline_runtime_controls_v1'
@@ -590,8 +844,11 @@ def baseline_runtime_controls(path, config, commit, control_config=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('config','certificate','control-config','baseline-root','output'):
+    for name in ('config','certificate','control-config','output'):
         parser.add_argument('--'+name,required=True)
+    parser.add_argument('--baseline-root', help='Required for historical measured launch modes.')
+    parser.add_argument('--published-method', action='store_true',
+                        help='Finalize efficient_one_epoch_v1 using published methods and ordinary native startup guards.')
     parser.add_argument('--execution-benchmark')
     parser.add_argument('--execution-profile')
     parser.add_argument('--recovery-benchmark')
@@ -607,6 +864,14 @@ def main(argv=None):
     if args.baseline_runtime_control_config and not args.baseline_runtime_controls:
         parser.error('Original baseline runtime config requires the measured controls')
     config = validate_configuration(read_json(args.config),runtime=True)
+    efficient = config['sft'].get('training_budget') == 'efficient_one_epoch_v1'
+    if efficient != args.published_method:
+        parser.error('efficient_one_epoch_v1 requires --published-method; this flag supports only that recipe')
+    if args.published_method and any((args.execution_benchmark, args.execution_profile,
+            args.recovery_benchmark, args.baseline_runtime_controls, args.baseline_runtime_control_config)):
+        parser.error('Published-method preparation cannot import historical native benchmark approval')
+    if not args.published_method and not args.baseline_root:
+        parser.error('--baseline-root is required for historical measured launch modes')
     certificate = validate_handoff(read_json(args.certificate),config)
     commit = subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     if config['runtime']['implementation_revision'] != commit:
@@ -615,9 +880,10 @@ def main(argv=None):
     original_config = read_json(args.control_config)
     if configuration_hash(original_config) != controls['control_configuration_hash']:
         raise ValueError('Original GPU control configuration differs')
-    for key in ('models','sft','rl'):
-        if config[key] != original_config[key]:
-            raise ValueError('Training settings changed after passed controls: '+key)
+    if args.published_method:
+        prepare_published_method(config, certificate, commit, controls, original_config, args.output)
+        return
+    training_amendment = declared_training_budget_change(config, original_config)
     gpu_source = controls['source_revision_for_gpu_checks']
     accepted, execution_checks = (accepted_execution_controls(args.execution_benchmark,
         args.execution_profile, config, certificate, commit, args.recovery_benchmark)
@@ -626,19 +892,28 @@ def main(argv=None):
     if args.baseline_runtime_controls:
         native_baseline, execution_checks = baseline_runtime_controls(args.baseline_runtime_controls, config, commit,
             read_json(args.baseline_runtime_control_config) if args.baseline_runtime_control_config else None)
+    if training_amendment is not None and not (accepted or native_baseline):
+        raise ValueError('A changed SFT training budget requires fresh native execution evidence')
     functions = (['render_sft_completion','tokenize_completion','capture_rng','restore_rng','exposure_order',
                   'SFTRecipe','TARGET_MODULES','LOSS_REDUCTION','MODELS','LEVELS'] if accepted or native_baseline else
                  ['_runtime','render_sft_completion','tokenize_completion','verify_mask_gradients','collate_completion',
                   'completion_loss','capture_rng','restore_rng','train_optimizer_updates','SFTRecipe',
                   'TARGET_MODULES','LOSS_REDUCTION','MODELS','LEVELS'])
+    if accepted or native_baseline:
+        functions = [name for name in functions if name not in ('SFTRecipe', 'exposure_order')]
     bindings = {'gpu_functions':compatible_functions(gpu_source,
         'src/training/sft/individual_fit/sft_fit.py',
         functions),
         'gpu_control':({'native_source_sha256':native_baseline['source_file_hashes']['src/shared_procedures/preflight.py']}
-                       if native_baseline else compatible_functions(gpu_source,'src/shared_procedures/preflight.py',['_run_model_checks'])),
+                       if native_baseline else compatible_model_control_budget(gpu_source)),
         'checkpoint':identical_files(gpu_source,['src/shared_procedures/checkpointing.py',
             'requirements.lock','src/shared_procedures/identity.py',
             'src/shared_procedures/response_parsing.py','src/shared_procedures/storage.py'])}
+    if accepted or native_baseline:
+        bindings['recipe_fields'] = compatible_recipe_fields(gpu_source)
+        bindings['exposure_order'] = compatible_exposure_order(gpu_source)
+    if training_amendment is not None:
+        bindings['declared_training_budget_amendment'] = training_amendment
     bindings['asset_verification'] = asset_verification_compatibility(gpu_source)
     if accepted or native_baseline:
         bindings['scientific_sft_numerics'] = compatible_sft_numerics(gpu_source,

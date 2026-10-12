@@ -1,8 +1,10 @@
-"""One fixed, completion-only QLoRA fit (protocol C.2 and E.1.3).
+"""One declared, completion-only QLoRA fit (protocol C.2 and E.1.3).
 
 Heavy dependencies are loaded only at execution. CPU helpers exercise the real
 masked cross entropy, batching, and full-state recovery with declared fixtures.
-The production entry point never reduces the frozen corpus or recipe.
+The one-epoch budgets are explicitly distinguished from historical QLoRA.
+The efficient budget declares BF16 LoRA, AdamW and the published execution
+backend; no historical checkpoint or numerical equivalence claim is reused.
 """
 from __future__ import annotations
 
@@ -32,6 +34,9 @@ LEVELS = {
 TARGET_MODULES = ("q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj")
 LOSS_REDUCTION = "mean_supervised_tokens_per_example_then_mean_examples"
 IMPLEMENTATION_VERSION = "completion_sft_v1"
+LEGACY_TRAINING_BUDGET = "legacy_two_epoch_v1"
+PILOT_TRAINING_BUDGET = "one_epoch_pilot_v1"
+EFFICIENT_TRAINING_BUDGET = "efficient_one_epoch_v1"
 
 
 class SFTInputError(ValueError):
@@ -73,9 +78,31 @@ class SFTRecipe:
         result["target_modules"] = list(self.target_modules)
         return result
 
+    @classmethod
+    def for_budget(cls, name: str) -> "SFTRecipe":
+        if name == LEGACY_TRAINING_BUDGET:
+            return cls()
+        if name == PILOT_TRAINING_BUDGET:
+            return cls(epochs=1)
+        if name == EFFICIENT_TRAINING_BUDGET:
+            return cls(epochs=1, quantization="bf16", double_quantization=False,
+                       optimizer="adamw", gradient_checkpointing=False)
+        raise SFTInputError("Unknown named SFT training budget")
+
     def validate(self) -> None:
-        if self != SFTRecipe():
-            raise SFTInputError("SFT recipe differs from frozen C.2 settings")
+        if type(self.epochs) is not int or self not in (SFTRecipe.for_budget(LEGACY_TRAINING_BUDGET),
+                        SFTRecipe.for_budget(PILOT_TRAINING_BUDGET),
+                        SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET)):
+            raise SFTInputError("SFT recipe differs from the declared frozen budget settings")
+
+    def optimizer_steps(self, train_count: int) -> int:
+        self.validate()
+        if type(train_count) is not int or train_count <= 0:
+            raise SFTInputError("Training count must be a positive integer")
+        return math.ceil(train_count * self.epochs / self.effective_batch_size)
+
+    def warmup_steps(self, train_count: int) -> int:
+        return math.ceil(self.optimizer_steps(train_count) * self.warmup_ratio)
 
 
 @dataclass(frozen=True)
@@ -89,8 +116,10 @@ class SFTFitSpec:
     dataset_hash: str
     producer_configuration_hash: str | None = None
     handoff_certificate_hash: str | None = None
+    training_budget: str = LEGACY_TRAINING_BUDGET
 
     def __post_init__(self) -> None:
+        self.recipe.validate()
         if self.family not in LEVELS or self.model_id not in MODELS or type(self.level) is not int or not 1 <= self.level <= 10:
             raise SFTInputError("Unknown SFT family/model/level")
         for key in ("model_revision", "tokenizer_revision"):
@@ -119,10 +148,22 @@ class SFTFitSpec:
     def model_name(self) -> str:
         return MODELS[self.model_id]
 
+    @property
+    def recipe(self) -> SFTRecipe:
+        return SFTRecipe.for_budget(self.training_budget)
+
     def identity(self) -> dict[str, Any]:
-        return {**asdict(self), "run_id": self.run_id, "model_name": self.model_name,
+        fields = asdict(self)
+        # Historical checkpoint and certificate identities remain byte-identical.
+        if self.training_budget == LEGACY_TRAINING_BUDGET:
+            fields.pop("training_budget")
+        identity = {**fields, "run_id": self.run_id, "model_name": self.model_name,
                 "strength": self.strength, "implementation_version": IMPLEMENTATION_VERSION,
-                "recipe": SFTRecipe().to_dict()}
+                "recipe": self.recipe.to_dict()}
+        if self.training_budget == EFFICIENT_TRAINING_BUDGET:
+            from training.sft.published_execution import PUBLISHED_EXECUTION_POLICY
+            identity["published_execution_policy"] = dict(PUBLISHED_EXECUTION_POLICY)
+        return identity
 
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> "SFTFitSpec":
@@ -432,11 +473,13 @@ def _loaded_loss_helper_hash(profile: SFTExecutionProfile) -> dict[str, str]:
     return {"loss_helper_sha256": hashlib.sha256(Path(spatial_loss.__file__).read_bytes()).hexdigest()}
 
 
-def exposure_order(count: int, seed: int = 42) -> list[int]:
-    """Two seeded epoch permutations, accumulated continuously across boundary."""
+def exposure_order(count: int, seed: int = 42, *, epochs: int = 2) -> list[int]:
+    """Declared seeded epoch permutations, accumulated across epoch boundaries."""
+    if type(epochs) is not int or epochs not in (1, 2):
+        raise SFTInputError("Exposure order requires a declared one- or two-epoch budget")
     generator = random.Random(seed)
     order = []
-    for _ in range(2):
+    for _ in range(epochs):
         epoch = list(range(count))
         generator.shuffle(epoch)
         order.extend(epoch)
@@ -477,13 +520,27 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
         batch = (prepared_batch.batch_for(example, pad_token_id, device) if prepared_batch is not None
                  else collate_completion([example], pad_token_id, device,
                                           validate_counts=profile.validated_loss_counts))
-        logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
-        loss = profile_completion_loss(logits, batch["labels"],
-            validated_counts=(batch["validated_completion_counts"] if profile.validated_loss_counts else None),
-            execution_profile=profile)
+        published = bool(getattr(model, "_sft_published_execution", False))
+        hidden = None
+        if published:
+            from training.sft.published_execution import published_loss_with_hidden
+            loss, hidden = published_loss_with_hidden(model, batch)
+        else:
+            logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
+            loss = profile_completion_loss(logits, batch["labels"],
+                validated_counts=(batch["validated_completion_counts"] if profile.validated_loss_counts else None),
+                execution_profile=profile)
         if not torch.isfinite(loss):
             raise SFTRuntimeBlocked("Actual completion loss is not finite")
         loss.backward()
+        if hidden is not None:
+            # These are direct loss-row gradients at the final decoder output;
+            # prompt inputs still provide context for later supervised tokens.
+            mask = torch.zeros_like(batch["labels"], dtype=torch.bool)
+            mask[:, :-1] = batch["labels"][:, 1:] != -100
+            if (hidden.grad is None or not torch.isfinite(hidden.grad).all()
+                    or torch.count_nonzero(hidden.grad[~mask]).item() != 0):
+                raise SFTRuntimeBlocked("Published loss has invalid masked decoder-row gradients")
         names = []
         for name, parameter in model.named_parameters():
             if parameter.requires_grad:
@@ -499,7 +556,9 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
                 raise SFTRuntimeBlocked(f"LoRA projection families missing: {absent}")
         return {"status": "passed", "loss": loss.item(), "nonzero_gradient_parameters": names,
                 "prompt_token_count": example["prompt_token_count"], "supervised_token_count": example["supervised_token_count"],
-                "loss_reduction": LOSS_REDUCTION, **_loaded_loss_helper_hash(profile)}
+                "loss_reduction": LOSS_REDUCTION,
+                **({"masked_decoder_rows": "zero_direct_loss_gradient", "published_execution": True}
+                   if published else _loaded_loss_helper_hash(profile))}
     finally:
         model.zero_grad(set_to_none=True)
         restore_rng(before)
@@ -508,7 +567,8 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
 def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
                          examples: Sequence[Mapping[str, Any]], pad_token_id: int,
                          *, execution_profile: SFTExecutionProfile | None = None,
-                         prepared_batches: Sequence[PreparedCompletionBatch] | None = None) -> tuple[Any, ...]:
+                         prepared_batches: Sequence[PreparedCompletionBatch] | None = None,
+                         recipe: SFTRecipe | None = None) -> tuple[Any, ...]:
     """One real update, also used by the isolated hardware benchmark.
 
     The optional count metadata preserves CE and reduction operation order.
@@ -518,7 +578,10 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
     """
     import torch
     profile = resolve_execution_profile(execution_profile)
-    recipe = SFTRecipe()
+    recipe = recipe or SFTRecipe()
+    recipe.validate()
+    if bool(getattr(model, "_sft_published_execution", False)) != (recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET)):
+        raise SFTInputError("Actual loss backend differs from the declared training recipe")
     if not 1 <= len(examples) <= recipe.gradient_accumulation_steps:
         raise SFTInputError("One SFT update requires one to sixteen ordered examples")
     device = next(model.parameters()).device
@@ -540,9 +603,13 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
         batch = (batches[position] if batches is not None else
                  collate_completion([example], pad_token_id, device, validate_counts=profile.validated_loss_counts))
         counts = batch["validated_completion_counts"] if profile.validated_loss_counts else None
-        loss = profile_completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
-                               batch["labels"], validated_counts=counts,
-                               execution_profile=profile)
+        if getattr(model, "_sft_published_execution", False):
+            from training.sft.published_execution import published_loss
+            loss = published_loss(model, batch)
+        else:
+            loss = profile_completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
+                                   batch["labels"], validated_counts=counts,
+                                   execution_profile=profile)
         if not profile.defer_finite_checks and not torch.isfinite(loss):
             raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
         (loss / len(examples)).backward()
@@ -556,36 +623,60 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
     return tuple(losses)
 
 
+def _progress_execution_metadata(model: Any, recipe: SFTRecipe,
+                                 profile: SFTExecutionProfile) -> dict[str, Any]:
+    if recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET):
+        if not getattr(model, "_sft_published_execution", False) or profile != SFTExecutionProfile():
+            raise SFTInputError("Published training progress requires its declared runtime baseline")
+        from training.sft.published_execution import PUBLISHED_EXECUTION_POLICY
+        return {"execution_profile": None,
+                "published_execution_policy": dict(PUBLISHED_EXECUTION_POLICY),
+                "gradient_checkpointing": bool(model.is_gradient_checkpointing)}
+    return {"execution_profile": profile.to_dict()}
+
+
 def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
                             examples: Sequence[Mapping[str, Any]], pad_token_id: int,
                             *, progress: Mapping[str, Any] | None = None,
                             save: Callable[[dict[str, Any]], None] | None = None,
                             should_pause: Callable[[], bool] | None = None,
                             execution_profile: SFTExecutionProfile | None = None,
-                            prepared_batches: Sequence[PreparedCompletionBatch] | None = None) -> dict[str, Any]:
+                            prepared_batches: Sequence[PreparedCompletionBatch] | None = None,
+                            recipe: SFTRecipe | None = None) -> dict[str, Any]:
     """Real optimizer loop, shared by GPU production and tiny CPU fixtures.
 
     Pause happens only after one complete logical optimizer update. Exceptions
     propagate without claiming the potentially partial update as completed.
     """
     profile = resolve_execution_profile(execution_profile)
-    recipe = SFTRecipe()
-    order = exposure_order(len(examples))
+    recipe = recipe or SFTRecipe()
+    recipe.validate()
+    execution_metadata = _progress_execution_metadata(model, recipe, profile)
+    order = exposure_order(len(examples), recipe.seed, epochs=recipe.epochs)
     order_hash = _hash(order)
-    total_steps = math.ceil(len(order) / recipe.gradient_accumulation_steps)
+    total_steps = recipe.optimizer_steps(len(examples))
     completed = int((progress or {}).get("completed_steps", 0))
     position = int((progress or {}).get("sampler_position", 0))
     if progress and progress.get("exposure_order_hash") != order_hash:
         raise SFTInputError("Resume sampler/exposure identity mismatch")
     if progress:
-        try:
-            previous_profile = SFTExecutionProfile.from_dict(progress.get("execution_profile", {}))
-        except (TypeError, ValueError) as error:
-            raise SFTInputError("Checkpoint execution profile is invalid") from error
-        if previous_profile != profile:
-            raise SFTInputError("Resume execution profile differs; declare a runtime migration")
-    if completed < 0 or completed > total_steps or position != min(completed * 16, len(order)):
+        if recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET):
+            if ("execution_profile" not in progress or progress["execution_profile"] is not None
+                    or progress.get("published_execution_policy") != execution_metadata["published_execution_policy"]
+                    or progress.get("gradient_checkpointing") is not execution_metadata["gradient_checkpointing"]):
+                raise SFTInputError("Published recovery progress differs from its actual execution policy")
+        else:
+            try:
+                previous_profile = SFTExecutionProfile.from_dict(progress.get("execution_profile", {}))
+            except (TypeError, ValueError) as error:
+                raise SFTInputError("Checkpoint execution profile is invalid") from error
+            if previous_profile != profile:
+                raise SFTInputError("Resume execution profile differs; declare a runtime migration")
+    if completed < 0 or completed > total_steps or position != min(completed * recipe.effective_batch_size, len(order)):
         raise SFTInputError("Checkpoint is not at a completed optimizer boundary")
+    if progress and (progress.get("total_optimizer_steps") != total_steps
+                     or progress.get("example_presentations") != position):
+        raise SFTInputError("Resume progress differs from the declared training budget")
     processed_tokens = int((progress or {}).get("processed_tokens", 0))
     if profile.cache_collated_inputs and prepared_batches is None:
         prepared_batches = prepare_cuda_input_cache(examples, pad_token_id, next(model.parameters()).device,
@@ -596,7 +687,7 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
     for step in range(completed, total_steps):
         indices = order[position:position + recipe.gradient_accumulation_steps]
         one_optimizer_update(model, optimizer, scheduler, [examples[index] for index in indices],
-                             pad_token_id, execution_profile=profile,
+                             pad_token_id, execution_profile=profile, recipe=recipe,
                              prepared_batches=([prepared_batches[index] for index in indices]
                                                if prepared_batches is not None else None))
         position += len(indices)
@@ -605,16 +696,16 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
         state = {"completed_steps": completed, "sampler_position": position,
                  "exposure_order_hash": order_hash, "processed_tokens": processed_tokens,
                  "total_optimizer_steps": total_steps, "example_presentations": position,
-                 "execution_profile": profile.to_dict()}
+                 **execution_metadata}
         pause = bool(should_pause and should_pause())
-        if save and (completed % 100 == 0 or completed == total_steps or pause):
+        if save and (completed % recipe.checkpoint_steps == 0 or completed == total_steps or pause):
             save(state)
         if pause:
             return {**state, "status": "paused"}
     return {"completed_steps": completed, "sampler_position": position,
             "exposure_order_hash": order_hash, "processed_tokens": processed_tokens,
             "total_optimizer_steps": total_steps, "example_presentations": position,
-            "execution_profile": profile.to_dict(), "status": "complete"}
+            **execution_metadata, "status": "complete"}
 
 
 def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token_id: int,
@@ -630,9 +721,13 @@ def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token
         for example in examples:
             batch = collate_completion([example], pad_token_id, device,
                                        validate_counts=profile.validated_loss_counts)
-            value = profile_completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
-                batch["labels"], validated_counts=(batch["validated_completion_counts"]
-                    if profile.validated_loss_counts else None), execution_profile=profile)
+            if getattr(model, "_sft_published_execution", False):
+                from training.sft.published_execution import published_loss
+                value = published_loss(model, batch)
+            else:
+                value = profile_completion_loss(model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits,
+                    batch["labels"], validated_counts=(batch["validated_completion_counts"]
+                        if profile.validated_loss_counts else None), execution_profile=profile)
             if not torch.isfinite(value):
                 raise SFTRuntimeBlocked("Nonfinite validation loss")
             values.append(value.item())
@@ -640,8 +735,17 @@ def validation_loss(model: Any, examples: Sequence[Mapping[str, Any]], pad_token
 
 
 def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = None,
-             execution_profile: SFTExecutionProfile | None = None) -> tuple[Any, Any, Any, Any, dict[str, Any]]:
+             execution_profile: SFTExecutionProfile | None = None,
+             train_count: int = 10000) -> tuple[Any, Any, Any, Any, dict[str, Any]]:
     profile = resolve_execution_profile(execution_profile)
+    recipe = spec.recipe
+    total_steps = recipe.optimizer_steps(train_count)
+    warmup_steps = recipe.warmup_steps(train_count)
+    if spec.training_budget == EFFICIENT_TRAINING_BUDGET:
+        if profile != SFTExecutionProfile():
+            raise SFTInputError("Published efficient training cannot reuse historical execution candidates")
+        from training.sft.published_execution import build_runtime
+        return build_runtime(spec, device, cache_root=cache_root, train_count=train_count)
     try:
         import numpy as np
         import torch
@@ -682,7 +786,7 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
         raise SFTRuntimeBlocked("Actual model gradient checkpointing differs from execution profile")
     optimizer = bnb.optim.PagedAdamW32bit([parameter for parameter in model.parameters() if parameter.requires_grad],
                                          lr=2e-4, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.0)
-    scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=math.ceil(1250 * 0.03), num_training_steps=1250)
+    scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=total_steps)
     runtime = {"asset_integrity_policy": "full_sha256_then_private_manifest_and_file_identity_receipts",
                "asset_verification_receipt_root": str(verification_receipts),
                "device": device, "gpu_name": torch.cuda.get_device_name(torch.device(device)),
@@ -691,7 +795,8 @@ def _runtime(spec: SFTFitSpec, device: str, *, cache_root: str | Path | None = N
                "execution_profile": profile.to_dict(), "use_reentrant": False,
                "gradient_checkpointing": actual_gradient_checkpointing,
                "loss_implementation": profile.loss_implementation,
-               "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8, "warmup_steps": 38,
+               "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8, "warmup_steps": warmup_steps,
+               "training_budget": spec.training_budget, "total_optimizer_steps": total_steps,
                "packages": {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "bitsandbytes", "numpy")},
                **_loaded_loss_helper_hash(profile)}
     return model, tokenizer, optimizer, scheduler, runtime
@@ -744,30 +849,67 @@ def _verify_adapter(directory: Path, identity: Mapping[str, Any]) -> dict[str, A
 
 verify_adapter_manifest = _verify_adapter
 
+def _identity_recipe(identity: Mapping[str, Any]) -> SFTRecipe:
+    spec = SFTFitSpec.from_dict(identity)
+    if identity.get("recipe") != spec.recipe.to_dict():
+        raise SFTInputError("Fit identity recipe differs from its named training budget")
+    if (spec.training_budget == EFFICIENT_TRAINING_BUDGET
+            and identity.get("published_execution_policy") != spec.identity()["published_execution_policy"]):
+        raise SFTInputError("Fit identity differs from its published execution policy")
+    return spec.recipe
+
+
 def verify_fit_result(output_dir: str | Path, expected_identity: Mapping[str, Any]) -> dict[str, Any]:
     from shared_procedures.checkpointing import load_checkpoint, verify_checkpoint
     from shared_procedures.storage import read_json
     from safetensors.torch import load_file
     import torch
     output_dir = Path(output_dir)
+    recipe = _identity_recipe(expected_identity)
+    # Every declared production budget still consumes the same frozen corpus.
+    train_count = 10000
+    total_steps = recipe.optimizer_steps(train_count)
+    presentations = train_count * recipe.epochs
     result = read_json(output_dir / "fit_result.json")
     if result.get("status") != "complete" or result.get("identity") != dict(expected_identity):
         raise SFTInputError("Fit completion has a different condition/config/data identity")
-    if result.get("progress", {}).get("example_presentations") != 20000 or result["progress"].get("completed_steps") != 1250:
+    if (result.get("data", {}).get("train_count", train_count) != train_count
+            or result.get("progress", {}).get("example_presentations") != presentations
+            or result["progress"].get("sampler_position") != presentations
+            or result["progress"].get("completed_steps") != total_steps
+            or result["progress"].get("total_optimizer_steps", total_steps) != total_steps):
         raise SFTInputError("Fit completion does not establish fixed exposure")
+    published = expected_identity.get("training_budget") == EFFICIENT_TRAINING_BUDGET
+    if published:
+        actual_gc = result.get("runtime", {}).get("gradient_checkpointing")
+        if (type(actual_gc) is not bool
+                or result.get("runtime", {}).get("published_execution_policy") != expected_identity["published_execution_policy"]
+                or result["progress"].get("execution_profile", {}) is not None
+                or result["progress"].get("published_execution_policy") != expected_identity["published_execution_policy"]
+                or result["progress"].get("gradient_checkpointing") is not actual_gc):
+            raise SFTInputError("Fit completion misstates the actual published execution policy")
     if not math.isfinite(result["validation_loss"]) or result["validation_count"] != 100:
         raise SFTInputError("Fit lacks the fixed held-out validation computation")
     manifest = _verify_adapter(output_dir / "final_adapter", expected_identity)
     if result.get("adapter_manifest_hash") != manifest["manifest_hash"] or result.get("adapter_files") != manifest["files"]:
         raise SFTInputError("Completion result differs from verified final adapter")
-    final_checkpoint = output_dir / "checkpoint_001250"
+    final_checkpoint = output_dir / f"checkpoint_{total_steps:06d}"
     recovery_manifest = verify_checkpoint(final_checkpoint, dict(expected_identity))
     if result.get('checkpoint_hash') != manifest['checkpoint_hash'] or manifest["checkpoint_hash"] != recovery_manifest["checkpoint_hash"]:
         raise SFTInputError("Final adapter is not bound to the completed full-state checkpoint")
     if any(recovery_manifest['progress'].get(key) != required for key, required in
-           (('completed_steps', 1250), ('sampler_position', 20000), ('example_presentations', 20000))):
+           (('completed_steps', total_steps), ('sampler_position', presentations), ('example_presentations', presentations))):
         raise SFTInputError("Final full-state checkpoint does not establish fixed exposure")
+    if recovery_manifest['progress'].get('total_optimizer_steps', total_steps) != total_steps:
+        raise SFTInputError("Final full-state checkpoint has a different training budget")
     recovered = load_checkpoint(final_checkpoint, dict(expected_identity))
+    if published:
+        if (recovered.get("runtime", {}).get("published_execution_policy") != expected_identity["published_execution_policy"]
+                or recovered.get("runtime", {}).get("gradient_checkpointing") is not actual_gc
+                or recovered["progress"].get("execution_profile", {}) is not None
+                or recovered["progress"].get("published_execution_policy") != expected_identity["published_execution_policy"]
+                or recovered["progress"].get("gradient_checkpointing") is not actual_gc):
+            raise SFTInputError("Completed recovery state misstates the published execution policy")
     weights = load_file(str(output_dir / "final_adapter" / "adapter_model.safetensors"), device="cpu")
     if set(weights) != set(recovered["adapter"]):
         raise SFTInputError("Final adapter tensor names differ from complete recovery weights")
@@ -777,7 +919,8 @@ def verify_fit_result(output_dir: str | Path, expected_identity: Mapping[str, An
     return result
 
 
-def _publish_adapter(output: Path, model: Any, tokenizer: Any, identity: Mapping[str, Any], recovery: Any) -> dict[str, Any]:
+def _publish_adapter(output: Path, model: Any, tokenizer: Any, identity: Mapping[str, Any], recovery: Any,
+                     *, train_count: int = 10000) -> dict[str, Any]:
     from shared_procedures.checkpointing import verify_checkpoint
     from shared_procedures.storage import atomic_write_json, fsync_directory
     adapter = output / "final_adapter"
@@ -792,7 +935,7 @@ def _publish_adapter(output: Path, model: Any, tokenizer: Any, identity: Mapping
     tokenizer.save_pretrained(staging)
     files = {str(path.relative_to(staging)): hashlib.sha256(path.read_bytes()).hexdigest()
              for path in staging.rglob("*") if path.is_file()}
-    checkpoint = verify_checkpoint(output / "checkpoint_001250", dict(identity))
+    checkpoint = verify_checkpoint(output / f"checkpoint_{_identity_recipe(identity).optimizer_steps(train_count):06d}", dict(identity))
     manifest = {"identity": dict(identity), "files": files, "checkpoint_hash": checkpoint["checkpoint_hash"]}
     manifest["manifest_hash"] = _hash(manifest)
     atomic_write_json(staging / "manifest.json", manifest)
@@ -848,20 +991,32 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
     fixtures into a paid-launch authorization. Its own live gradient check also
     runs before the first optimizer update and after exact-state restoration.
     """
-    from shared_procedures.configuration import configuration_hash
+    from shared_procedures.configuration import configuration_hash, sft_execution_selection
     from shared_procedures.checkpointing import load_checkpoint, save_checkpoint, verify_checkpoint
     from shared_procedures.preflight import require_preflights
     from shared_procedures.storage import atomic_write_json
     profile = resolve_execution_profile(execution_profile)
     if not isinstance(spec, SFTFitSpec):
         spec = SFTFitSpec.from_dict(spec)
+    recipe = spec.recipe
+    sft_config = config.get("sft", {})
+    if (sft_config.get("training_budget", LEGACY_TRAINING_BUDGET) != spec.training_budget
+            or type(sft_config.get("epochs")) is not int
+            or sft_config["epochs"] != recipe.epochs):
+        raise SFTInputError("Resolved SFT epoch count differs from its named training budget")
+    if {"family": spec.family, "model_id": spec.model_id, "level": spec.level} not in sft_execution_selection(config):
+        raise SFTInputError("SFT condition is outside the declared execution selection")
     if config.get("sft", {}).get("loss_reduction") != LOSS_REDUCTION:
         raise SFTInputError("Resolved SFT loss reduction differs from frozen engine convention")
     if configuration_hash(dict(config)) != spec.configuration_hash:
         raise SFTInputError("Configuration differs from frozen fit identity")
     if not preflight_report or preflight_report.get("configuration_hash") != spec.configuration_hash:
         raise SFTRuntimeBlocked("Matching real preflight report is required")
-    require_preflights(dict(preflight_report), ["model_runtime", "clean_data", "loss_mask_gradients", "full_checkpoint_resume", "durable_storage", "spending_authorization", "baseline_repeatability", "statistical_validation"])
+    published = spec.training_budget == EFFICIENT_TRAINING_BUDGET
+    required_preflights = (["clean_data", "durable_storage", "spending_authorization", "statistical_validation"]
+        if published else ["model_runtime", "clean_data", "loss_mask_gradients", "full_checkpoint_resume",
+                           "durable_storage", "spending_authorization", "baseline_repeatability", "statistical_validation"])
+    require_preflights(dict(preflight_report), required_preflights)
     if preflight_report.get("ready_models") is not None:
         if spec.model_id not in preflight_report["ready_models"] or profile != SFTExecutionProfile():
             raise SFTRuntimeBlocked("Model-scoped native baseline controls do not authorize this model or execution profile")
@@ -874,6 +1029,8 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
     if not identity["code_revision"] or not identity["dependency_hash"]:
         raise SFTInputError("Resolved code and dependency identities are required")
     execution_approval = None
+    if published and (profile != SFTExecutionProfile() or execution_benchmark is not None):
+        raise SFTInputError("Published efficient training is a new baseline, not a historical execution candidate")
     if profile != SFTExecutionProfile():
         if execution_benchmark is None:
             raise SFTRuntimeBlocked("Nonbaseline SFT execution requires selected-GPU empirical approval")
@@ -911,7 +1068,8 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
         _record_fit_attempt(output, identity, resume, restored['progress'] if restored else None)
         model, tokenizer, optimizer, scheduler, runtime = _runtime(
             spec, config.get("runtime", {}).get("sft_device", "cuda:0"),
-            cache_root=config.get("runtime", {}).get("cache_root"), execution_profile=profile)
+            cache_root=config.get("runtime", {}).get("cache_root"), execution_profile=profile,
+            train_count=data_evidence["train_count"])
         if execution_approval is not None:
             measured_hardware = execution_approval.get("hardware")
             actual_hardware = {"gpu": runtime["gpu_name"], "vram_bytes": runtime["vram_bytes"],
@@ -929,10 +1087,28 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
             optimizer.load_state_dict(restored["optimizer"])
             scheduler.load_state_dict(restored["scheduler"])
             restore_rng(restored["rng"])
+        if published:
+            from training.sft.published_execution import capacity_setup
+            previous_gc = None
+            if restored:
+                if restored.get("runtime", {}).get("published_execution_policy") != identity["published_execution_policy"]:
+                    raise SFTInputError("Published recovery state differs from the declared runtime policy")
+                if scheduler.last_epoch != restored["progress"]["completed_steps"]:
+                    raise SFTInputError("Published scheduler state differs from the completed update count")
+                previous_gc = restored.get("runtime", {}).get("gradient_checkpointing")
+                if type(previous_gc) is not bool:
+                    raise SFTInputError("Published checkpoint does not record its actual activation policy")
+                if previous_gc:
+                    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+                else:
+                    model.gradient_checkpointing_disable()
+                runtime["gradient_checkpointing"] = previous_gc
+            capacity_evidence = capacity_setup(model, max(train, key=lambda record: len(record["input_ids"])),
+                                               tokenizer.pad_token_id, optimizer=optimizer)
+            if previous_gc is not None and bool(model.is_gradient_checkpointing) != previous_gc:
+                raise SFTRuntimeBlocked("Recovered published runtime changed activation policy; a new declaration is required")
+            runtime["capacity_setup"] = capacity_evidence
         gradient_evidence = verify_mask_gradients(model, train[0], tokenizer.pad_token_id, execution_profile=profile)
-        atomic_write_json(output / "runtime_evidence.json", {"identity": identity, "runtime": runtime,
-            "mask_gradients": gradient_evidence, "data": data_evidence,
-            "train_token_lengths": {"min": min(len(r["input_ids"]) for r in train), "max": max(len(r["input_ids"]) for r in train), "mean": sum(len(r["input_ids"]) for r in train) / len(train)}})
         def save(progress: dict[str, Any]) -> None:
             directory = output / f"checkpoint_{progress['completed_steps']:06d}"
             save_checkpoint(directory, identity, {"adapter": get_peft_model_state_dict(model, save_embedding_layers=False),
@@ -942,10 +1118,38 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
             valid = _verified_checkpoints(output, identity)
             for _, old in valid[:-2]:
                 shutil.rmtree(old)
+        startup_recovery = None
+        if published:
+            if restored is None:
+                initial_progress = {"completed_steps": 0, "sampler_position": 0,
+                    "exposure_order_hash": _hash(exposure_order(len(train), recipe.seed, epochs=recipe.epochs)),
+                    "processed_tokens": 0, "total_optimizer_steps": recipe.optimizer_steps(len(train)),
+                    "example_presentations": 0, **_progress_execution_metadata(model, recipe, profile)}
+                save(initial_progress)
+                checked = load_checkpoint(output / "checkpoint_000000", identity)
+            else:
+                checked = restored
+            # This is a normal save/load guard of the actual unchanged state,
+            # not an optimization benchmark or an outcome acceptance receipt.
+            import torch
+            current_adapter = get_peft_model_state_dict(model, save_embedding_layers=False)
+            if (set(current_adapter) != set(checked["adapter"])
+                    or any(not torch.equal(tensor.detach().cpu(), checked["adapter"][name].cpu())
+                           for name, tensor in current_adapter.items())):
+                raise SFTRuntimeBlocked("Actual adapter state differs from the verified recovery state")
+            set_peft_model_state_dict(model, checked["adapter"])
+            optimizer.load_state_dict(checked["optimizer"])
+            scheduler.load_state_dict(checked["scheduler"])
+            restore_rng(checked["rng"])
+            startup_recovery = {"status": "passed", "completed_steps": checked["progress"]["completed_steps"],
+                "adapter_optimizer_scheduler_rng": "actual_full_state_loaded_without_update"}
+        atomic_write_json(output / "runtime_evidence.json", {"identity": identity, "runtime": runtime,
+            "mask_gradients": gradient_evidence, "full_checkpoint_resume": startup_recovery, "data": data_evidence,
+            "train_token_lengths": {"min": min(len(r["input_ids"]) for r in train), "max": max(len(r["input_ids"]) for r in train), "mean": sum(len(r["input_ids"]) for r in train) / len(train)}})
         start = time.monotonic()
         progress = train_optimizer_updates(model, optimizer, scheduler, train, tokenizer.pad_token_id,
                     progress=restored["progress"] if restored else None, save=save, should_pause=should_pause,
-                    execution_profile=profile)
+                    execution_profile=profile, recipe=recipe)
         if progress["status"] == "paused":
             result = {"status": "paused", "run_id": spec.run_id, "identity": identity, "progress": progress}
             atomic_write_json(output / "fit_status.json", result)
@@ -957,7 +1161,7 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
         recovery = RecoveryManager.for_worker(artifact_root=output.parent.parent)
         def publish_adapter():
             try:
-                return _publish_adapter(output, model, tokenizer, identity, recovery)
+                return _publish_adapter(output, model, tokenizer, identity, recovery, train_count=data_evidence["train_count"])
             except OSError as error:
                 if error.errno in {errno.EIO, errno.ETIMEDOUT, errno.ESTALE, errno.EAGAIN}:
                     raise RetryableFailure("Transient final adapter publication I/O failed") from error

@@ -16,6 +16,11 @@ class ConfigurationError(ValueError):
 MODEL_IDS = {'7b': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B', '14b': 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'}
 KAZITEXT_ALPHAS = ['0.200','0.301','0.454','0.684','1.031','1.553','2.339','3.524','5.310','8.000']
 PROJECTION_TARGETS = ['q_proj','k_proj','v_proj','o_proj','gate_proj','up_proj','down_proj']
+SFT_TRAINING_BUDGETS = {'legacy_two_epoch_v1': 2, 'one_epoch_pilot_v1': 1,
+                        'efficient_one_epoch_v1': 1}
+SFT_BUDGET_OVERRIDES = {'efficient_one_epoch_v1': {
+    'sft.quantization': 'bf16', 'sft.load_in_4bit': False, 'sft.double_quantization': False,
+    'sft.optimizer': 'adamw', 'sft.gradient_checkpointing': False}}
 FIXED = {
     'seed': 42,
     'generation.temperature': 0.6, 'generation.top_p': 0.95, 'generation.max_new_tokens': 3072,
@@ -87,6 +92,10 @@ def validate_configuration(config: dict, *, runtime: bool = False) -> dict:
     if not isinstance(config, dict):
         raise ConfigurationError('configuration must be a mapping')
     for key, expected in FIXED.items():
+        if key == 'sft.epochs':
+            expected = sft_budget_epochs(config)
+        elif key in SFT_BUDGET_OVERRIDES.get(sft_training_budget(config), {}):
+            expected = SFT_BUDGET_OVERRIDES[sft_training_budget(config)][key]
         actual = _get(config, key)
         if type(expected) is int and type(actual) is not int:
             raise ConfigurationError(f'{key} must be integer')
@@ -94,6 +103,7 @@ def validate_configuration(config: dict, *, runtime: bool = False) -> dict:
             raise ConfigurationError(f'{key} must be boolean')
         if actual != expected:
             raise ConfigurationError(f'frozen setting violated: {key}')
+    sft_execution_selection(config)
     if set(config.get('models', {})) != set(MODEL_IDS):
         raise ConfigurationError('exactly 7b and 14b construction models required')
     for size, name in MODEL_IDS.items():
@@ -105,6 +115,49 @@ def validate_configuration(config: dict, *, runtime: bool = False) -> dict:
         if missing:
             raise ConfigurationError('unresolved runtime prerequisites: '+', '.join(missing))
     return deepcopy(config)
+
+
+def sft_training_budget(config: dict) -> str:
+    """Historical snapshots retain their original two-epoch training identity."""
+    budget = config.get('sft', {}).get('training_budget', 'legacy_two_epoch_v1')
+    if not isinstance(budget, str) or budget not in SFT_TRAINING_BUDGETS:
+        raise ConfigurationError('unknown sft.training_budget')
+    return budget
+
+
+def sft_budget_epochs(config: dict) -> int:
+    return SFT_TRAINING_BUDGETS[sft_training_budget(config)]
+
+
+def sft_declared_recipe_changes(config: dict) -> dict:
+    """Only these named, validated settings differ from the historical recipe."""
+    values = {'epochs': sft_budget_epochs(config)}
+    for key in SFT_BUDGET_OVERRIDES.get(sft_training_budget(config), {}):
+        values[key.split('.', 1)[1]] = _get(config, key)
+    return values
+
+
+def sft_execution_selection(config: dict) -> list[dict]:
+    """Validate the declared execution scope without reducing the certified corpus."""
+    selection = config.get('sft', {}).get('selection')
+    if 'selection' not in config.get('sft', {}):
+        models, families, levels = ['7b', '14b'], ['rot13', 'kazitext'], list(range(1, 11))
+    else:
+        if not isinstance(selection, dict) or set(selection) != {'models', 'families', 'levels'}:
+            raise ConfigurationError('sft.selection requires models, families and levels')
+        models, families, levels = (selection[name] for name in ('models', 'families', 'levels'))
+        for name, values, allowed in (
+                ('models', models, ('7b', '14b')),
+                ('families', families, ('rot13', 'kazitext')),
+                ('levels', levels, tuple(range(1, 11)))):
+            if (not isinstance(values, list) or not values
+                    or any(type(value) is not (int if name == 'levels' else str) for value in values)
+                    or len(set(values)) != len(values) or any(value not in allowed for value in values)):
+                raise ConfigurationError('invalid sft.selection.' + name)
+    return [{'family': family, 'model_id': model, 'level': level}
+            for family in ('rot13', 'kazitext') if family in families
+            for model in ('7b', '14b') if model in models
+            for level in range(1, 11) if level in levels]
 
 def _reject_secrets(value: Any, prefix: str = '') -> None:
     if isinstance(value, dict):
@@ -212,8 +265,8 @@ def freeze_configuration(config: dict, path: str | Path) -> dict:
 
 def sft_matrix(config: dict) -> list[dict]:
     validate_configuration(config)
-    return [{'family':family,'model':model,'level':f'level_{level:02d}'} for family in ('rot13','kazitext')
-            for model in ('7b','14b') for level in range(1,11)]
+    return [{'family':row['family'],'model':row['model_id'],'level':f"level_{row['level']:02d}"}
+            for row in sft_execution_selection(config)]
 
 
 def load_private_environment(path: str | Path) -> None:

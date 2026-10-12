@@ -1,0 +1,4 @@
+# Supplemental immutable VCS pin; install after the hash-locked GPU base.
+# No Transformers extra: upstream's extra conflicts with Transformers 4.57.3.
+# Installed Git commit and direct API capabilities are checked at runtime.
+cut-cross-entropy @ git+https://github.com/apple/ml-cross-entropy.git@3de376c106a1916bc5e1b619f9c77c87a461ee1c

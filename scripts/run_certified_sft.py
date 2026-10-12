@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'src'))
 from experiment_overview.experiment_overview import Experiment
 from operations.workflow import Stage
-from shared_procedures.configuration import validate_configuration
+from shared_procedures.configuration import validate_configuration, sft_execution_selection, sft_training_budget
 from shared_procedures.identity import content_hash
 from shared_procedures.preflight import load_preflight_evidence, preflight_requirements, require_preflights
 from shared_procedures.recovery_procedure import configure_worker_recovery
@@ -36,17 +36,22 @@ def certified_tasks(config, certificate, bundle, worklist, *, family, model, lev
             or bundle.get('content_hash') != certificate['bundle_hash']):
         raise ValueError('Production manifest differs from the certified corpus')
     conditions = {(row['family'],row['model_id'],row['level']):row for row in bundle['datasets']}
-    expected = {(f,m,l) for f in ('rot13','kazitext') for m in ('7b','14b') for l in range(1,11)}
-    if len(bundle['datasets']) != 40 or set(conditions) != expected or len(worklist) != 40:
-        raise ValueError('Certified SFT matrix must contain exactly forty conditions')
+    corpus_expected = {(f,m,l) for f in ('rot13','kazitext') for m in ('7b','14b') for l in range(1,11)}
+    expected = {(row['family'], row['model_id'], row['level']) for row in sft_execution_selection(config)}
+    if (not any(f == family and m == model and (level is None or l == level) for f,m,l in expected)):
+        raise ValueError('Requested SFT condition is outside the declared execution selection')
+    if len(bundle['datasets']) != 40 or set(conditions) != corpus_expected or len(worklist) != len(expected):
+        raise ValueError('Certified corpus must contain forty conditions and worklist must match declared selection')
     seen = set()
     selected = []
     for task in worklist:
         spec = SFTFitSpec.from_dict(task['spec'])
         key = (spec.family,spec.model_id,spec.level)
-        if (key in seen or key not in conditions or task['dataset'] != conditions[key]
+        if (key in seen or key not in expected or task['dataset'] != conditions[key]
                 or (task['family'],task['model_id'],task['level']) != key
                 or task['run_id'] != spec.run_id
+                or task['spec'] != spec.identity()
+                or spec.training_budget != sft_training_budget(config)
                 or task.get('initialization') != 'untouched_base_or_exact_full_checkpoint'):
             raise ValueError('Worklist differs from the immutable certified matrix')
         validate_handoff(certificate, config, spec)
@@ -63,7 +68,7 @@ def main():
     for name in ('config','certificate','bundle','worklist','preflight','deadline'):
         parser.add_argument('--'+name, required=True)
     parser.add_argument('--family', choices=('rot13','kazitext'), default='rot13')
-    parser.add_argument('--model', choices=('7b','14b'), default='7b')
+    parser.add_argument('--model', choices=('7b','14b'), required=True)
     parser.add_argument('--level', type=int, choices=range(1,11))
     parser.add_argument('--execution-benchmark', help='Hash-verified accepted target-GPU benchmark receipt.')
     parser.add_argument('--execution-profile', help='Accepted profile name in the benchmark plan.')
@@ -74,6 +79,12 @@ def main():
                         help='Validate saved launch bindings without GPU work or Drive requests.')
     args = parser.parse_args()
     config = validate_configuration(read_json(args.config),runtime=True)
+    published = sft_training_budget(config) == 'efficient_one_epoch_v1'
+    if published and args.level is None:
+        raise ValueError('The published per-fit recipe requires an explicitly selected --level; no level is chosen by default')
+    if published and any((args.execution_benchmark,args.execution_profile,args.migration_checkpoint,
+                          args.migration_receipt,args.recovery_benchmark)):
+        raise ValueError('The declared published recipe is a fresh baseline; historical optimization or migration receipts cannot authorize it')
     experiment = Experiment(config,config_path=args.config)
     if config['runtime']['implementation_revision'] != experiment.code:
         raise ValueError('Executed source differs from the frozen SFT consumer')
@@ -107,7 +118,19 @@ def main():
         if migration.get('receipt_hash') != content_hash({k:v for k,v in migration.items() if k != 'receipt_hash'}):
             raise ValueError('Original pause receipt integrity differs')
     preflight = load_preflight_evidence(args.preflight,config)
-    require_preflights(preflight,preflight_requirements('training'),expected_configuration_hash=experiment.hash)
+    requirements = preflight_requirements('published_sft' if published else 'training')
+    if published:
+        from training.sft.published_execution import PUBLISHED_EXECUTION_POLICY
+        pending = ['model_runtime','loss_mask_gradients','full_checkpoint_resume']
+        if (preflight.get('scope') != 'published_sft'
+                or preflight.get('training_budget') != 'efficient_one_epoch_v1'
+                or preflight.get('native_runtime_preflight_status') != 'PENDING_AT_LAUNCH'
+                or preflight.get('native_startup_required') != pending
+                or preflight.get('published_execution_policy') != PUBLISHED_EXECUTION_POLICY
+                or preflight.get('policy_hash') != content_hash(PUBLISHED_EXECUTION_POLICY)
+                or preflight.get('ready_models') is not None or preflight.get('ready_scope') is not None):
+            raise ValueError('Published SFT requires its exact declared policy and pending native startup checks; historical native approvals cannot replace them')
+    require_preflights(preflight,requirements,expected_configuration_hash=experiment.hash)
     if preflight.get('ready_models') is not None:
         if args.model not in preflight['ready_models'] or execution_profile is not None or migration is not None:
             raise ValueError('Model-scoped baseline controls cannot authorize another model, an optimization, or runtime migration')
@@ -122,12 +145,16 @@ def main():
     if datetime.now(timezone.utc) >= deadline:
         raise ValueError('Deadline already passed; SFT was not launched')
     if args.validate_only:
-        print(__import__('json').dumps({'status':'READY','source_code_commit':experiment.code,
+        report = {'status':'READY_TO_INITIALIZE' if published else 'READY','source_code_commit':experiment.code,
             'configuration_hash':experiment.hash,'handoff_certificate_hash':certificate['certificate_hash'],
-            'preflight_report_hash':preflight['report_hash'],'required_gates':len(preflight_requirements('training')),
+            'preflight_report_hash':preflight['report_hash'],'required_gates':len(requirements),
             'certified_conditions':len(certificate['conditions']),'selected_conditions':len(tasks),
             'family':args.family,'model':args.model,'deadline':deadline.isoformat(),
-            'gpu_work_started':False,'drive_requests_made':False}),flush=True)
+            'gpu_work_started':False,'drive_requests_made':False}
+        if published:
+            report.update(native_runtime_preflight_status='PENDING_AT_LAUNCH',
+                native_startup_required=preflight['native_startup_required'],policy_hash=preflight['policy_hash'])
+        print(__import__('json').dumps(report),flush=True)
         return 0
     stop = {'requested':False}
     def request_pause(_signum,_frame):

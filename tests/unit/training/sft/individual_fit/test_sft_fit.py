@@ -330,7 +330,8 @@ def test_verified_full_state_resume_matches_uninterrupted_real_optimizer(tmp_pat
         train_optimizer_updates(model, optimizer, scheduler, examples, 0, progress=invalid)
 
 
-def test_actual_peft_adapter_publication_binds_full_state_and_detects_corruption(tmp_path):
+@pytest.mark.parametrize('budget', ['legacy_two_epoch_v1', 'one_epoch_pilot_v1'])
+def test_actual_peft_adapter_publication_binds_full_state_and_detects_corruption(tmp_path, budget):
     """Tiny CPU PEFT fixture; the validator counters are deliberately artificial."""
     import json
     import torch
@@ -339,6 +340,9 @@ def test_actual_peft_adapter_publication_binds_full_state_and_detects_corruption
     from shared_procedures.checkpointing import save_checkpoint
     from shared_procedures.storage import atomic_write_json
     from training.sft.individual_fit.sft_fit import TARGET_MODULES, _publish_adapter, _verified_checkpoints, verify_fit_result
+    fit_spec = SFTFitSpec('rot13', '7b', 1, 'a'*40, 'b'*40, 'c'*64, '1'*64, training_budget=budget)
+    total_steps = fit_spec.recipe.optimizer_steps(10000)
+    presentations = fit_spec.recipe.epochs * 10000
     tiny = LlamaForCausalLM(LlamaConfig(vocab_size=128,hidden_size=16,intermediate_size=32,
         num_hidden_layers=1,num_attention_heads=4,num_key_value_heads=4,max_position_embeddings=256))
     tiny.config._name_or_path = spec().model_name
@@ -350,11 +354,13 @@ def test_actual_peft_adapter_publication_binds_full_state_and_detects_corruption
         def save_pretrained(self,path):
             (path/'tokenizer_config.json').write_text('{"fixture":"not_a_scientific_tokenizer"}')
     # Full state has real tensors; artificial progress exercises completion validation only.
-    identity = {**spec().identity(),'fixture':'tiny_peft_cpu_not_scientific_training'}
-    progress = {'completed_steps':1250,'sampler_position':20000,'example_presentations':20000}
+    identity = {**fit_spec.identity(),'fixture':'tiny_peft_cpu_not_scientific_training'}
+    progress = {'completed_steps':total_steps,'sampler_position':presentations,'example_presentations':presentations,
+                'total_optimizer_steps':total_steps}
     state = {'adapter':get_peft_model_state_dict(model,save_embedding_layers=False),'optimizer':{'fixture':True},'scheduler':{'fixture':True},
              'rng':capture_rng(),'progress':progress}
-    save_checkpoint(tmp_path/'checkpoint_001250',identity,state)
+    final_checkpoint = tmp_path / f'checkpoint_{total_steps:06d}'
+    save_checkpoint(final_checkpoint,identity,state)
     manifest = _publish_adapter(tmp_path,model,SavingTokenizer(),identity,None)
     result = {'status':'complete','run_id':spec().run_id,'identity':identity,
         'progress':progress,'validation_loss':1.0,'validation_count':100,'adapter_files':manifest['files'],
@@ -366,10 +372,10 @@ def test_actual_peft_adapter_publication_binds_full_state_and_detects_corruption
         verify_fit_result(tmp_path,identity)
     atomic_write_json(tmp_path/'fit_result.json',result)
     # Valid earlier state remains usable if a higher alleged checkpoint is corrupt.
-    damaged = tmp_path/'checkpoint_001251'
+    damaged = tmp_path / f'checkpoint_{total_steps + 1:06d}'
     damaged.mkdir()
     (damaged/'manifest.json').write_text('{}')
-    assert _verified_checkpoints(tmp_path,identity) == [(1250,tmp_path/'checkpoint_001250')]
+    assert _verified_checkpoints(tmp_path,identity) == [(total_steps,final_checkpoint)]
     assert (tmp_path/'checkpoint_integrity_failures.json').is_file()
     with (tmp_path/'final_adapter'/'adapter_model.safetensors').open('ab') as handle:
         handle.write(b'corrupt')
