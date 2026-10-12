@@ -83,6 +83,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       shared_infrastructure.md
     architecture.md
     baseline_repeatability_worker.md
+    colab_cli_handoff.md
     contracts.md
     decisions.md
     delegation.md
