@@ -11,8 +11,15 @@ Google's official [Colab CLI](https://github.com/googlecolab/google-colab-cli)
 supports runtime provisioning, Python/notebook execution, file transfers, and
 SSH over WebSocket. Version **0.7.4** was installed in an isolated cloud venv at
 `/workspace/colab_cli_env`; its version and SSH help completed successfully.
-No Colab runtime was allocated, and authenticated execution has not yet been
-verified. The upstream README currently supports Linux and macOS; use a Linux
+After an age-encrypted transfer authorized by the user, the cloud CLI login was
+installed privately with mode 0600. Authenticated session listing succeeded and
+found the existing CPU, High-RAM session. No Colab runtime was allocated, and
+remote execution has not yet been verified. The runtime content request was
+blocked by the network allowlist: Colab assigns dynamic runtime hosts under
+`prod.colab.dev`, so `*.prod.colab.dev` is a required additional allowed domain
+for this automation route. Never put the credential cache or session state
+(which includes runtime tokens) in Git or public artifacts.
+The upstream README currently supports Linux and macOS; use a Linux
 environment such as WSL on Windows, subject to verifying that environment.
 
 ## One-time local authentication
