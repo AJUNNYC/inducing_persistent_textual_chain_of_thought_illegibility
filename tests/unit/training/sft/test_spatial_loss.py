@@ -1,6 +1,7 @@
 """CPU bridge tests; native Triton agreement and performance remain separate."""
 
 from contextlib import nullcontext
+from unittest.mock import MagicMock
 
 import pytest
 import torch
@@ -24,6 +25,30 @@ def test_precision_is_not_silently_changed(logit_dtype, target_dtype):
 def test_cpu_fallback_is_forbidden():
     with pytest.raises(spatial_loss.SpatialLossUnsupported, match="CPU fallback is forbidden"):
         spatial_loss.spatial_token_cross_entropy(torch.zeros(2, 5, 3), torch.zeros(2, 3, dtype=torch.long))
+
+
+@pytest.mark.parametrize("capability", [(8, 0), (12, 0)])
+def test_native_candidate_guard_accepts_only_declared_architectures(monkeypatch, capability):
+    """A guard pass permits measurement, not native numerical certification."""
+    device = torch.device("cuda:0")
+    logits = MagicMock(ndim=3, shape=(2, 5, 3), dtype=torch.float32, device=device)
+    targets = MagicMock(ndim=2, shape=(2, 3), dtype=torch.long, device=device, requires_grad=False)
+    targets.__lt__.return_value = False
+    targets.__ge__.return_value = False
+    monkeypatch.setattr(torch.cuda, "get_device_capability", lambda value: capability)
+    monkeypatch.setattr(torch, "any", lambda value: False)
+    spatial_loss._validate_inputs(logits, targets, -100)
+
+
+@pytest.mark.parametrize("capability", [(7, 5), (8, 6), (8, 9), (9, 0), (10, 0), (12, 1)])
+def test_unmeasured_architectures_fail_before_loading_kernel(monkeypatch, capability):
+    device = torch.device("cuda:0")
+    logits = MagicMock(ndim=3, shape=(2, 5, 3), dtype=torch.float32, device=device)
+    targets = MagicMock(ndim=2, shape=(2, 3), dtype=torch.long, device=device, requires_grad=False)
+    monkeypatch.setattr(torch.cuda, "get_device_capability", lambda value: capability)
+    monkeypatch.setattr(spatial_loss, "_load_backward_kernel", lambda: pytest.fail("unsupported architecture loaded kernel"))
+    with pytest.raises(spatial_loss.SpatialLossUnsupported, match="SM80.*SM120"):
+        spatial_loss.spatial_token_cross_entropy(logits, targets)
 
 
 @pytest.mark.parametrize("ignore_index", [0, -1, -100.0, False])

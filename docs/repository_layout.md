@@ -335,6 +335,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_collection_until.py
     run_experiment.py
     run_model_generation_worker.py
+    run_optimized_sft_queue.py
     run_preflight.py
     run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
@@ -696,6 +697,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_coordinator_topology.py
         test_drive.py
         test_operations.py
+        test_optimized_sft_queue.py
         test_protocol_provenance.py
         test_runpod.py
         test_sft_optimization_benchmark.py

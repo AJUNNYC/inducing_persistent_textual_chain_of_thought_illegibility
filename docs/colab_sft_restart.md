@@ -43,3 +43,28 @@ uses `9999-12-31T23:59:59.999999+00:00` as an operational sentinel. Colab resour
 limits and explicit stop requests can still interrupt a runtime. No fit or final
 validation is yet reported complete. Only 7B baseline execution is qualified;
 14B and optimized A100 profiles remain outside these receipts.
+
+## A100 optimization measurements
+
+Both baseline queues were paused at complete updates (ROT13 28, KaziText 30),
+with full state verified in Drive. The user requested A100-compatible speedups
+and fresh optimized restarts. The candidate scheduled spatial CE retains the
+original serial FP32 forward arithmetic and gradient checkpointing; its shared
+hardware guard now permits SM80 measurements. The original Blackwell helper
+bytes and historical acceptance scope remain preserved. A checkpointed SDPA
+combination is a separate candidate, not an automatic production selection.
+
+Candidate comparison keeps at least one warm-up and five measured updates in
+each of two counterbalanced repetitions, unchanged loss/gradient/update bounds,
+identical RNG and a minimum 1.05x speedup for every corresponding update pair.
+Each model/family/level needs its own measured approval and longest-record
+memory/gradient probe. Paused baseline checkpoints serve as isolated benchmark
+evidence only; optimized official fits restart in a clean namespace from the
+pinned base. Compatible provider/corpus/statistical evidence is reused. No
+A100 optimization is claimed accepted before its actual measured gate passes.
+
+`scripts/run_optimized_sft_queue.py` applies those gates separately at every
+level, publishes full benchmark/launch evidence to Drive, and starts each
+accepted fit from the untouched base. It never treats a level-1 timing result
+as permission for other levels. Rejected candidates retain their failed evidence
+and use the qualified baseline; acceptance thresholds are not relaxed.

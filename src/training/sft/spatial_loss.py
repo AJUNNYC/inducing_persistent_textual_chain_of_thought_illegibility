@@ -16,6 +16,9 @@ Triton 3.5 CUDA libdevice.exp dispatches FP32 to __nv_expf, rather than the
 approximate exp2-based tl.exp. Floating-point contraction remains enabled as
 in the original CUDA expression. Actual gradient parity and speed still need
 the fixed native comparison; no equality or production approval is assumed.
+The same kernels may be measured on A100 SM80 and RTX PRO 6000 SM120. This
+candidate hardware allowlist is not a production approval: the caller must
+still supply the exact native GPU/profile comparison required by the runner.
 """
 
 # Reference-project notice (PyTorch v2.9.0, BSD-3-Clause):
@@ -164,8 +167,8 @@ def _validate_inputs(logits: Any, targets: Any, ignore_index: int) -> None:
         raise ValueError("Spatial CE inputs must share one CUDA device")
     if logits.device.type != "cuda":
         raise SpatialLossUnsupported("Spatial CE backward is an explicit CUDA candidate; CPU fallback is forbidden")
-    if torch.cuda.get_device_capability(logits.device) != (12, 0):
-        raise SpatialLossUnsupported("Spatial CE backward is scoped to the RTX PRO 6000 SM120 comparison")
+    if torch.cuda.get_device_capability(logits.device) not in ((8, 0), (12, 0)):
+        raise SpatialLossUnsupported("Spatial CE backward candidates require A100 SM80 or RTX PRO 6000 SM120")
     if torch.any((targets != ignore_index) & ((targets < 0) | (targets >= logits.shape[1]))):
         raise ValueError("Spatial CE target lies outside the unchanged vocabulary")
 

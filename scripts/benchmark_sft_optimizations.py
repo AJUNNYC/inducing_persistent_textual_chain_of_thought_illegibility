@@ -61,6 +61,14 @@ PROFILE_SETTINGS = {
     "fused_ce_no_gradient_checkpointing": {"attention_implementation": "eager", "validated_loss_counts": False,
                                            "defer_finite_checks": False, "cache_collated_inputs": False,
                                            "gradient_checkpointing": False, "loss_implementation": "fused_ce"},
+    "spatial_scheduled_ce_checkpointed": {
+        "attention_implementation": "eager", "validated_loss_counts": False,
+        "defer_finite_checks": False, "cache_collated_inputs": False,
+        "gradient_checkpointing": True, "loss_implementation": "spatial_scheduled_ce"},
+    "spatial_scheduled_ce_checkpointed_sdpa": {
+        "attention_implementation": "sdpa", "validated_loss_counts": False,
+        "defer_finite_checks": False, "cache_collated_inputs": False,
+        "gradient_checkpointing": True, "loss_implementation": "spatial_scheduled_ce"},
     "spatial_fused_backward_no_gradient_checkpointing": {
         "attention_implementation": "eager", "validated_loss_counts": False,
         "defer_finite_checks": False, "cache_collated_inputs": False,

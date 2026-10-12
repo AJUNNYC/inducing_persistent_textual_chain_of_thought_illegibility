@@ -180,12 +180,23 @@ def validate_execution_benchmark(report: Mapping[str, Any], source: str,
     reference_profile = _profile(plan["profiles"][reference_name]).to_dict()
     if profile_name not in names or profile_name == reference_name:
         raise MigrationError("A compared measured optimization candidate is required")
-    if chosen["loss_implementation"] == "spatial_scheduled_ce" and (
-            reference_profile["loss_implementation"] != "spatial_fused_backward"
-            or reference_profile["gradient_checkpointing"] is not False
-            or any(chosen[key] != value for key, value in reference_profile.items()
-                   if key != "loss_implementation")):
-        raise MigrationError("Scheduled spatial CE requires the unchanged accepted spatial-backward reference")
+    if chosen["loss_implementation"] == "spatial_scheduled_ce":
+        if chosen["gradient_checkpointing"] is True:
+            # The 40 GB A100 candidate retains checkpointing and measures its
+            # complete loss/optional SDPA change directly against the original
+            # native baseline. Another GPU's accepted no-checkpoint reference
+            # cannot authorize this independently measured execution path.
+            baseline_profile = SFTExecutionProfile().to_dict()
+            if (reference_profile != baseline_profile
+                    or chosen["attention_implementation"] not in ("eager", "sdpa")
+                    or any(chosen[key] != value for key, value in baseline_profile.items()
+                           if key not in ("loss_implementation", "attention_implementation"))):
+                raise MigrationError("Checkpointed scheduled spatial CE requires the unchanged eager spatial-CE baseline")
+        elif (reference_profile["loss_implementation"] != "spatial_fused_backward"
+                or reference_profile["gradient_checkpointing"] is not False
+                or any(chosen[key] != value for key, value in reference_profile.items()
+                       if key != "loss_implementation")):
+            raise MigrationError("Scheduled spatial CE requires the unchanged accepted spatial-backward reference")
     exact_causal_layout = chosen["loss_implementation"] == "causal_contiguous_gradient_ce"
     if exact_causal_layout and plan.get("technical_tolerances", {}).get("require_exact_state_comparison") is not True:
         raise MigrationError("Causal gradient layout requires the predeclared exact-state comparison")

@@ -163,6 +163,33 @@ def scheduled_spatial_fixture(identity, manifest=None):
     return rehash(report)
 
 
+def checkpointed_scheduled_fixture(identity, attention='eager'):
+    """A separate native baseline comparison retains checkpointing throughout."""
+    report = measured_fixture(identity)
+    name = 'spatial_scheduled_ce_checkpointed'
+    settings = SFTExecutionProfile(attention_implementation=attention,
+                                   loss_implementation='spatial_scheduled_ce').to_dict()
+    report['plan']['reference_profile'] = 'baseline'
+    report['plan']['profiles'][name] = settings
+    del report['plan']['profiles']['cuda_cached']
+    for helper in ('spatial_loss.py', 'scheduled_spatial_loss.py'):
+        path = 'src/training/sft/' + helper
+        report['plan']['source_file_hashes'][path] = file_hash(ROOT/path)
+    digest = report['plan']['source_file_hashes']['src/training/sft/scheduled_spatial_loss.py']
+    for container in (report['profiles'], report['profile_runs']):
+        for row in container.values():
+            if row['profile'] == 'cuda_cached':
+                row['profile'] = name
+                row['settings'] = settings
+                row['runtime']['execution_profile'] = settings
+                for field in ('runtime', 'actual_execution_policy', 'longest_sequence_probe'):
+                    row.setdefault(field, {}).update(loss_implementation='spatial_scheduled_ce',
+                                                      loss_helper_sha256=digest)
+    report['profiles'][name] = report['profiles'].pop('cuda_cached')
+    report['comparisons'][name] = report['comparisons'].pop('cuda_cached')
+    return rehash(report)
+
+
 def causal_gradient_fixture(identity, manifest=None):
     """Declared exact-state scheduling parent versus causal gradient layout."""
     report = incremental_fixture(identity, manifest)
@@ -287,6 +314,55 @@ def test_scheduled_ce_binds_both_loaded_helpers_and_incremental_accepted_referen
     assert result['reference_execution_profile']['loss_implementation'] == 'spatial_fused_backward'
     assert result['execution_profile']['loss_implementation'] == 'spatial_scheduled_ce'
     assert result['scientific_equivalence_established'] is False
+
+
+@pytest.mark.parametrize('attention', ('eager', 'sdpa'))
+def test_checkpointed_scheduled_ce_accepts_direct_native_baseline_measurement(attention):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(attention_implementation=attention,
+        loss_implementation='spatial_scheduled_ce').to_dict()
+    result = validate_execution_benchmark(checkpointed_scheduled_fixture(new, attention),
+                                          new['code_revision'], new['execution_profile'])
+    assert result['reference_execution_profile'] == SFTExecutionProfile().to_dict()
+    assert result['execution_profile']['gradient_checkpointing'] is True
+    assert result['execution_profile']['attention_implementation'] == attention
+    assert result['scientific_equivalence_established'] is False
+
+
+@pytest.mark.parametrize('field,value', (
+    ('attention_implementation', 'sdpa'), ('loss_implementation', 'spatial_fused_backward'),
+    ('gradient_checkpointing', False), ('validated_loss_counts', True),
+    ('defer_finite_checks', True), ('cache_collated_inputs', True)))
+def test_checkpointed_scheduled_ce_rejects_any_nonbaseline_reference(field, value):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(loss_implementation='spatial_scheduled_ce').to_dict()
+    report = checkpointed_scheduled_fixture(new)
+    report['plan']['profiles']['baseline'][field] = value
+    rehash(report)
+    with pytest.raises(MigrationError, match='unchanged eager spatial-CE baseline'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+@pytest.mark.parametrize('field', ('validated_loss_counts', 'defer_finite_checks', 'cache_collated_inputs'))
+def test_checkpointed_scheduled_ce_cannot_bundle_unmeasured_execution_flags(field):
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(loss_implementation='spatial_scheduled_ce',
+                                                **{field: True}).to_dict()
+    report = checkpointed_scheduled_fixture(new)
+    report['plan']['profiles']['spatial_scheduled_ce_checkpointed'][field] = True
+    rehash(report)
+    with pytest.raises(MigrationError, match='unchanged eager spatial-CE baseline'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
+
+
+def test_checkpointed_scheduled_ce_keeps_native_numerical_acceptance_gate():
+    _, new = identities()
+    new['execution_profile'] = SFTExecutionProfile(loss_implementation='spatial_scheduled_ce').to_dict()
+    report = checkpointed_scheduled_fixture(new)
+    report['comparisons']['spatial_scheduled_ce_checkpointed']['numerical_screen_passed'] = False
+    rehash(report)
+    with pytest.raises(MigrationError, match='numerical, speed or RNG screen'):
+        validate_execution_benchmark(report, new['code_revision'], new['execution_profile'])
 
 
 @pytest.mark.parametrize('run', ('baseline_2', 'cuda_cached_2'))
