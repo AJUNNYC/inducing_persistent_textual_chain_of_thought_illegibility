@@ -467,14 +467,20 @@ def accepted_execution_controls(report_path, profile_name, config, certificate, 
     return accepted, checks
 
 
-def baseline_runtime_controls(path, config, commit):
+def baseline_runtime_controls(path, config, commit, control_config=None):
     """Bind fresh native baseline controls without weakening optimization gates."""
     report = checked_report(path)
+    measured_config = config if control_config is None else control_config
+    if control_config is not None:
+        from training.sft.data_handoff import compatibility_projection
+        if compatibility_projection(config) != compatibility_projection(control_config):
+            raise ValueError('Scientific settings changed after measured baseline controls')
+    measured_commit = measured_config.get('runtime', {}).get('implementation_revision', commit)
     models = report.get('model_ids')
     if (report.get('schema_version') != 'sft_baseline_runtime_controls_v1'
             or report.get('status') != 'PASSED'
-            or report.get('source_code_commit') != commit
-            or report.get('consumer_configuration_hash') != configuration_hash(config)
+            or report.get('source_code_commit') != measured_commit
+            or report.get('consumer_configuration_hash') != configuration_hash(measured_config)
             or report.get('execution_profile') != SFTExecutionProfile().to_dict()
             or report.get('dependency_hash') != file_hash(ROOT/'requirements.lock')
             or not isinstance(models, list) or len(models) != 1
@@ -483,7 +489,7 @@ def baseline_runtime_controls(path, config, commit):
             or report.get('training_started') is not False
             or report.get('optimization_activated') is not False):
         raise ValueError('Fresh baseline runtime control identity differs')
-    if report.get('control_configuration_hash') != configuration_hash(config):
+    if report.get('control_configuration_hash') != configuration_hash(measured_config):
         raise ValueError('Native controls changed the frozen production config')
     hashes = report.get('source_file_hashes', {})
     expected = {str(p.relative_to(ROOT)) for p in (ROOT/'src/training/sft').rglob('*.py')}
@@ -512,7 +518,9 @@ def baseline_runtime_controls(path, config, commit):
         copied = deepcopy(row)
         copied['evidence']['native_baseline_binding'] = {
             'report_hash':report['report_hash'], 'model_ids':models,
-            'consumer_commit':commit, 'hardware':report['hardware']}
+            'consumer_commit':commit, 'measured_source_commit':measured_commit,
+            'measured_configuration_hash':configuration_hash(measured_config),
+            'hardware':report['hardware']}
         checks[name] = CheckResult(**copied)
     return report, checks
 
@@ -525,6 +533,7 @@ def main(argv=None):
     parser.add_argument('--execution-profile')
     parser.add_argument('--recovery-benchmark')
     parser.add_argument('--baseline-runtime-controls', help='Fresh model-scoped native baseline controls on replacement hardware.')
+    parser.add_argument('--baseline-runtime-control-config', help='Original measured config for byte-identical native-runtime source reuse.')
     args = parser.parse_args(argv)
     if bool(args.execution_benchmark) != bool(args.execution_profile):
         parser.error('--execution-benchmark and --execution-profile must be supplied together')
@@ -532,6 +541,8 @@ def main(argv=None):
         parser.error('--recovery-benchmark requires the execution benchmark')
     if args.baseline_runtime_controls and args.execution_benchmark:
         parser.error('Native baseline controls cannot authorize an optimization profile')
+    if args.baseline_runtime_control_config and not args.baseline_runtime_controls:
+        parser.error('Original baseline runtime config requires the measured controls')
     config = validate_configuration(read_json(args.config),runtime=True)
     certificate = validate_handoff(read_json(args.certificate),config)
     commit = subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
@@ -550,7 +561,8 @@ def main(argv=None):
         if args.execution_benchmark else (None, {}))
     native_baseline = None
     if args.baseline_runtime_controls:
-        native_baseline, execution_checks = baseline_runtime_controls(args.baseline_runtime_controls, config, commit)
+        native_baseline, execution_checks = baseline_runtime_controls(args.baseline_runtime_controls, config, commit,
+            read_json(args.baseline_runtime_control_config) if args.baseline_runtime_control_config else None)
     functions = (['render_sft_completion','tokenize_completion','capture_rng','restore_rng','exposure_order',
                   'SFTRecipe','TARGET_MODULES','LOSS_REDUCTION','MODELS','LEVELS'] if accepted or native_baseline else
                  ['_runtime','render_sft_completion','tokenize_completion','verify_mask_gradients','collate_completion',
@@ -636,6 +648,7 @@ def main(argv=None):
         report['ready_scope'] = accepted['condition']
         report['study_ready'] = False
         report['entire_model_condition_matrix_retested'] = False
+    if accepted or native_baseline:
         report['report_hash'] = content_hash({key:value for key,value in report.items() if key != 'report_hash'})
         atomic_write_json(Path(args.output)/'preflight'/'report.json', report)
     require_preflights(report,preflight_requirements('training'),expected_configuration_hash=configuration_hash(config))
@@ -655,6 +668,10 @@ def main(argv=None):
         receipt.update(ready_scope=accepted['condition'], study_ready=False,
             execution_benchmark=accepted, target_sft_controls_repeated=True,
             entire_model_condition_matrix_retested=False)
+    if native_baseline:
+        receipt.update(ready_models=native_baseline['model_ids'], baseline_only=True,
+            study_ready=False, native_baseline_report_hash=native_baseline['report_hash'],
+            target_sft_controls_repeated=True, entire_model_condition_matrix_retested=False)
     receipt['receipt_hash'] = content_hash(receipt)
     atomic_write_json(Path(args.output)/'readiness_receipt.json',receipt)
     print(__import__('json').dumps({k:v for k,v in receipt.items() if k != 'source_compatibility_bindings'}),flush=True)
