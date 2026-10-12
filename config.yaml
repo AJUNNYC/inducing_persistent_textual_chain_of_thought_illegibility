@@ -147,6 +147,10 @@ sft:
   scheduler: cosine
   warmup_ratio: 0.03
   training_budget: efficient_one_epoch_v1
+  selection:
+    models: [14b]
+    families: [rot13, kazitext]
+    levels: [10]
   epochs: 1
   effective_batch_size: 16
   microbatch_size: 2
