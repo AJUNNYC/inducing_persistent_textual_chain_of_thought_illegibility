@@ -1,9 +1,11 @@
 {
   "schema_version": "sft_final_efficient_design_v2",
-  "status": "FINALIZED_PENDING_USER_RUN_SELECTION_AND_ORDINARY_NATIVE_STARTUP",
+  "status": "FINALIZED_TWO_FRESH_14B_LEVEL10_FITS_PENDING_GPU_ACCESS_AND_NATIVE_STARTUP",
   "recipe": "efficient_one_epoch_v1",
   "previous_recipe": "legacy_two_epoch_v1",
-  "level_selection": null,
+  "level_selection": [
+    10
+  ],
   "training_running": false,
   "available_models": [
     "7b",
@@ -213,5 +215,32 @@
     "actual_gradient_checkpointing": null,
     "capacity_bound": "maximum_padded_sequence_length_not_guaranteed_maximum_memory_across_completion_masks",
     "later_oom_mode_switch_permitted": false
-  }
+  },
+  "selected_models": [
+    "14b"
+  ],
+  "selected_families": [
+    "rot13",
+    "kazitext"
+  ],
+  "selected_levels": [
+    10
+  ],
+  "selected_fit_count": 2,
+  "selected_conditions": [
+    {
+      "model_size": "14b",
+      "family": "rot13",
+      "level": 10,
+      "initialization": "fresh_untouched_pinned_base"
+    },
+    {
+      "model_size": "14b",
+      "family": "kazitext",
+      "level": 10,
+      "initialization": "fresh_untouched_pinned_base"
+    }
+  ],
+  "gpu_connection_available": false,
+  "multi_level_construction_window_established": false
 }

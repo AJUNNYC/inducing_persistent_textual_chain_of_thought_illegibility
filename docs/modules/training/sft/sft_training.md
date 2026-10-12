@@ -1,8 +1,8 @@
 # sft_training.md
 
-## Active redesign: efficient one-epoch SFT; all training paused
+## Active selection: two fresh 14B level-10 fits; awaiting GPU access
 
-The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](../../../sft_short_pilot.md).
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The selected launch scope is two independent fresh 14B fits: ROT13 level 10 and KaziText level 10. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU connection is available and training remains paused pending GPU access. See [the training redesign](../../../sft_short_pilot.md).
 
 The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
@@ -33,7 +33,7 @@ Source `05f42b0` has accepted no-recomputation evidence and READY affected-runti
 
 ## Responsibility and controlling details
 
-All forty conditions remain available, but **no model, family, level or GPU has been selected**. The default per-fit recipe is `efficient_one_epoch_v1`; consumers must explicitly choose conditions rather than infer level 10, 14B or a two-worker launch from prior conversation examples. Each chosen fit starts from its untouched base in a separate recipe/configuration/source/output identity.
+All forty conditions remain available. The user selected **two independent fresh14B fits: ROT13 level10 and KaziText level10**. GPU access is pending, so training remains paused. The per-fit recipe is `efficient_one_epoch_v1`; the remaining38 conditions are available but not selected. Each chosen fit starts from its untouched base in a separate recipe/configuration/source/output identity.
 
 Each selected fit uses all 10,000 examples once, effective batch 16, 625 updates and a complete cosine horizon with 19 warmup updates. Unquantized BF16 base/head, exact full-gradient CCE, standard SDPA and plain AdamW are a newly declared published-method baseline. They are not migrations of the old NF4 optimizer states or activation under historical 7B kernel receipts. Before updates, normal native startup guards check masks/gradients, recovery and actual capacity, enabling recomputation if the non-updating capacity probe requires it. The user requested no repeated optimization test or timing campaign.
 
@@ -58,7 +58,7 @@ Both flat-layout and fully fused forward CE failed the frozen numerical screen d
 
 `build_worklist(config, datasets, handoff_certificate=certificate)` reads the forty verified JSONL conditions and binds actual ordered record bytes to exact fit specifications. It requires the same ordered train/validation IDs, prompt bytes and common accepted-pool hash across every condition; model-specific clean-trace hashes and final-answer bytes remain identical across that model's families/strengths. Different model traces are never interchangeable. `load_dataset_bundle(bundle)` verifies persisted JSONL content hashes before loading.
 
-`run_family_queue(family, worklist, output_root, config, *, preflight_report=None, fit_runner=run_sft_fit, release_gpu=None, should_pause=None)` runs the explicitly selected independent fits. The historical full family worklist contains twenty; the active redesigned default specifies a per-fit recipe while selecting no conditions. A child failure or pause preserves verified prior fits and an explicit partial queue report. An injected runner is labeled `injected_fixture`, and cannot supply scientific results. `sft_training(..., families=('rot13','kazitext'))`, also exported as `run_sft_training`, runs selected queues with the same reusable engine. The single-process default is sequential; independent external workers may run queues on separately assigned GPUs. A failed family does not erase another family's work. A release callback runs when the queue returns.
+`run_family_queue(family, worklist, output_root, config, *, preflight_report=None, fit_runner=run_sft_fit, release_gpu=None, should_pause=None)` runs the explicitly selected independent fits. The historical full family worklist contains twenty; the active selection contains fresh14B level10 for ROT13 and KaziText, with no other conditions selected. A child failure or pause preserves verified prior fits and an explicit partial queue report. An injected runner is labeled `injected_fixture`, and cannot supply scientific results. `sft_training(..., families=('rot13','kazitext'))`, also exported as `run_sft_training`, runs selected queues with the same reusable engine. The single-process default is sequential; independent external workers may run queues on separately assigned GPUs. A failed family does not erase another family's work. A release callback runs when the queue returns.
 
 The [queue tests](../../../../tests/unit/training/sft/test_sft_training.py) use all forty full-count dataset conditions to verify the worklist, exact ordered exposure inputs, original-base identities, sequential failure/partial reporting, independent family progress and paused incomplete adapter handling. They do not train the construction models. Exact commands/results and live limitations are recorded in `artifacts/preflight/sft_implementation_report.json`.
 
@@ -86,8 +86,8 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% Default efficient_one_epoch_v1 applies per explicitly selected fit.
-%% All forty conditions remain available; no model, family, level or GPU is selected.
-%% All training is PAUSED. No paid runtime allocation or benchmark campaign is implied.
+%% All forty conditions remain available; select two fresh14B fits: ROT13 L10 and KaziText L10.
+%% Training is PAUSED pending GPU access. No paid allocation or benchmark campaign is implied.
 %% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
 %% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
 %% Completion-only per-example weighting, full 4096 targets, LoRA and effective batch remain fixed.
@@ -99,18 +99,18 @@ flowchart TD
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
-    PAUSE["PAUSED: no selected conditions or GPU workers"]
-    SELECT["Future explicit condition selection<br/>Default recipe: efficient_one_epoch_v1"]
+    PAUSE["PAUSED pending GPU access<br/>Selected: two fresh14B level10 fits"]
+    SELECT["Selected: fresh14B ROT13 L10 and KaziText L10<br/>Recipe: efficient_one_epoch_v1"]
     BIND["Bind recipe / published policy v2 / source / data identity<br/>Request 2 x 8; capacity fallback 1 x 16<br/>Reuse compatible upstream evidence"]
     PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
-    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected ROT13 condition<br/>All 10,000 examples; one epoch"]
-    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected KaziText condition<br/>All 10,000 examples; one epoch"]
+    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh14B ROT13 level10<br/>All 10,000 examples; one epoch"]
+    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh14B KaziText level10<br/>All 10,000 examples; one epoch"]
     ROTDONE["Verify final 625 state and adapter in Drive<br/>Release assigned ROT13 worker"]
     KAZDONE["Verify final 625 state and adapter in Drive<br/>Release assigned KaziText worker"]
-    OUT["Only selected, verified adapters<br/>Validation diagnostics; final panels reserved"]
+    OUT["Only selected, verified adapters<br/>Validation diagnostics; final panels reserved<br/>L10-only cannot establish multi-level success"]
     LEGACY["Explicit NF4 alternatives only<br/>legacy_two_epoch_v1 / one_epoch_pilot_v1"]
     INPUT --> PAUSE
-    PAUSE -.->|Explicit selection and resume| SELECT --> BIND --> PLAN
+    PAUSE -.->|Connect GPU and start selected fits| SELECT --> BIND --> PLAN
     PLAN --> ROTFIT --> ROTDONE --> OUT
     PLAN --> KAZFIT --> KAZDONE --> OUT
     INPUT -.->|Separately declared alternative| LEGACY

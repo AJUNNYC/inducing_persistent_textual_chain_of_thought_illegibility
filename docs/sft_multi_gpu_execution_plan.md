@@ -1,8 +1,8 @@
 # Efficient SFT deployment and available condition ownership
 
-## Active redesign: efficient one-epoch SFT; all training paused
+## Active selection: two fresh 14B level-10 fits; awaiting GPU access
 
-The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. No model, family or level has been selected for launch. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU is allocated and no training is running. See [the training redesign](sft_short_pilot.md).
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The selected launch scope is two independent fresh 14B fits: ROT13 level 10 and KaziText level 10. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU connection is available and training remains paused pending GPU access. See [the training redesign](sft_short_pilot.md).
 
 The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
@@ -12,7 +12,7 @@ The user requested implementation without another optimization test or timing ca
 
 ## Selection and independent workers
 
-No condition or GPU has been selected. The available inventory comprises both 7B and 14B models, ROT13 and KaziText, and ten levels each: forty independent data conditions. A future explicit selection determines which fits run; the default efficient per-fit recipe does not itself select all forty or level 10.
+The user selected two independent fresh fits: 14B ROT13 level 10 and 14B KaziText level 10. Both start from the untouched pinned 14B base, with separate adapters, full states and Drive namespaces. GPU connections are not yet available; training remains paused. The unchanged certified inventory still contains both model sizes, both families and all ten levels: forty available data conditions, of which two are selected.
 
 Each selected fit starts fresh with separate adapter, optimizer, scheduler, RNG/sampler and immutable Drive namespace. Separate GPUs can run independent selected fits concurrently; completion time is the longest assigned queue, not the sum of concurrent durations. No resource allocation or restart is authorized by this document alone. The existing user-owned CPU Colab session remains unaffected.
 
@@ -34,4 +34,4 @@ Record actual hardware, elapsed updates, sequence lengths, peak memory, checkpoi
 
 Use the existing [central Drive project](https://drive.google.com/drive/folders/176a8Tm6l4WhfakY_0nCOo4ICeT7KPSmx); local caches are disposable. Save full state at updates 100, 200, 300, 400, 500, 600 and final 625, and verify actual bytes before retention or completion advances. Preserve original source/data identities alongside the new consumer recipe/configuration, precision, dependency and hardware records. Credentials stay private.
 
-Diagnostics use the 100 certified validation IDs and untouched-base companions. Keep final test panels reserved and original confirmatory thresholds unchanged. A future restricted level selection cannot establish untrained levels, an intermediate response curve or a three-level construction window. Extra epochs after final 625 need a separately declared continuation or fresh legacy fit; they cannot inherit the old 1,250-update schedule by relabelling.
+Diagnostics use the 100 certified validation IDs and untouched-base companions. Keep final test panels reserved and original confirmatory thresholds unchanged. This level-10-only selection cannot establish untrained levels, an intermediate response curve or the original minimum-three-contiguous-level construction window. Extra epochs after final 625 need a separately declared continuation or fresh legacy fit; they cannot inherit the old 1,250-update schedule by relabelling.

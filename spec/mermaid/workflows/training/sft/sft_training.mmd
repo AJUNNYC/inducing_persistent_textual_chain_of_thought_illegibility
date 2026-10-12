@@ -3,8 +3,8 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% Default efficient_one_epoch_v1 applies per explicitly selected fit.
-%% All forty conditions remain available; no model, family, level or GPU is selected.
-%% All training is PAUSED. No paid runtime allocation or benchmark campaign is implied.
+%% All forty conditions remain available; select two fresh14B fits: ROT13 L10 and KaziText L10.
+%% Training is PAUSED pending GPU access. No paid allocation or benchmark campaign is implied.
 %% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
 %% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
 %% Completion-only per-example weighting, full 4096 targets, LoRA and effective batch remain fixed.
@@ -16,18 +16,18 @@ flowchart TD
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
-    PAUSE["PAUSED: no selected conditions or GPU workers"]
-    SELECT["Future explicit condition selection<br/>Default recipe: efficient_one_epoch_v1"]
+    PAUSE["PAUSED pending GPU access<br/>Selected: two fresh14B level10 fits"]
+    SELECT["Selected: fresh14B ROT13 L10 and KaziText L10<br/>Recipe: efficient_one_epoch_v1"]
     BIND["Bind recipe / published policy v2 / source / data identity<br/>Request 2 x 8; capacity fallback 1 x 16<br/>Reuse compatible upstream evidence"]
     PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
-    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected ROT13 condition<br/>All 10,000 examples; one epoch"]
-    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Selected KaziText condition<br/>All 10,000 examples; one epoch"]
+    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh14B ROT13 level10<br/>All 10,000 examples; one epoch"]
+    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh14B KaziText level10<br/>All 10,000 examples; one epoch"]
     ROTDONE["Verify final 625 state and adapter in Drive<br/>Release assigned ROT13 worker"]
     KAZDONE["Verify final 625 state and adapter in Drive<br/>Release assigned KaziText worker"]
-    OUT["Only selected, verified adapters<br/>Validation diagnostics; final panels reserved"]
+    OUT["Only selected, verified adapters<br/>Validation diagnostics; final panels reserved<br/>L10-only cannot establish multi-level success"]
     LEGACY["Explicit NF4 alternatives only<br/>legacy_two_epoch_v1 / one_epoch_pilot_v1"]
     INPUT --> PAUSE
-    PAUSE -.->|Explicit selection and resume| SELECT --> BIND --> PLAN
+    PAUSE -.->|Connect GPU and start selected fits| SELECT --> BIND --> PLAN
     PLAN --> ROTFIT --> ROTDONE --> OUT
     PLAN --> KAZFIT --> KAZDONE --> OUT
     INPUT -.->|Separately declared alternative| LEGACY

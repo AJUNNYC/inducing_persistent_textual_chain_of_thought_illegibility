@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** all training paused. The efficient per-fit redesign is implemented; native startup and training remain unrun. Historical full-grid scope is available, but no model, family or level is selected.
+**Owner:** `coordinator`. **Current status:** all training paused. The efficient per-fit redesign is implemented; native startup and training remain unrun. The selected scope is fresh 14B ROT13 level 10 and 14B KaziText level 10; GPU access is pending.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -13,7 +13,7 @@
 
 ## Responsibility and controlling details
 
-The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. Published policy v2 requests physical microbatch 2 × accumulation 8, with capacity fallback 1 × 16 and unchanged effective batch 16. Each optimizer update retains the same ordered 16 examples and per-example weight 1/16; actual batch/accumulation/recomputation is recorded and fixed on resume. No condition or GPU is selected; all training remains paused. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
+The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. Published policy v2 requests physical microbatch 2 × accumulation 8, with capacity fallback 1 × 16 and unchanged effective batch 16. Each optimizer update retains the same ordered 16 examples and per-example weight 1/16; actual batch/accumulation/recomputation is recorded and fixed on resume. Fresh 14B ROT13 level 10 and KaziText level 10 are selected; all training remains paused pending GPU access. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
 
 The original full matrix comprises forty SFT fits, two independent 100-step RL trajectories with twenty snapshots, and two bases, yielding62 states if every required output exists. This historical accounting is not a current launch instruction. RL and final confirmatory evaluation remain deferred. Preserve the original Sonnet reward, Dr. GRPO semantics and original final evaluation thresholds; this redesign changes only the declared SFT recipe. Never infer completed branches from a join node or relabel old full checkpoints as efficient-run state.
 
@@ -58,7 +58,7 @@ flowchart TD
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
 %% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
 %% Actual batch/accumulation/recomputation mode stays fixed throughout each fit and exact resume.
-%% Forty conditions remain available; no model/family/level selected and all training PAUSED.
+%% Forty conditions remain available; select fresh14B ROT13 L10 and KaziText L10; PAUSED pending GPU access.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
@@ -72,7 +72,7 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 conditions available; none selected<br/>Default: efficient one epoch / 625 updates"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 conditions available; two selected<br/>Fresh14B ROT13 L10 and KaziText L10<br/>Default: efficient one epoch / 625 updates"]
     SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
     RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]

@@ -1024,7 +1024,7 @@
     },
     {
       "id": "req_sft_optimization",
-      "requirement": "Default efficient_one_epoch_v1: all 10,000 examples once, 625 optimizer updates, complete cosine horizon 625 and warmup 19; LR 2e-4, plain AdamW with FP32 states, zero decay, maximum gradient norm 0.3, requested microbatch 2/accumulation 8/effective 16, capacity fallback 1/16/16; same ordered 16 examples and per-example weight 1/16 per update, fixed actual mode on exact resume, full 4096 sequence eligibility without truncation, seed 42. Legacy NF4 two-epoch recipe retains 1250 updates/warmup 38; intermediate NF4 one-epoch recipe retains 625/19. No condition selected or training launched.",
+      "requirement": "Default efficient_one_epoch_v1: all 10,000 examples once, 625 optimizer updates, complete cosine horizon 625 and warmup 19; LR 2e-4, plain AdamW with FP32 states, zero decay, maximum gradient norm 0.3, requested microbatch 2/accumulation 8/effective 16, capacity fallback 1/16/16; same ordered 16 examples and per-example weight 1/16 per update, fixed actual mode on exact resume, full 4096 sequence eligibility without truncation, seed 42. Legacy NF4 two-epoch recipe retains 1250 updates/warmup 38; intermediate NF4 one-epoch recipe retains 625/19. Selected scope: two independent fresh 14B fits, ROT13 level 10 and KaziText level 10; GPU access pending, training paused. All forty certified datasets remain available. Level-10-only scope cannot establish the original multi-level success window.",
       "source_sections": "C.2.2; explicitly authorized efficient_one_epoch_v1 redesign",
       "pdf_pages": [
         28,

@@ -1,8 +1,8 @@
 # Final efficient SFT recipe for each selected level
 
-`efficient_one_epoch_v1` is the finalized default recipe. Each fit uses all 10,000 certified training examples and the same 100 validation examples. All forty 7B/14B × ROT13/KaziText × level 1–10 conditions remain available. No condition is selected and training remains paused.
+`efficient_one_epoch_v1` is the finalized default recipe. Each fit uses all 10,000 certified training examples and the same 100 validation examples. All forty 7B/14B × ROT13/KaziText × level 1–10 conditions remain available. The selected scope is two independent fresh 14B fits: ROT13 level 10 and KaziText level 10. Training remains paused pending GPU access.
 
-This is an explicitly declared scientific amendment. It changes exposure and numerical execution; identical eventual results have not been established. The choices below prioritize preserving the data, objective and adaptation capacity while removing avoidable computation. No new optimization benchmark campaign was run.
+The two selected fits retain the same finalized per-fit algorithm: one epoch, LR `2e-4`, requested 2 × 8 with capacity fallback 1 × 16, and separate fresh untouched-base initialization. This is an explicitly declared scientific amendment. It changes exposure and numerical execution; identical eventual results have not been established. The choices below prioritize preserving the data, objective and adaptation capacity while removing avoidable computation. No new optimization benchmark campaign was run.
 
 ## Decisions and justification
 
@@ -29,7 +29,7 @@ Physical batching changes execution grouping, padding and dropout RNG assignment
 
 Do not pack examples across boundaries, drop samples, truncate completions, train only upper layers, lower adapter rank, increase learning rate, filter small gradients, or choose checkpoints from the final evaluation set. These could save compute but add uncertainty to adaptation capacity, stochastic training or scientific interpretation. Validation remains diagnostic, with no adaptive stopping: the final endpoint is update 625.
 
-Full recovery states are saved at initialization, every 100 updates and the final update. Completed scientific/recovery outputs must be verified on Google Drive before their local copies are relied upon. The existing final-evaluation thresholds are unchanged; this redesign does not assert that they have been met.
+Full recovery states are saved at initialization, every 100 updates and the final update. Completed scientific/recovery outputs must be verified on Google Drive before their local copies are relied upon. The existing final-evaluation thresholds are unchanged; this redesign does not assert that they have been met. The level-10-only selection cannot establish the original minimum-three-contiguous-level construction-success window or conclusions about untrained levels.
 
 ## Exact published execution policy
 

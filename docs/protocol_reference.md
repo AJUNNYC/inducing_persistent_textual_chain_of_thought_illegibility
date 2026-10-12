@@ -85,13 +85,14 @@ Surface­level opacity can satisfy the construction objective without useful hid
 Garbage surrounding a complete readable solution does not establish loss of textual access to
 reasoning; retain the existing readable­solution and padding controls. These distinctions motivate
 mechanism­neutral claims about the model organisms [44, 46, 41, 54, 51].
-Table 1. Available conditions and current recipe default
+Table 1. Available conditions and selected 14B level-10 fits
 Models: DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Qwen-14B, each compared against its own
 untouched base.
 Transformations: ROT13 and official KaziText, each at ten fixed levels.
 Available inventory: 2 model sizes x 2 families x 10 levels = forty independent condition datasets, all verified in
 Drive.
-Selected jobs: none. No model, family or level is scheduled; all training is PAUSED and no GPU is allocated.
+Selected jobs: two independent fresh14B fits, ROT13 L10 and KaziText L10. Training is PAUSED pending
+GPU access. Both start from the untouched pinned14B base.
 Default per-fit efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine
 horizon and19 warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with
 FP32 loss/hidden-gradient accumulation, SDPA and plain AdamW. It retains completion-only
@@ -104,8 +105,8 @@ one-hour completion.14B throughput/memory remain unmeasured.
 Original NF4 legacy_two_epoch_v1 and intermediate NF4 one_epoch_pilot_v1 remain explicit alternatives.
 The original full-grid design evaluates40 SFT adapters,20 RL snapshots and2 bases (62 states); those counts
 are available legacy scope, not the active queue. Validation diagnostics may precede reserved final tests.
-Original confirmatory thresholds/windows remain unchanged; restricted selections cannot claim unobserved
-levels.
+Original confirmatory thresholds/windows remain unchanged; L10-only selection cannot claim unobserved
+levels or a multi-level success window.
 ```
 
 ## page_003
@@ -1483,9 +1484,9 @@ October 2026
 28
 C.2.1 Published-method baseline and scientific scope
 The active efficient_one_epoch_v1 recipe is a newly declared scientific baseline, not an exact migration of
-NF4 checkpoints. It applies to any explicitly selected model/family/level. All forty condition datasets remain
-available; no condition is selected and all training is PAUSED. Both families use the same full-target
-completion-only objective and seeded exposure per chosen fit.
+NF4 checkpoints. It applies to any explicitly selected model/family/level. All forty datasets remain available.
+Select fresh14B ROT13 L10 and KaziText L10; training PAUSED pending GPU access. Both families use
+the same full-target completion-only objective and seeded exposure per chosen fit.
 Precedent: LoRA (arxiv.org/abs/2106.09685) supports frozen-base low-rank adaptation. Mixed-precision
 training (1710.03740) supports lower-precision computation with stable accumulation. FlashAttention
 (2205.14135) motivates memory-efficient exact attention, used here through standard PyTorch SDPA
@@ -1556,8 +1557,8 @@ actual batch/accumulation/recomputation to state. Resume restores that mode, nev
 Same ordered16/update and each example weight1/16; grouping/dropout/rounding differ. Length bound is
 not a universal memory bound. No measured gain.
 User request: no optimization tests, comparative benchmarks or GPU runs during implementation. Static
-document/config/source checks do not establish native execution or speed. No condition selected, no
-resource allocated, all training paused.
+document/config/source checks do not establish native execution or speed. Fresh14B ROT13 L10 and
+KaziText L10 selected; GPU access pending, training paused.
 Alternatives: legacy_two_epoch_v1 retains NF4/FP32-head/pagedAdamW and1250/38; intermediate
 one_epoch_pilot_v1 retains those numerics with 625/19. Start fresh across recipe boundaries. Never
 relabel old full state as new baseline state.
@@ -1585,9 +1586,10 @@ for 7B and 14B and for each transformation strength. Fixed examples and epochs m
 exposure, not identical token compute or identical optimization dynamics.
 30
 All forty certified conditions remain available: both 7B/14B models, ROT13/KaziText and ten levels each.
-No model, family or level has been selected. A prepared data condition is not an active scheduled job. Each
-chosen fit starts from its untouched base with separate source/configuration/recipe, adapter, optimizer,
-scheduler and RNG/sampler identity. All training is PAUSED and no new GPU is allocated.
+Select two fresh14B fits: ROT13 L10 and KaziText L10. The other38 prepared conditions are available, not
+active jobs. Each chosen fit starts from its untouched base with separate source/configuration/recipe,
+adapter, optimizer, scheduler and RNG/sampler identity. Training is PAUSED pending GPU access for the
+selected two fresh14B L10 fits.
 C.2.4 Efficient per-fit accounting and resource implications
 The default efficient_one_epoch_v1 processes all 10,000 accepted training records once, plus loss-only
 diagnostics on the separate 100 validation IDs. Request microbatch2 x accumulation8; capacity fallback1
@@ -1619,10 +1621,10 @@ identities; PRO987/A10028/A10030 states remain archives, not warm starts. A fina
 cannot be extended as an exact1,250-schedule resume. Additional epochs require a separately defined
 continuation or fresh legacy fit.
 Pilot diagnostics use validation IDs and base companions; frozen final tests remain reserved. Original
-capability, opacity, transfer and simultaneous-bound thresholds remain unchanged. A future restricted
-selection cannot claim untrained intermediate levels or minimum-three-contiguous-level construction
-success. Measure actual selected-run throughput, token lengths, peak memory, billed rates and verified
-checkpoint overhead before a dependable runtime forecast.
+capability, opacity, transfer and simultaneous-bound thresholds remain unchanged. The L10-only selection
+cannot claim untrained levels or minimum-three-contiguous-level construction success. Measure actual
+selected-run throughput, token lengths, peak memory, billed rates and verified checkpoint overhead before
+a dependable runtime forecast.
 ```
 
 ## page_031
@@ -2698,9 +2700,9 @@ updates100,200,300,400,500,600 and final 625.
 Retain latest two verified recovery states and
 every final adapter. Explicit
 legacy_two_epoch_v1 ends at 1,250. Advance
-retention only after verified Drive publication. No
-selected fits or GPUs; all training remains
-paused.
+retention only after verified Drive publication.
+Two fresh14B L10 fits selected; GPU access
+pending, training paused.
 ```
 
 ## page_051
@@ -2922,26 +2924,27 @@ change both the text being transformed and the transformation strength. Paired p
 the base models’ own generated targets.
 E.2.3 Machine-readable configuration and exact artifact contracts
 54
-Freeze model/tokenizer, data, source and dependency identities; hashes verify recorded bytes, not correctness. All forty
-condition datasets remain Drive-verified; none is selected for launch.
+Freeze model/tokenizer, data, source and dependency identities; hashes verify recorded bytes, not correctness. All forty condition
+datasets remain Drive-verified. Select fresh14B ROT13 L10 and KaziText L10; GPU access pending.
 Default efficient_one_epoch_v1: all 10,000 examples once per selected fit;625 updates, full cosine horizon 625, warmup 19.
-Unquantized BF16 base/head, exact direct full-gradient CCE FP32 loss/hidden accumulation, SDPA and plain AdamW replace
-old NF4 execution. Preserve full-target completion-only weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1
-x16),effective16,seed 42 and4096 eligibility. Save every 100/final 625; verify full state in Drive. This scientific/numerical
-change does not prove equal final results. Legacy recipes/archives remain separate; no warm starts. All training PAUSED, no
-resources allocated. No optimization campaign. Native identity/mask/gradient/recovery guards run at startup before updates,
-not previously passed approval.14B speed/memory unmeasured. Validation diagnostics precede reserved final tests.
+Unquantized BF16 base/head, exact direct full-gradient CCE FP32 loss/hidden accumulation, SDPA and plain AdamW replace old
+NF4 execution. Preserve full-target completion-only weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1
+x16),effective16,seed 42 and4096 eligibility. Save every 100/final 625; verify full state in Drive. This scientific/numerical change
+does not prove equal final results. Legacy recipes/archives remain separate; no warm starts. Training PAUSED pending GPU
+access; two fresh14B L10 fits selected. No optimization campaign. Native identity/mask/gradient/recovery guards run at startup
+before updates, not previously passed approval.14B speed/memory unmeasured. Validation diagnostics precede reserved final
+tests.
 Generation remains vLLM0.11.0,Transformers4.57.3,Torch2.8+cu128, separate from Torch2.9 training. BF16
 context4096,sequences128,scheduler8192,GPUfraction.9,no prefix cache; every response retains3072 new tokens. Producer
 dc520cb/config3757493e stay frozen.
 Evaluation retains the same pinned BF16 vLLM engine for bases and SFT/RL adapters:128
-requests,context8192,scheduler8192,GPUfraction.9,no prefix cache,LoRA enabled(maxrank32) even for bases. Verify
-checkpoint bytes. Preserve public templates,EOS,item seeds,temperature.6,top-p.95 and3072 response tokens; never
-truncate prompts. Archive native outputs; engine changes can change answers. Judge deferred seed 42 outputs later; deferral
-does not certify opacity/full evaluation. Drive-verify raw batches before advancing and scored bundles/reports after Docker
-scoring. Bind handoff/measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or exact code
-field without prose inference,ambiguity or code repair. Rescoring7398 saved outputs passed both bases and unchanged
-gates; no generation. Retain failures and use identical field rules for trained evaluation.
+requests,context8192,scheduler8192,GPUfraction.9,no prefix cache,LoRA enabled(maxrank32) even for bases. Verify checkpoint
+bytes. Preserve public templates,EOS,item seeds,temperature.6,top-p.95 and3072 response tokens; never truncate prompts.
+Archive native outputs; engine changes can change answers. Judge deferred seed 42 outputs later; deferral does not certify
+opacity/full evaluation. Drive-verify raw batches before advancing and scored bundles/reports after Docker scoring. Bind
+handoff/measurement sources separately. Final-field scorer v2 requires a unique terminal scalar or exact code field without prose
+inference,ambiguity or code repair. Rescoring7398 saved outputs passed both bases and unchanged gates; no generation. Retain
+failures and use identical field rules for trained evaluation.
 ```
 
 ## page_055
@@ -3134,8 +3137,8 @@ repeatability after rescoring 7398 saved outputs.
 Active recipe efficient_one_epoch_v1 applies per chosen fit, not an automatic condition selection. All 10,000 examples once;
 625 updates/19 warmup. Unquantized BF16 base/head, full-gradient direct CCE FP32 loss/hidden accumulation, SDPA and
 plain AdamW are prospectively declared scientific changes. Completion-only full targets, LoRA, LR 2e-4, requested2 x8
-(fallback1 x16),effective16 and Drive integrity remain fixed. Original NF4 recipes and all forty conditions remain available. No
-model, family or level is selected.
+(fallback1 x16),effective16 and Drive integrity remain fixed. Original NF4 recipes and all forty conditions remain available.
+Selected: fresh14B ROT13 L10 and KaziText L10; GPU access pending.
 All training is PAUSED; no new GPU allocation. Prior A100 assignments ended at zero compute units, replacement rejected
 for quota/entitlement; states ROT13 28/KaziText 30 are full Drive archives. Candidate comparisons incomplete: zero A100
 optimizations approved. 14B speed/memory are unmeasured. No optimization test or timing campaign is scheduled. New
@@ -3635,18 +3638,18 @@ subsequent outcomes, not consequences of possessing a complete specification.
 CoT Illegibility - Implementation decisions
 Active default efficient_one_epoch_v1: one epoch/all 10,000 examples per selected fit, 625 updates, full cosine
 horizon, warmup 19. BF16 base/head, exact CCE FP32 loss/hidden accumulation, SDPA and plain AdamW
-replace NF4 execution. All forty conditions available; no model, family or level selected. All training PAUSED;
-no GPUs allocated. No optimization campaign. Native startup guards unrun; 14B speed/memory unmeasured.
-Legacy recipes/Drive archives preserved; final tests and construction thresholds unchanged. No same-result or
-one-hour guarantee.
-Precedence. The authorized efficient_one_epoch_v1 baseline with published execution policy v2 (requested2 x8,
-fallback1 x16, effective16; fixed recovered mode) controls active SFT recipe over earlier NF4, FP32-head,
-paged-optimizer and two-epoch wording/diagrams. It changes scientific exposure and numerical execution, not the
-original construction success thresholds. All forty conditions remain available with no active selection. Legacy NF4
-two-epoch and intermediate NF4 one-epoch recipes remain explicitly named alternatives; old checkpoints cannot
-be relabelled. Appendix H retains operational authority and Appendix G retains its original full-grid/window criteria.
-Restricted future level selections cannot establish those unobserved levels or windows. The original 67-page
-archive remains unchanged; active changes are integrated into existing pages without appended amendments.
+replace NF4 execution. Forty conditions available; selected fresh14B ROT13 L10 and KaziText L10. Training
+PAUSED pending GPU access. No optimization campaign. Native startup guards unrun; 14B speed/memory
+unmeasured. Legacy recipes/Drive archives preserved; final tests and construction thresholds unchanged. No
+same-result or one-hour guarantee.
+Precedence. The authorized efficient_one_epoch_v1 baseline with published execution policy v2 (requested2 x8, fallback1
+x16, effective16; fixed recovered mode) controls active SFT recipe over earlier NF4, FP32-head, paged-optimizer and
+two-epoch wording/diagrams. It changes scientific exposure and numerical execution, not the original construction success
+thresholds. All forty conditions remain available; active selection is two fresh14B L10 fits, one per family. Legacy NF4
+two-epoch and intermediate NF4 one-epoch recipes remain explicitly named alternatives; old checkpoints cannot be
+relabelled. Appendix H retains operational authority and Appendix G retains its original full-grid/window criteria. The
+L10-only selection cannot establish unobserved levels or multi-level success windows. The original 67-page archive remains
+unchanged; active changes are integrated into existing pages without appended amendments.
 ```
 
 ## page_069

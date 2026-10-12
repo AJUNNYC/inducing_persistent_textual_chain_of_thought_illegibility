@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "3a36f6c0beab635b237c88c96a11bf3abead83f8e5f64be567efe3ace6cd4d3d"
+    "sha256": "df6c9a9304844af8e024fc4663fceabee785d11912e25e5d0b8f398320e7a38f"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,10 +27,10 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "bf554207ad8fd11307031cea3f9a64df4a3f40ae0ac04719751d3d627cbc61de",
+  "procedure_update_sha256": "e3e144c6a74ea531afdd3006a7ed3164d3281bca9a8b8459ffd1e057d150cf71",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
-    "status": "PAUSED",
+    "status": "PAUSED_PENDING_GPU_ACCESS",
     "available_model_sizes": [
       "7b",
       "14b"
@@ -52,7 +52,20 @@
       10
     ],
     "available_conditions": 40,
-    "selected_conditions": [],
+    "selected_conditions": [
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 10,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 10,
+        "initialization": "fresh_untouched_pinned_base"
+      }
+    ],
     "allocated_gpu_workers": 0,
     "epochs_per_selected_fit": 1,
     "train_examples": 10000,
@@ -92,6 +105,19 @@
     "capacity_fallback_gradient_accumulation_steps": 16,
     "actual_execution_mode_fixed_on_resume": true,
     "physical_batch_speedup_measured": false,
-    "per_example_weight_per_optimizer_update": 0.0625
+    "per_example_weight_per_optimizer_update": 0.0625,
+    "selected_fit_count": 2,
+    "selected_models": [
+      "14b"
+    ],
+    "selected_families": [
+      "rot13",
+      "kazitext"
+    ],
+    "selected_levels": [
+      10
+    ],
+    "gpu_connection_available": false,
+    "multi_level_construction_window_established": false
   }
 }
