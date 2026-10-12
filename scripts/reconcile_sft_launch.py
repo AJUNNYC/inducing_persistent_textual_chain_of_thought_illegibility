@@ -63,7 +63,7 @@ def identical_files(commit, names):
 
 
 def declared_training_budget_change(config, original_config):
-    """Record the explicit epoch/scope amendment; preserve all other settings.
+    """Record exact named recipe amendments; preserve all other settings.
 
     This is not a proof that scientific training results remain equivalent.
     Changed training budgets require fresh native SFT execution evidence.
@@ -77,18 +77,19 @@ def declared_training_budget_change(config, original_config):
     changing = ('epochs', 'training_budget', 'selection')
     if config['sft'].get('training_budget') == 'efficient_one_epoch_v1':
         # These values are individually enforced by the named configuration
-        # validator. This is an explicit precision/optimizer/budget amendment,
+        # validator. Physical batching preserves the effective batch of 16.
+        # This is an explicit precision/optimizer/budget/batching amendment,
         # not a claim of numerical identity with the original NF4 recipe.
         changing += ('quantization', 'load_in_4bit', 'double_quantization',
-                     'optimizer', 'gradient_checkpointing')
+                     'optimizer', 'gradient_checkpointing', 'microbatch_size',
+                     'gradient_accumulation_steps')
     unchanged_before = {key: value for key, value in before.items() if key not in changing}
     unchanged_after = {key: value for key, value in after.items() if key not in changing}
     if unchanged_before != unchanged_after:
         raise ValueError('Training settings changed beyond the named budget: sft')
     before_budget = before.get('training_budget', 'legacy_two_epoch_v1')
     after_budget = after.get('training_budget', 'legacy_two_epoch_v1')
-    if (before_budget, before['epochs'], before.get('selection')) == (
-            after_budget, after['epochs'], after.get('selection')):
+    if all(before.get(key) == after.get(key) for key in changing):
         return None
     return {'schema_version': 'declared_sft_budget_amendment_v1',
             'before': {key: before.get(key) for key in changing},

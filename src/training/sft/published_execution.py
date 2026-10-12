@@ -27,8 +27,21 @@ CCE_REPOSITORY = "https://github.com/apple/ml-cross-entropy.git"
 PUBLISHED_BUDGET = "efficient_one_epoch_v1"
 SUPPLEMENTAL_LOCK_SHA256 = "0260a293515f8aca6252e56685ae4df92153ae7d2c145255c86369b22d6304c9"
 PUBLISHED_EXECUTION_POLICY = {
-    "policy": "published_bf16_lora_full_gradient_cce_v1",
+    "policy": "published_bf16_lora_full_gradient_cce_v2",
     "training_budget": PUBLISHED_BUDGET,
+    "requested_physical_microbatch": 2,
+    "requested_gradient_accumulation": 8,
+    "fallback_physical_microbatch": 1,
+    "fallback_gradient_accumulation": 16,
+    "effective_batch_size": 16,
+    "physical_batch_capacity_policy": "duplicate_longest_example_non_updating_backward",
+    "physical_batch_selection_order": [
+        {"physical_microbatch": 2, "gradient_checkpointing": False},
+        {"physical_microbatch": 1, "gradient_checkpointing": False},
+        {"physical_microbatch": 2, "gradient_checkpointing": True},
+        {"physical_microbatch": 1, "gradient_checkpointing": True},
+    ],
+    "physical_batch_adaptation": "startup_only_frozen_for_fit_and_resume",
     "base_weights_dtype": "bfloat16",
     "base_quantization": "none",
     "adapter_parameters_dtype": "float32",
@@ -40,7 +53,7 @@ PUBLISHED_EXECUTION_POLICY = {
     "attention_implementation": "sdpa",
     "sdpa_backend_policy": "prefer_flash_then_efficient_allow_math_fallback",
     "sdpa_actual_backend": "not_instrumented",
-    "gradient_checkpointing_policy": "off_unless_longest_example_cuda_oom",
+    "gradient_checkpointing_policy": "off_unless_full_single_example_cuda_oom",
     "gradient_checkpointing_use_reentrant": False,
     "gradient_checkpointing_preserve_rng_state": True,
     "loss_implementation": "upstream_cce_exact_full_gradient",
@@ -103,6 +116,9 @@ def build_runtime(spec: Any, device: str, *, cache_root: str | Path | None = Non
     if spec.training_budget != PUBLISHED_BUDGET or train_count != 10000:
         raise _blocked("Published execution requires the declared 10,000-example one-epoch budget")
     recipe = spec.recipe
+    if (recipe.microbatch_size, recipe.gradient_accumulation_steps,
+            recipe.effective_batch_size) != (2, 8, 16):
+        raise _blocked("Published execution requires requested physical batch 2 x 8, effective batch 16")
     if (recipe.optimizer_steps(train_count), recipe.warmup_steps(train_count)) != (625, 19):
         raise _blocked("Published execution schedule differs from the declared 625 updates/19 warmup")
     try:
@@ -189,6 +205,11 @@ def build_runtime(spec: Any, device: str, *, cache_root: str | Path | None = Non
         "sdpa_backend_policy": PUBLISHED_EXECUTION_POLICY["sdpa_backend_policy"],
         "sdpa_actual_backend": "not_instrumented",
         "gradient_checkpointing": False, "use_reentrant": False,
+        "requested_physical_microbatch": 2,
+        "requested_gradient_accumulation": 8,
+        "physical_microbatch": None, "gradient_accumulation": None,
+        "effective_batch_size": 16,
+        "physical_batch_selection_status": "PENDING_CAPACITY_SETUP",
         "loss_implementation": "upstream_cce_exact_full_gradient",
         "optimizer_betas": [0.9, 0.999], "optimizer_epsilon": 1e-8,
         "optimizer_state_dtype": "float32", "warmup_steps": 19,
@@ -246,12 +267,17 @@ def published_loss(model: Any, batch: Mapping[str, Any]) -> Any:
 
 
 def capacity_setup(model: Any, longest_example: Mapping[str, Any], pad_token_id: int,
-                   *, optimizer: Any = None) -> dict[str, Any]:
-    """One non-updating longest-example backward; enable checkpointing on OOM.
+                   *, optimizer: Any = None, fixed_microbatch_size: int | None = None,
+                   fixed_gradient_checkpointing: bool | None = None) -> dict[str, Any]:
+    """Select physical batching with a non-updating worst-pair capacity backward.
 
     This is an ordinary capacity/mask setup operation, not timing, a benchmark,
-    or candidate-profile selection. RNG is restored and gradients are cleared;
-    no optimizer or scheduler step occurs and no examples or targets are cut.
+    or candidate-profile optimization. Two copies of the longest example are a
+    conservative bound for a padded pair. Prefer 2 x 8, then 1 x 16 without
+    checkpointing, then the same order with checkpointing. A resumed fit tests
+    only its frozen physical batch and checkpointing mode. RNG is restored and
+    gradients are cleared; no optimizer or scheduler step occurs and no examples
+    or targets are cut.
     """
     import torch
     from training.sft.individual_fit.sft_fit import capture_rng, collate_completion, restore_rng
@@ -259,9 +285,13 @@ def capacity_setup(model: Any, longest_example: Mapping[str, Any], pad_token_id:
         raise _blocked("Capacity setup requires the declared published execution runtime")
     if any(parameter.grad is not None for parameter in model.parameters() if parameter.requires_grad):
         raise _blocked("Capacity setup requires an optimizer-update boundary with cleared gradients")
+    fixed = fixed_microbatch_size is not None or fixed_gradient_checkpointing is not None
+    if fixed and (type(fixed_microbatch_size) is not int
+                  or fixed_microbatch_size not in (1, 2)
+                  or type(fixed_gradient_checkpointing) is not bool):
+        raise _blocked("Resumed capacity setup requires both saved physical batch and checkpointing mode")
     before_rng, before_training = capture_rng(), model.training
     device = next(model.parameters()).device
-    checkpointing = bool(model.is_gradient_checkpointing)
     # Adam initializes two FP32 moments lazily at its first step. Reserve their
     # exact tensor storage during capacity setup so a successful pre-update
     # backward does not overlook the next step's persistent optimizer memory.
@@ -277,15 +307,36 @@ def capacity_setup(model: Any, longest_example: Mapping[str, Any], pad_token_id:
             elif existing.shape != parameter.shape or existing.dtype != torch.float32:
                 raise _blocked("Restored Adam moments differ from FP32 adapter shape or precision")
 
-    def backward_fits() -> bool:
+    def backward_fits(physical_microbatch: int) -> bool:
         try:
             optimizer_moment_reservation = torch.empty(
                 optimizer_moment_bytes, device=device, dtype=torch.uint8)
-            batch = collate_completion([longest_example], pad_token_id, device)
-            loss = published_loss(model, batch)
+            batch = collate_completion([longest_example] * physical_microbatch, pad_token_id, device)
+            loss, hidden = published_loss_with_hidden(model, batch)
             if not torch.isfinite(loss):
-                raise _blocked("Longest-example completion loss is nonfinite")
+                raise _blocked("Worst-pair completion loss is nonfinite")
             loss.backward()
+            # The causal loss is shifted by one token; prompt inputs remain
+            # context, but unsupervised final-decoder rows must contribute no
+            # direct loss gradient in every selected physical-batch row.
+            mask = torch.zeros_like(batch["labels"], dtype=torch.bool)
+            mask[:, :-1] = batch["labels"][:, 1:] != -100
+            if (hidden.grad is None or not torch.isfinite(hidden.grad).all()
+                    or torch.count_nonzero(hidden.grad[~mask]).item() != 0):
+                raise _blocked("Worst-pair capacity loss has invalid masked decoder-row gradients")
+            nonzero_adapter_gradient = False
+            for name, parameter in model.named_parameters():
+                if not parameter.requires_grad:
+                    continue
+                if "lora_" not in name:
+                    raise _blocked("Worst-pair capacity found a trainable non-LoRA parameter")
+                if parameter.grad is not None:
+                    if not torch.isfinite(parameter.grad).all():
+                        raise _blocked("Worst-pair capacity has a nonfinite LoRA gradient")
+                    if parameter.grad.count_nonzero().item() > 0:
+                        nonzero_adapter_gradient = True
+            if not nonzero_adapter_gradient:
+                raise _blocked("Worst-pair capacity produced no nonzero LoRA gradient")
             torch.cuda.synchronize(device)
             # Keep the reservation alive through every backward kernel.
             del optimizer_moment_reservation
@@ -297,30 +348,58 @@ def capacity_setup(model: Any, longest_example: Mapping[str, Any], pad_token_id:
 
     try:
         model.train()
-        fits = backward_fits()
-        if not fits and not checkpointing:
-            # Drop the failed graph before retrying. The frozen base, LoRA
-            # tensors, example and precision policy are not altered.
+        modes = ([(fixed_microbatch_size, fixed_gradient_checkpointing)] if fixed else
+                 [(2, False), (1, False), (2, True), (1, True)])
+        attempts = []
+        selected = None
+        for physical_microbatch, checkpointing in modes:
+            restore_rng(before_rng)
+            if checkpointing:
+                model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={
+                    "use_reentrant": False, "preserve_rng_state": True})
+            else:
+                model.gradient_checkpointing_disable()
+            fits = backward_fits(physical_microbatch)
+            attempts.append({
+                "physical_microbatch": physical_microbatch,
+                "gradient_accumulation": 16 // physical_microbatch,
+                "gradient_checkpointing": checkpointing,
+                "status": "passed" if fits else "cuda_out_of_memory",
+            })
+            if fits:
+                selected = physical_microbatch
+                break
+            # Release a failed graph before the next complete capacity attempt.
+            # Never switch physical batching during an optimizer update.
             gc.collect()
             torch.cuda.empty_cache()
-            restore_rng(before_rng)
-            model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={
-                "use_reentrant": False, "preserve_rng_state": True})
-            checkpointing = True
-            fits = backward_fits()
-        if not fits:
-            raise _blocked("Full longest example does not fit; use a GPU with more VRAM")
+        if selected is None:
+            message = ("Saved physical batch/checkpointing mode does not fit on this GPU; "
+                       "resume requires the same execution mode" if fixed else
+                       "Full longest example does not fit; use a GPU with more VRAM")
+            raise _blocked(message)
         result = {
-            "status": "passed", "operation": "non_updating_longest_example_backward",
+            "status": "passed", "operation": "non_updating_worst_pair_backward",
             "longest_example_tokens": len(longest_example["input_ids"]),
+            "capacity_bound": "duplicated_longest_example_with_padding",
+            "physical_microbatch": selected,
+            "gradient_accumulation": 16 // selected,
+            "effective_batch_size": 16,
+            "selection_frozen_for_resume": True,
+            "resumed_saved_mode_only": fixed,
+            "capacity_attempts": attempts,
             "gradient_checkpointing": bool(model.is_gradient_checkpointing),
             "use_reentrant": False, "preserve_rng_state": True,
             "optimizer_updates": 0, "rng_restored": True,
+            "masked_decoder_rows": "zero_direct_loss_gradient",
+            "nonzero_lora_gradient": True,
             "optimizer_moment_reservation_bytes": optimizer_moment_bytes,
             "sequence_truncation": False,
         }
         model._sft_published_runtime.update({
-            "gradient_checkpointing": result["gradient_checkpointing"], "capacity_setup": result})
+            "gradient_checkpointing": result["gradient_checkpointing"],
+            "physical_microbatch": selected, "gradient_accumulation": 16 // selected,
+            "physical_batch_selection_status": "FROZEN", "capacity_setup": result})
         return result
     finally:
         model.zero_grad(set_to_none=True)

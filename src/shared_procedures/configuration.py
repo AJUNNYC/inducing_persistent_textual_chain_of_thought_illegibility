@@ -20,7 +20,8 @@ SFT_TRAINING_BUDGETS = {'legacy_two_epoch_v1': 2, 'one_epoch_pilot_v1': 1,
                         'efficient_one_epoch_v1': 1}
 SFT_BUDGET_OVERRIDES = {'efficient_one_epoch_v1': {
     'sft.quantization': 'bf16', 'sft.load_in_4bit': False, 'sft.double_quantization': False,
-    'sft.optimizer': 'adamw', 'sft.gradient_checkpointing': False}}
+    'sft.optimizer': 'adamw', 'sft.gradient_checkpointing': False,
+    'sft.microbatch_size': 2, 'sft.gradient_accumulation_steps': 8}}
 FIXED = {
     'seed': 42,
     'generation.temperature': 0.6, 'generation.top_p': 0.95, 'generation.max_new_tokens': 3072,

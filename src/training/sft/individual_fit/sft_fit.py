@@ -86,7 +86,8 @@ class SFTRecipe:
             return cls(epochs=1)
         if name == EFFICIENT_TRAINING_BUDGET:
             return cls(epochs=1, quantization="bf16", double_quantization=False,
-                       optimizer="adamw", gradient_checkpointing=False)
+                       optimizer="adamw", gradient_checkpointing=False,
+                       microbatch_size=2, gradient_accumulation_steps=8)
         raise SFTInputError("Unknown named SFT training budget")
 
     def validate(self) -> None:
@@ -564,11 +565,26 @@ def verify_mask_gradients(model: Any, example: Mapping[str, Any], pad_token_id: 
         restore_rng(before)
 
 
+def _published_batching(model: Any, runtime: Mapping[str, Any] | None) -> tuple[int, int]:
+    """Return the actual startup-selected physical batch without changing it."""
+    if not isinstance(runtime, Mapping):
+        raise SFTInputError("Published training requires its startup-selected physical batch")
+    microbatch = runtime.get("physical_microbatch")
+    accumulation = runtime.get("gradient_accumulation")
+    if (type(microbatch) is not int or type(accumulation) is not int
+            or (microbatch, accumulation) not in ((2, 8), (1, 16))
+            or type(runtime.get("gradient_checkpointing")) is not bool
+            or runtime["gradient_checkpointing"] is not bool(model.is_gradient_checkpointing)):
+        raise SFTInputError("Published training has an invalid or changed actual batching/activation policy")
+    return microbatch, accumulation
+
+
 def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
                          examples: Sequence[Mapping[str, Any]], pad_token_id: int,
                          *, execution_profile: SFTExecutionProfile | None = None,
                          prepared_batches: Sequence[PreparedCompletionBatch] | None = None,
-                         recipe: SFTRecipe | None = None) -> tuple[Any, ...]:
+                         recipe: SFTRecipe | None = None,
+                         runtime: Mapping[str, Any] | None = None) -> tuple[Any, ...]:
     """One real update, also used by the isolated hardware benchmark.
 
     The optional count metadata preserves CE and reduction operation order.
@@ -580,10 +596,14 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
     profile = resolve_execution_profile(execution_profile)
     recipe = recipe or SFTRecipe()
     recipe.validate()
-    if bool(getattr(model, "_sft_published_execution", False)) != (recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET)):
+    published = bool(getattr(model, "_sft_published_execution", False))
+    if published != (recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET)):
         raise SFTInputError("Actual loss backend differs from the declared training recipe")
-    if not 1 <= len(examples) <= recipe.gradient_accumulation_steps:
+    if not 1 <= len(examples) <= recipe.effective_batch_size:
         raise SFTInputError("One SFT update requires one to sixteen ordered examples")
+    microbatch = _published_batching(model, runtime)[0] if published else 1
+    if published and profile != SFTExecutionProfile():
+        raise SFTInputError("Published training requires the declared execution profile")
     device = next(model.parameters()).device
     if profile.cache_collated_inputs:
         if prepared_batches is None or len(prepared_batches) != len(examples):
@@ -599,11 +619,12 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
         batches = None
     optimizer.zero_grad(set_to_none=True)
     losses = []
-    for position, example in enumerate(examples):
+    for position in range(0, len(examples), microbatch):
+        group = examples[position:position + microbatch]
         batch = (batches[position] if batches is not None else
-                 collate_completion([example], pad_token_id, device, validate_counts=profile.validated_loss_counts))
+                 collate_completion(group, pad_token_id, device, validate_counts=profile.validated_loss_counts))
         counts = batch["validated_completion_counts"] if profile.validated_loss_counts else None
-        if getattr(model, "_sft_published_execution", False):
+        if published:
             from training.sft.published_execution import published_loss
             loss = published_loss(model, batch)
         else:
@@ -612,7 +633,13 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
                                    execution_profile=profile)
         if not profile.defer_finite_checks and not torch.isfinite(loss):
             raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
-        (loss / len(examples)).backward()
+        # The batch loss is already an example mean. Weight by group size so
+        # paired and singleton execution cover the same logical example mean,
+        # including a final partial update, without token-length reweighting.
+        if published:
+            (loss * (len(group) / len(examples))).backward()
+        else:
+            (loss / len(examples)).backward()
         losses.append(loss.detach())
     if profile.defer_finite_checks and not torch.isfinite(torch.stack(losses)).all():
         raise SFTRuntimeBlocked("Nonfinite training loss; partial update requires rollback")
@@ -624,14 +651,18 @@ def one_optimizer_update(model: Any, optimizer: Any, scheduler: Any,
 
 
 def _progress_execution_metadata(model: Any, recipe: SFTRecipe,
-                                 profile: SFTExecutionProfile) -> dict[str, Any]:
+                                 profile: SFTExecutionProfile,
+                                 runtime: Mapping[str, Any] | None = None) -> dict[str, Any]:
     if recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET):
         if not getattr(model, "_sft_published_execution", False) or profile != SFTExecutionProfile():
             raise SFTInputError("Published training progress requires its declared runtime baseline")
         from training.sft.published_execution import PUBLISHED_EXECUTION_POLICY
+        microbatch, accumulation = _published_batching(model, runtime)
         return {"execution_profile": None,
                 "published_execution_policy": dict(PUBLISHED_EXECUTION_POLICY),
-                "gradient_checkpointing": bool(model.is_gradient_checkpointing)}
+                "gradient_checkpointing": bool(model.is_gradient_checkpointing),
+                "physical_microbatch": microbatch,
+                "gradient_accumulation": accumulation}
     return {"execution_profile": profile.to_dict()}
 
 
@@ -642,7 +673,8 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
                             should_pause: Callable[[], bool] | None = None,
                             execution_profile: SFTExecutionProfile | None = None,
                             prepared_batches: Sequence[PreparedCompletionBatch] | None = None,
-                            recipe: SFTRecipe | None = None) -> dict[str, Any]:
+                            recipe: SFTRecipe | None = None,
+                            runtime: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Real optimizer loop, shared by GPU production and tiny CPU fixtures.
 
     Pause happens only after one complete logical optimizer update. Exceptions
@@ -651,7 +683,7 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
     profile = resolve_execution_profile(execution_profile)
     recipe = recipe or SFTRecipe()
     recipe.validate()
-    execution_metadata = _progress_execution_metadata(model, recipe, profile)
+    execution_metadata = _progress_execution_metadata(model, recipe, profile, runtime)
     order = exposure_order(len(examples), recipe.seed, epochs=recipe.epochs)
     order_hash = _hash(order)
     total_steps = recipe.optimizer_steps(len(examples))
@@ -663,7 +695,9 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
         if recipe == SFTRecipe.for_budget(EFFICIENT_TRAINING_BUDGET):
             if ("execution_profile" not in progress or progress["execution_profile"] is not None
                     or progress.get("published_execution_policy") != execution_metadata["published_execution_policy"]
-                    or progress.get("gradient_checkpointing") is not execution_metadata["gradient_checkpointing"]):
+                    or progress.get("gradient_checkpointing") is not execution_metadata["gradient_checkpointing"]
+                    or any(type(progress.get(key)) is not int or progress[key] != execution_metadata[key]
+                           for key in ("physical_microbatch", "gradient_accumulation"))):
                 raise SFTInputError("Published recovery progress differs from its actual execution policy")
         else:
             try:
@@ -685,9 +719,9 @@ def train_optimizer_updates(model: Any, optimizer: Any, scheduler: Any,
         raise SFTInputError("Prepared input cache does not cover the exact frozen corpus")
     model.train()
     for step in range(completed, total_steps):
-        indices = order[position:position + recipe.gradient_accumulation_steps]
+        indices = order[position:position + recipe.effective_batch_size]
         one_optimizer_update(model, optimizer, scheduler, [examples[index] for index in indices],
-                             pad_token_id, execution_profile=profile, recipe=recipe,
+                             pad_token_id, execution_profile=profile, recipe=recipe, runtime=runtime,
                              prepared_batches=([prepared_batches[index] for index in indices]
                                                if prepared_batches is not None else None))
         position += len(indices)
@@ -882,11 +916,19 @@ def verify_fit_result(output_dir: str | Path, expected_identity: Mapping[str, An
     published = expected_identity.get("training_budget") == EFFICIENT_TRAINING_BUDGET
     if published:
         actual_gc = result.get("runtime", {}).get("gradient_checkpointing")
+        actual_microbatch = result.get("runtime", {}).get("physical_microbatch")
+        actual_accumulation = result.get("runtime", {}).get("gradient_accumulation")
         if (type(actual_gc) is not bool
+                or type(actual_microbatch) is not int or type(actual_accumulation) is not int
+                or (actual_microbatch, actual_accumulation) not in ((2, 8), (1, 16))
                 or result.get("runtime", {}).get("published_execution_policy") != expected_identity["published_execution_policy"]
                 or result["progress"].get("execution_profile", {}) is not None
                 or result["progress"].get("published_execution_policy") != expected_identity["published_execution_policy"]
-                or result["progress"].get("gradient_checkpointing") is not actual_gc):
+                or result["progress"].get("gradient_checkpointing") is not actual_gc
+                or type(result["progress"].get("physical_microbatch")) is not int
+                or type(result["progress"].get("gradient_accumulation")) is not int
+                or result["progress"]["physical_microbatch"] != actual_microbatch
+                or result["progress"]["gradient_accumulation"] != actual_accumulation):
             raise SFTInputError("Fit completion misstates the actual published execution policy")
     if not math.isfinite(result["validation_loss"]) or result["validation_count"] != 100:
         raise SFTInputError("Fit lacks the fixed held-out validation computation")
@@ -906,9 +948,17 @@ def verify_fit_result(output_dir: str | Path, expected_identity: Mapping[str, An
     if published:
         if (recovered.get("runtime", {}).get("published_execution_policy") != expected_identity["published_execution_policy"]
                 or recovered.get("runtime", {}).get("gradient_checkpointing") is not actual_gc
+                or type(recovered.get("runtime", {}).get("physical_microbatch")) is not int
+                or type(recovered.get("runtime", {}).get("gradient_accumulation")) is not int
+                or recovered["runtime"]["physical_microbatch"] != actual_microbatch
+                or recovered["runtime"]["gradient_accumulation"] != actual_accumulation
                 or recovered["progress"].get("execution_profile", {}) is not None
                 or recovered["progress"].get("published_execution_policy") != expected_identity["published_execution_policy"]
-                or recovered["progress"].get("gradient_checkpointing") is not actual_gc):
+                or recovered["progress"].get("gradient_checkpointing") is not actual_gc
+                or type(recovered["progress"].get("physical_microbatch")) is not int
+                or type(recovered["progress"].get("gradient_accumulation")) is not int
+                or recovered["progress"]["physical_microbatch"] != actual_microbatch
+                or recovered["progress"]["gradient_accumulation"] != actual_accumulation):
             raise SFTInputError("Completed recovery state misstates the published execution policy")
     weights = load_file(str(output_dir / "final_adapter" / "adapter_model.safetensors"), device="cpu")
     if set(weights) != set(recovered["adapter"]):
@@ -1090,23 +1140,41 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
         if published:
             from training.sft.published_execution import capacity_setup
             previous_gc = None
+            previous_microbatch = None
             if restored:
                 if restored.get("runtime", {}).get("published_execution_policy") != identity["published_execution_policy"]:
                     raise SFTInputError("Published recovery state differs from the declared runtime policy")
                 if scheduler.last_epoch != restored["progress"]["completed_steps"]:
                     raise SFTInputError("Published scheduler state differs from the completed update count")
                 previous_gc = restored.get("runtime", {}).get("gradient_checkpointing")
-                if type(previous_gc) is not bool:
-                    raise SFTInputError("Published checkpoint does not record its actual activation policy")
+                previous_microbatch = restored.get("runtime", {}).get("physical_microbatch")
+                previous_accumulation = restored.get("runtime", {}).get("gradient_accumulation")
+                if (type(previous_gc) is not bool or type(previous_microbatch) is not int
+                        or type(previous_accumulation) is not int
+                        or (previous_microbatch, previous_accumulation) not in ((2, 8), (1, 16))
+                        or restored["progress"].get("gradient_checkpointing") is not previous_gc
+                        or type(restored["progress"].get("physical_microbatch")) is not int
+                        or type(restored["progress"].get("gradient_accumulation")) is not int
+                        or restored["progress"]["physical_microbatch"] != previous_microbatch
+                        or restored["progress"]["gradient_accumulation"] != previous_accumulation):
+                    raise SFTInputError("Published checkpoint does not record a consistent actual batching/activation policy")
                 if previous_gc:
                     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
                 else:
                     model.gradient_checkpointing_disable()
                 runtime["gradient_checkpointing"] = previous_gc
             capacity_evidence = capacity_setup(model, max(train, key=lambda record: len(record["input_ids"])),
-                                               tokenizer.pad_token_id, optimizer=optimizer)
-            if previous_gc is not None and bool(model.is_gradient_checkpointing) != previous_gc:
-                raise SFTRuntimeBlocked("Recovered published runtime changed activation policy; a new declaration is required")
+                                               tokenizer.pad_token_id, optimizer=optimizer,
+                                               fixed_microbatch_size=previous_microbatch,
+                                               fixed_gradient_checkpointing=previous_gc)
+            runtime.update({key: capacity_evidence[key] for key in
+                            ("physical_microbatch", "gradient_accumulation", "gradient_checkpointing")})
+            actual_microbatch, actual_accumulation = _published_batching(model, runtime)
+            if (previous_gc is not None
+                    and (runtime["gradient_checkpointing"] is not previous_gc
+                         or actual_microbatch != previous_microbatch
+                         or actual_accumulation != previous_accumulation)):
+                raise SFTRuntimeBlocked("Recovered published runtime changed its actual batching/activation policy; a new declaration is required")
             runtime["capacity_setup"] = capacity_evidence
         gradient_evidence = verify_mask_gradients(model, train[0], tokenizer.pad_token_id, execution_profile=profile)
         def save(progress: dict[str, Any]) -> None:
@@ -1124,7 +1192,7 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
                 initial_progress = {"completed_steps": 0, "sampler_position": 0,
                     "exposure_order_hash": _hash(exposure_order(len(train), recipe.seed, epochs=recipe.epochs)),
                     "processed_tokens": 0, "total_optimizer_steps": recipe.optimizer_steps(len(train)),
-                    "example_presentations": 0, **_progress_execution_metadata(model, recipe, profile)}
+                    "example_presentations": 0, **_progress_execution_metadata(model, recipe, profile, runtime)}
                 save(initial_progress)
                 checked = load_checkpoint(output / "checkpoint_000000", identity)
             else:
@@ -1149,7 +1217,7 @@ def run_sft_fit(spec: SFTFitSpec | Mapping[str, Any], train_records: Sequence[Ma
         start = time.monotonic()
         progress = train_optimizer_updates(model, optimizer, scheduler, train, tokenizer.pad_token_id,
                     progress=restored["progress"] if restored else None, save=save, should_pause=should_pause,
-                    execution_profile=profile, recipe=recipe)
+                    execution_profile=profile, recipe=recipe, runtime=runtime)
         if progress["status"] == "paused":
             result = {"status": "paused", "run_id": spec.run_id, "identity": identity, "progress": progress}
             atomic_write_json(output / "fit_status.json", result)

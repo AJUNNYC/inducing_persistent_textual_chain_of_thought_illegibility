@@ -178,7 +178,11 @@ def main():
     def preserve(path, metadata):
         experiment.publish_permanent(path,metadata)
         if Path(path).name == 'manifest.json' and metadata.get('progress'):
-            status('RUNNING',completed_steps=metadata['progress']['completed_steps'],drive_status='VERIFIED')
+            progress = metadata['progress']
+            batching = {key: progress[key] for key in
+                        ('physical_microbatch', 'gradient_accumulation', 'gradient_checkpointing')
+                        if key in progress}
+            status('RUNNING',completed_steps=progress['completed_steps'],drive_status='VERIFIED',**batching)
     with file_lock(output_root/f'.worker_{args.family}_{args.model}.lock',timeout=1),artifact_hook(preserve):
         try:
             status('STARTING',drive_status='PENDING')

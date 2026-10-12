@@ -56,7 +56,7 @@ def main():
             replace(page, [rect.x0, rect.y0, rect.x1+15, rect.y1+3],
                     'CoT Illegibility - Implementation decisions', maximum=9)
     metadata = doc.metadata
-    metadata['subject'] = 'Integrated procedure edition: 11 October 2026'
+    metadata['subject'] = 'Integrated procedure edition: ' + spec['edition']
     doc.set_metadata(metadata)
     with tempfile.NamedTemporaryFile(dir=active.parent, suffix='.pdf', delete=False) as output:
         temporary = Path(output.name)

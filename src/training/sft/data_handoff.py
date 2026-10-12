@@ -26,10 +26,18 @@ def compatibility_projection(config):
 
 def training_amendment(producer, consumer):
     """Record the approved budget/scope change without relabelling producer data."""
+    # Preserve the exact amendment representation in historical certificates.
+    # Only the revised published recipe declares the new physical batching.
+    batching_revision = (sft_training_budget(consumer) == 'efficient_one_epoch_v1'
+                         and consumer['sft'].get('microbatch_size') == 2
+                         and consumer['sft'].get('gradient_accumulation_steps') == 8)
     def settings(config):
+        names = ('quantization', 'load_in_4bit', 'double_quantization', 'optimizer',
+                 'gradient_checkpointing')
+        if batching_revision:
+            names += ('microbatch_size', 'gradient_accumulation_steps')
         return {'training_budget': sft_training_budget(config), 'epochs': sft_budget_epochs(config),
-                'recipe_changes': {name: config['sft'][name] for name in
-                    ('quantization', 'load_in_4bit', 'double_quantization', 'optimizer', 'gradient_checkpointing')},
+                'recipe_changes': {name: config['sft'][name] for name in names},
                 'selected_conditions': sft_execution_selection(config)}
     before, after = settings(producer), settings(consumer)
     if before == after:

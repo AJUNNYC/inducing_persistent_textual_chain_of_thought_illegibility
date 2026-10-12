@@ -26,7 +26,8 @@ def test_historical_absent_budget_and_scope_keep_two_epochs_and_forty_conditions
     config=load_configuration(CONFIG)
     config['sft'].pop('training_budget');config['sft'].pop('selection',None)
     config['sft'].update(epochs=2,quantization='nf4',load_in_4bit=True,double_quantization=True,
-        optimizer='paged_adamw_32bit',gradient_checkpointing=True)
+        optimizer='paged_adamw_32bit',gradient_checkpointing=True,
+        microbatch_size=1,gradient_accumulation_steps=16)
     assert sft_training_budget(config)=='legacy_two_epoch_v1'
     assert len(sft_matrix(config))==40
     config['sft']['epochs']=1
@@ -45,7 +46,8 @@ def test_invalid_execution_scope_is_rejected(selection):
 def test_named_budget_and_selection_remain_scientific_identity_fields():
     config=load_configuration(CONFIG);legacy=deepcopy(config)
     legacy['sft'].update(training_budget='legacy_two_epoch_v1',epochs=2,quantization='nf4',
-        load_in_4bit=True,double_quantization=True,optimizer='paged_adamw_32bit',gradient_checkpointing=True)
+        load_in_4bit=True,double_quantization=True,optimizer='paged_adamw_32bit',gradient_checkpointing=True,
+        microbatch_size=1,gradient_accumulation_steps=16)
     assert configuration_hash(config)!=configuration_hash(legacy)
     wider=deepcopy(config);wider['sft']['selection']={'models':['7b','14b'],'families':['rot13','kazitext'],'levels':[5,10]}
     assert configuration_hash(config)!=configuration_hash(wider)
