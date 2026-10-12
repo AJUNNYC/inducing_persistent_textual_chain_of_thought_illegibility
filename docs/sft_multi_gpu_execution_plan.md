@@ -1,11 +1,11 @@
-# Proposed SFT deployment across RunPod and Colab
+# SFT deployment across RunPod and Colab
 
-## Current session: paused on 11 October 2026
+## Current session: two A100 queues started on 12 October 2026
 
-At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+The user authorized fresh 7B ROT13 and KaziText queues, levels 1–10 each, on separate Colab A100-SXM4-40GB runtimes. Both native 7B controls and all thirteen launch gates passed; GitHub source `05f47f4` runs the eager baseline with gradient checkpointing enabled. Both queues completed their first optimizer update and verified full checkpoints in Google Drive, then resumed those exact new-run states to remove the temporary operator cutoff. There is no user-imposed wall-clock deadline. Each later level starts from the untouched pinned base. The previous PRO 6000 step-987 checkpoint is archived and is not the parent of these fresh queues. No fits or final validations are yet reported complete; 14B training has not started. See [the restart record](colab_sft_restart.md) for scope and provenance.
 
-Status: planning discussion recorded on 11 October 2026. The additional workers
-have not been deployed or validated by this plan. The study remains 40 independent
+Status: two 7B A100 workers deployed on 12 October 2026; the two 14B
+RunPod workers remain a proposal. The study remains 40 independent
 fits: two model sizes, two transformation families and ten levels per family.
 RL and final evaluation are outside the runtime estimates below.
 
@@ -20,7 +20,7 @@ their original scope. The [final memory-copy trial](evidence/sft_memory_copy_pro
 passed exact numerical/state comparisons but failed speed and remains rejected.
 The [existing-lineage resume](evidence/sft_memory_copy_pro6000_training_resume.json)
 preserved step 673 and the original deadline. These are dated evidence snapshots,
-not a live optimizer-step counter. The accepted profile remains selected; the current session is paused as recorded above.
+not a live optimizer-step counter. That optimized profile remains historical PRO 6000 evidence; current A100 queues use the checkpointed eager baseline.
 
 Optimization trials are closed. Allocating independent fits to additional GPU
 sessions is a deployment proposal; it does not approve new kernels, hardware,
@@ -30,21 +30,19 @@ model sizes or transformation levels through the existing measurements.
 
 The proposed workers operate concurrently, each with one GPU and an independent
 adapter, optimizer, scheduler and sampler. Assign whole fits rather than changing
-the physical or effective training batch. The current fit stays on its existing
-worker until completion or a separately verified recovery.
+the physical or effective training batch. The prior partial fit is archived following the explicit fresh-restart decision.
 
 | Proposed worker | Device | Conditions to assign |
 |---|---|---|
-| RunPod worker A | RTX PRO 6000 96GB | 14B ROT13 levels 1–10, after its current 7B fit finishes if using the existing Pod |
+| RunPod worker A | RTX PRO 6000 96GB | 14B ROT13 levels 1–10 (proposed, not started) |
 | RunPod worker B | RTX PRO 6000 96GB | 14B KaziText levels 1–10 |
-| Colab worker A | A100, actual VRAM to be recorded | 7B ROT13 levels 2–10; level 1 remains owned by the current worker |
-| Colab worker B | A100, actual VRAM to be recorded | 7B KaziText levels 1–10 |
+| Colab worker A | A100-SXM4-40GB | 7B ROT13 levels 1–10, fresh restart (active) |
+| Colab worker B | A100-SXM4-40GB | 7B KaziText levels 1–10 |
 
-The 39 proposed assignments plus the already owned 7B ROT13 level-1 fit cover
-all 40 conditions exactly once. If the current fit is interrupted, recover its
-verified full state under its existing ownership or a recorded migration; do
-not independently restart it on another worker. Keep hardware/profile provenance
-for every condition so comparisons do not conceal execution differences.
+The two active A100 queues own all twenty 7B conditions. The twenty 14B
+conditions remain unstarted. The archived step-987 attempt adds no scientific
+condition and is not a warm start for these queues. Keep independent immutable
+Drive outputs and hardware/profile provenance for every condition.
 
 Use an explicit condition-to-worker assignment before launch. There is no
 four-worker launch receipt or validated cross-provider job-claim mechanism in

@@ -14,11 +14,12 @@ flowchart TD
 %% Historical a6e3295 lineage began at step 509 with preserved parent bytes.
 %% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
 %% Historical resume: accepted a6e3295 from step 673 in the same lineage; no new migration.
-%% Current session paused safely at step 987/1250; full checkpoint verified in Drive.
-%% No new worker deployment; remaining 263 updates and final validation await resume.
+%% Historical PRO session paused at step 987/1250; checkpoint archived in Drive.
+%% Current: two A100 40GB baseline queues, 7B ROT13 and KaziText levels 1-10, fresh restart.
 %% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
 %% PROPOSED only: two PRO 6000 workers for 14B and two Colab A100 workers for remaining 7B fits.
-%% Current 7B ROT13 level 1 stays owned; no duplicate condition, new deployment or A100/14B approval.
+%% Native 7B baseline controls passed on both A100s; 14B remains unstarted.
+%% No user-imposed wall-clock deadline; whole checkpoints require Drive verification.
 %% Planning source: docs/sft_multi_gpu_execution_plan.md; forecasts are estimates, not benchmarks.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Contract: ../../shared_procedures/recovery_procedure.mmd applies to execution failures.
@@ -35,9 +36,9 @@ flowchart TD
     INPUT["40 verified condition datasets"]
     CERT["Bind original producer to certified consumer<br/>40-condition worklist and exact dataset hashes"]
     GATES["Require source-compatible launch evidence<br/>Reuse unchanged baselines and upstream controls"]
-    PLAN["Two independent family queues<br/>Select 7B ROT13 first on the current single GPU"]
+    PLAN["Two independent family queues<br/>7B ROT13 and KaziText on separate A100s"]
     ROT["ROT13 queue: assigned GPU<br/>20 independent fits; 10 per model"]
-    KAZ["KaziText queue: when a GPU is available<br/>20 independent fits; 10 per model"]
+    KAZ["KaziText queue: assigned GPU<br/>20 independent fits; 10 per model"]
     ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the ROT13 queue"]
     KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Individual SFT fit<br/>Repeat for the KaziText queue"]
     ROTDONE["Verify 20 fits<br/>Release assigned GPU"]
@@ -46,7 +47,7 @@ flowchart TD
     OUT["Release all 40 final adapters"]
     BENCH["New source or hardware: paired candidate measurements<br/>Active-profile comparison; scoped acceptance and full-state lineage"]
     PROPOSED["PROPOSED independent-fit allocation<br/>2 PRO 6000: 14B; 2 Colab A100: 7B"]
-    OWNERS["PROPOSED disjoint condition ownership<br/>Exclude active 7B ROT13 level 1<br/>Distinct verified Drive outputs; same 40 fits"]
+    OWNERS["PROPOSED disjoint condition ownership<br/>Fresh 7B levels 1-10 per family; old attempt archived<br/>Distinct verified Drive outputs; same 40 fits"]
     PLAN -.->|Proposal; target hardware unvalidated| PROPOSED
     PROPOSED -.-> OWNERS
     OWNERS -.->|Require affected runtime evidence| GATES

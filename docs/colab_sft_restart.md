@@ -33,5 +33,13 @@ Each worker has separate per-family state, output directories and immutable
 Drive checkpoint identities. Dataset downloads must match the certified Drive
 index by hash and size. GPU state is disposable; complete adapter, optimizer,
 scheduler, RNG and sampler checkpoints must be verified in Drive. Current
-status: pinned setup complete, certified data staging and affected runtime
-qualification in progress; training has not yet started.
+status: both native 7B control reports passed, all thirteen required launch gates
+passed, and both family queues started on 12 October 2026 using source
+`05f47f48f2cc2bbaaff326bb83b3594e5ae973c5`. Each completed its first optimizer
+update and verified full state in Drive. A whole-update pause then exact recovery
+removed an operator-imposed cutoff; neither queue inherits the old step-987 run.
+Both now have no intentional time limit. The legacy required deadline argument
+uses `9999-12-31T23:59:59.999999+00:00` as an operational sentinel. Colab resource
+limits and explicit stop requests can still interrupt a runtime. No fit or final
+validation is yet reported complete. Only 7B baseline execution is qualified;
+14B and optimized A100 profiles remain outside these receipts.

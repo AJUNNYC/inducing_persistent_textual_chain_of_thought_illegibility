@@ -14,11 +14,12 @@ flowchart TD
 %% Historical a6e3295 lineage began at step 509 with preserved parent bytes.
 %% Final source 07f8a68 copy-removal trial passed bitwise state/RNG but failed speed; rejected.
 %% Historical resume: accepted a6e3295 from step 673 in the same lineage; no new migration.
-%% Current session paused safely at step 987/1250; full checkpoint verified in Drive.
-%% No new worker deployment; remaining 263 updates and final validation await resume.
+%% Historical PRO session paused at step 987/1250; checkpoint archived in Drive.
+%% Current: two A100 40GB baseline queues, 7B ROT13 and KaziText levels 1-10, fresh restart.
 %% Optimization rounds are closed; all scientific settings and 40 planned fits are retained.
 %% PROPOSED only: two PRO 6000 workers for 14B and two Colab A100 workers for remaining 7B fits.
-%% Current 7B ROT13 level 1 stays owned; no duplicate condition, new deployment or A100/14B approval.
+%% Native 7B baseline controls passed on both A100s; 14B remains unstarted.
+%% No user-imposed wall-clock deadline; whole checkpoints require Drive verification.
 %% Planning source: docs/sft_multi_gpu_execution_plan.md; forecasts are estimates, not benchmarks.
 %% Loss trials compare against active no recomputation; preserve latest full-state progress and RNG.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
@@ -70,7 +71,7 @@ flowchart TD
     MEASURE["Freeze prospective paired target-GPU screen<br/>Losses, gradients, updates, speed and RNG"]
     ACCEPT{"Source / GPU / condition evidence passes?"}
     MIGRATE["If continuing: preserve parent checkpoint<br/>Inherit full state and publish child lineage"]
-    PROPOSED["PROPOSED worker assignment<br/>One owner per independent fit<br/>Exclude active 7B ROT13 level 1"]
+    PROPOSED["PROPOSED worker assignment<br/>One owner per independent fit<br/>Fresh 7B levels 1-10 per family; old attempt archived"]
     INPUT -.->|Additional workers unvalidated| PROPOSED
     PROPOSED -.->|Record source, hardware and Drive ownership| PROFILE
     INPUT --> PROFILE --> SETUP --> DONE

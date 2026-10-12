@@ -1,8 +1,13 @@
 ## Current SFT optimization evidence — 2026-10-11
 
-## Current session: paused on 11 October 2026
+## Current session: two A100 queues started on 12 October 2026
 
-At **7:19 PM EDT**, the accepted 7B ROT13 level-1 fit was safely paused at **step 987 of 1,250** through its whole-update handler. The [pause receipt](evidence/sft_pro6000_session_pause_987.json) verifies the full adapter, optimizer, scheduler, RNG and sampler checkpoint in Google Drive. There are 263 optimizer updates remaining; training and final validation are not complete. The Pod may be stopped through the RunPod console. Resume from the verified full checkpoint under the existing scientific identity; if the original deadline has elapsed, a new authorized deadline is required. This session pause supersedes earlier RUNNING snapshots without changing their historical evidence. No additional workers have been deployed.
+The user authorized fresh 7B ROT13 and KaziText queues, levels 1–10 each, on separate Colab A100-SXM4-40GB runtimes. Both native 7B controls and all thirteen launch gates passed; GitHub source `05f47f4` runs the eager baseline with gradient checkpointing enabled. Both queues completed their first optimizer update and verified full checkpoints in Google Drive, then resumed those exact new-run states to remove the temporary operator cutoff. There is no user-imposed wall-clock deadline. Each later level starts from the untouched pinned base. The previous PRO 6000 step-987 checkpoint is archived and is not the parent of these fresh queues. No fits or final validations are yet reported complete; 14B training has not started. See [the restart record](colab_sft_restart.md) for scope and provenance.
+
+
+## Prior implementation and evidence scope
+
+The following implementation details and dated measurements retain their original scope; the current A100 deployment is described above.
 
 The [four-worker execution plan](sft_multi_gpu_execution_plan.md) records a **proposal**, not a deployed configuration: two PRO 6000 workers for 14B and two Colab A100 workers for the remaining 7B fits. The currently owned 7B ROT13 level-1 fit is excluded from their queues. All 40 independent fits and scientific settings remain fixed, with distinct verified Drive outputs and no duplicate ownership. Runtime/cost forecasts are estimates; A100/14B capacity, throughput and execution profiles are unvalidated. Current source a6e3295 approval remains limited to the measured 7B ROT13 level-1 condition.
 

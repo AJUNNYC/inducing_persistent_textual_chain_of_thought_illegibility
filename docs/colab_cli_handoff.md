@@ -67,28 +67,22 @@ checkpoint as an archive. See [the two-A100 restart](colab_sft_restart.md).
 - Data generation and the certified 7B SFT handoff have already been completed;
   inspect [SFT data handoff](sft_data_handoff.md) and its evidence rather than
   restarting collection or repeating completed scientific suites.
-- The accepted production source is
-  `a6e3295bfeca2c213360ae6d772dbfec6a08017e`, specifically for 7B ROT13 level 1
-  on RTX PRO 6000 Blackwell 96GB. The later memory-copy optimization was
-  rejected and must not be activated.
-- Training is **PAUSED at optimizer step 987/1250**. The complete state is
-  verified in Google Drive. There are **263 updates plus final validation**
-  remaining. See [the pause receipt](evidence/sft_pro6000_session_pause_987.json).
-- Full-checkpoint Drive folder:
-  `142UamKwaFNprt3DbsXP1F0YNR3iizBU5`; full-state file:
-  `1aOXFsl8kpXbDGbkMps9UKpS36gILXzvr`, SHA-256
-  `c0e84a69de64b6c2cd113b601f7ccee2fa25ba84ac1a0d2cbcbe9b29e15a3231`.
-- Preserve the adapter, optimizer, scheduler, RNG, sampler, exposure order, and
-  scientific condition identity when resuming. The recorded deadline is
-  `2026-10-12T02:24:01.558671+00:00`; if it has elapsed, obtain a newly authorized
-  deadline rather than silently extending it.
+- Current training source is `05f47f48f2cc2bbaaff326bb83b3594e5ae973c5`.
+  Two A100-SXM4-40GB workers run fresh 7B baseline family queues:
+  `sft_a100` ROT13 levels 1–10 and `sft_a100_kazi` KaziText levels 1–10.
+  Native 7B controls passed on each device; all thirteen launch gates passed.
+- The prior PRO 6000 step-987 checkpoint remains archived in Drive and must not
+  be used as the parent of these new queues. Its original receipt is historical.
+- Both new queues completed one optimizer update and Drive-verified full state,
+  then resumed that exact state solely to remove the operator time cutoff.
+  The user imposes no wall-clock deadline. The runner's legacy mandatory deadline
+  uses datetime.max (`9999-12-31T23:59:59.999999+00:00`) as a sentinel.
+  Explicit stop requests and Colab/provider termination remain possible.
 - Google Drive is the sole durable checkpoint store. Verify uploaded bytes
   before treating a checkpoint as recoverable or releasing a runtime.
-- An A100 runtime is allocated and command access is verified, but no
-  additional training workers or A100 training profiles have been deployed or measured. The fast Triton helpers were qualified for SM120 with Triton 3.5.0;
-  do not assume those helpers work on an A100. Qualify a compatible execution
-  profile while preserving the scientific recipe, starting with changes least
-  likely to alter results. Reuse completed checks and run only affected checks.
+- Both A100s use the eager checkpointed baseline; Blackwell-specific optimized
+  kernels are not activated. Qualification covers 7B only, not 14B or optimized
+  A100 profiles. No measured A100 throughput forecast is claimed yet.
 - See [the proposed worker allocation](sft_multi_gpu_execution_plan.md) and
   [measured optimizations](sft_optimizations.md). The four-worker allocation is
   a proposal, not proof that four sessions can run or that Colab has sufficient
