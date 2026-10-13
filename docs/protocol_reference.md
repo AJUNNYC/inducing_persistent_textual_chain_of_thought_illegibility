@@ -86,29 +86,28 @@ Garbage surrounding a complete readable solution does not establish loss of text
 reasoning; retain the existing readable­solution and padding controls. These distinctions motivate
 mechanism­neutral claims about the model organisms [44, 46, 41, 54, 51].
 Table 1. Available conditions and completed 14B ROT13 level-10 fit
-Models: DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Qwen-14B, each compared against its own
-untouched base.
+Models: DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Qwen-14B, each compared against its own untouched
+base.
 Transformations: ROT13 and official KaziText, each at ten fixed levels.
-Available inventory: 2 model sizes x 2 families x 10 levels = forty independent condition datasets, all verified in
-Drive.
-Completed: fresh 14B ROT13 L10,625 updates,Drive verified. Retain adapter;19 selected 14B conditions
-uncompleted. $240 authorized. VerifiedGPQA 49/198 baseline preceded source 9de8813 KaziText L10
-training;checkpoint 200/625 Drive-verified 13 Oct 21:31 UTC.
-Default per-fit efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine horizon
-and19 warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with FP32
-loss/hidden-gradient accumulation, SDPA and plain AdamW. It retains completion-only masks/per-example
-weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1 x16),effective16,seed 42 and full 4096 eligibility.
-Checkpoint every 100 and final 625 with verified Drive recovery.
+Available inventory: 2 model sizes x 2 families x 10 levels = forty independent condition datasets, all verified in Drive.
+Completed: fresh 14B ROT13 L10,625 updates,Drive verified. Retain adapter;19 selected 14B conditions uncompleted.
+$240 authorized. GPQA49/198 baseline Drive-verified. KaziTextL10 paused444/625;currentpriorityROT13levels1?9. L1
+nativeguards/checkpoint0/Drive/GPUproofpassed22:06UTC;source9de unchanged,no auto-KaziText.
+Default per-fit efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine horizon and19
+warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with FP32 loss/hidden-gradient
+accumulation, SDPA and plain AdamW. It retains completion-only masks/per-example weighting, LoRA 8/16/.05,LR
+2e-4,requested2 x8 (fallback1 x16),effective16,seed 42 and full 4096 eligibility. Checkpoint every 100 and final 625 with
+verified Drive recovery.
 The user authorizes this published-method baseline without another optimization test/timing campaign. Actual native
-model/mask/gradient/full-state guards execute at startup before updates; public receipts certify completed ROT13
-L10 and started KaziText L10 native guards,not future conditions,actual 1 x 16,checkpointing off. This changes
-exposure and numerical execution and does not guarantee the same trained results or one-hour completion.This fit
+model/mask/gradient/full-state guards execute at startup before updates; public receipts certify completed ROT13 L10
+and started KaziText L10 native guards,not future conditions,actual 1 x 16,checkpointing off. This changes exposure
+and numerical execution and does not guarantee the same trained results or one-hour completion.This fit
 took5793.143751s; worker6322.565654s($4.81/$5.25 at $2.99/h,not invoices). Other runtimes remain unmeasured.
-Original NF4 legacy_two_epoch_v1 and intermediate NF4 one_epoch_pilot_v1 remain explicit alternatives. The
-original full-grid design evaluates40 SFT adapters,20 RL snapshots and2 bases (62 states); those counts are
-available legacy scope, not the active queue. Validation diagnostics may precede reserved final tests. Original
-confirmatory thresholds/windows remain unchanged; The single completed L10 fit cannot claim unobserved levels
-or a multi-level success window.
+Original NF4 legacy_two_epoch_v1 and intermediate NF4 one_epoch_pilot_v1 remain explicit alternatives. The original
+full-grid design evaluates40 SFT adapters,20 RL snapshots and2 bases (62 states); those counts are available legacy
+scope, not the active queue. Validation diagnostics may precede reserved final tests. Original confirmatory
+thresholds/windows remain unchanged; The single completed L10 fit cannot claim unobserved levels or a multi-level
+success window.
 ```
 
 ## page_003
@@ -1592,10 +1591,10 @@ All forty datasets remain available. Active SFT is14B only:ROT13/KaziText at all
 data/results retained. CompletedROT13 14B L10 retained; 19 active 14B conditions remain uncompleted;7B
 data/history retained. Each chosen fit starts from its untouched base with separate source/configuration/recipe,
 adapter, optimizer, scheduler and RNG/sampler identity. GPQA untouched 14B baseline first:198
-items,raw/scored/report Drive-verified before SFT. Queue KaziText L10 then ROT13/KaziText levels 1?9;19 fresh
-base fits. $240 authorized; no imposed rate cutoff. GPQA baseline nowcomplete49/198,Drive-verified; fixed3072
-cap caused133 truncated/3 malformed. Worker9de8813 started KaziText L10;200/625 verified21:31UTC13Oct.
-Laterqueue pending; docscommit is separate.
+items,raw/scored/report Drive-verified before SFT. Currentqueue:ROT13 levels1?9 only,after KaziTextL10
+paused444/625 Drive-verified. No auto-KaziText. $240 authorized; no imposed rate cutoff. GPQA baseline
+nowcomplete49/198,Drive-verified; fixed3072 cap caused133 truncated/3 malformed. Worker9de8813 started
+KaziText L10;200/625 verified21:31UTC13Oct. Laterqueue pending; docscommit is separate.
 C.2.4 Efficient per-fit accounting and resource implications
 The default efficient_one_epoch_v1 processes all 10,000 accepted training records once, plus loss-only diagnostics
 on the separate 100 validation IDs. Request microbatch2 x accumulation8; capacity fallback1 x16. Both retain
@@ -2933,7 +2932,8 @@ E.2.3 Machine-readable configuration and exact artifact contracts
 54
 Freeze model/tokenizer, data, source and dependency identities; hashes verify recorded bytes, not correctness. All forty condition
 datasets remain Drive-verified. Completed 14B ROT13 L10 retained; 19 selected 14B conditions uncompleted. $240 authorized.
-VerifiedGPQA 49/198 baseline preceded source 9de8813 KaziText L10 training;checkpoint 200/625 Drive-verified 13 Oct 21:31 UTC.
+GPQA49/198 baseline Drive-verified. KaziTextL10 paused444/625;currentpriorityROT13levels1?9. L1
+nativeguards/checkpoint0/Drive/GPUproofpassed22:06UTC;source9de unchanged,no auto-KaziText.
 Default efficient_one_epoch_v1: all 10,000 examples once per selected fit;625 updates, full cosine horizon 625, warmup 19.
 Unquantized BF16 base/head, exact direct full-gradient CCE FP32 loss/hidden accumulation, SDPA and plain AdamW replace old
 NF4 execution. Preserve full-target completion-only weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1 x16),effective16,seed
@@ -3137,19 +3137,21 @@ induction or apparent internal-monitor success subject to judge shortcuts, selec
 changes and intervention artifacts; the audit is intended to protect that inference rather than
 manufacture a stronger scientific result [41, 54, 59].
 58
-Corpus: 10,100 accepted pairs; all40 transformed datasets/404,000 records and122 artifacts Drive-verified. Existing
-four-domain bases passed repeatability after rescoring7,398 saved outputs; baseline legibility judges deferred.
+Corpus: 10,100 accepted pairs; all40 transformed datasets/404,000 records and122 artifacts Drive-verified. Existing four-domain
+bases passed repeatability after rescoring7,398 saved outputs; baseline legibility judges deferred.
 Retained14B ROT13 L10 completed625 updates/10,000 presentations on PRO6000 96GB. Source2ea4fb9/config6f7e5048
-unchanged; final adapter/state/report Drive-verified. Fit5,793s / worker6,323s, historical$2.99/h:$4.81/$5.25(calculated,not
-invoices). All20 selected14B fits use the same one-epoch625-update recipe;19 newfits exclude retainedROT13 L10. $240
-authorization retained; no imposedrate cutoff/newprice inferred.
-Actual untouched14B GPQA Diamond seed42:49/198=24.75%,Drive-verified. Outcomes:49 correct,13 incorrect,133
-truncated,3 malformed. All198 count;3072-new-token cap matches primary evaluation. This is budget-limited output/final-field
-performance,not unrestricted GPQA accuracy. First128 cached results survived timeout recovery; no retry-until-correct.
-Worker9de8813 exited0/releasedGPU before training; laterdocs do not change its identity. TrainedGPQA remains unrun.
-Campaign started13Oct20:58:33UTC. KaziText14B L10 native guards passed; actual1 x16/checkpointing off.
-Checkpoint200/625 Drive-verified21:31UTC; process/GPU active21:38UTC,not completed. Next:ROT13/KaziText levels1?9
-ascending. Historical plans remain prospective records. Final four-domain gates unchanged; fullscope reporting pending.
+unchanged; final adapter/state/report Drive-verified. Fit5,793s / worker6,323s, historical$2.99/h:$4.81/$5.25(calculated,not invoices).
+All20 selected14B fits use the same one-epoch625-update recipe;19 newfits exclude retainedROT13 L10. $240 authorization retained;
+no imposedrate cutoff/newprice inferred.
+Actual untouched14B GPQA Diamond seed42:49/198=24.75%,Drive-verified. Outcomes:49 correct,13 incorrect,133 truncated,3
+malformed. All198 count;3072-new-token cap matches primary evaluation. This is budget-limited output/final-field performance,not
+unrestricted GPQA accuracy. First128 cached results survived timeout recovery; no retry-until-correct. Worker9de8813
+exited0/releasedGPU before training; laterdocs do not change its identity. TrainedGPQA remains unrun.
+User priority changed: KaziTextL10 paused444/625,full state Drive-verified21:58UTC. RetainROT13L10;run nine freshROT13
+levels1?9 ascending,no automaticKaziText. ROT13L1 active: nativeguards/checkpoint0 recovery passed,fullstate
+Drive-verified;PID6684 GPU98%/94%22:05/22:06UTC. Only startup0 observed;exactupdates waitforsave. Exact496-byte
+pause-status recovery changed only local_path before realDrive verification;source9de/config/cert/data/recipe unchanged. Historical
+plans remain prospective records. Final four-domain gates unchanged; fullscope reporting pending.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)

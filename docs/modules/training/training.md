@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Nineteen selected 14B conditions remain uncompleted; 20 comprise the active scope. Prepared 7B data/historical results are retained outside the queue. $240 was authorized for SFT on 13 October. The source 9de8813 campaign now runs after the verified GPQA baseline; KaziText L10 checkpoint 200/625 was Drive-verified 13 Oct 21:31 UTC. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
+**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Nineteen selected 14B conditions remain uncompleted; 20 comprise the active scope. Prepared 7B data/historical results are retained outside the queue. $240 was authorized for SFT on 13 October. The same source9de8813 worker now trainsROT13 L1; KaziTextL10 was safely paused444/625 Drive-verified21:58UTC. Currentqueue is ROT13levels 1–9 only; native startup/Drivecheckpoint 0/GPUproof passed,exactupdateswaitforsave. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
 
 | Artifact | Exact repository path |
 |---|---|
@@ -55,14 +55,14 @@ title: "spec/mermaid/workflows/training/training.mmd"
 ---
 flowchart TD
 %% Dated13Oct21:38UTC evidence: actualGPQA49/198 complete/Drive verified;133 truncated+3 malformed at3072 tokens.
-%% Worker scientificsource9de8813 runsKaziText14B L10;200/625 checkpointDrive verified21:31UTC, native guards passed1x16/GCoff.
+%% Same scientificsource9de nowtrainsROT13L1: masks/recovery passed1x16/GCoff,checkpoint0Drive-verified,GPU94-98%.
 %% RetainedROT13L10 keeps old2ea4fb9 identity; laterdocumentation cannot relabel executed workers.
 %% Training
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
 %% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
 %% Actual batch/accumulation/recomputation mode stays fixed throughout each fit and exact resume.
 %% Committed coordinator requires untouched 14B Diamond 198 baseline+verified Drive barrier before 19 new fits.
-%% Queue KaziText L10 then ROT13/KaziText levels 1-9 ascending; completed ROT13L10 retained.
+%% Queue Currentpriority:ROT13 levels1-9 only<br/>KaziTextpaused444/625; no automaticrestart ascending; completed ROT13L10 retained.
 %% Authorization $240 recorded; no inferred new price or rate-based cutoff; explicit deadline/safe pause separate.
 %% Forty datasets available; active14B scope20, completed ROT13 L10 retained;19 selectedfits uncompleted.
 %% $240 SFT authorized 13 Oct; no new worker launch recorded. RL/final evaluation remain separate.
@@ -79,7 +79,7 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 datasets; active 14B only, all ten levels<br/>Completed 14B ROT13 L10 retained<br/>20 active 14B conditions; 19 remaining<br/>7B data/history retained; disjoint jobs only<br/>GPQA untouched 14B baseline + Drive barrier first<br/>KaziText L10 then ROT13/KaziText levels 1-9<br/>Default: efficient one epoch / 625 updates"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 datasets; active 14B only, all ten levels<br/>Completed 14B ROT13 L10 retained<br/>20 active 14B conditions; 19 remaining<br/>7B data/history retained; disjoint jobs only<br/>GPQA untouched 14B baseline + Drive barrier first<br/>Currentpriority:ROT13 levels1-9 only<br/>KaziTextpaused444/625; no automaticrestart<br/>Default: efficient one epoch / 625 updates"]
     SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
     RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]

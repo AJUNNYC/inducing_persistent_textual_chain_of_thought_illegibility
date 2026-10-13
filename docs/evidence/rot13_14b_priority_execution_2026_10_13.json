@@ -1,0 +1,83 @@
+{
+  "version": "public_rot13_priority_execution_v1",
+  "status": "ROT13_LEVEL1_TRAINING_ACTIVE_KAZITEXT_PAUSED444_VERIFIED",
+  "observed_at_utc": "2026-10-13T22:06:10.376539+00:00",
+  "new_user_priority": "ROT13_levels1_through9_now_KaziText_on_hold_no_automatic_restart",
+  "scientific_source_commit": "9de8813031da737453f491723a10b305679dc42d",
+  "configuration_hash": "44e9de3f9c8b01d7bc941a676af1e64261ba841e97c6c3a6d3e90c88235dcf90",
+  "handoff_certificate_hash": "859cf4918939c99042512eca02d77864bb17393c48a7af54edb06a125592e49f",
+  "priority_plan_hash": "2038408b5101b4f0fafcfab504948fcabbec5e6e9f14dfef9cf7896fe89f6919",
+  "science_configuration_data_and_recipe_unchanged": true,
+  "current_new_job_order": [
+    "rot13_14b_level_01",
+    "rot13_14b_level_02",
+    "rot13_14b_level_03",
+    "rot13_14b_level_04",
+    "rot13_14b_level_05",
+    "rot13_14b_level_06",
+    "rot13_14b_level_07",
+    "rot13_14b_level_08",
+    "rot13_14b_level_09"
+  ],
+  "current_new_job_count": 9,
+  "automatic_kazitext_jobs": false,
+  "retained_run_ids": [
+    "rot13_14b_level_10"
+  ],
+  "paused_kazitext": {
+    "run_id": "kazitext_14b_level_10",
+    "status": "PAUSED",
+    "observed_at_utc": "2026-10-13T21:58:06.326308+00:00",
+    "completed_steps": 444,
+    "target_steps": 625,
+    "example_presentations": 7104,
+    "drive_status": "VERIFIED",
+    "checkpoint_state_hash": "570620362ba00923e3d5b63da10e8d7e8b2711ce4149ec9c4ea9a21ec468ff17",
+    "checkpoint_manifest_sha256": "9ce202a9aefb4d85c4e38c42a3aab50d79c920767c9331734d10905a53cb40ed",
+    "fit_complete": false
+  },
+  "rot13_first_fit": {
+    "run_id": "rot13_14b_level_01",
+    "status": "TRAINING_ACTIVE",
+    "wrapper_pid": 6682,
+    "child_pid": 6684,
+    "native_startup_proof": "passed",
+    "optimizer_training_claimed": true,
+    "observed_saved_checkpoint_updates": 0,
+    "exact_completed_optimizer_updates_not_yet_observed": true,
+    "physical_microbatch": 1,
+    "gradient_accumulation": 16,
+    "gradient_checkpointing": false,
+    "runtime_evidence_document": "docs/evidence/rot13_14b_level01_native_startup_2026_10_13.json",
+    "gpu_busy_samples": [
+      {
+        "at": "2026-10-13T22:05:44+00:00",
+        "utilization_percent": 98
+      },
+      {
+        "at": "2026-10-13T22:06:10+00:00",
+        "utilization_percent": 94
+      }
+    ],
+    "checkpoint_zero_drive_status": "VERIFIED"
+  },
+  "gpqa_baseline_previously_verified": true,
+  "gpqa_baseline_regenerated": false,
+  "rate_based_cutoff": false,
+  "operational_recovery": {
+    "first_helper_pid": 6668,
+    "first_failure_before_gpu": true,
+    "reason": "mutable_coordinator_pause_status_overwritten_after_failed_publication",
+    "exact_recovered_payload_bytes": 496,
+    "exact_recovered_payload_sha256": "c029f2807eb60ec99604db38868ca7373a3933319c648caef440b3303fe65ed1",
+    "registry_fields_changed": [
+      "local_path"
+    ],
+    "status": "RECOVERED_VERIFIED",
+    "receipt_hash": "086aa7efe9938e298282e1969b535f110148a50ce906040099a184e6c9259056",
+    "records_deleted": false,
+    "retry_budgets_reset": false,
+    "immutable_identity_changed": false
+  },
+  "credential_values_or_dataset_rows_included": false
+}

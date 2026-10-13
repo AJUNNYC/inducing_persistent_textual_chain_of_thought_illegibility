@@ -113,8 +113,12 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       mbpp_sandbox_check.json
       mbpp_sandbox_prior_attempt.json
       readme.md
+      rot13_14b_level01_native_startup_2026_10_13.json
+      rot13_14b_pause_status_reconciliation_2026_10_13.json
+      rot13_14b_priority_execution_2026_10_13.json
       scaffold_validation_report.md
       sft_14b_campaign_training_active_2026_10_13.json
+      sft_14b_rot13_priority_active_2026_10_13.json
       sft_data_handoff_773cfd3_certificate.json
       sft_data_handoff_certificate.json
       sft_data_handoff_drive_index.json

@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 570,
+  "files": 574,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1177,6 +1177,39 @@
       "blank": false
     },
     {
+      "path": "docs/evidence/rot13_14b_level01_native_startup_2026_10_13.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/rot13_14b_level01_native_startup_2026_10_13.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_5d198d843dc846",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/rot13_14b_pause_status_reconciliation_2026_10_13.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/rot13_14b_pause_status_reconciliation_2026_10_13.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_05f6af56d5a968",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_503d2f3805196c",
+      "blank": false
+    },
+    {
       "path": "docs/evidence/scaffold_validation_report.md",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -1196,6 +1229,17 @@
       "display_path": "docs/evidence/sft_14b_campaign_training_active_2026_10_13.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_8c45045a709b2c",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_14b_rot13_priority_active_2026_10_13.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_14b_rot13_priority_active_2026_10_13.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_09e59285cebd20",
       "blank": false
     },
     {

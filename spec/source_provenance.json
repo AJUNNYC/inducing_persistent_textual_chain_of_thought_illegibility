@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "e8137a00ead72a3de3f5dbad39a48a1776fcdf463d631a529b2af153fd4110a7"
+    "sha256": "1fefed6d26e199991b67e105b0ec6de0cd8215f7002eeadb0dc78b18d80896a2"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,7 +27,7 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "5e97e4b5ab09d33631fca55d39a0d4fa9a1ce5ef6071293efd7f3592a69670aa",
+  "procedure_update_sha256": "4cb657eb22dd6851c9dc52ebf5cd34f2624253b19ad758e87eea97f98786551f",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_19_SELECTED_14B_FITS",
@@ -266,9 +266,65 @@
     "original_full_grid_state_count": 62,
     "original_full_grid_window_count": 216,
     "missing_unrun_states_are_success": false,
-    "coordinator_cli": "scripts/run_14b_sft_campaign.py",
+    "coordinator_cli": "scripts/run_certified_sft.py",
     "baseline_before_sft_required": true,
-    "ordered_remaining_fits": [
+    "new_queue_status": "ROT13_LEVEL1_TRAINING_ACTIVE_KAZITEXT_LEVEL10_PAUSED444_VERIFIED",
+    "current_worker_scientific_source": "9de8813031da737453f491723a10b305679dc42d",
+    "campaign_started_at": "2026-10-13T20:58:33+00:00",
+    "current_fit": {
+      "run_id": "rot13_14b_level_01",
+      "status": "TRAINING_ACTIVE",
+      "wrapper_pid": 6682,
+      "child_pid": 6684,
+      "snapshot_at": "2026-10-13T22:06:10.376539+00:00",
+      "native_guards": "passed",
+      "checkpoint_zero_recovery": "passed",
+      "startup_checkpoint_drive_status": "VERIFIED",
+      "last_observed_saved_checkpoint_updates": 0,
+      "exact_completed_optimizer_updates_not_yet_observed": true,
+      "physical_microbatch": 1,
+      "gradient_accumulation": 16,
+      "gradient_checkpointing": false,
+      "gpu_samples_percent": [
+        98,
+        94
+      ],
+      "evidence_document": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json"
+    },
+    "current_operational_priority": "ROT13_LEVELS1_TO9_KAZITEXT_SUSPENDED",
+    "current_queue_families": [
+      "rot13"
+    ],
+    "current_queue_levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "current_queue_new_fit_count": 9,
+    "automatic_kazitext_restart": false,
+    "current_priority_receipt": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json",
+    "paused_kazitext_fit": {
+      "run_id": "kazitext_14b_level_10",
+      "status": "PAUSED",
+      "observed_at_utc": "2026-10-13T21:58:06.326308+00:00",
+      "completed_steps": 444,
+      "target_steps": 625,
+      "example_presentations": 7104,
+      "drive_status": "VERIFIED",
+      "checkpoint_state_hash": "570620362ba00923e3d5b63da10e8d7e8b2711ce4149ec9c4ea9a21ec468ff17",
+      "checkpoint_manifest_sha256": "9ce202a9aefb4d85c4e38c42a3aab50d79c920767c9331734d10905a53cb40ed",
+      "fit_complete": false
+    },
+    "priority_active_receipt": "docs/evidence/sft_14b_rot13_priority_active_2026_10_13.json",
+    "priority_active_receipt_hash": "5b635753bd2666fbc98b09137004dc35daca6a2d70e5e58ed6be52644576aacd",
+    "priority_three_gpu_busy_samples": true,
+    "original_baseline_first_ordered_fits": [
       {
         "family": "kazitext",
         "model_size": "14b",
@@ -365,21 +421,58 @@
         "level": 9
       }
     ],
-    "new_queue_status": "RUNNING_KAZITEXT_14B_LEVEL10_AFTER_VERIFIED_GPQA_BASELINE",
-    "current_worker_scientific_source": "9de8813031da737453f491723a10b305679dc42d",
-    "campaign_started_at": "2026-10-13T20:58:33+00:00",
-    "current_fit": {
-      "run_id": "kazitext_14b_level_10",
-      "status": "RUNNING",
-      "checkpoint_snapshot_at": "2026-10-13T21:31:09+00:00",
-      "last_verified_completed_updates": 200,
-      "target_updates": 625,
-      "drive_status": "VERIFIED",
-      "native_guards": "passed",
-      "physical_microbatch": 1,
-      "gradient_accumulation": 16,
-      "gradient_checkpointing": false,
-      "new_fit_completion_claimed": false
+    "ordered_remaining_fits": [
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 1
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 2
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 3
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 4
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 5
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 6
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 7
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 8
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 9
+      }
+    ],
+    "historical_baseline_first_coordinator_cli": "scripts/run_14b_sft_campaign.py",
+    "current_operational_lifecycle_helper": {
+      "git_tracked": false,
+      "sha256": "9bad1636b781bcbf8f6dc05199ee28f0c7837e555f1df282d545e49f91af288c",
+      "purpose": "Sequential lifecycle calls to the published single-fit CLI for ROT13 levels 1 through 9; no scientific implementation changes"
     }
   },
   "current_sft_authorization": {
