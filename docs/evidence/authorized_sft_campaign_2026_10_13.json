@@ -1,0 +1,536 @@
+{
+  "schema_version": "prospective_sft_campaign_v1",
+  "status": "PLANNED_NOT_LAUNCHED",
+  "authorized_on": "2026-10-13",
+  "authorized_usd": 240,
+  "scope": "SFT_only",
+  "training_recipe_unchanged": true,
+  "available_conditions": 40,
+  "completed_conditions": 1,
+  "remaining_conditions": 39,
+  "completed_fit": {
+    "run_id": "rot13_14b_level_10",
+    "identity": {
+      "code_revision": "2ea4fb9a7737cff806226366e73743eec5935fad",
+      "configuration_hash": "6f7e50488aa8e8379dfb7f303bc790cef38493b1a260be3b27e5e8d13ad666ec",
+      "dataset_hash": "7bce352922c2a205046ecd600f118802f8cab8360f2cf744024ef94e74ebeba4",
+      "dependency_hash": "105fdef0f204ddf5b4a5570f86c91fce03164b5746e14835f1b569e5b3af29e2",
+      "family": "rot13",
+      "handoff_certificate_hash": "a34e70567bb2c65b3ce3de45624a075b8818cd51ed8c62f954ae14b6edeb610c",
+      "implementation_version": "completion_sft_v1",
+      "level": 10,
+      "model_id": "14b",
+      "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+      "model_revision": "1df8507178afcc1bef68cd8c393f61a886323761",
+      "producer_configuration_hash": "3757493e93d7f3ac31d9215bd493ae4f13cae0bed7c97e773f4ca4ef5be2ed54",
+      "published_execution_policy": {
+        "adapter_parameters_dtype": "float32",
+        "approximate_gradient_filtering": false,
+        "attention_implementation": "sdpa",
+        "base_quantization": "none",
+        "base_weights_dtype": "bfloat16",
+        "cce_autotune": false,
+        "cce_commit": "3de376c106a1916bc5e1b619f9c77c87a461ee1c",
+        "cce_options": {
+          "accum_c_fp32": true,
+          "accum_e_fp32": true,
+          "bias": null,
+          "filter_c_grad": false,
+          "filter_e_grad": false,
+          "filter_eps": null,
+          "ignore_index": -100,
+          "impl": "cce_exact",
+          "reduction": "none",
+          "shift": 1,
+          "softcap": null
+        },
+        "cce_repository": "https://github.com/apple/ml-cross-entropy.git",
+        "classifier_dot_accumulator_dtype": "float32",
+        "classifier_logits_rounding_dtype": "bfloat16",
+        "classifier_weights_dtype": "bfloat16",
+        "effective_batch_size": 16,
+        "fallback_gradient_accumulation": 16,
+        "fallback_physical_microbatch": 1,
+        "global_tf32": false,
+        "gradient_checkpointing_policy": "off_unless_full_single_example_cuda_oom",
+        "gradient_checkpointing_preserve_rng_state": true,
+        "gradient_checkpointing_use_reentrant": false,
+        "historical_fp32_head_equivalence": false,
+        "loss_dtype": "float32",
+        "loss_implementation": "upstream_cce_exact_full_gradient",
+        "loss_reduction": "mean_supervised_tokens_per_example_then_mean_examples",
+        "native_speedup_measured": false,
+        "optimizer_state_dtype": "float32",
+        "physical_batch_adaptation": "startup_only_frozen_for_fit_and_resume",
+        "physical_batch_capacity_policy": "duplicate_longest_example_non_updating_backward",
+        "physical_batch_selection_order": [
+          {
+            "gradient_checkpointing": false,
+            "physical_microbatch": 2
+          },
+          {
+            "gradient_checkpointing": false,
+            "physical_microbatch": 1
+          },
+          {
+            "gradient_checkpointing": true,
+            "physical_microbatch": 2
+          },
+          {
+            "gradient_checkpointing": true,
+            "physical_microbatch": 1
+          }
+        ],
+        "policy": "published_bf16_lora_full_gradient_cce_v2",
+        "requested_gradient_accumulation": 8,
+        "requested_physical_microbatch": 2,
+        "sdpa_actual_backend": "not_instrumented",
+        "sdpa_backend_policy": "prefer_flash_then_efficient_allow_math_fallback",
+        "supplemental_dependency_lock": "requirements_sft_published.lock",
+        "supplemental_dependency_lock_sha256": "0260a293515f8aca6252e56685ae4df92153ae7d2c145255c86369b22d6304c9",
+        "training_budget": "efficient_one_epoch_v1"
+      },
+      "recipe": {
+        "checkpoint_steps": 100,
+        "compute_dtype": "bfloat16",
+        "double_quantization": false,
+        "early_stopping": false,
+        "effective_batch_size": 16,
+        "epochs": 1,
+        "gradient_accumulation_steps": 8,
+        "gradient_checkpointing": false,
+        "learning_rate": 0.0002,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_rank": 8,
+        "loss_reduction": "mean_supervised_tokens_per_example_then_mean_examples",
+        "max_grad_norm": 0.3,
+        "max_length": 4096,
+        "microbatch_size": 2,
+        "optimizer": "adamw",
+        "quantization": "bf16",
+        "scheduler": "cosine",
+        "seed": 42,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "warmup_ratio": 0.03,
+        "weight_decay": 0.0
+      },
+      "run_id": "rot13_14b_level_10",
+      "strength": 1.0,
+      "tokenizer_revision": "1df8507178afcc1bef68cd8c393f61a886323761",
+      "training_budget": "efficient_one_epoch_v1"
+    },
+    "adapter_manifest_hash": "0921af25d94fd23b5d748a5b5e5e4d74f0ab57542a0946c10cd493380ab8b9aa",
+    "checkpoint_hash": "99912dfd758442f1e91d3a92a8aa31121ecda8bc1828aa2a2a03f82ecc6c0175",
+    "drive_folder_id": "1dnkVaKj7eBZhWDOUTLf62inXRCzeo2R0",
+    "reuse": "retain_original_identity_and_exclude_from_remaining_jobs"
+  },
+  "remaining_jobs": [
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 1,
+      "run_id": "rot13_7b_level_01",
+      "dataset_hash": "f44d6380a396d8ba808303635152efbe339a5a2b605907c0288cbf62ef7f355f",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 2,
+      "run_id": "rot13_7b_level_02",
+      "dataset_hash": "a7aa423958e29ff05d347795e48a539903eb8d5f9fae6da165892918fcee468f",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 3,
+      "run_id": "rot13_7b_level_03",
+      "dataset_hash": "ca34118e530dcbf4498a6b011f0d28a349e09b62f172cdbf35b2b3793c094d98",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 4,
+      "run_id": "rot13_7b_level_04",
+      "dataset_hash": "f70b0166800f9073a37a1dda868f302420c6da31dd8ab42a25c7260d2d3bed76",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 5,
+      "run_id": "rot13_7b_level_05",
+      "dataset_hash": "ce91e0f10279334af0367dc9311d097389ca0180503b956b9d6c9219ca6ca2c9",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 6,
+      "run_id": "rot13_7b_level_06",
+      "dataset_hash": "3a09be9259729024f5c5fb71210919d00a2221d0c65ca5a21e614772eb90761d",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 7,
+      "run_id": "rot13_7b_level_07",
+      "dataset_hash": "99964d7e09e0470193e64805eef591f3693c4f3c37176000d79e781a804417a4",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 8,
+      "run_id": "rot13_7b_level_08",
+      "dataset_hash": "3a4bbd25c0b4d41abf8a9206bc97bbfef3a521003f094ab43cdee480a0a51c05",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 9,
+      "run_id": "rot13_7b_level_09",
+      "dataset_hash": "79ff8ef93295e9c70b2ea06f9722e56d4675aeab6cc692c44ab4a7a85862ee1d",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "7b",
+      "level": 10,
+      "run_id": "rot13_7b_level_10",
+      "dataset_hash": "a85aa15904a9d8f1007bee05bf9b122e31be40f4847973a0244623ff432d6c86",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 1,
+      "run_id": "rot13_14b_level_01",
+      "dataset_hash": "9b6bf59abcc7998e76b1b092be2aa74e2895471378c489af61f08c1483fd522d",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 2,
+      "run_id": "rot13_14b_level_02",
+      "dataset_hash": "3f8c0ba9691b972c5ab1d2f0d3a5dfc9f452c0ce43daeedfa108d825e058846d",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 3,
+      "run_id": "rot13_14b_level_03",
+      "dataset_hash": "ed1e9b9043eebe2b4e208756e6375aa3ae768fb292c26d877b7d9d3809f5a8b8",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 4,
+      "run_id": "rot13_14b_level_04",
+      "dataset_hash": "052b6cff8985bdda84aef70ec97ad3f7b6bdd364935422eb6f5e35dd049984ff",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 5,
+      "run_id": "rot13_14b_level_05",
+      "dataset_hash": "19c053c2785858ceb6a9adce561b79eb776154833bc4ab38aa2d4a22a18ee571",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 6,
+      "run_id": "rot13_14b_level_06",
+      "dataset_hash": "1e4335ce3d55dfe99419ac1de58db368d55c71fe871bc0efa38ce50b5cd278fe",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 7,
+      "run_id": "rot13_14b_level_07",
+      "dataset_hash": "2e17ec1c3d2480936f35b19f01ef86ca396e62a0799102ca837988a587c703ca",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 8,
+      "run_id": "rot13_14b_level_08",
+      "dataset_hash": "2ff132eccddf564544e381e3d066e31028c0041a88418316453aaa6c483c8472",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "rot13",
+      "model": "14b",
+      "level": 9,
+      "run_id": "rot13_14b_level_09",
+      "dataset_hash": "79e67dbb68d90d9e92966e133810646f506aaf6a918df3fa89f0ba67896b9cbc",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 1,
+      "run_id": "kazitext_7b_level_01",
+      "dataset_hash": "7264d4ba09f62e8680b13d3059ac32543e90f7ae180b33d9045101ef0f53201e",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 2,
+      "run_id": "kazitext_7b_level_02",
+      "dataset_hash": "672e5e6231dfd5c69ce299f37b2fb0bdbfaaa0705dba577bc82565f711ac4cd0",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 3,
+      "run_id": "kazitext_7b_level_03",
+      "dataset_hash": "9f9dd13ce4a023548b2b1e5cdcc81dd108456fb49c88e0845616908a0a2585f3",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 4,
+      "run_id": "kazitext_7b_level_04",
+      "dataset_hash": "ac80de20417c296dcab684cbd98edc2f27f3944130867f43b96aae1ebfb1d40f",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 5,
+      "run_id": "kazitext_7b_level_05",
+      "dataset_hash": "667787ccc6762ed69b76550ace6dde44a7b33e2e605d05da42ecfbc40c7263f7",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 6,
+      "run_id": "kazitext_7b_level_06",
+      "dataset_hash": "ea41eddc97a5d68ebf8a8af342f6315aa56783e42df5382eb78d6a52c7e55bab",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 7,
+      "run_id": "kazitext_7b_level_07",
+      "dataset_hash": "9646a82a0a89486a1462fa2ad5b6f032ac7a2efe5022a53c45118e6581700076",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 8,
+      "run_id": "kazitext_7b_level_08",
+      "dataset_hash": "39aa568f428f2c95fa79af9e299b20d2e807c885261dc79e32846c7743111f2b",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 9,
+      "run_id": "kazitext_7b_level_09",
+      "dataset_hash": "c590af4bba205c9d9d387c329740e3d7888380f8ddfa0f3292f46656dc8eb508",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "7b",
+      "level": 10,
+      "run_id": "kazitext_7b_level_10",
+      "dataset_hash": "9a530cab60af0d6a9a1454ad848df759e2947932e2b05d145bd22d0c43375d29",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 1,
+      "run_id": "kazitext_14b_level_01",
+      "dataset_hash": "43d35542646abf7d3ebb849b55315b611d60c1a74cd5e2c110979ff7688433c6",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 2,
+      "run_id": "kazitext_14b_level_02",
+      "dataset_hash": "2a09180d736e848e84968700da7a16beb143e3e53ae93e6e987aa5c869fa2669",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 3,
+      "run_id": "kazitext_14b_level_03",
+      "dataset_hash": "8da51d500b5d5efd69a054143afd0b7757ff4bd5557a80148835bd48fdcfb72e",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 4,
+      "run_id": "kazitext_14b_level_04",
+      "dataset_hash": "a4d5a42ceabc6432078b48637b5a5912cd82b0576bf93095a49d77161883fc90",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 5,
+      "run_id": "kazitext_14b_level_05",
+      "dataset_hash": "25da81d73fbfed30fdfc8580248b5dfee9082e2f61a9b892aa6b95b5690bbfb7",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 6,
+      "run_id": "kazitext_14b_level_06",
+      "dataset_hash": "0210474e49723544c73d51d43bfd86faec3bb0db57d30941a6a84902b30bc35a",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 7,
+      "run_id": "kazitext_14b_level_07",
+      "dataset_hash": "cae22e30f513145cf82e0214a02e22bdd3fde62f9ae632e65411373d8086a6f0",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 8,
+      "run_id": "kazitext_14b_level_08",
+      "dataset_hash": "08a1f1784ca7abdddce7b7c4d1908ed4b9f5855f14938a62a403ef0e1d201da7",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 9,
+      "run_id": "kazitext_14b_level_09",
+      "dataset_hash": "cbd828d676538000ad6bb7f2b80f786696f5b490d84ee6f5da25b7048504deac",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    },
+    {
+      "family": "kazitext",
+      "model": "14b",
+      "level": 10,
+      "run_id": "kazitext_14b_level_10",
+      "dataset_hash": "94cb2dd7c36789441a7324ccdd3dbf0f1ee71f344e46255c252ab4236a34c365",
+      "initialization": "untouched_pinned_base",
+      "training_budget": "efficient_one_epoch_v1",
+      "optimizer_updates": 625
+    }
+  ],
+  "launch_requirements": [
+    "Freeze a consumer configuration selecting remaining campaign conditions",
+    "Reuse compatible certified upstream corpus and reconcile exact source/configuration bindings",
+    "Run ordinary native capacity/mask/recovery safeguards for each fresh fit",
+    "Retrieve and verify completed adapter bytes before reuse in evaluation"
+  ],
+  "gpqa": "separately_frozen_appended_evaluation_does_not_change_SFT",
+  "gpu_allocations_made": 0
+}

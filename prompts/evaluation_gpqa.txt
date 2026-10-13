@@ -1,0 +1,7 @@
+Question:
+{question}
+
+Choices:
+{choices}
+
+Give the final choice label on a separate line in the form Final answer: LABEL.

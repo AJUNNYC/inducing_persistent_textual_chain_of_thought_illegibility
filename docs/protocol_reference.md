@@ -3144,9 +3144,9 @@ final adapter/state/report Drive-verified. Validation loss 0.76358 / 100 items i
 Fit 5,793.143751 s; worker 6,322.565654 s. At $2.99/h: $4.81 / $5.25 (calculated, not invoices). $240 SFT authorized 13 Oct;
 retain adapter, 39 uncompleted. Comparable 40-run projection 70.25 h / $210.05; remaining 39: 68.49 h / $204.80. One-condition
 extrapolations exclude setup/idle and RL/evaluation; track actual budget. No new worker launched here.
-GPQA Diamond (198) appended descriptive supplement matches reference dataset variant, not its full pipeline. Source acquired;
-panel freeze/evaluation pending; no results. Four-domain gates/windows unchanged; final panels reserved. Archival NF4 states
-are not warm starts; no final-efficacy equivalence is claimed.
+GPQA Diamond (198) appended descriptive supplement matches reference dataset variant, not its full pipeline. Panel prepared:
+198 questions. Comparison-state freeze/generation/evaluation pending; no results. Four-domain gates/windows unchanged; final
+panels reserved. Archival NF4 states are not warm starts; no final-efficacy equivalence is claimed.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)

@@ -23,6 +23,10 @@
   "dataset_match_is_not_pipeline_replication": true,
   "source_pipeline_public_format": "Question text only; correct answer separate; LLM correctness grader",
   "project_public_format": "Four deterministically permuted choices; frozen explicit final-letter correctness rule",
-  "dataset_download_verified": false,
-  "evaluation_executed": false
+  "dataset_download_verified": true,
+  "evaluation_executed": false,
+  "panel_prepared": true,
+  "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
+  "source_csv_sha256": "41d1213cd7a4998605a26c2798500652572007161b3a92817ba46b35befcd305",
+  "preparation_receipt": "docs/evidence/gpqa_preparation_receipt.json"
 }

@@ -1,0 +1,11 @@
+flowchart TD
+    O[Official pinned GPQA Diamond CSV: 198 questions] --> P[Prepare full panel and deterministic public choices]
+    P --> F[Freeze separate supplemental protocol before inference]
+    A[Exact published final adapter and original training identity] --> F
+    B[Untouched original base: identical model and tokenizer commits] --> F
+    F --> G[Existing native or pinned vLLM engine]
+    G --> R[Isolated immutable raw output cache]
+    R --> S[Native final-label scorer: no reference in prompt]
+    S --> C[Paired descriptive GPQA accuracies]
+    C --> D[Verified Google Drive artifacts]
+    X[Existing four-domain primary suite] -. remains unchanged .-> X

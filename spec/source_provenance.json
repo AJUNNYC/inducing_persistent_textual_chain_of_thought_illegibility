@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "852e1a5d9410528d7a99a4afaf0308fca0a0d23ad290febc186b255c81c638e4"
+    "sha256": "42eeb4479851307f829d4cf0716a8d8b5503674f66527882fd49604f6cfae3af"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,7 +27,7 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "4fc8586323752265402e7202d74c9170b03c7ba6b22011df05ea5d102551602f",
+  "procedure_update_sha256": "fb6644e9edd9c5338cfcdda1905bc73ca08c0fa00a5ad5e6f1da7f260486739c",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_39_UNCOMPLETED",
@@ -154,13 +154,15 @@
     "conditional_remaining_39_cost_usd": 204.79843914248335,
     "projection_assumption": "same_runtime_as_one_completed_14b_rot13_level10_fit",
     "installation_idle_time_included": false,
-    "rl_and_final_evaluation_included": false
+    "rl_and_final_evaluation_included": false,
+    "prospective_campaign_plan": "docs/evidence/authorized_sft_campaign_2026_10_13.json",
+    "prospective_campaign_status": "PLANNED_NOT_LAUNCHED"
   },
   "appended_gpqa_evaluation": {
     "authorized": true,
     "replaces_existing_domains": false,
     "variant": "gpqa_diamond",
-    "preparation_status": "panel_freeze_pending",
+    "preparation_status": "PREPARED",
     "results_available": false,
     "original_confirmatory_thresholds_changed": false,
     "question_count": 198,
@@ -174,6 +176,12 @@
     "source_csv_bytes": 1373492,
     "source_csv_sha256": "41d1213cd7a4998605a26c2798500652572007161b3a92817ba46b35befcd305",
     "new_user_authentication_required": false,
-    "variant_source_evidence": "docs/evidence/gpqa_variant_source.json"
+    "variant_source_evidence": "docs/evidence/gpqa_variant_source.json",
+    "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
+    "preparation_receipt": "docs/evidence/gpqa_preparation_receipt.json",
+    "comparison_state_freeze_status": "pending",
+    "generation_started": false,
+    "trained_states_evaluated": 0,
+    "supplemental_procedure_document": "docs/modules/evaluation/supplemental_gpqa.md"
   }
 }
