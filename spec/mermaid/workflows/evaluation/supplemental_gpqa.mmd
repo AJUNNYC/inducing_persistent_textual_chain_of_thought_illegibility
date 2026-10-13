@@ -1,8 +1,16 @@
 flowchart TD
     O[Official pinned GPQA Diamond CSV: 198 questions] --> P[Prepare full panel and deterministic public choices]
-    P --> F[Freeze separate supplemental protocol before inference]
+    P --> BF[Freeze untouched base-only protocol before inference]
+    B[Untouched official base: pinned model and tokenizer] --> BF
+    BF --> BG[Existing native or pinned vLLM engine: base only]
+    BG --> BR[Immutable baseline raw outputs and 198 scores]
+    BR --> BD[Baseline report and verified Drive inventory]
+    BD --> Q[Verify actual records and Drive receipt before SFT]
+    P --> F[Freeze separate paired protocol before comparison]
     A[Exact published final adapter and original training identity] --> F
-    B[Untouched original base: identical model and tokenizer commits] --> F
+    B --> F
+    BF -. optional exact-contract reuse .-> F
+    BR -. reuse original base raw bytes .-> R
     F --> G[Existing native or pinned vLLM engine]
     G --> R[Isolated immutable raw output cache]
     R --> S[Native final-label scorer: no reference in prompt]

@@ -32,6 +32,7 @@ SOURCE_REVISION = "83022cefff930aea54f654c0b282e74b9eeda5c6"
 VARIANTS = {"gpqa_main": 448, "gpqa_diamond": 198}
 PANEL_VERSION = "supplemental_gpqa_panel_v1"
 PROTOCOL_VERSION = "supplemental_gpqa_comparison_v1"
+BASELINE_VERSION = "supplemental_gpqa_baseline_v1"
 SCORER_VERSION = "supplemental_gpqa_exact_final_label_v1"
 NATIVE_VERSION = "supplemental_gpqa_native_generation_v1"
 VLLM_VERSION = "supplemental_gpqa_vllm_generation_v1"
@@ -245,16 +246,63 @@ def comparison_states(adapter_path: str | Path, cache_root: str | Path) -> list[
     return [base, trained]
 
 
-def freeze_gpqa_protocol(panel: Mapping, states: list[dict], *, backend: str) -> dict:
+def baseline_state(model: str, cache_root: str | Path, *, model_revision: str,
+                   tokenizer_revision: str) -> dict:
+    """Bind an untouched official model without requiring a trained adapter.
+
+    The baseline's model identity deliberately excludes training configuration:
+    its raw answers can be reused by later comparisons with matching pins.
+    """
+    if (model not in MODEL_IDS or not _REVISION.fullmatch(str(model_revision))
+            or not _REVISION.fullmatch(str(tokenizer_revision))):
+        raise ValueError("GPQA baseline requires an official model and immutable model/tokenizer commits")
+    model_identity = {"id": MODEL_IDS[model], "revision": model_revision,
+                      "tokenizer_revision": tokenizer_revision}
+    return {"state_id": "base_" + model, "family": "base", "model": model,
+            "model_id": MODEL_IDS[model], "model_revision": model_revision,
+            "tokenizer_revision": tokenizer_revision,
+            "cache_root": str(Path(cache_root).resolve()),
+            "checkpoint_hash": content_hash(model_identity),
+            "configuration_hash": content_hash({"untouched_base": model_identity}),
+            "runtime_hash": "pending_freeze"}
+
+
+def freeze_gpqa_baseline(panel: Mapping, state: dict, *, backend: str) -> dict:
+    validate_gpqa_panel(panel)
+    contract = generation_contract(backend)
+    state = deepcopy(state)
+    state["runtime_hash"] = content_hash(contract)
+    protocol = _seal({"version": BASELINE_VERSION, "scope": "supplemental_capability_only",
+                      "panel": deepcopy(panel), "states": [state], "seed": 42,
+                      "generation": contract, "checkpoint_selection": "untouched_official_base_before_training",
+                      "reporting": "baseline_descriptive_accuracy_no_primary_window_or_multiplicity_claim"},
+                     "protocol_hash")
+    validate_gpqa_protocol(protocol)
+    return protocol
+
+
+def freeze_gpqa_protocol(panel: Mapping, states: list[dict], *, backend: str,
+                         baseline_protocol: Mapping | None = None) -> dict:
     validate_gpqa_panel(panel)
     contract = generation_contract(backend)
     states = deepcopy(states)
     for state in states:
         state["runtime_hash"] = content_hash(contract)
-    protocol = _seal({"version": PROTOCOL_VERSION, "scope": "supplemental_capability_only",
+    protocol = {"version": PROTOCOL_VERSION, "scope": "supplemental_capability_only",
                       "panel": deepcopy(panel), "states": states, "seed": 42,
                       "generation": contract, "checkpoint_selection": "explicit_completed_final_adapter_before_evaluation",
-                      "reporting": "paired_descriptive_accuracy_no_primary_window_or_multiplicity_claim"}, "protocol_hash")
+                      "reporting": "paired_descriptive_accuracy_no_primary_window_or_multiplicity_claim"}
+    if baseline_protocol is not None:
+        validate_gpqa_protocol(baseline_protocol)
+        if baseline_protocol["version"] != BASELINE_VERSION:
+            raise ValueError("GPQA reuse requires a frozen base-only protocol")
+        protocol["baseline_reuse"] = {
+            "protocol_hash": baseline_protocol["protocol_hash"],
+            "panel_hash": baseline_protocol["panel"]["panel_hash"],
+            "generation": deepcopy(baseline_protocol["generation"]),
+            "state": deepcopy(baseline_protocol["states"][0]),
+        }
+    _seal(protocol, "protocol_hash")
     validate_gpqa_protocol(protocol)
     return protocol
 
@@ -264,24 +312,53 @@ def validate_gpqa_protocol(protocol: Mapping, *, verify_adapters: bool = True) -
     validate_gpqa_panel(protocol.get("panel", {}))
     contract = protocol.get("generation", {})
     backend = "vllm" if (contract.get("backend") or {}).get("name") == "vllm" else "native"
-    if (protocol.get("version") != PROTOCOL_VERSION or protocol.get("scope") != "supplemental_capability_only"
+    base_only = protocol.get("version") == BASELINE_VERSION
+    if (protocol.get("version") not in {PROTOCOL_VERSION, BASELINE_VERSION} or protocol.get("scope") != "supplemental_capability_only"
             or protocol.get("seed") != 42 or contract != generation_contract(backend)
-            or protocol.get("checkpoint_selection") != "explicit_completed_final_adapter_before_evaluation"
-            or protocol.get("reporting") != "paired_descriptive_accuracy_no_primary_window_or_multiplicity_claim"):
+            or protocol.get("checkpoint_selection") != ("untouched_official_base_before_training" if base_only else
+                                                        "explicit_completed_final_adapter_before_evaluation")
+            or protocol.get("reporting") != ("baseline_descriptive_accuracy_no_primary_window_or_multiplicity_claim" if base_only else
+                                            "paired_descriptive_accuracy_no_primary_window_or_multiplicity_claim")):
         raise ValueError("GPQA protocol settings differ from the frozen supplemental design")
     states = protocol.get("states", [])
-    if (not isinstance(states, list) or len(states) != 2 or states[0].get("family") != "base"
-            or states[1].get("family") not in {"rot13", "kazitext"}):
+    if (not isinstance(states, list) or len(states) != (1 if base_only else 2)
+            or any(not isinstance(s, dict) for s in states) or states[0].get("family") != "base"
+            or (not base_only and states[1].get("family") not in {"rot13", "kazitext"})):
         raise ValueError("GPQA requires one untouched base paired with one preselected final SFT adapter")
     for state in states:
         validate_state(state)
         if state.get("runtime_hash") != content_hash(contract):
             raise ValueError("GPQA state runtime binding differs")
+    if not all(_REVISION.fullmatch(str(states[0][k])) for k in ("model_revision", "tokenizer_revision")):
+        raise ValueError("GPQA model/tokenizer pins are not immutable")
+    if base_only:
+        expected = baseline_state(states[0]["model"], states[0].get("cache_root", ""),
+                                  model_revision=states[0]["model_revision"],
+                                  tokenizer_revision=states[0]["tokenizer_revision"])
+        expected["runtime_hash"] = content_hash(contract)
+        if states[0] != expected or "baseline_reuse" in protocol:
+            raise ValueError("GPQA baseline differs from the untouched official model identity")
+        return
     for key in ("model", "model_revision", "tokenizer_revision", "configuration_hash"):
         if states[0].get(key) != states[1].get(key):
             raise ValueError("GPQA base/adapter pairing differs from the original training identity")
-    if not all(_REVISION.fullmatch(str(states[0][k])) for k in ("model_revision", "tokenizer_revision")):
-        raise ValueError("GPQA model/tokenizer pins are not immutable")
+    reuse = protocol.get("baseline_reuse")
+    if reuse is not None:
+        # Reconstruct the entire baseline protocol rather than trusting a caller's
+        # claimed reuse hash or relabeling old predictions as new evidence.
+        if not isinstance(reuse, Mapping) or not isinstance(reuse.get("state"), dict):
+            raise ValueError("GPQA baseline reuse is malformed")
+        try:
+            restored = freeze_gpqa_baseline(protocol["panel"], reuse["state"], backend=backend)
+        except ValueError as error:
+            raise ValueError("GPQA baseline reuse changed its original official model identity") from error
+        if (set(reuse) != {"protocol_hash", "panel_hash", "generation", "state"}
+                or reuse["protocol_hash"] != restored["protocol_hash"]
+                or reuse["panel_hash"] != protocol["panel"]["panel_hash"]
+                or reuse["generation"] != contract
+                or any(reuse["state"].get(k) != states[0].get(k)
+                       for k in ("model", "model_revision", "tokenizer_revision"))):
+            raise ValueError("GPQA baseline reuse differs in panel, engine, prompt, seed, or model/tokenizer pins")
     if verify_adapters:
         trained = states[1]
         manifest = verify_adapter_payload(trained)
@@ -302,12 +379,14 @@ class _GPQAIdentity:
         if frozen != item:
             raise ValueError("GPQA request item differs from its immutable panel")
         prompt, version = render_gpqa_prompt(item)
+        reuse = self.protocol.get("baseline_reuse") if state["family"] == "base" else None
         return {"version": self.protocol["generation"]["version"], "state": dict(state),
                 "question_id": item["question_id"], "public_prompt": prompt,
                 "prompt_version": version, "protocol_hash": self.protocol["protocol_hash"], "seed": seed,
                 "settings": dict(GENERATION_SETTINGS),
                 "execution_mode": "fixture" if self.backend else "production",
-                **({"backend": dict(BACKEND)} if isinstance(self, VLLMEvaluationGenerator) else {})}
+                **({"backend": dict(BACKEND)} if isinstance(self, VLLMEvaluationGenerator) else {}),
+                **({"state": deepcopy(reuse["state"]), "protocol_hash": reuse["protocol_hash"]} if reuse else {})}
 
 
 class GPQANativeGenerator(_GPQAIdentity, NativeGenerator):
@@ -362,6 +441,10 @@ def evaluate_gpqa(protocol: Mapping, cache_root: str | Path, *, generator=None) 
     expected_version = protocol["generation"]["version"]
     records, summaries = [], {}
     for state in protocol["states"]:
+        # Opt-in paired reuse reads the original baseline namespace and validates
+        # complete raw identities/checksums. Legacy paired cache paths stay intact.
+        generator.cache_root = (Path(cache_root) / protocol["baseline_reuse"]["protocol_hash"]
+                                if state["family"] == "base" and protocol.get("baseline_reuse") else root)
         observed = []
         items = protocol["panel"]["items"]
         if generator.identity(state, items[0])["version"] != expected_version:
@@ -383,12 +466,14 @@ def evaluate_gpqa(protocol: Mapping, cache_root: str | Path, *, generator=None) 
         summaries[state["state_id"]] = {"denominator": len(items), "observed": len(observed),
             "correct_count": sum(r["score"]["correct"] for r in observed),
             "accuracy": sum(r["score"]["correct"] for r in observed) / len(items)}
-    base, trained = [s["state_id"] for s in protocol["states"]]
-    report = _seal({"version": PROTOCOL_VERSION, "scope": "supplemental_capability_only", "status": "complete",
+    base_only = protocol["version"] == BASELINE_VERSION
+    base = protocol["states"][0]["state_id"]
+    difference = None if base_only else summaries[protocol["states"][1]["state_id"]]["accuracy"] - summaries[base]["accuracy"]
+    report = _seal({"version": protocol["version"], "scope": "supplemental_capability_only", "status": "complete",
                    "protocol_hash": protocol["protocol_hash"], "panel_hash": protocol["panel"]["panel_hash"],
                    "variant": protocol["panel"]["variant"], "summaries": summaries, "records": records,
-                   "accuracy_difference_trained_minus_base": summaries[trained]["accuracy"] - summaries[base]["accuracy"],
+                   "accuracy_difference_trained_minus_base": difference,
                    "simulation": any(r["simulation"] for r in records),
                    "primary_suite_changed": False, "checkpoint_selection_performed": False}, "report_hash")
-    publish_immutable(root / "comparison.json", report)
+    publish_immutable(root / ("baseline.json" if base_only else "comparison.json"), report)
     return report

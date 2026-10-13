@@ -29,7 +29,7 @@ The literal `Question`, `Correct Answer`, and `Incorrect Answer 1/2/3` columns
 are used. Explanations, pre/extra-revision fields, validator feedback, and canary
 strings are never rendered in the prompt.
 
-## Frozen comparison and reuse of the completed level-10 fit
+## Untouched baseline first, then frozen adapter comparisons
 
 Preparation fixes one deterministic SHA-256 choice permutation per question
 (seed 42) and moves the correct reference label with its option. Both the
@@ -43,6 +43,22 @@ CSV checksum, panel, prompt, parser/scorer/generator implementation hashes,
 backend, seed, and exact state descriptors. Source/prompt changes cannot reuse
 the old supplemental protocol or raw cache. The original four-domain generator
 versions and prompt bytes remain unchanged.
+
+The baseline can be frozen and evaluated **before training**, without a trained
+adapter. `freeze-base` reads official model/tokenizer pins from the project
+configuration (or both explicit immutable commits) and permits only the untouched
+construction model. Its separate `supplemental_gpqa_baseline_v1` protocol contains
+one state, and `baseline.json` is complete only after every panel item has a raw
+output and a score. It never invents a missing adapter or runs a trained state.
+
+Later paired freezes can opt into `--baseline-protocol` reuse. The original
+baseline protocol is reconstructed and checked against the full panel, prompt,
+source implementations, sampling contract, engine, seed, and model/tokenizer
+commits. Use the same `--output-root` containing the baseline raw records. Exact
+baseline raw identities and bytes are reused without re-labeling them as new
+predictions or inferring accuracy from a summary alone. A missing raw cache cannot
+be substituted with the baseline's reported accuracy. Existing paired protocols
+without this option retain their original paired cache identities.
 
 Select the published `final_adapter` with its matching `fit_result.json` alongside
 it. The loader checks the original model/tokenizer commits, LoRA payload bytes,
@@ -66,11 +82,23 @@ python scripts/run_supplemental_gpqa.py prepare \
   --model-cache /workspace/model_cache \
   --output /workspace/data/evaluation/supplemental_gpqa/gpqa_diamond_panel.json
 
+python scripts/run_supplemental_gpqa.py freeze-base \
+  --panel /workspace/data/evaluation/supplemental_gpqa/gpqa_diamond_panel.json \
+  --config config.yaml --model 14b \
+  --model-cache /workspace/model_cache --backend vllm \
+  --output /workspace/data/evaluation/supplemental_gpqa/base_14b_protocol.json
+
+python scripts/run_supplemental_gpqa.py run \
+  --protocol /workspace/data/evaluation/supplemental_gpqa/base_14b_protocol.json \
+  --output-root /workspace/artifacts/evaluation/supplemental_gpqa \
+  --save-to-drive
+
 python scripts/run_supplemental_gpqa.py freeze \
   --panel /workspace/data/evaluation/supplemental_gpqa/gpqa_diamond_panel.json \
   --adapter /path/to/completed/rot13/14b/level_10/final_adapter \
   --model-cache /workspace/model_cache \
-  --backend native \
+  --backend vllm \
+  --baseline-protocol /workspace/data/evaluation/supplemental_gpqa/base_14b_protocol.json \
   --output /workspace/data/evaluation/supplemental_gpqa/rot13_14b_level10_protocol.json
 
 python scripts/run_supplemental_gpqa.py run \
@@ -87,6 +115,14 @@ the frozen protocol first, then raw outputs, scores, and the final comparison.
 No secret values are written to the artifact tree. If omitted, the CLI explicitly
 reports `drive_status: NOT_REQUESTED`; local publication is not Drive evidence.
 
+After synchronous verified publication, the CLI writes an immutable inventory
+`drive_manifest.json` and a local `completion_receipt.json` orchestration barrier.
+The receipt binds protocol/panel hashes, source, model/tokenizer commits, seed,
+simulation status, report hash and file checksum, and inventory path/checksum.
+It is written only after the payloads and inventory have been verified in Drive.
+A training coordinator must verify the actual 198 raw records and scores and
+their Drive registry entries, not trust the receipt's `COMPLETE` string alone.
+
 `--backend vllm` is available only with the existing pinned vLLM evaluation
 runtime, verified cached model snapshots, and its fixed backend contract.
 Switching backends requires a separately frozen protocol; it cannot resume a
@@ -94,7 +130,8 @@ native protocol under another backend.
 
 ## Results and validation
 
-The report contains each state's accuracy and the paired descriptive difference
+The base-only report contains the untouched model's accuracy and a null paired
+difference; a comparison report contains both accuracies and their difference
 on the complete 198-question panel. Malformed or truncated model outputs count
 as incorrect under the frozen scorer. Infrastructure errors stop execution and
 leave resumable raw records; they cannot be converted into incorrect answers or
