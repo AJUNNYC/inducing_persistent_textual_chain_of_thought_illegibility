@@ -2,7 +2,7 @@
 
 ## Current SFT status: 14B ROT13 level 10 complete; $240 authorized for remaining work
 
-The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The first fresh fit, 14B ROT13 level 10, completed all 625 updates on 12 October 2026; KaziText level 10 has not completed under this recipe. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. The completed adapter is retained, leaving 39 available conditions uncompleted. On 13 October the user authorized $240 for SFT; no additional GPU launch is recorded here. See [the training redesign](../../../../sft_short_pilot.md).
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The first fresh fit, 14B ROT13 level 10, completed all 625 updates on 12 October 2026; KaziText level 10 has not completed under this recipe. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. The active scope is now 14B only: ROT13 and KaziText across all ten levels, 20 conditions total. The completed adapter is retained, leaving 19 selected fits uncompleted; the 7B data and historical results remain available but outside the active training queue. On 13 October the user authorized $240 for SFT; no additional GPU launch is recorded here. See [the training redesign](../../../../sft_short_pilot.md).
 
 The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
@@ -56,7 +56,7 @@ Install through `scripts/setup_environment.py --profile gpu-published --skip-tes
 
 `legacy_two_epoch_v1` retains NF4/double quantization, FP32 head, paged AdamW and 1,250 updates with 38 warmup updates. `one_epoch_pilot_v1` retains that numerical recipe with 625/19. The efficient recipe changes these numerics and is a newly declared baseline, not an approved migration of a previous optimizer state. Start fresh; only an exact efficient-fit full checkpoint may resume its own fit. A second epoch after final 625 requires a separate continuation declaration or a fresh legacy run.
 
-Use the common [artifact contracts](../../../../contracts.md), [prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). The [deployment plan](../../../../sft_multi_gpu_execution_plan.md) retains completed 14B ROT13 level10 and documents39 uncompleted conditions under the $240 SFT authorization.
+Use the common [artifact contracts](../../../../contracts.md), [prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). The [deployment plan](../../../../sft_multi_gpu_execution_plan.md) retains completed 14B ROT13 level10 and documents19 remaining selected 14B conditions under the $240 SFT authorization.
 
 | Source node | Called procedure | Specification |
 |---|---|---|
@@ -142,12 +142,12 @@ flowchart TD
 %% Checkpoints every 100 updates and final 625; actual Drive verification before retention/completion.
 %% Observed: 14B ROT13 L10 completed 625 with native guards passed; actual 1 x 16, checkpointing off.
 %% Final adapter/full state Drive-verified; source 2ea4fb9/config 6f7e5048 remain immutable.
-%% 39 conditions uncompleted; $240 authorized 13 Oct. No new worker launch implied.
+%% 19 selected 14B fits uncompleted; $240 authorized 13 Oct. No new worker launch implied.
 %% Fresh non-updating duplicate-longest capacity guard: 2/off, 1/off, 2/on, 1/on; CUDA-OOM-only fallback.
 %% Exact-fit recovery restores recorded actual batch/accumulation/recomputation, never changes it.
 %% Policy v2 has a distinct execution identity; old NF4 or prior-policy states cannot be relabelled.
 %% Child: RECOVER => ../../../shared_procedures/recovery_procedure.mmd
-    INPUT["Explicitly selected condition<br/>Completed14B ROT13 L10 retained<br/>Remaining certified records only"]
+    INPUT["Explicitly selected 14B condition<br/>Completed 14B ROT13 L10 retained<br/>Remaining certified records only"]
     SETUP["Untouched BF16 base/head and LoRA<br/>Pinned exact full-gradient CCE; SDPA; AdamW<br/>One epoch; cosine 625; warmup 19"]
     CAPACITY["Non-updating duplicate-longest capacity guard<br/>Fresh: 2/off - 1/off - 2/on - 1/on<br/>Only CUDA OOM permits next mode<br/>Resume: restore recorded actual mode"]
     GUARDS["Normal native identity / causal mask / gradient guards<br/>Verify complete-state recovery before updates"]

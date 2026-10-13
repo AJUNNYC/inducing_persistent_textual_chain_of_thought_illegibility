@@ -2,7 +2,7 @@
 
 ## Current SFT status: 14B ROT13 level 10 complete; $240 authorized for remaining work
 
-The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The first fresh fit, 14B ROT13 level 10, completed all 625 updates on 12 October 2026; KaziText level 10 has not completed under this recipe. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. The completed adapter is retained, leaving 39 available conditions uncompleted. On 13 October the user authorized $240 for SFT; no additional GPU launch is recorded here. See [the training redesign](../../../sft_short_pilot.md).
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The first fresh fit, 14B ROT13 level 10, completed all 625 updates on 12 October 2026; KaziText level 10 has not completed under this recipe. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. The active scope is now 14B only: ROT13 and KaziText across all ten levels, 20 conditions total. The completed adapter is retained, leaving 19 selected fits uncompleted; the 7B data and historical results remain available but outside the active training queue. On 13 October the user authorized $240 for SFT; no additional GPU launch is recorded here. See [the training redesign](../../../sft_short_pilot.md).
 
 The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
@@ -35,7 +35,7 @@ Source `05f42b0` has accepted no-recomputation evidence and READY affected-runti
 
 ## Responsibility and controlling details
 
-All forty conditions remain available. Fresh **14B ROT13 level10 completed 625 updates** and is retained; 39 other conditions remain uncompleted. The per-fit recipe remains `efficient_one_epoch_v1`, and the user authorized $240 SFT on 13 Oct. Each remaining selected fit starts from its untouched base in a separate recipe/configuration/source/output identity. No new worker is launched by this document.
+All forty datasets remain available. Fresh **14B ROT13 level 10 completed 625 updates** and is retained; active training selects 20 14B conditions across both families and all ten levels, leaving 19 uncompleted. Prepared 7B data and results remain outside this queue. The per-fit recipe remains `efficient_one_epoch_v1`, and the user authorized $240 SFT on 13 Oct. Each remaining selected fit starts from its untouched base in a separate recipe/configuration/source/output identity. No new worker is launched by this document.
 
 Each selected fit uses all 10,000 examples once, effective batch 16, 625 updates and a complete cosine horizon with 19 warmup updates. Unquantized BF16 base/head, exact full-gradient CCE, standard SDPA and plain AdamW are a newly declared published-method baseline. They are not migrations of the old NF4 optimizer states or activation under historical 7B kernel receipts. Before updates, normal native startup guards check masks/gradients, recovery and actual capacity, enabling recomputation if the non-updating capacity probe requires it. The user requested no repeated optimization test or timing campaign.
 
@@ -88,7 +88,7 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% Default efficient_one_epoch_v1 applies per explicitly selected fit.
-%% Forty datasets remain available; 14B ROT13 L10 completed 625, leaving39 uncompleted.
+%% Forty datasets remain available; 14B ROT13 L10 completed 625, leaving 19 selected 14B fits uncompleted.
 %% $240 SFT authorized 13 Oct; retain completed adapter. No new worker or benchmark campaign implied.
 %% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
 %% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
@@ -102,8 +102,8 @@ flowchart TD
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
-    PAUSE["Retain completed 14B ROT13 L10 adapter<br/>39 conditions uncompleted; $240 SFT authorization<br/>No worker launched by this plan"]
-    SELECT["Select disjoint remaining fits<br/>Exclude completed 14B ROT13 L10<br/>Recipe: efficient_one_epoch_v1"]
+    PAUSE["Retain completed 14B ROT13 L10 adapter<br/>19 selected 14B fits uncompleted; $240 SFT authorization<br/>No worker launched by this plan"]
+    SELECT["Select 19 disjoint remaining 14B fits<br/>Both families; levels 1-10<br/>Exclude completed 14B ROT13 L10<br/>Recipe: efficient_one_epoch_v1"]
     BIND["Bind recipe / published policy v2 / source / data identity<br/>Request 2 x 8; capacity fallback 1 x 16<br/>Reuse compatible upstream evidence"]
     PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
     ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Remaining selected ROT13 condition<br/>All 10,000 examples; one epoch"]

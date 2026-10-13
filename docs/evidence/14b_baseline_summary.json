@@ -1,0 +1,66 @@
+{
+  "schema_version": "existing_14b_baseline_summary_v1",
+  "summarized_on": "2026-10-13",
+  "new_inference_performed": false,
+  "source_report": "docs/evidence/vllm_baseline_rescored_repeatability.json",
+  "source_report_hash": "d42978180c93bc433678a1b4316a75ecc1104b5cbf6503c72b4a5dfa9b85c5d2",
+  "model": "DeepSeek-R1-Distill-Qwen-14B",
+  "main_seed": 42,
+  "repeatability_seeds": [
+    43,
+    44
+  ],
+  "repeatability_status": "passed",
+  "panel_hash": "c8e3de419ddb776221fecd737eb41a28d9a6512f60d03eaf8fc2ad4265df68ae",
+  "benchmarks": {
+    "arc": {
+      "panel_count": 331,
+      "correct_counts": {
+        "42": 320,
+        "43": 314,
+        "44": 319
+      },
+      "main_seed_accuracy": 0.9667673716012085,
+      "repeatability_status": "passed"
+    },
+    "gsm8k": {
+      "panel_count": 300,
+      "correct_counts": {
+        "42": 246,
+        "43": 257,
+        "44": 256
+      },
+      "main_seed_accuracy": 0.82,
+      "repeatability_status": "passed"
+    },
+    "mbpp": {
+      "panel_count": 203,
+      "correct_counts": {
+        "42": 115,
+        "43": 117,
+        "44": 118
+      },
+      "main_seed_accuracy": 0.5665024630541872,
+      "repeatability_status": "passed"
+    },
+    "mmlu": {
+      "panel_count": 399,
+      "correct_counts": {
+        "42": 326,
+        "43": 320,
+        "44": 319
+      },
+      "main_seed_accuracy": 0.8170426065162907,
+      "repeatability_status": "passed"
+    }
+  },
+  "existing_raw_outputs_regenerated": false,
+  "legibility_judging": "DEFERRED",
+  "gpqa_diamond": {
+    "questions": 198,
+    "panel_status": "PREPARED",
+    "base_evaluation_status": "NOT_RUN",
+    "trained_evaluation_status": "NOT_RUN"
+  },
+  "limitation": "Fixed project panels and decoding/extraction rules; not full leaderboard reproductions. Three seed passes diagnose gross instability, not precise repeatability."
+}

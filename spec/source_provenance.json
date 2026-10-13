@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "42eeb4479851307f829d4cf0716a8d8b5503674f66527882fd49604f6cfae3af"
+    "sha256": "a16dc0b05e466727f622cf2f76be16869d60b39f36e114ed7ecc9d791fffa1e9"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,10 +27,10 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "fb6644e9edd9c5338cfcdda1905bc73ca08c0fa00a5ad5e6f1da7f260486739c",
+  "procedure_update_sha256": "a1440aaef9e976ee6cc9fd49eb7458393102a066bfe4ebb5b4bac63a389ad71d",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
-    "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_39_UNCOMPLETED",
+    "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_19_SELECTED_14B_FITS",
     "available_model_sizes": [
       "7b",
       "14b"
@@ -56,7 +56,115 @@
       {
         "model_size": "14b",
         "family": "rot13",
+        "level": 1,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 2,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 3,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 4,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 5,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 6,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 7,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 8,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 9,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
         "level": 10,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 1,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 2,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 3,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 4,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 5,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 6,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 7,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 8,
+        "initialization": "fresh_untouched_pinned_base"
+      },
+      {
+        "model_size": "14b",
+        "family": "kazitext",
+        "level": 9,
         "initialization": "fresh_untouched_pinned_base"
       },
       {
@@ -106,7 +214,7 @@
     "actual_execution_mode_fixed_on_resume": true,
     "physical_batch_speedup_measured": false,
     "per_example_weight_per_optimizer_update": 0.0625,
-    "selected_fit_count": 2,
+    "selected_fit_count": 20,
     "selected_models": [
       "14b"
     ],
@@ -115,6 +223,15 @@
       "kazitext"
     ],
     "selected_levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
       10
     ],
     "gpu_connection_available": false,
@@ -138,9 +255,17 @@
         "drive_status": "VERIFIED"
       }
     ],
-    "remaining_uncompleted_conditions": 39,
+    "remaining_uncompleted_conditions": 19,
     "condition_evidence_document": "docs/sft_completed_rot13_14b_level10.md",
-    "current_native_evidence_scope": "rot13_14b_level_10_on_observed_RTX_PRO_6000_Blackwell_96GB_only"
+    "current_native_evidence_scope": "rot13_14b_level_10_on_observed_RTX_PRO_6000_Blackwell_96GB_only",
+    "uncompleted_available_conditions": 39,
+    "active_training_scope": "14b_only_2_families_all_10_levels",
+    "historical7b_data_and_results_retained": true,
+    "full_main_campaign_confirmatory_workflow_automatically_narrowed": false,
+    "scope_specific_14b_aggregation_reporting_status": "pending",
+    "original_full_grid_state_count": 62,
+    "original_full_grid_window_count": 216,
+    "missing_unrun_states_are_success": false
   },
   "current_sft_authorization": {
     "date": "2026-10-13",
@@ -149,14 +274,15 @@
     "gpu_hourly_rate_used_usd": 2.99,
     "additional_gpu_launch_performed": false,
     "calculated_cost_not_invoice": true,
-    "scope": "remaining_work_retaining_completed_adapter",
-    "conditional_remaining_39_worker_hours": 68.49446125166666,
-    "conditional_remaining_39_cost_usd": 204.79843914248335,
+    "scope": "remaining19_selected14B_fits_retaining_completed_adapter",
     "projection_assumption": "same_runtime_as_one_completed_14b_rot13_level10_fit",
     "installation_idle_time_included": false,
     "rl_and_final_evaluation_included": false,
-    "prospective_campaign_plan": "docs/evidence/authorized_sft_campaign_2026_10_13.json",
-    "prospective_campaign_status": "PLANNED_NOT_LAUNCHED"
+    "prospective_campaign_plan": "docs/evidence/authorized_sft_14b_campaign_2026_10_13.json",
+    "prospective_campaign_status": "PLANNED_NOT_LAUNCHED",
+    "historical_superseded_plan": "docs/evidence/authorized_sft_campaign_2026_10_13.json",
+    "conditional_remaining19_worker_hours": 33.369096507222224,
+    "conditional_remaining19_cost_usd": 99.77359855659445
   },
   "appended_gpqa_evaluation": {
     "authorized": true,
@@ -182,6 +308,14 @@
     "comparison_state_freeze_status": "pending",
     "generation_started": false,
     "trained_states_evaluated": 0,
-    "supplemental_procedure_document": "docs/modules/evaluation/supplemental_gpqa.md"
+    "supplemental_procedure_document": "docs/modules/evaluation/supplemental_gpqa.md",
+    "active_comparison_models": [
+      "14b"
+    ],
+    "untouched14b_gpqa_baseline_status": "NOT_RUN",
+    "trained14b_gpqa_evaluation_status": "NOT_RUN",
+    "existing_four_domain_base_measurements_retained": true,
+    "existing_four_domain_judge_assessments": "deferred_not_full_legibility_evaluation",
+    "existing_14b_baseline_report": "docs/14b_baseline_results.md"
   }
 }

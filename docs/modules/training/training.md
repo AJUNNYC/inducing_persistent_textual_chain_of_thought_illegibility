@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Thirty-nine other conditions remain uncompleted; $240 was authorized for SFT on 13 October. No new worker is launched here. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
+**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Nineteen selected 14B conditions remain uncompleted; 20 comprise the active scope. Prepared 7B data/historical results are retained outside the queue. $240 was authorized for SFT on 13 October. No new worker is launched here. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
 
 | Artifact | Exact repository path |
 |---|---|
@@ -13,7 +13,7 @@
 
 ## Responsibility and controlling details
 
-The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. Published policy v2 requests physical microbatch 2 × accumulation 8, with capacity fallback 1 × 16 and unchanged effective batch 16. Each optimizer update retains the same ordered 16 examples and per-example weight 1/16; actual batch/accumulation/recomputation is recorded and fixed on resume. 14B ROT13 level 10 is complete; KaziText level 10 and the other remaining conditions are not completed. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
+The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. Published policy v2 requests physical microbatch 2 × accumulation 8, with capacity fallback 1 × 16 and unchanged effective batch 16. Each optimizer update retains the same ordered 16 examples and per-example weight 1/16; actual batch/accumulation/recomputation is recorded and fixed on resume. 14B ROT13 level 10 is complete; KaziText level 10 and the other 18 selected 14B conditions are not completed. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
 
 The original full matrix comprises forty SFT fits, two independent 100-step RL trajectories with twenty snapshots, and two bases, yielding62 states if every required output exists. This historical accounting is not a current launch instruction. RL and final confirmatory evaluation remain deferred. Preserve the original Sonnet reward, Dr. GRPO semantics and original final evaluation thresholds; this redesign changes only the declared SFT recipe. Never infer completed branches from a join node or relabel old full checkpoints as efficient-run state.
 
@@ -58,7 +58,7 @@ flowchart TD
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
 %% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
 %% Actual batch/accumulation/recomputation mode stays fixed throughout each fit and exact resume.
-%% Forty conditions available; completed 14B ROT13 L10 retained; 39 uncompleted.
+%% Forty datasets available; active14B scope20, completedROT13 L10 retained;19 selectedfits uncompleted.
 %% $240 SFT authorized 13 Oct; no new worker launch recorded. RL/final evaluation remain separate.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
@@ -73,7 +73,7 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 conditions; completed 14B ROT13 L10 retained<br/>39 remaining; disjoint selected jobs only<br/>Default: efficient one epoch / 625 updates"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 datasets; active 14B only, all ten levels<br/>Completed 14B ROT13 L10 retained<br/>20 active 14B conditions; 19 remaining<br/>7B data/history retained; disjoint jobs only<br/>Default: efficient one epoch / 625 updates"]
     SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
     RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]

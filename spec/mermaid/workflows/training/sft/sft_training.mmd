@@ -3,7 +3,7 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% Default efficient_one_epoch_v1 applies per explicitly selected fit.
-%% Forty datasets remain available; 14B ROT13 L10 completed 625, leaving39 uncompleted.
+%% Forty datasets remain available; 14B ROT13 L10 completed 625, leaving 19 selected 14B fits uncompleted.
 %% $240 SFT authorized 13 Oct; retain completed adapter. No new worker or benchmark campaign implied.
 %% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
 %% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
@@ -17,8 +17,8 @@ flowchart TD
 %% Child: ROTFIT => individual_fit/sft_fit.mmd
 %% Child: KAZFIT => individual_fit/sft_fit.mmd
     INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
-    PAUSE["Retain completed 14B ROT13 L10 adapter<br/>39 conditions uncompleted; $240 SFT authorization<br/>No worker launched by this plan"]
-    SELECT["Select disjoint remaining fits<br/>Exclude completed 14B ROT13 L10<br/>Recipe: efficient_one_epoch_v1"]
+    PAUSE["Retain completed 14B ROT13 L10 adapter<br/>19 selected 14B fits uncompleted; $240 SFT authorization<br/>No worker launched by this plan"]
+    SELECT["Select 19 disjoint remaining 14B fits<br/>Both families; levels 1-10<br/>Exclude completed 14B ROT13 L10<br/>Recipe: efficient_one_epoch_v1"]
     BIND["Bind recipe / published policy v2 / source / data identity<br/>Request 2 x 8; capacity fallback 1 x 16<br/>Reuse compatible upstream evidence"]
     PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
     ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Remaining selected ROT13 condition<br/>All 10,000 examples; one epoch"]
