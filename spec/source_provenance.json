@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "a16dc0b05e466727f622cf2f76be16869d60b39f36e114ed7ecc9d791fffa1e9"
+    "sha256": "d923efe1e65abd73de371f3be08c3d03f4e0a7cb946b3c30702c2a136b6e44e8"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,7 +27,7 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "a1440aaef9e976ee6cc9fd49eb7458393102a066bfe4ebb5b4bac63a389ad71d",
+  "procedure_update_sha256": "10aa24069da469faf45741862130ec0bee2294b0031a52f446b7bd52489e2d98",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_19_SELECTED_14B_FITS",
@@ -265,7 +265,107 @@
     "scope_specific_14b_aggregation_reporting_status": "pending",
     "original_full_grid_state_count": 62,
     "original_full_grid_window_count": 216,
-    "missing_unrun_states_are_success": false
+    "missing_unrun_states_are_success": false,
+    "coordinator_cli": "scripts/run_14b_sft_campaign.py",
+    "baseline_before_sft_required": true,
+    "ordered_remaining_fits": [
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 10
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 1
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 1
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 2
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 2
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 3
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 3
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 4
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 4
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 5
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 5
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 6
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 6
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 7
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 7
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 8
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 8
+      },
+      {
+        "family": "rot13",
+        "model_size": "14b",
+        "level": 9
+      },
+      {
+        "family": "kazitext",
+        "model_size": "14b",
+        "level": 9
+      }
+    ],
+    "new_queue_status": "PLANNED_NOT_LAUNCHED"
   },
   "current_sft_authorization": {
     "date": "2026-10-13",
@@ -282,7 +382,12 @@
     "prospective_campaign_status": "PLANNED_NOT_LAUNCHED",
     "historical_superseded_plan": "docs/evidence/authorized_sft_campaign_2026_10_13.json",
     "conditional_remaining19_worker_hours": 33.369096507222224,
-    "conditional_remaining19_cost_usd": 99.77359855659445
+    "conditional_remaining19_cost_usd": 99.77359855659445,
+    "rate_based_automatic_cutoff_imposed": false,
+    "new_hourly_rate_inferred": false,
+    "user_execution_instruction": "proceed_without_setting_budget_rate",
+    "historical_hourly_rate_only": true,
+    "explicit_deadline_and_safe_pause_separate": true
   },
   "appended_gpqa_evaluation": {
     "authorized": true,
@@ -305,7 +410,7 @@
     "variant_source_evidence": "docs/evidence/gpqa_variant_source.json",
     "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
     "preparation_receipt": "docs/evidence/gpqa_preparation_receipt.json",
-    "comparison_state_freeze_status": "pending",
+    "comparison_state_freeze_status": "BASELINE_ONLY_CLI_AVAILABLE_NOT_YET_RUN",
     "generation_started": false,
     "trained_states_evaluated": 0,
     "supplemental_procedure_document": "docs/modules/evaluation/supplemental_gpqa.md",
@@ -316,6 +421,12 @@
     "trained14b_gpqa_evaluation_status": "NOT_RUN",
     "existing_four_domain_base_measurements_retained": true,
     "existing_four_domain_judge_assessments": "deferred_not_full_legibility_evaluation",
-    "existing_14b_baseline_report": "docs/14b_baseline_results.md"
+    "existing_14b_baseline_report": "docs/14b_baseline_results.md",
+    "baseline_only_cli_available": true,
+    "baseline_only_cli": "scripts/run_supplemental_gpqa.py freeze-base",
+    "requires_trained_adapter_for_baseline": false,
+    "baseline_before_sft_required": true,
+    "baseline_drive_verification_required_before_sft": true,
+    "baseline_only_freeze_run_status": "NOT_RUN"
   }
 }

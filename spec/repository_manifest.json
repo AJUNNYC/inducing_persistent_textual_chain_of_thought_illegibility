@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 551,
+  "files": 568,
   "directories_including_root": 202,
   "entries": [
     {
@@ -740,6 +740,17 @@
       "node": "p_46b42b4229cd7a"
     },
     {
+      "path": "docs/14b_baseline_results.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/14b_baseline_results.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_ca044aaa74c0dd",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -935,6 +946,17 @@
       "node": "p_b9671765a5cdf7"
     },
     {
+      "path": "docs/evidence/14b_baseline_summary.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/14b_baseline_summary.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_1da3772e115a07",
+      "blank": false
+    },
+    {
       "path": "docs/evidence/a100_optimization_interruption.json",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -943,6 +965,28 @@
       "display_path": "docs/evidence/a100_optimization_interruption.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_3a94603ed7dd5a",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/authorized_sft_14b_campaign_2026_10_13.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/authorized_sft_14b_campaign_2026_10_13.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_a400c4764b129c",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/authorized_sft_campaign_2026_10_13.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/authorized_sft_campaign_2026_10_13.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_b996ff8c00562f",
       "blank": false
     },
     {
@@ -1020,6 +1064,28 @@
       "display_path": "docs/evidence/existing_runpod_inspection.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_6c62b1c7fa12ac",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/gpqa_preparation_receipt.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/gpqa_preparation_receipt.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_45c93cda1dbbed",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/gpqa_variant_source.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/gpqa_variant_source.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7d1ecdf1339176",
       "blank": false
     },
     {
@@ -1416,6 +1482,28 @@
       "display_path": "docs/evidence/sft_pro6000_session_pause_987.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_6a71f689dd7627",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_rot13_14b_level10_completion.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_rot13_14b_level10_completion.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_e3ee4616846f01",
+      "blank": false
+    },
+    {
+      "path": "docs/evidence/sft_rot13_14b_level10_runtime_evidence.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/sft_rot13_14b_level10_runtime_evidence.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_fa16e29ddd8d59",
       "blank": false
     },
     {
@@ -2308,6 +2396,17 @@
       "blank": false
     },
     {
+      "path": "docs/modules/evaluation/supplemental_gpqa.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/modules/evaluation/supplemental_gpqa.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_904196ce12e662",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -2921,6 +3020,17 @@
       "blank": false
     },
     {
+      "path": "docs/sft_completed_rot13_14b_level10.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/sft_completed_rot13_14b_level10.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_4f251bd21b89f1",
+      "blank": false
+    },
+    {
       "path": "docs/sft_data_handoff.md",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -3027,6 +3137,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_f2e29289dbf5e2",
+      "blank": false
+    },
+    {
+      "path": "prompts/evaluation_gpqa.txt",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "prompts/evaluation_gpqa.txt",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7a7f37b9ab2393",
       "blank": false
     },
     {
@@ -3567,6 +3688,17 @@
       "blank": false
     },
     {
+      "path": "scripts/run_14b_sft_campaign.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_14b_sft_campaign.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_a8af62978b1907",
+      "blank": false
+    },
+    {
       "path": "scripts/run_baseline_repeatability.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -3641,6 +3773,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_5db50e4653f724",
+      "blank": false
+    },
+    {
+      "path": "scripts/run_supplemental_gpqa.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_supplemental_gpqa.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_b6d8d53088aabc",
       "blank": false
     },
     {
@@ -4526,6 +4669,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/spec_layout.mmd",
       "node": "p_e3506e921f182e",
+      "blank": false
+    },
+    {
+      "path": "spec/mermaid/workflows/evaluation/supplemental_gpqa.mmd",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "spec/mermaid/workflows/evaluation/supplemental_gpqa.mmd",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_cfff13a5846360",
       "blank": false
     },
     {
@@ -5875,6 +6029,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/src_evaluation.mmd",
       "node": "p_868c5954f00557",
+      "blank": false
+    },
+    {
+      "path": "src/evaluation/supplemental_gpqa.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/evaluation/supplemental_gpqa.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7899e5b31728e1",
       "blank": false
     },
     {
@@ -7367,6 +7532,17 @@
       "blank": false
     },
     {
+      "path": "tests/unit/evaluation/test_supplemental_gpqa.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/evaluation/test_supplemental_gpqa.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_a529b6042bc226",
+      "blank": false
+    },
+    {
       "kind": "directory",
       "owner": "coordinator",
       "source": "Repository containment of source-mapped files",
@@ -7396,6 +7572,17 @@
       "display_path": "tests/unit/operations/",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_10e350a8a391f4"
+    },
+    {
+      "path": "tests/unit/operations/test_14b_sft_campaign.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_14b_sft_campaign.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_93f517445f9b94",
+      "blank": false
     },
     {
       "path": "tests/unit/operations/test_assets.py",

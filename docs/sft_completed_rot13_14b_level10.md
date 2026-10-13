@@ -37,9 +37,23 @@ The user subsequently narrowed active training to **14B ROT13 and 14B KaziText, 
 | All 20 selected 14B fits | 32.18 GPU-hours / $96.23 | 35.13 GPU-hours / $105.02 |
 | Remaining 19 selected 14B fits | 30.57 GPU-hours / $91.42 | 33.37 GPU-hours / $99.77 |
 
-The remaining 19 worker projection (approximately $100) leaves approximately **$140.23** of the new $240 authorization for setup, runtime variation, and idle time. It is **not a guaranteed bound**: KaziText, other levels, other GPUs, and different startup batching may take different time. Track observed costs as fits complete and preserve verified state before the authorized ceiling. At a constant $2.99/hour, $240 corresponds to at most **80.27 billed GPU-hours**, with all charged setup/idle time consuming that allocation. Multiple GPUs reduce elapsed time only if work is balanced; combined GPU-hours and cost remain chargeable.
+The remaining 19 worker projection (approximately $100) leaves approximately **$140.23** of the new $240 authorization for setup, runtime variation, and idle time. It is **not a guaranteed bound**: KaziText, other levels, other GPUs, and different startup batching may take different time. The $240 authorization remains recorded. The historical $2.99/hour scenario corresponds to 80.27 billed GPU-hours, including chargeable setup/idle; it is not an imposed rate or automated runtime cutoff. The current execution instruction is to proceed without setting a new budget rate. Multiple GPUs reduce elapsed time only if work is balanced; combined GPU-hours and cost remain chargeable.
 
 The historical 150-hour planning forecast and extrapolations from a two-update old-recipe benchmark are not actual spending. Do not present old approximately $740 or $2,000 conversation figures as measured invoices or as established estimates for this finalized recipe.
+
+## Baseline before the remaining SFT queue
+
+Use the committed [supplemental GPQA CLI](../scripts/run_supplemental_gpqa.py) `freeze-base` command to bind only the untouched pinned14B model to the prepared Diamond 198 panel; no trained adapter is required. Run that baseline first and verify all raw records, scores, the 198-item report and completion receipt in Google Drive. A locally written protocol or launched process is not a completed baseline. Wait for the baseline CLI to exit successfully and release GPU workers before invoking the training coordinator. Existing four-domain base outputs and repeatability evidence are retained; this new GPQA baseline is an additional measurement, not a repeat of those domains.
+
+The committed [14B SFT coordinator](../scripts/run_14b_sft_campaign.py) gates training on the actual GPQA completion and Drive receipt, then follows this sequence:
+
+1. Keep the completed14B ROT13 level 10 final adapter/full state under its original source/configuration identity; verify compatible bytes without retraining it.
+2. Train fresh 14B KaziText level 10 from the untouched pinned base.
+3. For each level 1 through 9 in ascending order, train fresh 14B ROT13 and then fresh 14B KaziText.
+
+All 19 new fits retain the finalized 625-update, one-epoch recipe, disjoint output identities, and verified Drive recovery. One fit’s adapter is never the next level’s initialization. The comparison protocol for evaluating trained adapters remains separate; completing the baseline does not imply any trained-state GPQA result or complete confirmatory evaluation. This record documents the authorized order; the new GPQA baseline and subsequent 19 fits are not claimed complete or running here.
+
+The $240 SFT authorization remains recorded. The user instructed proceeding without imposing a budget rate: the coordinator does not infer a new hourly price or set a rate-based automatic cutoff. The $2.99/hour tables above are historical-rate planning scenarios, not launch parameters. Explicit worker deadlines and user-requested safe pauses remain separate controls; checkpoint/Drive barriers continue to apply.
 
 ## Keeping the completed level without a training confound
 

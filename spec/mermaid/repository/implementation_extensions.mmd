@@ -25,6 +25,8 @@ flowchart TD
     EXT --> p_47e075e61e913f
     p_254db0fb64a77d["dockerfile"]
     EXT --> p_254db0fb64a77d
+    p_ca044aaa74c0dd["docs/14b_baseline_results.md"]
+    EXT --> p_ca044aaa74c0dd
     p_adbb9f98ebd907["docs/baseline_repeatability_worker.md"]
     EXT --> p_adbb9f98ebd907
     p_f42055da784280["docs/colab_cli_handoff.md"]
@@ -37,8 +39,14 @@ flowchart TD
     EXT --> p_ffc0aa76b10d2c
     p_b9671765a5cdf7["docs/evidence/"]
     EXT --> p_b9671765a5cdf7
+    p_1da3772e115a07["docs/evidence/14b_baseline_summary.json"]
+    EXT --> p_1da3772e115a07
     p_3a94603ed7dd5a["docs/evidence/a100_optimization_interruption.json"]
     EXT --> p_3a94603ed7dd5a
+    p_a400c4764b129c["docs/evidence/authorized_sft_14b_campaign_2026_10_13.json"]
+    EXT --> p_a400c4764b129c
+    p_b996ff8c00562f["docs/evidence/authorized_sft_campaign_2026_10_13.json"]
+    EXT --> p_b996ff8c00562f
     p_67d97cc6413728["docs/evidence/baseline_repeatability_launch.json"]
     EXT --> p_67d97cc6413728
     p_2b164493b6ae44["docs/evidence/colab_a100_connection.json"]
@@ -53,6 +61,10 @@ flowchart TD
     EXT --> p_0ecd4f7b3fb21f
     p_6c62b1c7fa12ac["docs/evidence/existing_runpod_inspection.json"]
     EXT --> p_6c62b1c7fa12ac
+    p_45c93cda1dbbed["docs/evidence/gpqa_preparation_receipt.json"]
+    EXT --> p_45c93cda1dbbed
+    p_7d1ecdf1339176["docs/evidence/gpqa_variant_source.json"]
+    EXT --> p_7d1ecdf1339176
     p_2852e28de55d2d["docs/evidence/judge_profile_guard_live_report.json"]
     EXT --> p_2852e28de55d2d
     p_f06f10df21bf2a["docs/evidence/kazitext_auxiliary_runtime.json"]
@@ -125,6 +137,10 @@ flowchart TD
     EXT --> p_5ea41ebcb9f929
     p_6a71f689dd7627["docs/evidence/sft_pro6000_session_pause_987.json"]
     EXT --> p_6a71f689dd7627
+    p_e3ee4616846f01["docs/evidence/sft_rot13_14b_level10_completion.json"]
+    EXT --> p_e3ee4616846f01
+    p_fa16e29ddd8d59["docs/evidence/sft_rot13_14b_level10_runtime_evidence.json"]
+    EXT --> p_fa16e29ddd8d59
     p_91473f1dafff64["docs/evidence/sft_runtime_checks_report.json"]
     EXT --> p_91473f1dafff64
     p_0014ba986e7d25["docs/evidence/sft_scheduled_forward_pro6000_benchmark.json"]
@@ -187,6 +203,8 @@ flowchart TD
     EXT --> p_efc352c8c290c1
     p_dd5026d54adf97["docs/implementation_acceptance.md"]
     EXT --> p_dd5026d54adf97
+    p_904196ce12e662["docs/modules/evaluation/supplemental_gpqa.md"]
+    EXT --> p_904196ce12e662
     p_95257a56b10fc2["docs/modules/operations/"]
     EXT --> p_95257a56b10fc2
     p_44308c75eff0f8["docs/modules/operations/artifacts.md"]
@@ -221,6 +239,8 @@ flowchart TD
     EXT --> p_f3faabb0109e25
     p_de016ee20fc087["docs/procedure_update.md"]
     EXT --> p_de016ee20fc087
+    p_4f251bd21b89f1["docs/sft_completed_rot13_14b_level10.md"]
+    EXT --> p_4f251bd21b89f1
     p_ecdcb9a3a86066["docs/sft_data_handoff.md"]
     EXT --> p_ecdcb9a3a86066
     p_c75807fea5d182["docs/sft_multi_gpu_execution_plan.md"]
@@ -231,6 +251,8 @@ flowchart TD
     EXT --> p_aaf6895a23c7a3
     p_d39631a8c666ef["docs/statistical_concentration_guard.md"]
     EXT --> p_d39631a8c666ef
+    p_7a7f37b9ab2393["prompts/evaluation_gpqa.txt"]
+    EXT --> p_7a7f37b9ab2393
     p_cea225e9d407b6["requirements-vllm.txt"]
     EXT --> p_cea225e9d407b6
     p_973d39fe9a7d95["requirements_cpu.lock"]
@@ -283,6 +305,8 @@ flowchart TD
     EXT --> p_05a1825d9110e8
     p_4da5d2a00cdc8a["scripts/revalidate_collection_inputs.py"]
     EXT --> p_4da5d2a00cdc8a
+    p_a8af62978b1907["scripts/run_14b_sft_campaign.py"]
+    EXT --> p_a8af62978b1907
     p_766c706bda3f71["scripts/run_baseline_repeatability.py"]
     EXT --> p_766c706bda3f71
     p_80c27bbd543ae6["scripts/run_certified_sft.py"]
@@ -293,6 +317,8 @@ flowchart TD
     EXT --> p_a47207fc0391be
     p_0b17e8b1f8bd2d["scripts/run_optimized_sft_queue.py"]
     EXT --> p_0b17e8b1f8bd2d
+    p_b6d8d53088aabc["scripts/run_supplemental_gpqa.py"]
+    EXT --> p_b6d8d53088aabc
     p_8c941d8eb9fa9f["scripts/run_vllm_baseline_repeatability.py"]
     EXT --> p_8c941d8eb9fa9f
     p_8110e6efb2a984["scripts/run_vllm_generation_worker.py"]
@@ -307,6 +333,8 @@ flowchart TD
     EXT --> p_7f50ac1ba05997
     p_704e54ee887094["spec/mermaid/repository/implementation_extensions.mmd"]
     EXT --> p_704e54ee887094
+    p_cfff13a5846360["spec/mermaid/workflows/evaluation/supplemental_gpqa.mmd"]
+    EXT --> p_cfff13a5846360
     p_0c4a1095037a43["spec/mermaid/workflows/operations/"]
     EXT --> p_0c4a1095037a43
     p_28b1f63ccb7ccc["spec/mermaid/workflows/operations/artifacts.mmd"]
@@ -335,6 +363,8 @@ flowchart TD
     EXT --> p_223f3785939cc3
     p_0d40f500a59f33["src/evaluation/shared_model_evaluation/item_evaluation/native_output/vllm_generation.py"]
     EXT --> p_0d40f500a59f33
+    p_7899e5b31728e1["src/evaluation/supplemental_gpqa.py"]
+    EXT --> p_7899e5b31728e1
     p_eb252cd9c87762["src/operations/"]
     EXT --> p_eb252cd9c87762
     p_d97269f48de7da["src/operations/__init__.py"]
@@ -375,8 +405,12 @@ flowchart TD
     EXT --> p_383bd21fdc964a
     p_8ab948fe4b8f2d["tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_vllm_generation.py"]
     EXT --> p_8ab948fe4b8f2d
+    p_a529b6042bc226["tests/unit/evaluation/test_supplemental_gpqa.py"]
+    EXT --> p_a529b6042bc226
     p_10e350a8a391f4["tests/unit/operations/"]
     EXT --> p_10e350a8a391f4
+    p_93f517445f9b94["tests/unit/operations/test_14b_sft_campaign.py"]
+    EXT --> p_93f517445f9b94
     p_c3f48a772aa350["tests/unit/operations/test_assets.py"]
     EXT --> p_c3f48a772aa350
     p_e1421003124fdb["tests/unit/operations/test_baseline_rescoring.py"]

@@ -1589,27 +1589,28 @@ exposure, not identical token compute or identical optimization dynamics.
 30
 All forty datasets remain available. Active SFT is14B only:ROT13/KaziText at all ten levels,20 fits; historical 7B
 data/results retained. CompletedROT13 14B L10 retained; 19 active 14B conditions remain uncompleted;7B
-data/history retained. Each chosen fit starts from its untouched base with separate
-source/configuration/recipe, adapter, optimizer, scheduler and RNG/sampler identity. No new worker
-launched; $240 SFT authorized 13 Oct.
+data/history retained. Each chosen fit starts from its untouched base with separate source/configuration/recipe,
+adapter, optimizer, scheduler and RNG/sampler identity. GPQA untouched 14B baseline first:198
+items,raw/scored/report Drive-verified before SFT. Queue KaziText L10 then ROT13/KaziText levels 1?9;19
+fresh base fits. $240 authorized; no imposed rate cutoff. New baseline/queue not run.
 C.2.4 Efficient per-fit accounting and resource implications
 The default efficient_one_epoch_v1 processes all 10,000 accepted training records once, plus loss-only
 diagnostics on the separate 100 validation IDs. Request microbatch2 x accumulation8; capacity fallback1 x16.
-Both retain effective16 and625 updates, the same ordered16 examples/update and each example weight1/16.
+Both retain effective16 and 625 updates, the same ordered16 examples/update and each example weight1/16.
 Cosine decay uses the complete 625-update horizon; ceil(0.03 x 625) = 19 warmup updates. Preserve all full
 assistant targets and joint 4,096-token eligibility without truncation, packing or record removal.
-The scientific baseline changes from NF4 to unquantized frozen BF16 base/head, uses direct exact
-full-gradient Cut Cross-Entropy, standard SDPA and plain AdamW with FP32 optimizer states. FP32 loss and
-hidden-gradient accumulation preserve stable reductions but are not identical to historical FP32 classifier
-arithmetic. Gradient filtering is disabled; no Qwen patch or materialized token-by-vocabulary logits is used.
-Keep completion-only masks/per-example weighting, LoRA rank/alpha/dropout8/16/.05, seven attention/MLP
-targets, LR 2e-4, zero decay, max norm .3, effective 16 and seed 42. Save full state every 100 and final 625;
-verify actual bytes in Drive before completion or retention advances.
+The scientific baseline changes from NF4 to unquantized frozen BF16 base/head, uses direct exact full-gradient
+Cut Cross-Entropy, standard SDPA and plain AdamW with FP32 optimizer states. FP32 loss and hidden-gradient
+accumulation preserve stable reductions but are not identical to historical FP32 classifier arithmetic. Gradient
+filtering is disabled; no Qwen patch or materialized token-by-vocabulary logits is used. Keep completion-only
+masks/per-example weighting, LoRA rank/alpha/dropout8/16/.05, seven attention/MLP targets, LR 2e-4, zero
+decay, max norm .3, effective 16 and seed 42. Save full state every 100 and final 625; verify actual bytes in Drive
+before completion or retention advances.
 The user requests final implementation without another optimization test or timing campaign. Model identity,
 causal masks, adapter gradients, duplicate-longest capacity and complete-state recovery are ordinary startup
-guards before updates, passed for completed 14B ROT13 L10 only. Policy v2 selects2/off,1/off,2/on,1/on at
-fresh startup through a non-updating duplicate-longest guard; only CUDA OOM permits fallback. Restore the
-recorded mode exactly on resume. Grouping/dropout/rounding differ; no measured speedup. Recorded
+guards before updates, passed for completed 14B ROT13 L10 only. Policy v2 selects2/off,1/off,2/on,1/on at fresh
+startup through a non-updating duplicate-longest guard; only CUDA OOM permits fallback. Restore the recorded
+mode exactly on resume. Grouping/dropout/rounding differ; no measured speedup. Recorded
 fit5793.143751s/worker6322.565654s; actual 1 x 16/checkpointing off. No paired speedup or other-condition
 runtime is established.
 Precedent motivates the declared recipe: mixed precision, LoRA, efficient attention and Cut Cross-Entropy
@@ -1617,17 +1618,17 @@ remove avoidable runtime/memory overhead. The uploaded 58.7-minute notebook moti
 exploratory budget and BF16/SDPA path, but had a different loss and length distribution. It is not a validated
 same-efficacy or 14B timing result. One epoch halves nominal example passes versus the same-condition
 two-epoch recipe; setup, validation and Drive overhead do not halve automatically.
-legacy_two_epoch_v1 retains NF4, FP32 head, paged AdamW,20,000 presentations,1,250 updates/38
-warmup. The intermediate one_epoch_pilot_v1 retains those numerics with 625/19. All recipes have distinct
-identities; PRO987/A10028/A10030 states remain archives, not warm starts. A final 625 cosine schedule
-cannot be extended as an exact1,250-schedule resume. Additional epochs require a separately defined
-continuation or fresh legacy fit.
-Pilot diagnostics use validation IDs and base companions; frozen final tests remain reserved. Original
-capability, opacity, transfer and simultaneous-bound thresholds remain unchanged. The The single completed
-L10 fit cannot claim untrained levels or minimum-three-contiguous-level construction success. The completed
-ROT13 14B L10 receipt binds source 2ea4fb9/config 6f7e5048. Retain it without retraining; evaluation-only
-GPQA addition does not change its training. Future algorithm changes need separate identities. $240 SFT
-authorized; actual whole-matrix runtime remains unmeasured.
+legacy_two_epoch_v1 retains NF4, FP32 head, paged AdamW,20,000 presentations,1,250 updates/38 warmup.
+The intermediate one_epoch_pilot_v1 retains those numerics with 625/19. All recipes have distinct identities;
+PRO987/A10028/A10030 states remain archives, not warm starts. A final 625 cosine schedule cannot be
+extended as an exact1,250-schedule resume. Additional epochs require a separately defined continuation or
+fresh legacy fit.
+Pilot diagnostics use validation IDs and base companions; frozen final tests remain reserved. Original capability,
+opacity, transfer and simultaneous-bound thresholds remain unchanged. The single completed L10 fit cannot
+claim untrained levels or minimum-three-contiguous-level construction success. The completed ROT13 14B L10
+receipt binds source 2ea4fb9/config 6f7e5048. Retain it without retraining; evaluation-only GPQA addition does
+not change its training. Future algorithm changes need separate identities. $240 SFT authorized; actual
+whole-matrix runtime remains unmeasured.
 ```
 
 ## page_031
@@ -2704,7 +2705,7 @@ Retain latest two verified recovery states and
 every final adapter. Explicit
 legacy_two_epoch_v1 ends at 1,250. Advance
 retention only after verified Drive publication.
-CompletedROT13 14B L10 final625 is
+CompletedROT13 14B L10 final 625 is
 Drive-verified and retained; 19 selected 14B
 conditions uncompleted.
 ```
@@ -3134,20 +3135,20 @@ induction or apparent internal-monitor success subject to judge shortcuts, selec
 changes and intervention artifacts; the audit is intended to protect that inference rather than
 manufacture a stronger scientific result [41, 54, 59].
 58
-Corpus: licensed acquisition and one-million-row audit verified; 407,214 candidates frozen. Existing evaluation panels and
-800-question RL manifest backed up. vLLM/refills yielded 10,100 accepted pairs; 1,539 rejections from 11,639 IDs. All 40 transformed
-conditions, 404,000 records and 122 artifacts Drive-verified. Both bases passed repeatability after rescoring 7,398 saved outputs.
-14B ROT13 L10 completed 625 updates / 10,000 presentations from untouched base on PRO 6000 96GB. Recipe
-efficient_one_epoch_v1: BF16 base/head, full-gradient exact CCE, SDPA, AdamW. Native identity/mask/gradient/capacity/recovery
-passed; actual 1 x 16, checkpointing off. Source 2ea4fb9 / config 6f7e5048 immutable; final adapter/state/report Drive-verified.
-Validation loss 0.76358 / 100 items is diagnostic, not capability/opacity proof.
-Fit 5,793.143751 s; worker 6,322.565654 s. At $2.99/h: $4.81 / $5.25 (calculated, not invoices). $240 SFT authorized 13 Oct; 14B-only
-scope 20: retain adapter,19 remaining. Comparable20-run projection35.13 h / $105.02; remaining 19:33.37 h / $99.77 (about$100).
-One-condition extrapolations exclude setup/idle and RL/evaluation; track actual budget. No new worker launched here.
-GPQA Diamond (198) appended descriptive supplement matches reference dataset variant, not its full pipeline. Panel prepared:198
-questions. Untouched14B GPQA baseline and trained 14B evaluation not run; comparison freeze pending. Existing four-domain base
-measurements retained; judges deferred. Four-domain gates/windows unchanged; final panels reserved. Archival NF4 states are not
-warm starts; no final-efficacy equivalence is claimed.
+Corpus: 10,100 accepted paired IDs, all 40 transformed conditions/404,000 records, and 122 artifacts verified in Drive.
+Existing evaluation/RL panels backed up; both bases passed repeatability after rescoring 7,398 saved outputs.
+14B ROT13 L10 completed 625 updates/10,000 presentations from untouched base on PRO 6000 96GB. Recipe
+efficient_one_epoch_v1: BF16 base/head, full-gradient CCE, SDPA, AdamW. Native identity/mask/gradient/capacity/recovery
+passed; actual 1 x 16, checkpointing off. Source 2ea4fb9/config 6f7e5048 immutable; final adapter/state/report Drive-verified.
+Validation loss 0.76358/100 items is diagnostic, not capability/opacity proof.
+Fit 5,793.143751 s; worker 6,322.565654 s. Historical $2.99/h:$4.81/$5.25,calculated not invoices. Active 14B scope
+20,completed adapter retained,19 remaining. Historical rate projection:remaining 19,33.37 h/$99.77;full 20,35.13 h/$105.02.
+Excludes setup/idle and RL/evaluation;not bounds. $240 authorization recorded; user says proceed without setting budget
+rate. No imposed rate cutoff or new price inferred.
+GPQA Diamond 198 panel prepared. Baseline-only CLI runs untouched 14B first;verify complete raw/scored baseline/report in
+Drive before SFT. Then fresh KaziText L10 followed by ROT13/KaziText levels 1?9 ascending. New baseline/fits/trained
+evaluation not run. Existing four-domain bases retained; judges deferred. GPQA supplements unchanged four-domain gates;
+historical NF4 states are not warm starts.
 Training and confirmatory execution require: (i) verified fixed R1-Distill-Qwen model identities; (ii) pinned model,
 tokenizer, dataset, KaziText and dependency revisions; (iii) recoverable verified Drive copies; (iv) checked real
 reasoning delimiters, full sequence lengths, nonzero adapter gradients and completion-only loss masks; (v)

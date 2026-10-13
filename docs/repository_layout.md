@@ -73,6 +73,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     coordinator.json
   dockerfile
   docs/
+    14b_baseline_results.md
     agents/
       analysis.md
       coordinator.md
@@ -91,7 +92,10 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     deployment/
       runpod.md
     evidence/
+      14b_baseline_summary.json
       a100_optimization_interruption.json
+      authorized_sft_14b_campaign_2026_10_13.json
+      authorized_sft_campaign_2026_10_13.json
       baseline_repeatability_launch.json
       colab_a100_connection.json
       coordinator_validation.json
@@ -99,6 +103,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       documentation_consistency_audit.json
       evaluation_validation.json
       existing_runpod_inspection.json
+      gpqa_preparation_receipt.json
+      gpqa_variant_source.json
       judge_profile_guard_live_report.json
       kazitext_auxiliary_runtime.json
       mbpp_isolation_checks.json
@@ -135,6 +141,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft_optimization_pro6000_selected_profile.json
       sft_optimization_pro6000_training_resume.json
       sft_pro6000_session_pause_987.json
+      sft_rot13_14b_level10_completion.json
+      sft_rot13_14b_level10_runtime_evidence.json
       sft_runtime_checks_report.json
       sft_scheduled_forward_pro6000_benchmark.json
       sft_scheduled_forward_pro6000_pause_509.json
@@ -218,6 +226,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             native_output/
               output_generation.md
           model_evaluation.md
+        supplemental_gpqa.md
       experiment_overview/
         experiment_overview.md
       operations/
@@ -275,6 +284,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     repository_layout.md
     requirements.md
     runbook.md
+    sft_completed_rot13_14b_level10.md
     sft_data_handoff.md
     sft_multi_gpu_execution_plan.md
     sft_optimizations.md
@@ -285,6 +295,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     validation_report.md
   prompts/
     evaluation_arc_easy.txt
+    evaluation_gpqa.txt
     evaluation_gsm8k.txt
     evaluation_legibility.txt
     evaluation_mbpp.txt
@@ -334,6 +345,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     refresh_dependency_locks.py
     rescore_vllm_baselines.py
     revalidate_collection_inputs.py
+    run_14b_sft_campaign.py
     run_baseline_repeatability.py
     run_certified_sft.py
     run_collection_until.py
@@ -341,6 +353,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_model_generation_worker.py
     run_optimized_sft_queue.py
     run_preflight.py
+    run_supplemental_gpqa.py
     run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
     score_vllm_baseline_cloud.py
@@ -424,6 +437,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
               native_output/
                 output_generation.mmd
             model_evaluation.mmd
+          supplemental_gpqa.mmd
         experiment_overview/
           experiment_overview.mmd
         operations/
@@ -550,6 +564,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             output_generation.py
             vllm_generation.py
         model_evaluation.py
+      supplemental_gpqa.py
     experiment_overview/
       __init__.py
       experiment_overview.py
@@ -689,9 +704,11 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             test_item_evaluation.py
           test_model_evaluation.py
         test_evaluation.py
+        test_supplemental_gpqa.py
       experiment_overview/
         test_experiment_overview.py
       operations/
+        test_14b_sft_campaign.py
         test_assets.py
         test_baseline_rescoring.py
         test_baseline_runtime_qualification.py

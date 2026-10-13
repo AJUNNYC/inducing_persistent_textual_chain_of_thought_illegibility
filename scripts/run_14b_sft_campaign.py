@@ -295,12 +295,12 @@ def main(argv=None):
                 if not args.wait_for_baseline:
                     raise ValueError("GPQA completion receipt is not available")
                 time.sleep(5)
-            status("TRAINING", gpqa_drive_status="VERIFIED")
+            status("BASELINE_VERIFIED", gpqa_drive_status="VERIFIED")
             for job in jobs:
                 if stop["requested"] or datetime.now(timezone.utc) >= deadline:
                     status("PAUSED", reason="deadline_or_stop", drive_status="VERIFIED")
                     return 3
-                status("TRAINING", current_run_id=job["run_id"])
+                status("STARTING_FIT", current_run_id=job["run_id"])
                 with (output / (job["run_id"] + ".log")).open("a") as log:
                     child = subprocess.Popen(training_command(args, job, deadline), cwd=ROOT,
                                              stdout=log, stderr=subprocess.STDOUT, start_new_session=True)

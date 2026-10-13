@@ -10,7 +10,7 @@ Keep completion-only masks and per-example weighting, all seven LoRA targets (ra
 
 The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/capacity/full-state guards passed for the completed 14B ROT13 level-10 fit on RTX PRO 6000 Blackwell 96GB. Actual execution was microbatch 1 / accumulation 16 with activation checkpointing off. The recorded fit interval was 5,793.143751 seconds (96m33s); worker launch through completion was 6,322.565654 seconds (105m23s). At $2.99/hour these imply $4.81 and $5.25, respectively, calculated from runtime rather than invoices. Other conditions remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
 
-See the [completion, provenance and budget record](../../../sft_completed_rot13_14b_level10.md). GPQA Diamond (198 questions) is appended to the existing capability suite, matching the José et al. dataset variant; the 198-question panel is prepared, while comparison-state freeze and evaluation remain pending. It is a supplemental stress test and does not change the original four-domain criteria.
+See the [completion, provenance and budget record](../../../sft_completed_rot13_14b_level10.md). GPQA Diamond (198 questions) is appended to the existing capability suite, matching the José et al. dataset variant; the 198-question panel is prepared, while comparison-state freeze and evaluation remain pending. It is a supplemental stress test and does not change the original four-domain criteria. The authorized execution order is now: freeze and run the untouched14B GPQA Diamond baseline on all198 prepared questions, verify its raw outputs/scores/report in Google Drive, retain the completedROT13 14B L10 adapter, then start freshKaziText 14B L10 followed by ROT13 andKaziText at levels1–9 in ascending level order. The committed baseline-only CLI supports evaluation before a trained adapter exists; the separate 19-fit coordinator requires that verified baseline before SFT. This is the prescribed queue, not evidence that the new baseline or fits have run.
 
 ## Archived interruption: A100 comparison stopped on 11 October 2026
 
@@ -87,44 +87,46 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
-%% Default efficient_one_epoch_v1 applies per explicitly selected fit.
-%% Forty datasets remain available; 14B ROT13 L10 completed 625, leaving 19 selected 14B fits uncompleted.
-%% $240 SFT authorized 13 Oct; retain completed adapter. No new worker or benchmark campaign implied.
-%% One epoch: all 10,000 examples once, 625 updates, cosine horizon 625, warmup 19.
-%% Declared baseline: BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW.
-%% Completion-only per-example weighting, full 4096 targets, LoRA and effective batch remain fixed.
-%% Policy v2 requests physical 2 x 8; capacity fallback 1 x 16 retains effective 16.
-%% Fresh duplicate-longest capacity order: 2/off, 1/off, 2/on, 1/on; exact resume keeps actual mode.
-%% Legacy NF4 one/two-epoch recipes retain separate source/configuration/state identities.
-%% Historical PRO/A100 partial checkpoints remain archives, never new-recipe warm starts.
-%% Native guards passed only for completed 14B ROT13 L10; actual 1 x 16/checkpointing off.
-%% Fit5793.143751s; worker6322.565654s; other condition runtimes unmeasured.
-%% Child: ROTFIT => individual_fit/sft_fit.mmd
-%% Child: KAZFIT => individual_fit/sft_fit.mmd
-    INPUT["Forty Drive-verified condition datasets<br/>7B / 14B; ROT13 / KaziText; levels 1-10"]
-    PAUSE["Retain completed 14B ROT13 L10 adapter<br/>19 selected 14B fits uncompleted; $240 SFT authorization<br/>No worker launched by this plan"]
-    SELECT["Select 19 disjoint remaining 14B fits<br/>Both families; levels 1-10<br/>Exclude completed 14B ROT13 L10<br/>Recipe: efficient_one_epoch_v1"]
-    BIND["Bind recipe / published policy v2 / source / data identity<br/>Request 2 x 8; capacity fallback 1 x 16<br/>Reuse compatible upstream evidence"]
-    PLAN["Assign disjoint selected fits to available workers<br/>Independent untouched-base initialization"]
-    ROTFIT["src/training/sft/individual_fit/sft_fit.py<br/>Remaining selected ROT13 condition<br/>All 10,000 examples; one epoch"]
-    KAZFIT["src/training/sft/individual_fit/sft_fit.py<br/>Remaining selected KaziText condition<br/>All 10,000 examples; one epoch"]
-    ROTDONE["Verify final 625 state and adapter in Drive<br/>Release assigned ROT13 worker"]
-    KAZDONE["Verify final 625 state and adapter in Drive<br/>Release assigned KaziText worker"]
-    OUT["Only selected, verified adapters<br/>Validation diagnostics; final panels reserved<br/>L10-only cannot establish multi-level success"]
-    LEGACY["Explicit NF4 alternatives only<br/>legacy_two_epoch_v1 / one_epoch_pilot_v1"]
-    INPUT --> PAUSE
-    PAUSE -.->|Connect GPU and start remaining fits| SELECT --> BIND --> PLAN
-    PLAN --> ROTFIT --> ROTDONE --> OUT
-    PLAN --> KAZFIT --> KAZDONE --> OUT
-    INPUT -.->|Separately declared alternative| LEGACY
+%% Current coordinator: scripts/run_14b_sft_campaign.py; no new work claimed complete here.
+%% Forty prepared datasets retained; active scope is 20 14B conditions, 19 new fits.
+%% Retain completed ROT13 14B L10 with immutable source 2ea4fb9/config 6f7e5048 identity.
+%% Baseline-only GPQA CLI needs no trained adapter; require real Diamond 198 completion and Drive verification.
+%% New fits: KaziText L10 first, then ROT13/KaziText at levels 1-9 ascending; serialize this queue.
+%% Each starts from untouched pinned base; default efficient_one_epoch_v1 applies per fit.
+%% All 10,000 examples once; 625 updates/cosine horizon; 19 warmup; full targets/effective 16.
+%% BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW; original LoRA/masks/LR unchanged.
+%% Requested 2 x 8; CUDA-OOM-only capacity fallback 1 x 16; recorded execution mode frozen for recovery.
+%% Checkpoints every 100/final 625, verified Drive outputs before advancement.
+%% $240 authorization retained; no new inferred hourly price or rate-based cutoff.
+%% Explicit UTC deadlines and safe user pauses remain separate controls.
+%% Historical 7B/NF4 outputs retained; no warm starts or success inferred from missing states.
+%% Child: FIT => individual_fit/sft_fit.mmd
+    INPUT["Forty Drive-verified datasets retained<br/>Active 14B: both families, all ten levels<br/>20 conditions; 19 new fits"]
+    RETAIN["Retain completed 14B ROT13 L10 adapter/full state<br/>Original immutable identity; no retraining"]
+    BASE["scripts/run_supplemental_gpqa.py freeze-base / run<br/>Untouched pinned 14B GPQA Diamond 198 baseline<br/>No trained adapter needed"]
+    BARRIER{"All 198 raw/scored items and baseline report<br/>Complete receipt and actual Drive verification?"}
+    WAIT["Preserve partial baseline and verified raw records<br/>No SFT advance until the real barrier passes"]
+    BIND["Bind source / certified data / finalized recipe<br/>Verify retained-fit compatibility without relabeling"]
+    ORDER["scripts/run_14b_sft_campaign.py<br/>KaziText 14B L10 first<br/>Then each level 1-9: ROT13 followed by KaziText"]
+    NEXT{"Next incomplete job in ordered 19-fit queue?"}
+    FIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh untouched-base initialization for this condition<br/>Native safeguards; one epoch / 625 updates"]
+    SAVE["Verify final adapter and full recovery state in Drive<br/>Record actual completion before advancing"]
+    OUT["Only actual verified selected adapters<br/>Trained GPQA comparisons and scope-specific analysis separate<br/>No unrun-state success claims"]
+    LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
+    INPUT --> RETAIN --> BASE --> BARRIER
+    BARRIER -->|No| WAIT
+    BARRIER -->|Yes| BIND --> ORDER --> NEXT
+    NEXT -->|Yes| FIT --> SAVE --> NEXT
+    NEXT -->|No| OUT
+    INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
-    class ROTFIT,KAZFIT detail
+    class BASE,FIT detail
     classDef stop fill:#fff3d9,stroke:#95733f,stroke-dasharray:5 5
-    class PAUSE,LEGACY stop
+    class WAIT,LEGACY stop
 
 %% Repository module: src/training/sft/sft_training.py
 %% Module documentation: docs/modules/training/sft/sft_training.md
 %% Unit test: tests/unit/training/sft/test_sft_training.py
 %% Owner: sft
-%% Source sections: C.2; E.1.1-E.1.3; E.2.2,E.2.5; authorized efficient redesign
+%% Source sections: C.2; E.1.1-E.1.3; E.2.2,E.2.5; authorized efficient redesign/current queue
 ```

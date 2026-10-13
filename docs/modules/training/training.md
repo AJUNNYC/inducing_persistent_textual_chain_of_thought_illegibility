@@ -58,7 +58,10 @@ flowchart TD
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
 %% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
 %% Actual batch/accumulation/recomputation mode stays fixed throughout each fit and exact resume.
-%% Forty datasets available; active14B scope20, completedROT13 L10 retained;19 selectedfits uncompleted.
+%% Committed coordinator requires untouched 14B Diamond 198 baseline+verified Drive barrier before 19 new fits.
+%% Queue KaziText L10 then ROT13/KaziText levels 1-9 ascending; completed ROT13L10 retained.
+%% Authorization $240 recorded; no inferred new price or rate-based cutoff; explicit deadline/safe pause separate.
+%% Forty datasets available; active14B scope20, completed ROT13 L10 retained;19 selectedfits uncompleted.
 %% $240 SFT authorized 13 Oct; no new worker launch recorded. RL/final evaluation remain separate.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
@@ -73,7 +76,7 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 datasets; active 14B only, all ten levels<br/>Completed 14B ROT13 L10 retained<br/>20 active 14B conditions; 19 remaining<br/>7B data/history retained; disjoint jobs only<br/>Default: efficient one epoch / 625 updates"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 datasets; active 14B only, all ten levels<br/>Completed 14B ROT13 L10 retained<br/>20 active 14B conditions; 19 remaining<br/>7B data/history retained; disjoint jobs only<br/>GPQA untouched 14B baseline + Drive barrier first<br/>KaziText L10 then ROT13/KaziText levels 1-9<br/>Default: efficient one epoch / 625 updates"]
     SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
     RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]
