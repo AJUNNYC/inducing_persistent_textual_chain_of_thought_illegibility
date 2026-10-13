@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "d923efe1e65abd73de371f3be08c3d03f4e0a7cb946b3c30702c2a136b6e44e8"
+    "sha256": "e8137a00ead72a3de3f5dbad39a48a1776fcdf463d631a529b2af153fd4110a7"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,7 +27,7 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "10aa24069da469faf45741862130ec0bee2294b0031a52f446b7bd52489e2d98",
+  "procedure_update_sha256": "5e97e4b5ab09d33631fca55d39a0d4fa9a1ce5ef6071293efd7f3592a69670aa",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_19_SELECTED_14B_FITS",
@@ -174,7 +174,7 @@
         "initialization": "fresh_untouched_pinned_base"
       }
     ],
-    "allocated_gpu_workers": 0,
+    "allocated_gpu_workers": 1,
     "epochs_per_selected_fit": 1,
     "train_examples": 10000,
     "validation_examples": 100,
@@ -234,7 +234,7 @@
       9,
       10
     ],
-    "gpu_connection_available": false,
+    "gpu_connection_available": true,
     "multi_level_construction_window_established": false,
     "completed_fit_count": 1,
     "completed_conditions": [
@@ -365,14 +365,29 @@
         "level": 9
       }
     ],
-    "new_queue_status": "PLANNED_NOT_LAUNCHED"
+    "new_queue_status": "RUNNING_KAZITEXT_14B_LEVEL10_AFTER_VERIFIED_GPQA_BASELINE",
+    "current_worker_scientific_source": "9de8813031da737453f491723a10b305679dc42d",
+    "campaign_started_at": "2026-10-13T20:58:33+00:00",
+    "current_fit": {
+      "run_id": "kazitext_14b_level_10",
+      "status": "RUNNING",
+      "checkpoint_snapshot_at": "2026-10-13T21:31:09+00:00",
+      "last_verified_completed_updates": 200,
+      "target_updates": 625,
+      "drive_status": "VERIFIED",
+      "native_guards": "passed",
+      "physical_microbatch": 1,
+      "gradient_accumulation": 16,
+      "gradient_checkpointing": false,
+      "new_fit_completion_claimed": false
+    }
   },
   "current_sft_authorization": {
     "date": "2026-10-13",
     "ceiling_usd": 240,
     "purpose": "SFT",
     "gpu_hourly_rate_used_usd": 2.99,
-    "additional_gpu_launch_performed": false,
+    "additional_gpu_launch_performed": true,
     "calculated_cost_not_invoice": true,
     "scope": "remaining19_selected14B_fits_retaining_completed_adapter",
     "projection_assumption": "same_runtime_as_one_completed_14b_rot13_level10_fit",
@@ -394,7 +409,7 @@
     "replaces_existing_domains": false,
     "variant": "gpqa_diamond",
     "preparation_status": "PREPARED",
-    "results_available": false,
+    "results_available": true,
     "original_confirmatory_thresholds_changed": false,
     "question_count": 198,
     "dataset_name": "Idavidrein/gpqa",
@@ -410,14 +425,14 @@
     "variant_source_evidence": "docs/evidence/gpqa_variant_source.json",
     "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
     "preparation_receipt": "docs/evidence/gpqa_preparation_receipt.json",
-    "comparison_state_freeze_status": "BASELINE_ONLY_CLI_AVAILABLE_NOT_YET_RUN",
-    "generation_started": false,
+    "comparison_state_freeze_status": "BASELINE_ONLY_FROZEN_TRAINED_COMPARISON_PENDING",
+    "generation_started": true,
     "trained_states_evaluated": 0,
     "supplemental_procedure_document": "docs/modules/evaluation/supplemental_gpqa.md",
     "active_comparison_models": [
       "14b"
     ],
-    "untouched14b_gpqa_baseline_status": "NOT_RUN",
+    "untouched14b_gpqa_baseline_status": "COMPLETE_VERIFIED",
     "trained14b_gpqa_evaluation_status": "NOT_RUN",
     "existing_four_domain_base_measurements_retained": true,
     "existing_four_domain_judge_assessments": "deferred_not_full_legibility_evaluation",
@@ -427,6 +442,24 @@
     "requires_trained_adapter_for_baseline": false,
     "baseline_before_sft_required": true,
     "baseline_drive_verification_required_before_sft": true,
-    "baseline_only_freeze_run_status": "NOT_RUN"
+    "baseline_only_freeze_run_status": "COMPLETE_VERIFIED",
+    "seed42_correct": 49,
+    "seed42_denominator": 198,
+    "seed42_accuracy": 0.2474747474747475,
+    "score_reason_counts": {
+      "correct": 49,
+      "truncated_output": 133,
+      "incorrect": 13,
+      "malformed_answer": 3
+    },
+    "no_parsed_answer_count": 136,
+    "max_new_tokens": 3072,
+    "major_interpretation_limitation": "133_truncated_and3_malformed_under_fixed3072_cap_budget_limited_score",
+    "result_evidence": "docs/evidence/gpqa_14b_baseline_completion_2026_10_13.json",
+    "worker_scientific_source": "9de8813031da737453f491723a10b305679dc42d",
+    "protocol_hash": "42fb1287bce7968810f9d14d5325b402a8e75649628a78e8835ceb990579bfb6",
+    "drive_folder_id": "19fz91SREgU0TvnqLMKUaXb1hx-gJUrRW",
+    "completion_receipt_hash": "2bc4a8c672fb219c857184109783fffc16677f4475c3c186cae2f8401fc4fe62",
+    "report_hash": "f8b4694057be584c0db4438819e2836ce37a7bfb4d41b1fd5f3d580aa6e970b5"
   }
 }

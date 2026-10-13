@@ -1,0 +1,61 @@
+{
+  "schema_version": "public_gpqa_baseline_summary_v1",
+  "status": "COMPLETE",
+  "drive_status": "VERIFIED",
+  "variant": "gpqa_diamond",
+  "model": "14b",
+  "seed": 42,
+  "observed": 198,
+  "denominator": 198,
+  "correct_count": 49,
+  "accuracy": 0.2474747474747475,
+  "score_reason_counts": {
+    "correct": 49,
+    "truncated_output": 133,
+    "incorrect": 13,
+    "malformed_answer": 3
+  },
+  "parsed_answer_count": 62,
+  "no_parsed_answer_count": 136,
+  "max_new_tokens": 3072,
+  "headline_denominator_includes_all_198": true,
+  "limitation": "budget_limited_native_output_and_final_field_score_not_unrestricted_benchmark_accuracy",
+  "primary_evaluation_response_budget_unchanged": true,
+  "protocol_hash": "42fb1287bce7968810f9d14d5325b402a8e75649628a78e8835ceb990579bfb6",
+  "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
+  "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+  "source_completion_receipt_hash": "2bc4a8c672fb219c857184109783fffc16677f4475c3c186cae2f8401fc4fe62",
+  "report_hash": "f8b4694057be584c0db4438819e2836ce37a7bfb4d41b1fd5f3d580aa6e970b5",
+  "report_sha256": "b2029f9277df0a36efcae13a30ad04c171f2b9fbe9689c321f41ae080827efdd",
+  "registry_sha256": "ec6e5ec326a922c8fbc458a10af4c41a67ee0cd6e41bbde520f3213c8f5dfdc1",
+  "model_revision": "1df8507178afcc1bef68cd8c393f61a886323761",
+  "tokenizer_revision": "1df8507178afcc1bef68cd8c393f61a886323761",
+  "registered_artifacts": 398,
+  "all_registered_artifacts_status": "VERIFIED",
+  "local_checksum_readback_scope": [
+    "baseline_report",
+    "drive_inventory"
+  ],
+  "raw_scored_file_verification_scope": "producer_completion_and_verified_inventory_records",
+  "report_drive_file_id": "1XrTIqDj1vbUY5j1CWtfw4cQ2RnYNbzZf",
+  "drive_folder_id": "19fz91SREgU0TvnqLMKUaXb1hx-gJUrRW",
+  "simulation": false,
+  "trained_states_evaluated": 0,
+  "repeatability_seed43_and44_gpqa_run": false,
+  "recovery": {
+    "first_attempt": "operational_timeout_after_first128_cached_results",
+    "cached_results_preserved": 128,
+    "retry_policy": "reuse_compatible_raw_cache_finish_missing_items_no_retry_until_correct",
+    "recovery_observation_source": "recorded_operational_run_provenance",
+    "baseline_process_exit_code": 0,
+    "gpu_released_before_sft": true
+  },
+  "licensed_questions_or_raw_responses_included": false,
+  "registered_payload_breakdown": {
+    "raw_records": 198,
+    "score_records": 198,
+    "protocol": 1,
+    "report": 1
+  },
+  "drive_inventory_counted_as_payload_record": false
+}

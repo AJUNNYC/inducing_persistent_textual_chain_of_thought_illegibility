@@ -103,6 +103,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       documentation_consistency_audit.json
       evaluation_validation.json
       existing_runpod_inspection.json
+      gpqa_14b_baseline_completion_2026_10_13.json
       gpqa_preparation_receipt.json
       gpqa_variant_source.json
       judge_profile_guard_live_report.json
@@ -113,6 +114,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       mbpp_sandbox_prior_attempt.json
       readme.md
       scaffold_validation_report.md
+      sft_14b_campaign_training_active_2026_10_13.json
       sft_data_handoff_773cfd3_certificate.json
       sft_data_handoff_certificate.json
       sft_data_handoff_drive_index.json

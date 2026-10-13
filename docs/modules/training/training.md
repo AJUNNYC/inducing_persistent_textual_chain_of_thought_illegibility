@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Nineteen selected 14B conditions remain uncompleted; 20 comprise the active scope. Prepared 7B data/historical results are retained outside the queue. $240 was authorized for SFT on 13 October. No new worker is launched here. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
+**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Nineteen selected 14B conditions remain uncompleted; 20 comprise the active scope. Prepared 7B data/historical results are retained outside the queue. $240 was authorized for SFT on 13 October. The source 9de8813 campaign now runs after the verified GPQA baseline; KaziText L10 checkpoint 200/625 was Drive-verified 13 Oct 21:31 UTC. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
 
 | Artifact | Exact repository path |
 |---|---|
@@ -54,6 +54,9 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/training.mmd"
 ---
 flowchart TD
+%% Dated13Oct21:38UTC evidence: actualGPQA49/198 complete/Drive verified;133 truncated+3 malformed at3072 tokens.
+%% Worker scientificsource9de8813 runsKaziText14B L10;200/625 checkpointDrive verified21:31UTC, native guards passed1x16/GCoff.
+%% RetainedROT13L10 keeps old2ea4fb9 identity; laterdocumentation cannot relabel executed workers.
 %% Training
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
 %% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
