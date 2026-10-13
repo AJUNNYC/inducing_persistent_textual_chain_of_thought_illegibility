@@ -1,0 +1,28 @@
+{
+  "schema_version": "gpqa_variant_source_v1",
+  "observed_date": "2026-10-13",
+  "author": "Arun Jose",
+  "author_profile": "https://github.com/Jozdien",
+  "code_repository": "https://github.com/Jozdien/cot_legibility",
+  "code_revision": "89195c70288b4b141460447f5fde02f67b38b043",
+  "source_path": "src/inference/datasets.py",
+  "source_sha256": "69c61105eeeabc763ff07a1796b35941a99634a66fb3dd9c7fce3aba1ea22e55",
+  "variant_evidence": {
+    "line": 17,
+    "mapping": {
+      "gpqa": "gpqa_diamond"
+    }
+  },
+  "official_dataset": "Idavidrein/gpqa",
+  "official_revision": "83022cefff930aea54f654c0b282e74b9eeda5c6",
+  "file": "gpqa_diamond.csv",
+  "expected_count": 198,
+  "license": "cc-by-4.0",
+  "gated": "auto",
+  "scope": "appended_descriptive_stress_test_existing_primary_panel_unchanged",
+  "dataset_match_is_not_pipeline_replication": true,
+  "source_pipeline_public_format": "Question text only; correct answer separate; LLM correctness grader",
+  "project_public_format": "Four deterministically permuted choices; frozen explicit final-letter correctness rule",
+  "dataset_download_verified": false,
+  "evaluation_executed": false
+}

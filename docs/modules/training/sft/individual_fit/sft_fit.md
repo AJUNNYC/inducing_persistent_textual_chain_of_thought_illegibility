@@ -1,14 +1,16 @@
 # sft_fit.md
 
-## Active selection: two fresh 14B level-10 fits; awaiting GPU access
+## Current SFT status: 14B ROT13 level 10 complete; $240 authorized for remaining work
 
-The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The selected launch scope is two independent fresh 14B fits: ROT13 level 10 and KaziText level 10. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. No GPU connection is available and training remains paused pending GPU access. See [the training redesign](../../../../sft_short_pilot.md).
+The default `efficient_one_epoch_v1` recipe processes **all 10,000 certified training examples once per selected fit**: 625 optimizer updates, a complete 625-update cosine schedule and 19 warmup updates. The first fresh fit, 14B ROT13 level 10, completed all 625 updates on 12 October 2026; KaziText level 10 has not completed under this recipe. Both 7B/14B, ROT13/KaziText and all ten levels remain available in the forty-condition Drive-verified inventory. The completed adapter is retained, leaving 39 available conditions uncompleted. On 13 October the user authorized $240 for SFT; no additional GPU launch is recorded here. See [the training redesign](../../../../sft_short_pilot.md).
 
 The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
 Keep completion-only masks and per-example weighting, all seven LoRA targets (rank 8/alpha 16/dropout 0.05), learning rate `2e-4`, requested microbatch 2/accumulation 8/effective batch 16 (capacity fallback 1/16/16), seed 42, all 10,000/100 records, full 4096-token eligibility without truncation and verified Drive saves. Checkpoints occur at updates 100, 200, 300, 400, 500, 600 and final 625. Each update retains the same ordered 16 examples with per-example weight 1/16; execution grouping, padding, dropout draws and floating-point rounding may differ. No measured batching speedup or bitwise-equivalent outcome is claimed. This prospectively declared scientific baseline changes exposure, precision/head numerics, optimizer and execution; it does not prove identical final results. The original NF4 `legacy_two_epoch_v1` and intermediate NF4 `one_epoch_pilot_v1` remain explicit alternatives, with incompatible checkpoints and separate identities.
 
-The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/full-state guards run during actual startup before any update; they have not passed for this redesign. Historical A100 comparisons ended without an accepted optimization, and 14B speed/memory remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/capacity/full-state guards passed for the completed 14B ROT13 level-10 fit on RTX PRO 6000 Blackwell 96GB. Actual execution was microbatch 1 / accumulation 16 with activation checkpointing off. The recorded fit interval was 5,793.143751 seconds (96m33s); worker launch through completion was 6,322.565654 seconds (105m23s). At $2.99/hour these imply $4.81 and $5.25, respectively, calculated from runtime rather than invoices. Other conditions remain unmeasured. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
+
+See the [completion, provenance and budget record](../../../../sft_completed_rot13_14b_level10.md). GPQA Diamond (198 questions) is appended to the existing capability suite, matching the José et al. dataset variant; preparation and evaluation remain pending. It is a supplemental stress test and does not change the original four-domain criteria.
 
 ## Archived interruption: A100 comparison stopped on 11 October 2026
 
@@ -16,7 +18,7 @@ Both Colab A100 assignments ended; the account reports 0.00 compute units and re
 
 ## Prior implementation and evidence scope
 
-The following implementation details and dated measurements retain their original scope; the paused execution and efficient recipe amendment are described above.
+The following implementation details and dated measurements retain their original scope; the completed efficient fit and current authorization are described above.
 
 **Owner:** `sft`. **Implementation status:** source `a6e3295` remains accepted only for 7B ROT13 level 1 on the measured Blackwell96GB GPU. Its existing lineage is running from verified step 673 with passed native gradients, verified Drive recovery and the original deadline. The final memory-copy candidate failed speed despite bitwise agreement. All parent checkpoints and science remain unchanged; optimization rounds are closed.
 
@@ -54,7 +56,7 @@ Install through `scripts/setup_environment.py --profile gpu-published --skip-tes
 
 `legacy_two_epoch_v1` retains NF4/double quantization, FP32 head, paged AdamW and 1,250 updates with 38 warmup updates. `one_epoch_pilot_v1` retains that numerical recipe with 625/19. The efficient recipe changes these numerics and is a newly declared baseline, not an approved migration of a previous optimizer state. Start fresh; only an exact efficient-fit full checkpoint may resume its own fit. A second epoch after final 625 requires a separate continuation declaration or a fresh legacy run.
 
-Use the common [artifact contracts](../../../../contracts.md), [prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). The [deployment plan](../../../../sft_multi_gpu_execution_plan.md) selects fresh14B ROT13 level10 and KaziText level10; GPU access is pending.
+Use the common [artifact contracts](../../../../contracts.md), [prompt instructions](../../../../prompts.md), [decision ledger](../../../../decisions.md) and [validation requirements](../../../../validation.md). The [deployment plan](../../../../sft_multi_gpu_execution_plan.md) retains completed 14B ROT13 level10 and documents39 uncompleted conditions under the $240 SFT authorization.
 
 | Source node | Called procedure | Specification |
 |---|---|---|
@@ -138,12 +140,14 @@ flowchart TD
 %% Completion-only per-example means; full 4096 eligibility without truncation; seed 42.
 %% LoRA 8 / 16 / .05, all seven projections, LR 2e-4, zero decay, max norm .3.
 %% Checkpoints every 100 updates and final 625; actual Drive verification before retention/completion.
-%% Native startup unrun; selected fresh14B ROT13 L10 and KaziText L10, PAUSED pending GPU access.
+%% Observed: 14B ROT13 L10 completed 625 with native guards passed; actual 1 x 16, checkpointing off.
+%% Final adapter/full state Drive-verified; source 2ea4fb9/config 6f7e5048 remain immutable.
+%% 39 conditions uncompleted; $240 authorized 13 Oct. No new worker launch implied.
 %% Fresh non-updating duplicate-longest capacity guard: 2/off, 1/off, 2/on, 1/on; CUDA-OOM-only fallback.
 %% Exact-fit recovery restores recorded actual batch/accumulation/recomputation, never changes it.
 %% Policy v2 has a distinct execution identity; old NF4 or prior-policy states cannot be relabelled.
 %% Child: RECOVER => ../../../shared_procedures/recovery_procedure.mmd
-    INPUT["Selected fresh14B level10 fit<br/>ROT13 or KaziText; certified records"]
+    INPUT["Explicitly selected condition<br/>Completed14B ROT13 L10 retained<br/>Remaining certified records only"]
     SETUP["Untouched BF16 base/head and LoRA<br/>Pinned exact full-gradient CCE; SDPA; AdamW<br/>One epoch; cosine 625; warmup 19"]
     CAPACITY["Non-updating duplicate-longest capacity guard<br/>Fresh: 2/off - 1/off - 2/on - 1/on<br/>Only CUDA OOM permits next mode<br/>Resume: restore recorded actual mode"]
     GUARDS["Normal native identity / causal mask / gradient guards<br/>Verify complete-state recovery before updates"]

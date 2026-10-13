@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "df6c9a9304844af8e024fc4663fceabee785d11912e25e5d0b8f398320e7a38f"
+    "sha256": "852e1a5d9410528d7a99a4afaf0308fca0a0d23ad290febc186b255c81c638e4"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -16,7 +16,7 @@
   "full_original_latex_available": false,
   "scientific_results_included": false,
   "live_integrations_validated": false,
-  "active_procedure_edition": "2026-10-12",
+  "active_procedure_edition": "2026-10-13",
   "procedure_update_source": "spec/protocol_page_updates.json",
   "validated_live_scope": [
     "vLLM generation benchmark",
@@ -27,10 +27,10 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation"
   ],
-  "procedure_update_sha256": "e3e144c6a74ea531afdd3006a7ed3164d3281bca9a8b8459ffd1e057d150cf71",
+  "procedure_update_sha256": "4fc8586323752265402e7202d74c9170b03c7ba6b22011df05ea5d102551602f",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
-    "status": "PAUSED_PENDING_GPU_ACCESS",
+    "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_39_UNCOMPLETED",
     "available_model_sizes": [
       "7b",
       "14b"
@@ -92,8 +92,8 @@
     "legacy_recipe": "legacy_two_epoch_v1",
     "intermediate_nf4_pilot_recipe": "one_epoch_pilot_v1",
     "optimization_campaign_requested": false,
-    "native_efficient_runtime_checks_executed": false,
-    "native_14b_throughput_or_memory_measured": false,
+    "native_efficient_runtime_checks_executed": true,
+    "native_14b_throughput_or_memory_measured": true,
     "final_test_panels_reserved": true,
     "construction_success_thresholds_changed": false,
     "design_document": "docs/sft_short_pilot.md",
@@ -118,6 +118,62 @@
       10
     ],
     "gpu_connection_available": false,
-    "multi_level_construction_window_established": false
+    "multi_level_construction_window_established": false,
+    "completed_fit_count": 1,
+    "completed_conditions": [
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 10,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "2ea4fb9a7737cff806226366e73743eec5935fad",
+        "configuration_hash": "6f7e50488aa8e8379dfb7f303bc790cef38493b1a260be3b27e5e8d13ad666ec",
+        "actual_microbatch": 1,
+        "actual_accumulation": 16,
+        "actual_gradient_checkpointing": false,
+        "elapsed_training_seconds": 5793.143751293886,
+        "launch_through_complete_seconds": 6322.565654,
+        "native_guards_status": "passed",
+        "drive_status": "VERIFIED"
+      }
+    ],
+    "remaining_uncompleted_conditions": 39,
+    "condition_evidence_document": "docs/sft_completed_rot13_14b_level10.md",
+    "current_native_evidence_scope": "rot13_14b_level_10_on_observed_RTX_PRO_6000_Blackwell_96GB_only"
+  },
+  "current_sft_authorization": {
+    "date": "2026-10-13",
+    "ceiling_usd": 240,
+    "purpose": "SFT",
+    "gpu_hourly_rate_used_usd": 2.99,
+    "additional_gpu_launch_performed": false,
+    "calculated_cost_not_invoice": true,
+    "scope": "remaining_work_retaining_completed_adapter",
+    "conditional_remaining_39_worker_hours": 68.49446125166666,
+    "conditional_remaining_39_cost_usd": 204.79843914248335,
+    "projection_assumption": "same_runtime_as_one_completed_14b_rot13_level10_fit",
+    "installation_idle_time_included": false,
+    "rl_and_final_evaluation_included": false
+  },
+  "appended_gpqa_evaluation": {
+    "authorized": true,
+    "replaces_existing_domains": false,
+    "variant": "gpqa_diamond",
+    "preparation_status": "panel_freeze_pending",
+    "results_available": false,
+    "original_confirmatory_thresholds_changed": false,
+    "question_count": 198,
+    "dataset_name": "Idavidrein/gpqa",
+    "dataset_revision": "83022cefff930aea54f654c0b282e74b9eeda5c6",
+    "reference_source": "https://github.com/Jozdien/cot_legibility/blob/89195c70288b4b141460447f5fde02f67b38b043/src/inference/datasets.py#L17",
+    "role": "supplemental_descriptive_capability_stress_test",
+    "matches_reference_dataset_variant": true,
+    "matches_entire_reference_measurement_pipeline": false,
+    "source_acquisition_status": "downloaded_through_standard_huggingface_sdk",
+    "source_csv_bytes": 1373492,
+    "source_csv_sha256": "41d1213cd7a4998605a26c2798500652572007161b3a92817ba46b35befcd305",
+    "new_user_authentication_required": false,
+    "variant_source_evidence": "docs/evidence/gpqa_variant_source.json"
   }
 }

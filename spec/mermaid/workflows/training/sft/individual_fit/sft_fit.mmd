@@ -12,12 +12,14 @@ flowchart TD
 %% Completion-only per-example means; full 4096 eligibility without truncation; seed 42.
 %% LoRA 8 / 16 / .05, all seven projections, LR 2e-4, zero decay, max norm .3.
 %% Checkpoints every 100 updates and final 625; actual Drive verification before retention/completion.
-%% Native startup unrun; selected fresh14B ROT13 L10 and KaziText L10, PAUSED pending GPU access.
+%% Observed: 14B ROT13 L10 completed 625 with native guards passed; actual 1 x 16, checkpointing off.
+%% Final adapter/full state Drive-verified; source 2ea4fb9/config 6f7e5048 remain immutable.
+%% 39 conditions uncompleted; $240 authorized 13 Oct. No new worker launch implied.
 %% Fresh non-updating duplicate-longest capacity guard: 2/off, 1/off, 2/on, 1/on; CUDA-OOM-only fallback.
 %% Exact-fit recovery restores recorded actual batch/accumulation/recomputation, never changes it.
 %% Policy v2 has a distinct execution identity; old NF4 or prior-policy states cannot be relabelled.
 %% Child: RECOVER => ../../../shared_procedures/recovery_procedure.mmd
-    INPUT["Selected fresh14B level10 fit<br/>ROT13 or KaziText; certified records"]
+    INPUT["Explicitly selected condition<br/>Completed14B ROT13 L10 retained<br/>Remaining certified records only"]
     SETUP["Untouched BF16 base/head and LoRA<br/>Pinned exact full-gradient CCE; SDPA; AdamW<br/>One epoch; cosine 625; warmup 19"]
     CAPACITY["Non-updating duplicate-longest capacity guard<br/>Fresh: 2/off - 1/off - 2/on - 1/on<br/>Only CUDA OOM permits next mode<br/>Resume: restore recorded actual mode"]
     GUARDS["Normal native identity / causal mask / gradient guards<br/>Verify complete-state recovery before updates"]
