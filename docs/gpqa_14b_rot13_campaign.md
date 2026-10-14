@@ -13,6 +13,26 @@ GSM8K, MMLU, ARC-Easy and MBPP evaluations are unchanged. No training restart is
 required. This capability-only campaign calls no provider judges and does not
 run legibility evaluation, RL or linear probes.
 
+## Execution snapshot: 14 October 2026
+
+The new RTX PRO 6000 Blackwell 96GB worker restored and byte-verified all 91
+selected Drive artifacts, including every final adapter and the frozen panel.
+The pinned model and tokenizer were verified, and vLLM initialization completed
+at 20:06:43 UTC. Two subsequent GPU observations showed 98% utilization while
+the untouched baseline child and engine were alive. The baseline is processing
+its first request group; no completed long-budget state or score is claimed at
+this snapshot. The published worker then evaluates levels 1–10 in order and
+verifies their Drive publications.
+
+The [startup receipt](evidence/gpqa_14b_rot13_long_started_2026_10_14.json)
+binds the restored inputs, runtime versions, frozen protocol and observed GPU
+activity. Execution uses source `5e6be1b0848e0e88725323591baddef37d69d8ae`,
+independently of this later documentation commit. Per-request progress bars are
+disabled; raw records appear after each request group returns. The parent
+campaign status remains local, while completed child payloads require verified
+Drive inventories. The earlier preparation receipt remains an unchanged dated
+snapshot, rather than evidence of completed inference.
+
 ## Runtime and restored inputs
 
 Use RTX PRO 6000 Blackwell 96GB and the pinned evaluation environment: vLLM

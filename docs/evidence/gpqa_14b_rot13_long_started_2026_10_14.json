@@ -1,0 +1,147 @@
+{
+  "baseline_protocol_hash": "a2075064c73f8c9bf9da658f7ef370cc20f63c304a2f83edbf3598a8902a3c50",
+  "campaign_parent_status_storage": "LOCAL_ONLY",
+  "completed_results_claimed": false,
+  "completed_state_ids_at_observation": [],
+  "credential_values_or_question_text_included": false,
+  "drive_publication": "published evaluation CLI was launched with --save-to-drive; completed result inventories must individually be VERIFIED",
+  "evidence_files": {
+    "base_14b.log": {
+      "sha256": "1b3603eeccb2f095845ee53c38a5b4222d48e8a4aac8266617b009dffc9d43eb",
+      "size": 8611
+    },
+    "campaign_status.json": {
+      "sha256": "cc62fb0f07a1bb52bc04f97a74704945a44fc5deda801cae250f5bec48dd59ce",
+      "size": 442
+    },
+    "gpu_startup_observation.json": {
+      "sha256": "571fab26c9f8098fe501c15790bd8fdcb8d49f9c2d186e26f0e6cb58112f8a0e",
+      "size": 1070
+    },
+    "inference_environment_manifest.json": {
+      "sha256": "5d61e85b5201a9178e52981b65f216b2d66ec87c9e0962a588fcf1ffa9609cbb",
+      "size": 4560
+    },
+    "restore_receipt.json": {
+      "sha256": "7b6e7188bd634b0ea5b48e0bd7f30a5d0a7b510177695b9f5f62abe8fc9ae401",
+      "size": 4266
+    }
+  },
+  "family": "rot13",
+  "full_adapter_bytes_verified_on_new_pod": true,
+  "generation": {
+    "answer_extraction": {
+      "ambiguity": "reject_multiple_final_answer_markers_or_boxes_and_non_scalar_suffixes",
+      "choice": "one_exact_public_label_no_option_text_or_prose_inference",
+      "mbpp": "exactly_one_python_or_unlabelled_fenced_final_code_field_or_entire_plain_code_no_repairs",
+      "numeric": "existing_exact_rational_decimal_grammar_no_units_or_prose_inference",
+      "presentation": "case_insensitive_final_answer_marker_optional_bold_and_paired_math_wrappers",
+      "scalar": "unique_terminal_final_answer_marker_or_box_or_entire_scalar",
+      "scope": "native_final_response_only_never_reasoning",
+      "version": "designated_final_fields_v2"
+    },
+    "backend": {
+      "batch_size": 128,
+      "dtype": "bfloat16",
+      "enable_lora": true,
+      "enable_prefix_caching": false,
+      "gpu_memory_utilization": 0.9,
+      "max_lora_rank": 32,
+      "max_model_len": 40960,
+      "max_num_batched_tokens": 8192,
+      "max_num_seqs": 8,
+      "name": "vllm",
+      "prompt_encoding": "native_chat_template_explicit_token_ids_v1",
+      "torch_version": "2.8.0+cu128",
+      "transformers_version": "4.57.3",
+      "version": "0.11.0"
+    },
+    "generation_profile": "long_32000",
+    "implementation_sha256": {
+      "scripts/run_supplemental_gpqa.py": "d2f6805c7211bd76744eab78d22db8f16bc3e2c517a41e5d3fd16c5897f5018c",
+      "src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py": "87614862e9ad33af1e8a12aa52bc4bd4dc492b7c69c8994b39fb212345af0383",
+      "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py": "1041cac7156c88916cf2c84120b7511d628d6b7eaf6aaa9c53fe84e99e6673f9",
+      "src/evaluation/shared_model_evaluation/item_evaluation/native_output/vllm_generation.py": "c973ce8436ad0db2f52a33e7551becaeeb9466bc2308c8fd215a329bf2053433",
+      "src/evaluation/supplemental_gpqa.py": "07ff7235aadd0dec16e5e34c9f56bea84ae0e2e0bcdbb5f7da938fbd6c44f994",
+      "src/operations/assets.py": "898909c45b2dc50c8949f6c05df2a1ecbf085e91e1358cd376f043a612da4ff7",
+      "src/shared_procedures/identity.py": "42bdf7a349557a42d2bc14d842b7b3adcb485412b6ec3b2919d3f7dc2a828887",
+      "src/shared_procedures/response_parsing.py": "fa80b63e8eb3e1e6626f347d444e0f6f3f22f9a95ed82a61833f64ac007a2ad3",
+      "src/shared_procedures/storage.py": "9c13b7c91ddd13667db96a541d24c75d6f5ffd2685ffec8b565bf408af4cf9f8",
+      "src/training/sft/individual_fit/sft_fit.py": "1a3a0b4c3e470bc83addc7a0eb8037ae1dc7609c7a06dbed146cf2f9c8ab4fd8"
+    },
+    "parser_version": "native_think_strict_v1",
+    "prompt_sha256": "4d354e37ecdc3e4446714bb922336323d419e36a705ba8227c8e236af423978f",
+    "scorer_version": "supplemental_gpqa_exact_final_label_v1",
+    "settings": {
+      "do_sample": true,
+      "max_new_tokens": 32000,
+      "repetition_penalty": 1.0,
+      "temperature": 0.6,
+      "top_k": 0,
+      "top_p": 0.95
+    },
+    "version": "supplemental_gpqa_vllm_generation_long_32000_v1"
+  },
+  "generation_profile": "long_32000",
+  "inference_evidence_basis": "completed engine initialization followed by two GPU samples at 98 percent utilization, 35 seconds apart, with the baseline child and engine alive",
+  "legacy_3072_evidence_preserved": true,
+  "model": "14b",
+  "observed_at": "2026-10-14T20:07:51.590758+00:00",
+  "order": "untouched baseline, then completed ROT13 levels 1 through 10 ascending",
+  "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
+  "plan_hash": "379f4be1ba4d4eba513811aec850d5a171a67b670c8fb9949e3cada235000051",
+  "primary_evaluation_suite_changed": false,
+  "questions_per_state": 198,
+  "receipt_hash": "91ee3aa82f1ed2654c183a4811178df8bff48f2de6e12daca40a970227355a13",
+  "restore_inventory_hash": "cc54245d3a7e607a1689c63c69a9cbb1172005eadcf151bfad7a4a796efb06df",
+  "restore_receipt_hash": "25628a3aa20080fea6f8036bcba29f62cc2ed60ab274a5a94286faca68618f9a",
+  "restored_artifacts": 91,
+  "runtime": {
+    "cuda_runtime": "12.8",
+    "python": "3.12.3",
+    "recorded_package_count": 172,
+    "torch": "2.8.0+cu128",
+    "transformers": "4.57.3",
+    "vllm": "0.11.0"
+  },
+  "source_code_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+  "startup_observation": {
+    "earlier_post_init_observation": {
+      "engine_initialization_complete": true,
+      "gpu_csv": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 595.91.07, 97887, 87621, 98, 224.51",
+      "gpu_csv_fields": [
+        "name",
+        "driver_version",
+        "memory_total_MiB",
+        "memory_used_MiB",
+        "utilization_percent",
+        "power_watts"
+      ],
+      "observed_at": "2026-10-14T20:07:16.614657+00:00",
+      "progress_lines": [],
+      "source_code_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae"
+    },
+    "engine_initialization_complete": true,
+    "engine_initialization_log_timestamp_utc": "2026-10-14T20:06:43+00:00",
+    "gpu_csv": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 595.91.07, 97887, 87621, 98, 231.48",
+    "gpu_csv_fields": [
+      "name",
+      "driver_version",
+      "memory_total_MiB",
+      "memory_used_MiB",
+      "utilization_percent",
+      "power_watts"
+    ],
+    "observed_at": "2026-10-14T20:07:51.590758+00:00",
+    "progress_reporting": "engine.generate use_tqdm=False; batch records are materialized after each full request group returns",
+    "raw_files_written": 0,
+    "request_progress_bar_enabled": false,
+    "source_code_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae"
+  },
+  "state_count": 11,
+  "status": "BASELINE_INFERENCE_ACTIVE",
+  "training_changed": false,
+  "unique_response_count": 2178,
+  "variant": "gpqa_diamond",
+  "version": "gpqa_14b_rot13_long_startup_receipt_v1"
+}
