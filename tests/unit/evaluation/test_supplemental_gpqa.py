@@ -11,7 +11,7 @@ from evaluation.supplemental_gpqa import (
 )
 from evaluation.shared_model_evaluation.item_evaluation.native_output.output_generation import NativeGenerator
 from shared_procedures.identity import content_hash, file_hash
-from shared_procedures.storage import atomic_write_json
+from shared_procedures.storage import atomic_write_json, read_json
 from training.sft.individual_fit.sft_fit import TARGET_MODULES
 
 
@@ -283,3 +283,182 @@ def test_later_paired_comparison_reuses_exact_baseline_raws_without_relabeling(t
     seal(modified, "protocol_hash")
     with pytest.raises(ValueError, match="reuse"):
         validate_gpqa_protocol(modified)
+
+
+def long_base_protocol(tmp_path):
+    return freeze_gpqa_baseline(panel(), baseline_state("14b", tmp_path / "model_cache",
+        model_revision="a" * 40, tokenizer_revision="b" * 40), backend="vllm",
+        generation_profile="long_32000")
+
+
+def mock_long_engine(monkeypatch, generator, *, output_tokens=4000, finish="stop", prompt_tokens=2):
+    """Exercise actual GPQA batch/cache publication with CPU inference fixtures."""
+    import sys
+    from types import SimpleNamespace
+    calls, params = [], []
+    class Tokenizer:
+        eos_token = "<eos>"
+        def apply_chat_template(self, messages, **kwargs):
+            calls.append(messages[0]["content"])
+            return messages[0]["content"] + "<think>\n"
+        def encode(self, *args, **kwargs):
+            return [1] * prompt_tokens
+        def decode(self, *args, **kwargs):
+            return "Fixture.</think>Final answer: A<eos>"
+    monkeypatch.setitem(sys.modules, "vllm", SimpleNamespace(SamplingParams=lambda **kw: params.append(kw) or kw))
+    monkeypatch.setattr(generator, "_load", lambda state: None)
+    generator._tokenizer, generator.eos_ids, generator._model_context_limit = Tokenizer(), [9], 131072
+    generator.engine = SimpleNamespace(generate=lambda inputs, settings, **kw: [
+        SimpleNamespace(prompt_token_ids=p["prompt_token_ids"], outputs=[
+            SimpleNamespace(token_ids=[3] * output_tokens, finish_reason=finish)]) for p in inputs])
+    return calls, params
+
+
+def test_long_profile_freezes_isolated_budget_engine_and_baseline_identity(tmp_path):
+    from evaluation.shared_model_evaluation.item_evaluation.native_output.output_generation import GENERATION_SETTINGS
+    from evaluation.shared_model_evaluation.item_evaluation.native_output.vllm_generation import BACKEND
+    original_settings, original_backend = deepcopy(GENERATION_SETTINGS), deepcopy(BACKEND)
+    old = base_protocol(tmp_path, backend="vllm")
+    long = long_base_protocol(tmp_path)
+    assert old["generation"]["settings"]["max_new_tokens"] == 3072
+    assert old["generation"]["backend"]["max_model_len"] == 8192
+    assert "generation_profile" not in old["generation"]
+    assert long["generation"]["generation_profile"] == "long_32000"
+    assert long["generation"]["settings"] == {**original_settings, "max_new_tokens": 32000}
+    assert long["generation"]["backend"] == {**original_backend, "max_model_len": 40960, "max_num_seqs": 8}
+    assert old["protocol_hash"] != long["protocol_hash"]
+    assert old["states"][0]["runtime_hash"] != long["states"][0]["runtime_hash"]
+    assert GENERATION_SETTINGS == original_settings and BACKEND == original_backend
+    with pytest.raises(ValueError, match="requires.*vLLM"):
+        generation_contract("native", "long_32000")
+    with pytest.raises(ValueError, match="profile"):
+        generation_contract("vllm", "unfrozen_budget")
+
+
+@pytest.mark.parametrize("baseline_profile,comparison_profile", [
+    ("legacy_3072", "long_32000"), ("long_32000", "legacy_3072")])
+def test_cross_profile_baseline_reuse_is_rejected(tmp_path, baseline_profile, comparison_profile):
+    baseline = freeze_gpqa_baseline(panel(), baseline_state("14b", tmp_path / "model_cache",
+        model_revision="a" * 40, tokenizer_revision="b" * 40), backend="vllm",
+        generation_profile=baseline_profile)
+    states = comparison_states(adapter(tmp_path), tmp_path / "model_cache")
+    with pytest.raises(ValueError, match="reuse.*profile"):
+        freeze_gpqa_protocol(panel(), states, backend="vllm", baseline_protocol=baseline,
+                             generation_profile=comparison_profile)
+
+
+def test_matching_long_baseline_reuse_preserves_original_raw_identity_and_fit(tmp_path):
+    baseline = long_base_protocol(tmp_path)
+    states = comparison_states(adapter(tmp_path), tmp_path / "model_cache")
+    paired = freeze_gpqa_protocol(panel(), states, backend="vllm", baseline_protocol=baseline,
+                                 generation_profile="long_32000")
+    base_generator = GPQAVLLMGenerator(tmp_path / "base", baseline)
+    paired_generator = GPQAVLLMGenerator(tmp_path / "paired", paired)
+    item = baseline["panel"]["items"][0]
+    assert base_generator.identity(baseline["states"][0], item) == paired_generator.identity(paired["states"][0], item)
+    assert paired["states"][1]["training_identity_hash"] == content_hash(
+        read_json(Path(states[1]["adapter_path"]) / "manifest.json")["identity"])
+
+
+@pytest.mark.parametrize("tokens,finish", [(4000, "stop"), (32000, "length")])
+def test_long_vllm_uses_full_budget_publishes_long_raw_and_reuses_cache(tmp_path, monkeypatch, tokens, finish):
+    frozen = long_base_protocol(tmp_path)
+    generator = GPQAVLLMGenerator(tmp_path / "vllm", frozen)
+    state, item = frozen["states"][0], frozen["panel"]["items"][0]
+    calls, params = mock_long_engine(monkeypatch, generator, output_tokens=tokens, finish=finish)
+    generator.generate_batch(state, [item])
+    raw = generator.generate(state, item)
+    assert params[0]["max_tokens"] == 32000
+    assert params[0]["temperature"] == .6 and params[0]["top_p"] == .95
+    assert raw["generated_tokens"] == tokens
+    assert raw["identity"]["settings"]["max_new_tokens"] == 32000
+    assert raw["identity"]["backend"]["max_num_seqs"] == 8
+    assert raw["runtime"]["prompt_tokens"] == 2
+    assert raw["runtime"]["model_context_limit"] == 131072
+    assert calls == [render_gpqa_prompt(item)[0]]
+    assert generator.generate(state, item) == raw
+    assert len(calls) == 1
+    if finish == "length":
+        assert score_gpqa(item, raw)["reason"] == "truncated_output"
+
+
+@pytest.mark.parametrize("tokens,finish", [(32001, "stop"), (31999, "length"), (10, "error")])
+def test_long_vllm_rejects_invalid_response_boundary(tmp_path, monkeypatch, tokens, finish):
+    frozen = long_base_protocol(tmp_path)
+    generator = GPQAVLLMGenerator(tmp_path / "vllm", frozen)
+    mock_long_engine(monkeypatch, generator, output_tokens=tokens, finish=finish)
+    with pytest.raises(RuntimeError, match="stopping boundary"):
+        generator.generate(frozen["states"][0], frozen["panel"]["items"][0])
+    assert not list((tmp_path / "vllm").rglob("*.json"))
+
+
+@pytest.mark.parametrize("prompt_tokens,accepted", [(8960, True), (8961, False)])
+def test_long_vllm_requires_full_untruncated_prompt_plus_response_capacity(tmp_path, monkeypatch, prompt_tokens, accepted):
+    frozen = long_base_protocol(tmp_path)
+    generator = GPQAVLLMGenerator(tmp_path / "vllm", frozen)
+    mock_long_engine(monkeypatch, generator, prompt_tokens=prompt_tokens)
+    if accepted:
+        assert generator.generate(frozen["states"][0], frozen["panel"]["items"][0])["generated_tokens"] == 4000
+    else:
+        with pytest.raises(ValueError, match="truncation is forbidden"):
+            generator.generate(frozen["states"][0], frozen["panel"]["items"][0])
+
+
+@pytest.mark.parametrize("mutation", ["short_length", "runtime_budget", "token_count", "capacity"])
+def test_long_raw_cache_cannot_bypass_budget_validation_by_resealing(tmp_path, monkeypatch, mutation):
+    from shared_procedures.storage import read_json
+    frozen = long_base_protocol(tmp_path)
+    generator = GPQAVLLMGenerator(tmp_path / "vllm", frozen)
+    mock_long_engine(monkeypatch, generator)
+    state, item = frozen["states"][0], frozen["panel"]["items"][0]
+    generator.generate(state, item)
+    path = next((tmp_path / "vllm" / "raw").rglob("*.json"))
+    changed = read_json(path)
+    if mutation == "short_length":
+        changed["finish_reason"] = "length"
+    elif mutation == "runtime_budget":
+        changed["runtime"]["max_model_len"] = 8192
+    elif mutation == "token_count":
+        changed["generated_tokens"] += 1
+    else:
+        changed["runtime"]["prompt_tokens"] = 8961
+    changed["runtime_observation_hash"] = content_hash(changed["runtime"])
+    seal(changed, "record_hash")
+    atomic_write_json(path, changed)
+    with pytest.raises(ValueError, match="long raw output"):
+        generator.generate(state, item)
+
+
+@pytest.mark.parametrize("model_context,accepted", [(131072, True), (40959, False)])
+def test_long_engine_loads_frozen_context_and_concurrency_only_when_model_allows(tmp_path, monkeypatch, model_context, accepted):
+    import sys
+    from types import SimpleNamespace
+    from evaluation.shared_model_evaluation.item_evaluation.native_output.output_generation import MODEL_IDS
+    frozen = long_base_protocol(tmp_path)
+    state = frozen["states"][0]
+    backend = frozen["generation"]["backend"]
+    snapshots = Path(state["cache_root"]) / "hub" / ("models--" + MODEL_IDS["14b"].replace("/", "--")) / "snapshots"
+    model_path = snapshots / state["model_revision"]
+    atomic_write_json(model_path / "config.json", {"max_position_embeddings": model_context})
+    atomic_write_json(model_path / "generation_config.json", {"eos_token_id": [9]})
+    calls, asset_calls = [], []
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(__version__=backend["torch_version"]))
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(__version__=backend["transformers_version"],
+        AutoTokenizer=SimpleNamespace(from_pretrained=lambda *args, **kw: SimpleNamespace(eos_token_id=9))))
+    monkeypatch.setitem(sys.modules, "vllm", SimpleNamespace(__version__=backend["version"],
+        LLM=lambda **kw: calls.append(kw) or object()))
+    monkeypatch.setattr("operations.assets.model_load_kwargs", lambda *args, **kw: asset_calls.append((args, kw)) or {})
+    generator = GPQAVLLMGenerator(tmp_path / "vllm", frozen)
+    if accepted:
+        generator._load(state)
+        assert calls[0]["max_model_len"] == 40960 and calls[0]["max_num_seqs"] == 8
+        assert calls[0]["max_num_batched_tokens"] == 8192
+        assert calls[0]["dtype"] == "bfloat16" and calls[0]["enable_lora"] is True
+        assert calls[0]["enable_prefix_caching"] is False
+        assert all(call[1]["offline"] is True for call in asset_calls)
+        generator._load(state)
+        assert len(calls) == 1
+    else:
+        with pytest.raises(ValueError, match="Frozen model context"):
+            generator._load(state)
+        assert not calls

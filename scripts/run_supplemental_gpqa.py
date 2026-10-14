@@ -41,6 +41,8 @@ def main():
     freeze.add_argument("--adapter", required=True, help="Published final_adapter directory with completed-fit report alongside")
     freeze.add_argument("--model-cache", required=True)
     freeze.add_argument("--backend", choices=("native", "vllm"), default="native")
+    freeze.add_argument("--generation-profile", choices=("legacy_3072", "long_32000"), default="legacy_3072",
+                        help="GPQA-only output allowance; long_32000 requires vLLM and a matching new baseline")
     freeze.add_argument("--output", required=True)
     freeze.add_argument("--baseline-protocol", help="Reuse matching base raw evidence under the same output root")
     base = commands.add_parser("freeze-base", help="Predeclare the untouched base without requiring a trained adapter")
@@ -52,6 +54,8 @@ def main():
     base.add_argument("--tokenizer-revision")
     base.add_argument("--model-cache", required=True)
     base.add_argument("--backend", choices=("native", "vllm"), default="vllm")
+    base.add_argument("--generation-profile", choices=("legacy_3072", "long_32000"), default="legacy_3072",
+                      help="GPQA-only output allowance; the four-domain evaluation settings are unchanged")
     base.add_argument("--output", required=True)
     run = commands.add_parser("run", help="Run/resume both frozen states on the identical supplemental questions")
     run.add_argument("--protocol", required=True)
@@ -74,6 +78,7 @@ def main():
         validate_gpqa_panel(panel)
         states = comparison_states(args.adapter, args.model_cache)
         protocol = freeze_gpqa_protocol(panel, states, backend=args.backend,
+                                       generation_profile=args.generation_profile,
                                        baseline_protocol=read_json(args.baseline_protocol) if args.baseline_protocol else None)
         publish_immutable(args.output, protocol)
         print(json.dumps({"status": "FROZEN", "protocol_hash": protocol["protocol_hash"],
@@ -96,7 +101,8 @@ def main():
             model_revision, tokenizer_revision = args.model_revision, args.tokenizer_revision
         state = baseline_state(args.model, args.model_cache, model_revision=model_revision,
                                tokenizer_revision=tokenizer_revision)
-        protocol = freeze_gpqa_baseline(read_json(args.panel), state, backend=args.backend)
+        protocol = freeze_gpqa_baseline(read_json(args.panel), state, backend=args.backend,
+                                       generation_profile=args.generation_profile)
         publish_immutable(args.output, protocol)
         print(json.dumps({"status": "FROZEN", "protocol_hash": protocol["protocol_hash"],
                           "states": [state["state_id"]], "source_code_commit": code_revision(),

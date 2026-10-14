@@ -23,7 +23,7 @@ from evaluation.shared_model_evaluation.item_evaluation.native_output.output_gen
 from evaluation.shared_model_evaluation.item_evaluation.native_output.vllm_generation import (
     BACKEND, VLLMEvaluationGenerator,
 )
-from shared_procedures.identity import content_hash, file_hash
+from shared_procedures.identity import content_hash, derive_seed, file_hash
 from shared_procedures.response_parsing import PARSER_VERSION, parse_native_output
 from shared_procedures.storage import atomic_write_json, file_lock, notify_artifact, read_json
 
@@ -36,6 +36,9 @@ BASELINE_VERSION = "supplemental_gpqa_baseline_v1"
 SCORER_VERSION = "supplemental_gpqa_exact_final_label_v1"
 NATIVE_VERSION = "supplemental_gpqa_native_generation_v1"
 VLLM_VERSION = "supplemental_gpqa_vllm_generation_v1"
+VLLM_LONG_VERSION = "supplemental_gpqa_vllm_generation_long_32000_v1"
+GENERATION_PROFILES = ("legacy_3072", "long_32000")
+LONG_BACKEND = {**BACKEND, "max_model_len": 40960, "max_num_seqs": 8}
 PERMUTATION_VERSION = "sha256_order_fixed_seed_42_v1"
 PROMPT_PATH = Path(__file__).resolve().parents[2] / "prompts" / "evaluation_gpqa.txt"
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
@@ -179,9 +182,13 @@ def render_gpqa_prompt(item: Mapping) -> tuple[str, str]:
         f"{c['label']}. {c['text']}" for c in choices)), content_hash({"version": PANEL_VERSION, "template": template})
 
 
-def generation_contract(backend: str) -> dict:
+def generation_contract(backend: str, generation_profile: str = "legacy_3072") -> dict:
     if backend not in {"native", "vllm"}:
         raise ValueError("Unknown GPQA measurement backend")
+    if generation_profile not in GENERATION_PROFILES:
+        raise ValueError("Unknown GPQA generation profile")
+    if generation_profile == "long_32000" and backend != "vllm":
+        raise ValueError("GPQA long_32000 requires the frozen vLLM backend")
     root = Path(__file__).resolve().parents[2]
     implementations = (
         "src/evaluation/supplemental_gpqa.py", "scripts/run_supplemental_gpqa.py",
@@ -192,12 +199,29 @@ def generation_contract(backend: str) -> dict:
         "src/evaluation/shared_model_evaluation/item_evaluation/native_output/vllm_generation.py",
         "src/training/sft/individual_fit/sft_fit.py",
     )
-    return {"version": NATIVE_VERSION if backend == "native" else VLLM_VERSION,
+    contract = {"version": NATIVE_VERSION if backend == "native" else VLLM_VERSION,
             "backend": None if backend == "native" else dict(BACKEND),
             "settings": dict(GENERATION_SETTINGS), "prompt_sha256": file_hash(PROMPT_PATH),
             "implementation_sha256": {name: file_hash(root / name) for name in implementations},
             "parser_version": PARSER_VERSION, "scorer_version": SCORER_VERSION,
             "answer_extraction": dict(ANSWER_EXTRACTION_CONTRACT)}
+    if generation_profile == "long_32000":
+        contract.update(version=VLLM_LONG_VERSION, generation_profile=generation_profile,
+                        backend=dict(LONG_BACKEND))
+        contract["settings"]["max_new_tokens"] = 32000
+    return contract
+
+
+def _generation_profile(contract: Mapping) -> str:
+    return contract.get("generation_profile", "legacy_3072")
+
+
+def _validate_generation_contract(contract: Mapping, backend: str) -> None:
+    profile = _generation_profile(contract)
+    current = generation_contract(backend, profile)
+    if contract == current:
+        return
+    raise ValueError("GPQA protocol settings differ from the frozen supplemental design")
 
 
 def comparison_states(adapter_path: str | Path, cache_root: str | Path) -> list[dict]:
@@ -267,9 +291,10 @@ def baseline_state(model: str, cache_root: str | Path, *, model_revision: str,
             "runtime_hash": "pending_freeze"}
 
 
-def freeze_gpqa_baseline(panel: Mapping, state: dict, *, backend: str) -> dict:
+def freeze_gpqa_baseline(panel: Mapping, state: dict, *, backend: str,
+                         generation_profile: str = "legacy_3072") -> dict:
     validate_gpqa_panel(panel)
-    contract = generation_contract(backend)
+    contract = generation_contract(backend, generation_profile)
     state = deepcopy(state)
     state["runtime_hash"] = content_hash(contract)
     protocol = _seal({"version": BASELINE_VERSION, "scope": "supplemental_capability_only",
@@ -282,9 +307,10 @@ def freeze_gpqa_baseline(panel: Mapping, state: dict, *, backend: str) -> dict:
 
 
 def freeze_gpqa_protocol(panel: Mapping, states: list[dict], *, backend: str,
-                         baseline_protocol: Mapping | None = None) -> dict:
+                         baseline_protocol: Mapping | None = None,
+                         generation_profile: str = "legacy_3072") -> dict:
     validate_gpqa_panel(panel)
-    contract = generation_contract(backend)
+    contract = generation_contract(backend, generation_profile)
     states = deepcopy(states)
     for state in states:
         state["runtime_hash"] = content_hash(contract)
@@ -296,6 +322,8 @@ def freeze_gpqa_protocol(panel: Mapping, states: list[dict], *, backend: str,
         validate_gpqa_protocol(baseline_protocol)
         if baseline_protocol["version"] != BASELINE_VERSION:
             raise ValueError("GPQA reuse requires a frozen base-only protocol")
+        if baseline_protocol["generation"] != contract:
+            raise ValueError("GPQA baseline reuse differs in generation profile or implementation")
         protocol["baseline_reuse"] = {
             "protocol_hash": baseline_protocol["protocol_hash"],
             "panel_hash": baseline_protocol["panel"]["panel_hash"],
@@ -312,9 +340,10 @@ def validate_gpqa_protocol(protocol: Mapping, *, verify_adapters: bool = True) -
     validate_gpqa_panel(protocol.get("panel", {}))
     contract = protocol.get("generation", {})
     backend = "vllm" if (contract.get("backend") or {}).get("name") == "vllm" else "native"
+    _validate_generation_contract(contract, backend)
     base_only = protocol.get("version") == BASELINE_VERSION
     if (protocol.get("version") not in {PROTOCOL_VERSION, BASELINE_VERSION} or protocol.get("scope") != "supplemental_capability_only"
-            or protocol.get("seed") != 42 or contract != generation_contract(backend)
+            or protocol.get("seed") != 42
             or protocol.get("checkpoint_selection") != ("untouched_official_base_before_training" if base_only else
                                                         "explicit_completed_final_adapter_before_evaluation")
             or protocol.get("reporting") != ("baseline_descriptive_accuracy_no_primary_window_or_multiplicity_claim" if base_only else
@@ -349,7 +378,8 @@ def validate_gpqa_protocol(protocol: Mapping, *, verify_adapters: bool = True) -
         if not isinstance(reuse, Mapping) or not isinstance(reuse.get("state"), dict):
             raise ValueError("GPQA baseline reuse is malformed")
         try:
-            restored = freeze_gpqa_baseline(protocol["panel"], reuse["state"], backend=backend)
+            restored = freeze_gpqa_baseline(protocol["panel"], reuse["state"], backend=backend,
+                                             generation_profile=_generation_profile(contract))
         except ValueError as error:
             raise ValueError("GPQA baseline reuse changed its original official model identity") from error
         if (set(reuse) != {"protocol_hash", "panel_hash", "generation", "state"}
@@ -383,16 +413,17 @@ class _GPQAIdentity:
         return {"version": self.protocol["generation"]["version"], "state": dict(state),
                 "question_id": item["question_id"], "public_prompt": prompt,
                 "prompt_version": version, "protocol_hash": self.protocol["protocol_hash"], "seed": seed,
-                "settings": dict(GENERATION_SETTINGS),
+                "settings": dict(self.protocol["generation"]["settings"]),
                 "execution_mode": "fixture" if self.backend else "production",
-                **({"backend": dict(BACKEND)} if isinstance(self, VLLMEvaluationGenerator) else {}),
+                **({"backend": deepcopy(self.protocol["generation"]["backend"])}
+                   if isinstance(self, VLLMEvaluationGenerator) else {}),
                 **({"state": deepcopy(reuse["state"]), "protocol_hash": reuse["protocol_hash"]} if reuse else {})}
 
 
 class GPQANativeGenerator(_GPQAIdentity, NativeGenerator):
     def __init__(self, cache_root, protocol, *, backend=None):
         validate_gpqa_protocol(protocol)
-        if protocol["generation"] != generation_contract("native"):
+        if protocol["generation"] != generation_contract("native", _generation_profile(protocol["generation"])):
             raise ValueError("GPQA native generator cannot change a frozen backend")
         super().__init__(cache_root, backend=backend)
         self.protocol = deepcopy(protocol)
@@ -402,11 +433,186 @@ class GPQANativeGenerator(_GPQAIdentity, NativeGenerator):
 class GPQAVLLMGenerator(_GPQAIdentity, VLLMEvaluationGenerator):
     def __init__(self, cache_root, protocol):
         validate_gpqa_protocol(protocol)
-        if protocol["generation"] != generation_contract("vllm"):
+        if protocol["generation"] != generation_contract("vllm", _generation_profile(protocol["generation"])):
             raise ValueError("GPQA vLLM generator cannot change a frozen backend")
         super().__init__(cache_root)
         self.protocol = deepcopy(protocol)
         self.items = {i["question_id"]: i for i in protocol["panel"]["items"]}
+        self.batch_size = protocol["generation"]["backend"]["batch_size"]
+
+    @property
+    def _long_profile(self):
+        return _generation_profile(self.protocol["generation"]) == "long_32000"
+
+    def _load(self, state):
+        if not self._long_profile:
+            return super()._load(state)
+        key = (state["model"], state["model_revision"], state["tokenizer_revision"])
+        if self.engine is not None:
+            if key != self._loaded_identity:
+                raise RuntimeError("Use a fresh process for the next model size")
+            return
+        import torch, transformers, vllm
+        from transformers import AutoTokenizer
+        from vllm import LLM
+        from operations.assets import model_load_kwargs
+        backend = self.protocol["generation"]["backend"]
+        if (vllm.__version__, transformers.__version__, torch.__version__) != (
+                backend["version"], backend["transformers_version"], backend["torch_version"]):
+            raise RuntimeError("Evaluation engine dependencies differ from frozen contract")
+        model_id, cache = MODEL_IDS[state["model"]], state["cache_root"]
+        model_load_kwargs(model_id, state["model_revision"], cache, offline=True)
+        model_load_kwargs(model_id, state["tokenizer_revision"], cache, tokenizer_only=True, offline=True)
+        snapshots = Path(cache) / "hub" / ("models--" + model_id.replace("/", "--")) / "snapshots"
+        model_path, tokenizer_path = snapshots / state["model_revision"], snapshots / state["tokenizer_revision"]
+        self._model_context_limit = read_json(model_path / "config.json").get("max_position_embeddings")
+        if (type(self._model_context_limit) is not int
+                or self._model_context_limit < backend["max_model_len"]):
+            raise ValueError("Frozen model context cannot contain the full GPQA long_32000 context")
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            str(tokenizer_path), trust_remote_code=False, local_files_only=True)
+        eos = read_json(model_path / "generation_config.json").get("eos_token_id", self._tokenizer.eos_token_id)
+        self.eos_ids = eos if isinstance(eos, list) else [eos]
+        if not self.eos_ids or any(type(token) is not int or token < 0 for token in self.eos_ids):
+            raise ValueError("Frozen model lacks valid EOS stopping tokens")
+        self.engine = LLM(model=str(model_path), tokenizer=str(tokenizer_path), dtype="bfloat16",
+            trust_remote_code=False, generation_config="vllm",
+            **{k: backend[k] for k in ("max_model_len", "max_num_seqs", "max_num_batched_tokens",
+                "gpu_memory_utilization", "enable_prefix_caching", "enable_lora", "max_lora_rank")})
+        self._loaded_identity = key
+
+    def _validate_long_output(self, output, state, effective_seed):
+        settings, backend = self.protocol["generation"]["settings"], self.protocol["generation"]["backend"]
+        count, tokens = output.get("generated_tokens"), output.get("generated_token_ids")
+        runtime = output.get("runtime", {})
+        if (not isinstance(output.get("raw_output"), str)
+                or not isinstance(output.get("decoded_generated_text"), str)
+                or output.get("finish_reason") not in {"stop", "length"}
+                or type(count) is not int or not 0 <= count <= settings["max_new_tokens"]
+                or not isinstance(tokens, list) or len(tokens) != count
+                or any(type(token) is not int or token < 0 for token in tokens)
+                or (output["finish_reason"] == "length" and count != settings["max_new_tokens"])
+                or output.get("effective_seed") != effective_seed
+                or output.get("native_prefix") not in {"", "<think>", "<think>\n"}
+                or not _SHA.fullmatch(str(output.get("native_chat_hash", "")))
+                or not isinstance(runtime, dict)
+                or any(runtime.get(k) != v for k, v in backend.items())
+                or runtime.get("model_commit") != state["model_revision"]
+                or runtime.get("tokenizer_commit") != state["tokenizer_revision"]
+                or type(runtime.get("generation_batch_size")) is not int
+                or not 1 <= runtime["generation_batch_size"] <= self.batch_size
+                or type(runtime.get("prompt_tokens")) is not int or runtime["prompt_tokens"] < 0
+                or runtime["prompt_tokens"] + settings["max_new_tokens"] > backend["max_model_len"]
+                or type(runtime.get("model_context_limit")) is not int
+                or runtime["model_context_limit"] < backend["max_model_len"]
+                or output.get("runtime_observation_hash") != content_hash(runtime)):
+            raise ValueError("GPQA long raw output violates its frozen stopping, token, or runtime contract")
+
+    def _long_raw(self, state, item, seed=42):
+        """Publish/read long outputs without the primary engine's 3072 validator."""
+        identity = self.identity(state, item, seed)
+        if state.get("adapter_path"):
+            state_key = content_hash(state)
+            root = Path(state["adapter_path"])
+            fingerprint = tuple(sorted((str(p.relative_to(root)), p.stat().st_size, p.stat().st_mtime_ns)
+                for p in root.rglob("*") if p.is_file()))
+            if self._verified_adapter_fingerprints.get(state_key) != fingerprint:
+                verify_adapter_payload(state)
+                self._verified_adapter_fingerprints[state_key] = fingerprint
+        key = content_hash(identity)
+        path = self.cache_root / "raw" / state["state_id"] / (key + ".json")
+        effective_seed = derive_seed("native_evaluation", seed, state["state_id"], item["question_id"])
+        with file_lock(str(path) + ".lock"):
+            if path.exists():
+                cached = read_json(path)
+                if (cached.get("request_hash") != key or cached.get("identity") != identity
+                        or cached.get("status") != "success" or cached.get("simulation") is not False
+                        or cached.get("raw_hash") != content_hash(cached.get("raw_output", ""))
+                        or cached.get("record_hash") != content_hash({k: v for k, v in cached.items() if k != "record_hash"})):
+                    raise ValueError("Raw generation cache integrity failure")
+                self._validate_long_output(cached, state, effective_seed)
+                return cached
+            output = self._generate_cuda(state, identity["public_prompt"], identity["settings"], effective_seed)
+            self._validate_long_output(output, state, effective_seed)
+            record = {**output, "status": "success", "simulation": False, "identity": identity,
+                      "request_hash": key, "raw_hash": content_hash(output["raw_output"])}
+            record["record_hash"] = content_hash(record)
+            atomic_write_json(path, record)
+            if read_json(path) != record:
+                raise OSError("Raw generation publication did not verify")
+            notify_artifact(path, {"kind": "evaluation_raw", "state_id": state["state_id"],
+                                   "request_hash": key, "raw_hash": record["raw_hash"], "simulation": False})
+            return record
+
+    def generate_batch(self, state, items, seed=42):
+        if not self._long_profile:
+            return super().generate_batch(state, items, seed)
+        items = list(items)
+        if len(items) > self.batch_size:
+            raise ValueError("GPQA request batch exceeds its frozen batch size")
+        missing = []
+        for item in items:
+            identity = self.identity(state, item, seed)
+            path = self.cache_root / "raw" / state["state_id"] / (content_hash(identity) + ".json")
+            if path.exists():
+                self._long_raw(state, item, seed)
+            else:
+                missing.append((item, identity))
+        if not missing:
+            return
+        self._load(state)
+        from vllm import SamplingParams
+        settings, backend = self.protocol["generation"]["settings"], self.protocol["generation"]["backend"]
+        adapter = None
+        if state.get("adapter_path"):
+            verify_adapter_payload(state)
+            from vllm.lora.request import LoRARequest
+            key = content_hash(state)
+            if key not in self._adapters:
+                self._adapters[key] = LoRARequest(key, len(self._adapters) + 1, state["adapter_path"])
+            adapter = self._adapters[key]
+        rendered = [self._tokenizer.apply_chat_template([{"role": "user", "content": i["public_prompt"]}],
+            tokenize=False, add_generation_prompt=True) for _, i in missing]
+        inputs = [{"prompt_token_ids": self._tokenizer.encode(p, add_special_tokens=False)} for p in rendered]
+        if any(len(p["prompt_token_ids"]) + settings["max_new_tokens"] > backend["max_model_len"] for p in inputs):
+            raise ValueError("Full prompt and response exceed context; truncation is forbidden")
+        seeds = [derive_seed("native_evaluation", seed, state["state_id"], i["question_id"]) for _, i in missing]
+        params = [SamplingParams(temperature=settings["temperature"], top_p=settings["top_p"], top_k=-1,
+            repetition_penalty=settings["repetition_penalty"], max_tokens=settings["max_new_tokens"], seed=s,
+            stop_token_ids=self.eos_ids, skip_special_tokens=False) for s in seeds]
+        outputs = self.engine.generate(inputs, params, lora_request=adapter, use_tqdm=False)
+        if len(outputs) != len(missing):
+            raise RuntimeError("Response multiplicity changed")
+        for (item, identity), prompt, inp, effective_seed, result in zip(missing, rendered, inputs, seeds, outputs):
+            if list(result.prompt_token_ids) != inp["prompt_token_ids"] or len(result.outputs) != 1:
+                raise RuntimeError("Prompt identity or completion multiplicity changed")
+            completion = result.outputs[0]
+            if (completion.finish_reason not in {"stop", "length"}
+                    or len(completion.token_ids) > settings["max_new_tokens"]
+                    or (completion.finish_reason == "length" and len(completion.token_ids) != settings["max_new_tokens"])):
+                raise RuntimeError("Invalid stopping boundary or response budget")
+            decoded = self._tokenizer.decode(completion.token_ids, skip_special_tokens=False)
+            text = decoded
+            if self._tokenizer.eos_token and text.endswith(self._tokenizer.eos_token):
+                text = text[:-len(self._tokenizer.eos_token)]
+            prefix = "<think>\n" if prompt.endswith("<think>\n") else ("<think>" if prompt.endswith("<think>") else "")
+            runtime = {**backend, "model_commit": state["model_revision"],
+                "tokenizer_commit": state["tokenizer_revision"], "generation_batch_size": len(missing),
+                "prompt_tokens": len(inp["prompt_token_ids"]), "model_context_limit": self._model_context_limit}
+            self._pending[effective_seed] = dict(raw_output=text, decoded_generated_text=decoded,
+                generated_token_ids=list(completion.token_ids), generated_tokens=len(completion.token_ids),
+                finish_reason=completion.finish_reason, native_prefix=prefix, native_chat_hash=content_hash(prompt),
+                effective_seed=effective_seed, runtime=runtime, runtime_observation_hash=content_hash(runtime))
+            self._long_raw(state, item, seed)
+
+    def generate(self, state, item, seed=42):
+        if not self._long_profile:
+            return super().generate(state, item, seed)
+        identity = self.identity(state, item, seed)
+        path = self.cache_root / "raw" / state["state_id"] / (content_hash(identity) + ".json")
+        if not path.exists():
+            self.generate_batch(state, [item], seed)
+        return self._long_raw(state, item, seed)
 
 
 def score_gpqa(item: Mapping, raw: Mapping) -> dict:
