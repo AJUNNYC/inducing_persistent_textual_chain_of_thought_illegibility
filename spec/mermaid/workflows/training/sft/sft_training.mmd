@@ -2,16 +2,16 @@
 title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
-%% Dated13Oct22:06UTC evidence: GPQA49/198 staysverified;KaziTextL10 paused444;ROT13L1 nowtraining.
+%% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
 %% ROT13L1 native masks/recovery passed1x16/GCoff;checkpoint0 Drive-verified;3 busyGPU samples94-98%.
-%% Exactupdatecountwaitsfornextsavedcheckpoint; launchedPID alone is not trainingproof.
+%% Historicalstartup evidence below remains dated; alltencompleted fits nowhave final625 evidence.
 %% RetainedROT13L10 keeps old2ea4fb9 identity; laterdocumentation cannot relabel executed workers.
 %% Current priority uses private lifecycle helper -> published scripts/run_certified_sft.py explicitlevel.
 %% No scientific source/configuration/data/recipe change; source9de8813 remains executed identity.
-%% Forty prepared datasets retained; active scope is 20 14B conditions, 19 new fits.
+%% Forty prepared datasets retained; alltenROT13 fitscomplete, tenKaziText fitsuncompleted.
 %% Retain completed ROT13 14B L10 with immutable source 2ea4fb9/config 6f7e5048 identity.
 %% Baseline-only GPQA CLI needs no trained adapter; require real Diamond 198 completion and Drive verification.
-%% New user priority: nineROT13 levels1-9 ascending; KaziTextpaused444/625 Drive-verified, no automaticrestart.
+%% Executedpriorityworkflow: nineROT13 levels1-9 ascending; nowcomplete. KaziTextpaused444, noauto.
 %% Each starts from untouched pinned base; default efficient_one_epoch_v1 applies per fit.
 %% All 10,000 examples once; 625 updates/cosine horizon; 19 warmup; full targets/effective 16.
 %% BF16 base/head, exact full-gradient CCE, SDPA, plain AdamW; original LoRA/masks/LR unchanged.
@@ -21,9 +21,9 @@ flowchart TD
 %% Explicit UTC deadlines and safe user pauses remain separate controls.
 %% Historical 7B/NF4 outputs retained; no warm starts or success inferred from missing states.
 %% Child: FIT => individual_fit/sft_fit.mmd
-    INPUT["Forty Drive-verified datasets retained<br/>Broader14B:20 prepared conditions<br/>Currentpriority:nineROT13 fits;KaziText onhold"]
+    INPUT["Forty Drive-verified datasets retained<br/>Broader14B:20 prepared conditions<br/>NineROT13 fits nowcomplete;KaziText onhold"]
     RETAIN["Retain completed 14B ROT13 L10 adapter/full state<br/>Original immutable identity; no retraining"]
-    BASE["Previously verified untouched14B GPQA baseline<br/>49/198; unchanged3072 cap,133 truncated/3 malformed<br/>Retain raw/scored outputs; no regeneration"]
+    BASE["Historical untouched14B GPQA baseline before SFT<br/>49/198;3072 cap,133 truncated/3 malformed<br/>Preserve separately from future32k comparison"]
     BARRIER{"All 198 raw/scored items and baseline report<br/>Complete receipt and actual Drive verification?"}
     WAIT["Preserve partial baseline and verified raw records<br/>No SFT advance until the real barrier passes"]
     BIND["Bind source / certified data / finalized recipe<br/>Verify retained-fit compatibility without relabeling"]
@@ -31,7 +31,7 @@ flowchart TD
     NEXT{"Next incomplete job in nine-ROT13 priority queue?"}
     FIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh untouched-base initialization for this condition<br/>Native safeguards; one epoch / 625 updates"]
     SAVE["Verify final adapter and full recovery state in Drive<br/>Record actual completion before advancing"]
-    OUT["Only actual verified selected adapters<br/>Trained GPQA comparisons and scope-specific analysis separate<br/>No unrun-state success claims"]
+    OUT["AlltenROT13 finaladapters/state/results verified<br/>Next:GPQA-onlynewmatchingbaseline+10levels<br/>Long32000 profile;2178 uniqueoutputs<br/>No GPQA result or opacity claim from SFTcompletion"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT

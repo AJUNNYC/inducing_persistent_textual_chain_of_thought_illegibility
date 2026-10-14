@@ -91,6 +91,8 @@ flowchart TD
     EXT --> p_76c95fe9d27cec
     p_8c45045a709b2c["docs/evidence/sft_14b_campaign_training_active_2026_10_13.json"]
     EXT --> p_8c45045a709b2c
+    p_511ade84a9543c["docs/evidence/sft_14b_rot13_matrix_completion_2026_10_14.json"]
+    EXT --> p_511ade84a9543c
     p_09e59285cebd20["docs/evidence/sft_14b_rot13_priority_active_2026_10_13.json"]
     EXT --> p_09e59285cebd20
     p_c8ef4e2af5d051["docs/evidence/sft_data_handoff_773cfd3_certificate.json"]
@@ -213,6 +215,8 @@ flowchart TD
     EXT --> p_a6e8bf75dfff55
     p_efc352c8c290c1["docs/final_field_scoring.md"]
     EXT --> p_efc352c8c290c1
+    p_cebddabf912a8d["docs/gpqa_14b_rot13_campaign.md"]
+    EXT --> p_cebddabf912a8d
     p_dd5026d54adf97["docs/implementation_acceptance.md"]
     EXT --> p_dd5026d54adf97
     p_904196ce12e662["docs/modules/evaluation/supplemental_gpqa.md"]
@@ -315,6 +319,8 @@ flowchart TD
     EXT --> p_9e568fd84943ef
     p_05a1825d9110e8["scripts/rescore_vllm_baselines.py"]
     EXT --> p_05a1825d9110e8
+    p_169853292e3b76["scripts/restore_gpqa_sft_inputs.py"]
+    EXT --> p_169853292e3b76
     p_4da5d2a00cdc8a["scripts/revalidate_collection_inputs.py"]
     EXT --> p_4da5d2a00cdc8a
     p_a8af62978b1907["scripts/run_14b_sft_campaign.py"]
@@ -325,6 +331,8 @@ flowchart TD
     EXT --> p_80c27bbd543ae6
     p_4af6351440d90c["scripts/run_collection_until.py"]
     EXT --> p_4af6351440d90c
+    p_83dd23db5fa479["scripts/run_gpqa_sft_campaign.py"]
+    EXT --> p_83dd23db5fa479
     p_a47207fc0391be["scripts/run_model_generation_worker.py"]
     EXT --> p_a47207fc0391be
     p_0b17e8b1f8bd2d["scripts/run_optimized_sft_queue.py"]
@@ -417,6 +425,10 @@ flowchart TD
     EXT --> p_383bd21fdc964a
     p_8ab948fe4b8f2d["tests/unit/evaluation/shared_model_evaluation/item_evaluation/native_output/test_vllm_generation.py"]
     EXT --> p_8ab948fe4b8f2d
+    p_e419def38a9e08["tests/unit/evaluation/test_gpqa_campaign.py"]
+    EXT --> p_e419def38a9e08
+    p_7aa41aebde2db8["tests/unit/evaluation/test_gpqa_restore_inputs.py"]
+    EXT --> p_7aa41aebde2db8
     p_a529b6042bc226["tests/unit/evaluation/test_supplemental_gpqa.py"]
     EXT --> p_a529b6042bc226
     p_10e350a8a391f4["tests/unit/operations/"]

@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "1fefed6d26e199991b67e105b0ec6de0cd8215f7002eeadb0dc78b18d80896a2"
+    "sha256": "15da61299c3daf315c8d226ea3f2349b826e1fec17e24be435ca2303ad623c36"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -16,7 +16,7 @@
   "full_original_latex_available": false,
   "scientific_results_included": false,
   "live_integrations_validated": false,
-  "active_procedure_edition": "2026-10-13",
+  "active_procedure_edition": "2026-10-14",
   "procedure_update_source": "spec/protocol_page_updates.json",
   "validated_live_scope": [
     "vLLM generation benchmark",
@@ -25,12 +25,14 @@
     "shared RL question selection",
     "joint accepted-pair validation and exact-deficit refills",
     "all forty SFT dataset conditions",
-    "independent full Drive byte readback and native record validation"
+    "independent full Drive byte readback and native record validation",
+    "historical 3072-token untouched 14B GPQA Diamond baseline",
+    "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched"
   ],
-  "procedure_update_sha256": "4cb657eb22dd6851c9dc52ebf5cd34f2624253b19ad758e87eea97f98786551f",
+  "procedure_update_sha256": "14e109a03057e70a00775323cc958f70c42c9747e4e54df735cd519e06dc84f5",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
-    "status": "ROT13_14B_LEVEL10_COMPLETE_REMAINING_19_SELECTED_14B_FITS",
+    "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
     "available_model_sizes": [
       "7b",
       "14b"
@@ -236,8 +238,116 @@
     ],
     "gpu_connection_available": true,
     "multi_level_construction_window_established": false,
-    "completed_fit_count": 1,
+    "completed_fit_count": 10,
     "completed_conditions": [
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 1,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "bf3c74d8cca148eb52d42ab6d2be0bf629737b07257cc744d4ec5ee61a43a457",
+        "checkpoint_hash": "7c8a914c2de0e8c80d5087704c6a0d63894b4eafb28d76c9a1f89971b3112085",
+        "drive_folder_id": "1p1VbNXqUClwJCQr_uvAorFiU-XU47PZC",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 2,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "53e0bc8ed41fad6833fa09cea544f3ae67ec2a6e680e3324176f75fda1f8b85a",
+        "checkpoint_hash": "95287f501daedfe43d7a3e8de8571592c9b35605742d91dcd95271294ebae7af",
+        "drive_folder_id": "1lnD1DUbMuxi2kXmmQYo3dQiP75hcrxMi",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 3,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "2b75d59aad3882c6ef6140b23f7d257b8b0c94c49fb95a76e86a298ebec3a9de",
+        "checkpoint_hash": "969a26f365fcb30981ea106110ea8f3806d91cd319798b60fe4658f5c40565c1",
+        "drive_folder_id": "1UANF-7QOGzrFxDRAb5AvMml_oXuVJZ7r",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 4,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "dece7abe1c40edf11522a443fe7881c61f0a92c03c1336ae139fb24215582406",
+        "checkpoint_hash": "cf2229f5f6519ebd5b249fe4c6aaa183525b24073e13f672b02349457a571df1",
+        "drive_folder_id": "1yz6PVatVIFBw3UCR--Ow53weiZB5EUNu",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 5,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "0ac8f0e78fcb9c07d61e03e2962c4d8f1ede69d019f904722394a26397f3bfef",
+        "checkpoint_hash": "8ded780581243354e66eac4593ec4af927db88c82a615a036e9084f76c7ad149",
+        "drive_folder_id": "1WLIobsrGLj-Ues2Hrl_SjOChNtIFEGrs",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 6,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "3ec46b39b69afc893927ccf9ac73d67d1a4250b070ce5838c4fb1b414e590423",
+        "checkpoint_hash": "31e2cf3cea5ef8984d52cde02040b0cfda1b79b05e1fbbe56a75cf970cb695b0",
+        "drive_folder_id": "1RT5VaOiwfwau6I1MzzKY7ZjjADteWOje",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 7,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "adefb8c82029591413533cec77c0a7dcc60eff85e4f941db01f343289ff20575",
+        "checkpoint_hash": "eac56a8b13d16dccfcf0ea688f4c97891c6a60c530964582cd3483c6b4a9b802",
+        "drive_folder_id": "1OdxkFSaC9VLTGMtRQ8n7YvAykl4iJHPJ",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 8,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "2f74ba36e262506ba5770a1c91d748c41d216a55bea8e03fa09cd995d0d4153d",
+        "checkpoint_hash": "8afa26868a834a31b0c784839b474b607fa0e6606bf78ab23d7283ef92116f83",
+        "drive_folder_id": "155abtEVq8k3GnSJBQakQYgNmtOCAEwUC",
+        "drive_status": "VERIFIED"
+      },
+      {
+        "model_size": "14b",
+        "family": "rot13",
+        "level": 9,
+        "optimizer_updates": 625,
+        "initialization": "fresh_untouched_pinned_base",
+        "source_code_commit": "9de8813031da737453f491723a10b305679dc42d",
+        "adapter_manifest_hash": "8dd909a92f8bce62164cf4df54dd80e7feb4d36474a61111fbd9b274b6c0dc5d",
+        "checkpoint_hash": "a2b802e880295edbb7f93cf5170dac1bad5c52e4acbb11426e0b95c8be41e561",
+        "drive_folder_id": "1-GLZGHvYqWufXAFjcSq4OlQiGIpQkFeO",
+        "drive_status": "VERIFIED"
+      },
       {
         "model_size": "14b",
         "family": "rot13",
@@ -255,10 +365,10 @@
         "drive_status": "VERIFIED"
       }
     ],
-    "remaining_uncompleted_conditions": 19,
+    "remaining_uncompleted_conditions": 10,
     "condition_evidence_document": "docs/sft_completed_rot13_14b_level10.md",
-    "current_native_evidence_scope": "rot13_14b_level_10_on_observed_RTX_PRO_6000_Blackwell_96GB_only",
-    "uncompleted_available_conditions": 39,
+    "current_native_evidence_scope": "all_ten_completed_rot13_14b_fits_original_training_identities_preserved",
+    "uncompleted_available_conditions": 30,
     "active_training_scope": "14b_only_2_families_all_10_levels",
     "historical7b_data_and_results_retained": true,
     "full_main_campaign_confirmatory_workflow_automatically_narrowed": false,
@@ -268,7 +378,7 @@
     "missing_unrun_states_are_success": false,
     "coordinator_cli": "scripts/run_certified_sft.py",
     "baseline_before_sft_required": true,
-    "new_queue_status": "ROT13_LEVEL1_TRAINING_ACTIVE_KAZITEXT_LEVEL10_PAUSED444_VERIFIED",
+    "new_queue_status": "COMPLETE",
     "current_worker_scientific_source": "9de8813031da737453f491723a10b305679dc42d",
     "campaign_started_at": "2026-10-13T20:58:33+00:00",
     "current_fit": {
@@ -291,22 +401,10 @@
       ],
       "evidence_document": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json"
     },
-    "current_operational_priority": "ROT13_LEVELS1_TO9_KAZITEXT_SUSPENDED",
-    "current_queue_families": [
-      "rot13"
-    ],
-    "current_queue_levels": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-    ],
-    "current_queue_new_fit_count": 9,
+    "current_operational_priority": "GPQA_14B_BASE_PLUS_TEN_COMPLETED_ROT13_LEVELS_LONG_32000",
+    "current_queue_families": [],
+    "current_queue_levels": [],
+    "current_queue_new_fit_count": 0,
     "automatic_kazitext_restart": false,
     "current_priority_receipt": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json",
     "paused_kazitext_fit": {
@@ -421,59 +519,86 @@
         "level": 9
       }
     ],
-    "ordered_remaining_fits": [
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 1
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 2
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 3
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 4
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 5
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 6
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 7
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 8
-      },
-      {
-        "family": "rot13",
-        "model_size": "14b",
-        "level": 9
-      }
-    ],
+    "ordered_remaining_fits": [],
     "historical_baseline_first_coordinator_cli": "scripts/run_14b_sft_campaign.py",
     "current_operational_lifecycle_helper": {
       "git_tracked": false,
       "sha256": "9bad1636b781bcbf8f6dc05199ee28f0c7837e555f1df282d545e49f91af288c",
       "purpose": "Sequential lifecycle calls to the published single-fit CLI for ROT13 levels 1 through 9; no scientific implementation changes"
-    }
+    },
+    "historical_priority_startup": {
+      "new_queue_status": "ROT13_LEVEL1_TRAINING_ACTIVE_KAZITEXT_LEVEL10_PAUSED444_VERIFIED",
+      "current_operational_priority": "ROT13_LEVELS1_TO9_KAZITEXT_SUSPENDED",
+      "current_queue_levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "current_queue_new_fit_count": 9,
+      "current_priority_receipt": "docs/evidence/rot13_14b_priority_execution_2026_10_13.json",
+      "priority_active_receipt": "docs/evidence/sft_14b_rot13_priority_active_2026_10_13.json",
+      "priority_active_receipt_hash": "5b635753bd2666fbc98b09137004dc35daca6a2d70e5e58ed6be52644576aacd",
+      "priority_three_gpu_busy_samples": true,
+      "ordered_remaining_fits": [
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 1
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 2
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 3
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 4
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 5
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 6
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 7
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 8
+        },
+        {
+          "family": "rot13",
+          "model_size": "14b",
+          "level": 9
+        }
+      ]
+    },
+    "active_training_workers": 0,
+    "training_gpu_idle_at_completion_observation": true,
+    "completed_matrix_receipt": "docs/evidence/sft_14b_rot13_matrix_completion_2026_10_14.json",
+    "completed_matrix_receipt_hash": "65509cb7053e6764de9fb50af8df8407cadb73c88f9d9ebb80943cbbf35033e6",
+    "completed_matrix_readback_scope": "fit_results_and_final_manifests_downloaded_bytes_verified_all_listed_payload_metadata_matched",
+    "independent_full_adapter_weight_readback_performed": false
   },
   "current_sft_authorization": {
     "date": "2026-10-13",
@@ -553,6 +678,58 @@
     "protocol_hash": "42fb1287bce7968810f9d14d5325b402a8e75649628a78e8835ceb990579bfb6",
     "drive_folder_id": "19fz91SREgU0TvnqLMKUaXb1hx-gJUrRW",
     "completion_receipt_hash": "2bc4a8c672fb219c857184109783fffc16677f4475c3c186cae2f8401fc4fe62",
-    "report_hash": "f8b4694057be584c0db4438819e2836ce37a7bfb4d41b1fd5f3d580aa6e970b5"
+    "report_hash": "f8b4694057be584c0db4438819e2836ce37a7bfb4d41b1fd5f3d580aa6e970b5",
+    "historical_generation_profile": "legacy_3072",
+    "long_profile_campaign": {
+      "profile": "long_32000",
+      "status": "PREPARED_NOT_STARTED",
+      "generation_started": false,
+      "results_available": false,
+      "model": "14b",
+      "family": "rot13",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "untouched_baseline_required": true,
+      "unique_response_count": 2178,
+      "questions_per_state": 198,
+      "max_new_tokens": 32000,
+      "max_model_len": 40960,
+      "max_num_seqs": 8,
+      "request_group_size": 128,
+      "max_num_batched_tokens": 8192,
+      "gpu_memory_utilization": 0.9,
+      "enable_prefix_caching": false,
+      "enable_lora": true,
+      "max_lora_rank": 32,
+      "dtype": "bfloat16",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "seed": 42,
+      "backend": "vllm",
+      "engine_versions": {
+        "vllm": "0.11.0",
+        "torch": "2.8.0+cu128",
+        "transformers": "4.57.3"
+      },
+      "old_3072_baseline_reusable": false,
+      "primary_four_domain_max_new_tokens": 3072,
+      "training_changed": false,
+      "campaign_cli": "scripts/run_gpqa_sft_campaign.py",
+      "operator_guide": "docs/gpqa_14b_rot13_campaign.md",
+      "planning_hours": 22,
+      "timing_measured": false,
+      "baseline_generated_once_per_campaign": true,
+      "baseline_generation_status": "NOT_RUN"
+    }
   }
 }

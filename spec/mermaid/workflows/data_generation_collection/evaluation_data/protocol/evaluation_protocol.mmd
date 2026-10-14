@@ -8,7 +8,7 @@ flowchart TD
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
 %% Evaluation protocol
 %% Native prompts contain no opacity instruction. Temperature .6, top_p .95, seed 42.
-%% Evaluation completion cap is 3072 new tokens for every domain and model state.
+%% Primary evaluation cap is3072 for each of four domains/modelstates; supplementalGPQA isseparate.
 %% Capability scoring specification
 %% Model-generated code cannot access network or host data. Fix sandbox time/resource limits before execution.
 %% Test failures are model outcomes; infrastructure failures are separate and recovered.
@@ -33,7 +33,7 @@ flowchart TD
 %% Parse the designated final code field, optionally remove one surrounding Python fence, and make no repairs.
 %% Child: ANALYSIS => analysis_plan/prospective_analysis_plan.mmd
     INPUT["Frozen panel identities"]
-    GEN["Native generation protocol<br/>No opacity instruction<br/>Temperature 0.6 and top_p 0.95 with seed 42<br/>3,072 new tokens for every domain and state"]
+    GEN["Native generation protocol<br/>No opacity instruction<br/>Temperature 0.6 and top_p 0.95 with seed 42<br/>3,072 new tokens for each primary domain and state"]
     SCORING["Freeze answer parsers and isolated MBPP pass@1; withhold tests and forbid code repair"]
     JUDGES["Freeze two trace-only scores and a separate question-aware GPT4o tri-state audit"]
     ANALYSIS["src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py<br/>Prospective analysis plan<br/>Capability, common correct items and opacity<br/>Freeze accepted criteria before inspecting outcomes"]

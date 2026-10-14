@@ -21,7 +21,7 @@ The current MBPP gate has actual passing evidence for the fixed selected 203 ori
 
 ## Responsibility and controlling details
 
-Freeze common native generation with no opacity instruction: temperature 0.6, `top_p=0.95`, main seed 42 and max 3072 new tokens across every domain and state. Fix domain prompts, exact reasoning/answer parsers, numeric normalization, choice labels and MBPP final-code extraction. MBPP receives task/interface only and uses the specified isolated pass@1 limits. No code repair, test feedback or response resampling is permitted.
+Freeze common native generation with no opacity instruction: temperature 0.6, `top_p=0.95`, main seed 42 and max 3072 new tokens across the four primary domains and every selected state. GPQA has its own separately frozen supplemental profile; its opt-in long allowance does not change this primary protocol. Fix domain prompts, exact reasoning/answer parsers, numeric normalization, choice labels and MBPP final-code extraction. MBPP receives task/interface only and uses the specified isolated pass@1 limits. No code repair, test feedback or response resampling is permitted.
 
 Freeze the two unchanged trace-only score prompts and the separate H.5 tri-state GPT-4o audit instruction/schema. GPT-4o primary/audit: `gpt-4o-2024-11-20`, temperature 0, strict JSON, cap 64. Sonnet diagnostic uses C.3/D.2's frozen settings. Keep exact payloads, no cross-fed scores, primary/secondary identities, cache namespaces, raw outputs and missingness explicit. Option A and denominator rules apply equally to baselines and trained states.
 
@@ -43,7 +43,7 @@ The following source comments retain the procedural detail of the supplied diagr
 - Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
 - Evaluation protocol
 - Native prompts contain no opacity instruction. Temperature .6, top_p .95, seed 42.
-- Evaluation completion cap is 3072 new tokens for every domain and model state.
+- Primary evaluation completion cap is 3072 new tokens for each of its four domains and model states; supplemental GPQA is frozen separately.
 - Capability scoring specification
 - Model-generated code cannot access network or host data. Fix sandbox time/resource limits before execution.
 - Test failures are model outcomes; infrastructure failures are separate and recovered.
@@ -88,7 +88,7 @@ flowchart TD
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
 %% Evaluation protocol
 %% Native prompts contain no opacity instruction. Temperature .6, top_p .95, seed 42.
-%% Evaluation completion cap is 3072 new tokens for every domain and model state.
+%% Primary evaluation cap is3072 for each of four domains/modelstates; supplementalGPQA isseparate.
 %% Capability scoring specification
 %% Model-generated code cannot access network or host data. Fix sandbox time/resource limits before execution.
 %% Test failures are model outcomes; infrastructure failures are separate and recovered.
@@ -113,7 +113,7 @@ flowchart TD
 %% Parse the designated final code field, optionally remove one surrounding Python fence, and make no repairs.
 %% Child: ANALYSIS => analysis_plan/prospective_analysis_plan.mmd
     INPUT["Frozen panel identities"]
-    GEN["Native generation protocol<br/>No opacity instruction<br/>Temperature 0.6 and top_p 0.95 with seed 42<br/>3,072 new tokens for every domain and state"]
+    GEN["Native generation protocol<br/>No opacity instruction<br/>Temperature 0.6 and top_p 0.95 with seed 42<br/>3,072 new tokens for each primary domain and state"]
     SCORING["Freeze answer parsers and isolated MBPP pass@1; withhold tests and forbid code repair"]
     JUDGES["Freeze two trace-only scores and a separate question-aware GPT4o tri-state audit"]
     ANALYSIS["src/data_generation_collection/evaluation_data/protocol/analysis_plan/prospective_analysis_plan.py<br/>Prospective analysis plan<br/>Capability, common correct items and opacity<br/>Freeze accepted criteria before inspecting outcomes"]

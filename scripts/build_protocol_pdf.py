@@ -86,7 +86,9 @@ def main():
                                         'evaluation panel preparation', 'shared RL question selection',
                                         'joint accepted-pair validation and exact-deficit refills',
                                         'all forty SFT dataset conditions',
-                                        'independent full Drive byte readback and native record validation']
+                                        'independent full Drive byte readback and native record validation',
+                                        'historical 3072-token untouched 14B GPQA Diamond baseline',
+                                        'ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched']
     provenance_path.write_text(json.dumps(provenance, indent=2)+'\n')
     print(f'Built {len(doc)}-page integrated protocol; refreshed extraction and provenance')
     doc.close()

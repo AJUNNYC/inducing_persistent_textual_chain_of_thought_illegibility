@@ -118,6 +118,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       rot13_14b_priority_execution_2026_10_13.json
       scaffold_validation_report.md
       sft_14b_campaign_training_active_2026_10_13.json
+      sft_14b_rot13_matrix_completion_2026_10_14.json
       sft_14b_rot13_priority_active_2026_10_13.json
       sft_data_handoff_773cfd3_certificate.json
       sft_data_handoff_certificate.json
@@ -179,6 +180,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       vllm_baseline_scoring_repair.json
       vllm_sft_drive_readback_audit.json
     final_field_scoring.md
+    gpqa_14b_rot13_campaign.md
     implementation_acceptance.md
     implementation_prompt.md
     modules/
@@ -350,12 +352,14 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     reconcile_sft_launch.py
     refresh_dependency_locks.py
     rescore_vllm_baselines.py
+    restore_gpqa_sft_inputs.py
     revalidate_collection_inputs.py
     run_14b_sft_campaign.py
     run_baseline_repeatability.py
     run_certified_sft.py
     run_collection_until.py
     run_experiment.py
+    run_gpqa_sft_campaign.py
     run_model_generation_worker.py
     run_optimized_sft_queue.py
     run_preflight.py
@@ -710,6 +714,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             test_item_evaluation.py
           test_model_evaluation.py
         test_evaluation.py
+        test_gpqa_campaign.py
+        test_gpqa_restore_inputs.py
         test_supplemental_gpqa.py
       experiment_overview/
         test_experiment_overview.py

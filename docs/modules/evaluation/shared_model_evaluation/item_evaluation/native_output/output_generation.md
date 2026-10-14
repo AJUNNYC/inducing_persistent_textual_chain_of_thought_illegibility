@@ -13,11 +13,13 @@
 
 ## Implemented public interface and validation
 
-The active backend is `VLLMEvaluationGenerator(cache_root)` in `vllm_generation.py`, selected by `runtime.evaluation_backend: vllm`. It batches 128 requests with context 8,192 and a full 3,072-token response allowance for each request. Both untouched bases and verified SFT/RL adapters use the same LoRA-enabled BF16 engine. Native outputs are archived and cannot enter the new baseline cache. Whole raw/scored bundles are verified in Drive before advancing; repeatability may defer judging explicitly, while full evaluation later reuses these outputs and completes the original judgments. See [worker instructions](../../../../../baseline_repeatability_worker.md).
+The active primary four-domain backend is `VLLMEvaluationGenerator(cache_root)` in `vllm_generation.py`, selected by `runtime.evaluation_backend: vllm`. It batches 128 requests with context 8,192 and a full 3,072-token response allowance for each request. Both untouched bases and verified SFT/RL adapters use the same LoRA-enabled BF16 engine. Native outputs are archived and cannot enter the new baseline cache. Whole raw/scored bundles are verified in Drive before advancing; repeatability may defer judging explicitly, while full evaluation later reuses these outputs and completes the original judgments. See [worker instructions](../../../../../baseline_repeatability_worker.md).
 
 The historical `NativeGenerator(cache_root, *, backend=None).generate(state, item, seed=42)` uses the fixed native prompt, temperature 0.6, top-p 0.95, and 3,072-token cap. Production requires actual CUDA/BF16, exact pinned base/tokenizer revisions and verified adapter manifests, uses the canonical verified Hub cache with SDK networking disabled, and refuses CPU/disk layer offload. The record retains token IDs, exact decoded generated text, the terminal-EOS-normalized native output, known tokenizer prefill, stopping metadata, effective seed, and observed runtime metadata. Full record hashes detect metadata corruption. Injected backends are explicitly simulation and occupy separate cache identities.
 
 Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../../../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../../../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
+
+The separate [GPQA supplement](../../../supplemental_gpqa.md) supports a profile-bound 32,000-token allowance through its own generator. It does not change this primary engine, prompts or caches.
 
 ## Responsibility and controlling details
 

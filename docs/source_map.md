@@ -1,6 +1,6 @@
 # source_map.md
 
-All scientific specifications derive from the supplied updated PDF and revised Mermaid package. Local filenames, exact ownership and the 14 extracted support-module boundaries are organizational choices made for the requested architecture, not new experimental parameters. The original 67-page PDF is retained unchanged. The authoritative 81-page PDF is retained unchanged; its title uses the visible title page. No web research or prior-chat architectural sketch substitutes for these sources.
+All scientific specifications derive from the supplied updated PDF and revised Mermaid package. Local filenames, exact ownership and the 14 extracted support-module boundaries are organizational choices made for the requested architecture, not new experimental parameters. The original 67-page PDF is retained unchanged. The active 81-page PDF integrates approved procedure updates into its existing sections; its title uses the visible title page. The editable page-update source and provenance preserve the historical archive separately. No web research or prior-chat architectural sketch substitutes for these sources.
 
 [Source hashes](../spec/source_provenance.json) · [Full page-indexed PDF extraction](protocol_reference.md) · [Canonical path inventory](../spec/repository_manifest.json) · [Original Mermaid text archive](../spec/archive/mermaid_source.json)
 

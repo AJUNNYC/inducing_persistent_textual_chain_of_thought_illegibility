@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** 14B ROT13 level 10 completed all 625 efficient-recipe updates with native guards and Drive publication verified. Actual mode: 1 × 16, activation checkpointing off. Nineteen selected 14B conditions remain uncompleted; 20 comprise the active scope. Prepared 7B data/historical results are retained outside the queue. $240 was authorized for SFT on 13 October. The same source9de8813 worker now trainsROT13 L1; KaziTextL10 was safely paused444/625 Drive-verified21:58UTC. Currentqueue is ROT13levels 1–9 only; native startup/Drivecheckpoint 0/GPUproof passed,exactupdateswaitforsave. See [completion and budget evidence](../../sft_completed_rot13_14b_level10.md).
+**Owner:** `coordinator`. **Current status:** All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. GPQA evaluation is a separate next stage; its longer response allowance does not alter SFT.
 
 | Artifact | Exact repository path |
 |---|---|
@@ -13,7 +13,7 @@
 
 ## Responsibility and controlling details
 
-The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. Published policy v2 requests physical microbatch 2 × accumulation 8, with capacity fallback 1 × 16 and unchanged effective batch 16. Each optimizer update retains the same ordered 16 examples and per-example weight 1/16; actual batch/accumulation/recomputation is recorded and fixed on resume. 14B ROT13 level 10 is complete; KaziText level 10 and the other 18 selected 14B conditions are not completed. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
+The active `efficient_one_epoch_v1` SFT default uses all 10,000 examples once per explicitly selected condition: 625 updates and 19 warmup updates, BF16 base/head, exact full-gradient CCE, SDPA and plain AdamW. Published policy v2 requests physical microbatch 2 × accumulation 8, with capacity fallback 1 × 16 and unchanged effective batch 16. Each optimizer update retains the same ordered 16 examples and per-example weight 1/16; actual batch/accumulation/recomputation is recorded and fixed on resume. All ten 14B ROT13 levels are complete; all ten KaziText conditions remain uncompleted, including the paused level 10. Available data still spans forty model/family/level conditions, and explicit legacy NF4 recipes remain separately identified. See the [training redesign](../../sft_short_pilot.md) and [SFT module](sft/sft_training.md).
 
 The original full matrix comprises forty SFT fits, two independent 100-step RL trajectories with twenty snapshots, and two bases, yielding62 states if every required output exists. This historical accounting is not a current launch instruction. RL and final confirmatory evaluation remain deferred. Preserve the original Sonnet reward, Dr. GRPO semantics and original final evaluation thresholds; this redesign changes only the declared SFT recipe. Never infer completed branches from a join node or relabel old full checkpoints as efficient-run state.
 
@@ -55,17 +55,17 @@ title: "spec/mermaid/workflows/training/training.mmd"
 ---
 flowchart TD
 %% Dated13Oct21:38UTC evidence: actualGPQA49/198 complete/Drive verified;133 truncated+3 malformed at3072 tokens.
-%% Same scientificsource9de nowtrainsROT13L1: masks/recovery passed1x16/GCoff,checkpoint0Drive-verified,GPU94-98%.
+%% Current14Oct: allten14B ROT13 fits complete625/Driveverified; L1-9source9de, retainedL10source2ea.
 %% RetainedROT13L10 keeps old2ea4fb9 identity; laterdocumentation cannot relabel executed workers.
 %% Training
 %% Active default: efficient_one_epoch_v1, per explicitly selected SFT condition.
 %% Published policy v2: request physical 2 x 8; capacity fallback 1 x 16, same effective 16.
 %% Actual batch/accumulation/recomputation mode stays fixed throughout each fit and exact resume.
 %% Committed coordinator requires untouched 14B Diamond 198 baseline+verified Drive barrier before 19 new fits.
-%% Queue Currentpriority:ROT13 levels1-9 only<br/>KaziTextpaused444/625; no automaticrestart ascending; completed ROT13L10 retained.
+%% Executednine-levelROT13queue isCOMPLETE; KaziTextpaused444/625, noautomaticrestart.
 %% Authorization $240 recorded; no inferred new price or rate-based cutoff; explicit deadline/safe pause separate.
-%% Forty datasets available; active14B scope20, completed ROT13 L10 retained;19 selectedfits uncompleted.
-%% $240 SFT authorized 13 Oct; no new worker launch recorded. RL/final evaluation remain separate.
+%% Forty datasets available; alltenROT13 fitscomplete, alltenKaziText fitsuncompleted.
+%% Historical$240SFT authorization retained; GPQA-onlylong32000 evaluation isseparate andnotyet run.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
@@ -79,7 +79,7 @@ flowchart TD
 %% Child: SFT => sft/sft_training.mmd
 %% Child: RL => rl_grpo/rl_training.mmd
     INPUT["Verified data and pinned training recipes"]
-    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>40 datasets; active 14B only, all ten levels<br/>Completed 14B ROT13 L10 retained<br/>20 active 14B conditions; 19 remaining<br/>7B data/history retained; disjoint jobs only<br/>GPQA untouched 14B baseline + Drive barrier first<br/>Currentpriority:ROT13 levels1-9 only<br/>KaziTextpaused444/625; no automaticrestart<br/>Default: efficient one epoch / 625 updates"]
+    SFT["src/training/sft/sft_training.py<br/>Selected independent SFT fits<br/>All ten14B ROT13 fits complete625 and Drive-verified<br/>L1-9source9de; retainedL10source2ea<br/>KaziTextpaused444/625; noautomaticrestart<br/>40 datasets and 7B history retained<br/>Default: efficient one epoch / 625 updates"]
     SFTOUT["Only selected verified adapters<br/>Each starts from its untouched base"]
     RL["src/training/rl_grpo/rl_training.py<br/>Deferred RL design: Dr. GRPO<br/>2 independent 100-step trajectories; unchanged reward"]
     RLOUT["20 RL checkpoints<br/>Steps 10, 20, ... 100 for each model"]

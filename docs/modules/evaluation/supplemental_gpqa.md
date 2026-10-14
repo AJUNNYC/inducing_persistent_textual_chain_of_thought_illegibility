@@ -1,8 +1,10 @@
 # Appended GPQA capability comparison
 
 GPQA is a separate capability supplement. It does not replace GSM8K, MMLU,
-ARC-Easy, or MBPP, change their counts/caches, enter the primary statistical
-window or multiplicity family, or modify SFT/RL training and certificates.
+ARC-Easy, or MBPP, change their counts/prompts/caches or 3,072-token budgets,
+enter the primary statistical window or multiplicity family, or modify SFT/RL
+training and certificates. The opt-in `long_32000` profile changes **GPQA
+evaluation only**. Existing trained adapters do not need to be retrained.
 
 ## Dataset and measurement distinction
 
@@ -16,6 +18,11 @@ See `docs/evidence/gpqa_variant_source.json` for the primary-source evidence.
 
 This matches the dataset variant, not José's complete measurement procedure.
 Their implementation renders question text and grades answers with an LLM.
+Their [archived 14B configuration](https://github.com/Jozdien/cot_legibility/blob/89195c70288b4b141460447f5fde02f67b38b043/streamlit_runs/20251022_013133_R1-Distill-Qwen-14B_gpqa/config.yaml)
+allows 32,000 completion tokens with a requested 28,000 reasoning-token
+allowance through OpenRouter. Our long profile allows up to
+32,000 **total generated tokens per response**, without a separate reasoning
+sub-budget. This is not a reproduction of their scores.
 This project's supplement renders four multiple-choice options, uses the native
 chat template and reasoning parser, and mechanically scores the designated
 final answer label. No provider judge is called and no extra legibility panel is
@@ -29,31 +36,67 @@ The literal `Question`, `Correct Answer`, and `Incorrect Answer 1/2/3` columns
 are used. Explanations, pre/extra-revision fields, validator feedback, and canary
 strings are never rendered in the prompt.
 
+## Frozen generation profiles
+
+Both profiles preserve temperature 0.6, top-p 0.95, seed 42, deterministic
+choice permutations, native prompts, pinned model/tokenizer revisions, BF16
+weights and designated-final-field scoring. Each item receives one response;
+ordinary wrong, malformed or truncated outputs are never regenerated until
+correct. The longer cap gives already-trained reasoning behavior more time to
+finish; it neither adds reasoning training nor guarantees better accuracy.
+
+| Setting | `legacy_3072` | `long_32000` |
+| --- | --- | --- |
+| Per-response maximum new tokens | 3,072 | 32,000 |
+| vLLM total sequence context | 8,192 | 40,960 |
+| vLLM maximum concurrent sequences | 128 | 8 |
+| Submitted request group | 128 | 128 |
+| vLLM scheduler token budget | 8,192 | 8,192 |
+| GPU memory utilization | 0.9 | 0.9 |
+| Prefix caching | Disabled | Disabled |
+| LoRA enabled, including untouched base | Yes; maximum rank 32 | Yes; maximum rank 32 |
+| Backend | Native or pinned vLLM | Pinned vLLM only |
+
+The submitted group size differs from concurrency. The long-profile engine
+schedules at most eight sequences concurrently from groups of up to 128
+requests. Its scheduler's 8,192 tokens are a processing allowance, not a shared
+completion cap. Every response retains its full 32,000-token allowance, with
+early stopping at native EOS. Prompts must fit alongside that allowance and
+are never truncated to fit.
+
+The evaluation environment remains pinned vLLM 0.11.0, Transformers 4.57.3 and
+Torch 2.8.0+cu128. Training has its separate Torch 2.9 environment and unchanged
+published loss policy. The selected evaluation GPU is RTX PRO 6000 Blackwell
+96GB; an old PyTorch 2.4 template is not the scientific evaluation environment.
+
 ## Untouched baseline first, then frozen adapter comparisons
 
 Preparation fixes one deterministic SHA-256 choice permutation per question
 (seed 42) and moves the correct reference label with its option. Both the
 untouched base and preselected final adapter receive exactly the same questions,
-options, prompt, sampling settings, and backend. Temperature is 0.6, top-p 0.95,
-and the response budget remains 3,072 tokens; there are no retry-until-correct
-outputs or shortened targets.
+options, prompt, generation profile, sampling settings and backend. Temperature
+is 0.6, top-p 0.95 and the response cap is fixed by the selected profile.
+There are no retry-until-correct outputs or shortened targets.
 
 Freeze the comparison before inference. It binds the full official source pin,
 CSV checksum, panel, prompt, parser/scorer/generator implementation hashes,
-backend, seed, and exact state descriptors. Source/prompt changes cannot reuse
-the old supplemental protocol or raw cache. The original four-domain generator
-versions and prompt bytes remain unchanged.
+generation profile, engine, backend, seed and exact state descriptors.
+Source/prompt/budget/engine changes cannot reuse an incompatible supplemental
+protocol or raw cache. Original four-domain versions and prompt bytes remain
+unchanged.
 
 The baseline can be frozen and evaluated **before training**, without a trained
 adapter. `freeze-base` reads official model/tokenizer pins from the project
 configuration (or both explicit immutable commits) and permits only the untouched
 construction model. Its separate `supplemental_gpqa_baseline_v1` protocol contains
 one state, and `baseline.json` is complete only after every panel item has a raw
-output and a score. It never invents a missing adapter or runs a trained state.
+output and a score. A long-profile evaluation starts with a new matching untouched
+baseline; the completed 3,072-token result cannot stand in for that baseline.
+It never invents a missing adapter or runs a trained state.
 
 Later paired freezes can opt into `--baseline-protocol` reuse. The original
 baseline protocol is reconstructed and checked against the full panel, prompt,
-source implementations, sampling contract, engine, seed, and model/tokenizer
+source implementations, generation profile, sampling contract, engine, seed and model/tokenizer
 commits. Use the same `--output-root` containing the baseline raw records. Exact
 baseline raw identities and bytes are reused without re-labeling them as new
 predictions or inferring accuracy from a summary alone. A missing raw cache cannot
@@ -65,7 +108,10 @@ it. The loader checks the original model/tokenizer commits, LoRA payload bytes,
 manifest/checkpoint hash, family/model/level, and original training configuration.
 The new evaluation protocol is stored separately; it does not relabel the
 adapter with the current evaluation configuration. **Adding GPQA does not
-require retraining the completed 14B ROT13 level-10 fit.** GPQA results must not
+require retraining any completed 14B ROT13 fit.** Levels 1–9 retain scientific
+source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source
+`2ea4fb9a7737cff806226366e73743eec5935fad`. All ten fits are complete and were
+independent untouched-base fits. GPQA results must not
 be used to select a checkpoint for this predeclared comparison. Each SFT level
 remains an independent fit from its original base.
 
@@ -86,11 +132,12 @@ python scripts/run_supplemental_gpqa.py freeze-base \
   --panel /workspace/data/evaluation/supplemental_gpqa/gpqa_diamond_panel.json \
   --config config.yaml --model 14b \
   --model-cache /workspace/model_cache --backend vllm \
-  --output /workspace/data/evaluation/supplemental_gpqa/base_14b_protocol.json
+  --generation-profile long_32000 \
+  --output /workspace/data/evaluation/supplemental_gpqa/base_14b_long32000_protocol.json
 
 python scripts/run_supplemental_gpqa.py run \
-  --protocol /workspace/data/evaluation/supplemental_gpqa/base_14b_protocol.json \
-  --output-root /workspace/artifacts/evaluation/supplemental_gpqa \
+  --protocol /workspace/data/evaluation/supplemental_gpqa/base_14b_long32000_protocol.json \
+  --output-root /workspace/artifacts/evaluation/gpqa_rot13_14b_long32000 \
   --save-to-drive
 
 python scripts/run_supplemental_gpqa.py freeze \
@@ -98,14 +145,28 @@ python scripts/run_supplemental_gpqa.py freeze \
   --adapter /path/to/completed/rot13/14b/level_10/final_adapter \
   --model-cache /workspace/model_cache \
   --backend vllm \
-  --baseline-protocol /workspace/data/evaluation/supplemental_gpqa/base_14b_protocol.json \
-  --output /workspace/data/evaluation/supplemental_gpqa/rot13_14b_level10_protocol.json
+  --generation-profile long_32000 \
+  --baseline-protocol /workspace/data/evaluation/supplemental_gpqa/base_14b_long32000_protocol.json \
+  --output /workspace/data/evaluation/supplemental_gpqa/rot13_14b_level10_long32000_protocol.json
 
 python scripts/run_supplemental_gpqa.py run \
-  --protocol /workspace/data/evaluation/supplemental_gpqa/rot13_14b_level10_protocol.json \
-  --output-root /workspace/artifacts/evaluation/supplemental_gpqa \
+  --protocol /workspace/data/evaluation/supplemental_gpqa/rot13_14b_level10_long32000_protocol.json \
+  --output-root /workspace/artifacts/evaluation/gpqa_rot13_14b_long32000 \
   --validate-only
 ```
+
+For baseline plus all ten completed ROT13 levels, use the published
+`scripts/run_gpqa_sft_campaign.py` and [operator guide](../../gpqa_14b_rot13_campaign.md).
+It validates all ten adapters before GPU inference, runs a new matching baseline
+once, then processes levels 1–10 ascending. The workload is **198 × 11 = 2,178
+unique responses**. Each paired report refers to the same baseline evidence;
+it does not generate another baseline for every level.
+
+The [sanitized completion receipt](../../evidence/sft_14b_rot13_matrix_completion_2026_10_14.json)
+records all ten SFT adapters. Fit results and final manifests were downloaded
+and byte-verified, and listed payloads matched their Drive metadata; this
+independent check did not download all adapter weights again. Restoration
+must verify downloaded payload bytes before loading them for inference.
 
 After GPU availability and spending authorization are established, use the
 published native GPU environment for `run` without `--validate-only`. Append
@@ -125,10 +186,21 @@ their Drive registry entries, not trust the receipt's `COMPLETE` string alone.
 
 `--backend vllm` is available only with the existing pinned vLLM evaluation
 runtime, verified cached model snapshots, and its fixed backend contract.
-Switching backends requires a separately frozen protocol; it cannot resume a
-native protocol under another backend.
+Switching backends or generation profiles requires a separately frozen protocol;
+it cannot resume an incompatible protocol under another contract.
 
 ## Results and validation
+
+The historical `legacy_3072` untouched 14B run remains complete and Drive-verified:
+**49/198 correct (24.75%)**, 13 incorrect, 133 truncated and 3 malformed. All 198
+stay in its denominator. Its original source and permanent outputs are preserved;
+see [baseline results](../../14b_baseline_results.md). Those short-budget outputs
+cannot enter the new 32k paired comparison. Availability of the long-profile
+commands and completed adapters does not establish a completed long GPQA result.
+
+Approximately **22 hours** for baseline plus ten levels on one PRO 6000 is a
+planning estimate, including ordinary Drive publication, not a measured 32k
+benchmark or deadline. Update it from actual throughput after startup.
 
 The base-only report contains the untouched model's accuracy and a null paired
 difference; a comparison report contains both accuracies and their difference
@@ -139,6 +211,8 @@ an apparently complete denominator. Fixture outputs are labeled simulations.
 
 CPU tests cover choice/reference correspondence, leakage prevention, official
 distractor quirks, immutable population and pairing, implementation/prompt
-binding, completed-adapter reuse across evaluation configuration changes, and
-resume/cache isolation. A prepared panel is not an evaluated model, and these
+binding, completed-adapter reuse across evaluation configuration changes,
+generation-profile isolation and strict matching-baseline reuse. GPQA is
+descriptive; it does not establish primary construction success, opacity,
+transfer or activation-probe performance. A prepared panel is not an evaluated model, and these
 tests do not establish native GPU correctness or GPQA performance.

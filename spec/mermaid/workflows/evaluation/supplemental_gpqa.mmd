@@ -1,19 +1,23 @@
 flowchart TD
-    O[Official pinned GPQA Diamond CSV: 198 questions] --> P[Prepare full panel and deterministic public choices]
-    P --> BF[Freeze untouched base-only protocol before inference]
-    B[Untouched official base: pinned model and tokenizer] --> BF
-    BF --> BG[Existing native or pinned vLLM engine: base only]
+    O[Official pinned GPQA Diamond CSV: all 198 questions] --> P[Fixed panel, seed-42 option permutation and native prompt]
+    PROFILE[GPQA-only long_32000<br/>32,000 new tokens; vLLM context 40,960<br/>8 concurrent sequences; request groups 128<br/>Scheduler 8,192; BF16; unchanged sampling] --> BF
+    P --> BF[Freeze new matching untouched baseline before inference]
+    B[Untouched official 14B base: pinned model and tokenizer] --> BF
+    BF --> BG[Pinned LoRA-enabled vLLM engine: one baseline response per item]
     BG --> BR[Immutable baseline raw outputs and 198 scores]
     BR --> BD[Baseline report and verified Drive inventory]
-    BD --> Q[Verify actual records and Drive receipt before SFT]
-    P --> F[Freeze separate paired protocol before comparison]
-    A[Exact published final adapter and original training identity] --> F
+    A[Ten completed ROT13 final adapters<br/>Original fit/checkpoint identity retained<br/>L1-9 source 9de8813; L10 source 2ea4fb9] --> V[Validate every level 1-10 before GPU inference]
+    V --> F[Freeze each paired protocol and strict baseline reuse binding]
+    P --> F
+    PROFILE --> F
+    BD --> F
     B --> F
-    BF -. optional exact-contract reuse .-> F
+    BF -. exact matching-profile reuse .-> F
     BR -. reuse original base raw bytes .-> R
-    F --> G[Existing native or pinned vLLM engine]
+    F --> G[Evaluate adapters in ascending level order<br/>198 fresh outputs per level; same profile and engine]
     G --> R[Isolated immutable raw output cache]
-    R --> S[Native final-label scorer: no reference in prompt]
-    S --> C[Paired descriptive GPQA accuracies]
+    R --> S[Native final-label scorer: no reference in prompt<br/>Wrong, malformed or truncated count as incorrect<br/>No retry-until-correct]
+    S --> C[Ten paired descriptive GPQA comparisons<br/>Baseline plus 10 levels = 2,178 unique responses]
     C --> D[Verified Google Drive artifacts]
-    X[Existing four-domain primary suite] -. remains unchanged .-> X
+    OLD[Historical 3,072-token GPQA baseline: 49/198<br/>Preserved separately; incompatible with 32k comparison] -. archived .-> OLD
+    X[Primary four-domain suite stays at 3,072 tokens<br/>SFT data, recipe and original criteria unchanged] -. unchanged .-> X

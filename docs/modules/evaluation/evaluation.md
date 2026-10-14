@@ -17,6 +17,8 @@
 
 Owned unit and cross-owner fixture checks are recorded in the [evaluation validation receipt](../../evidence/evaluation_validation.json). Actual restricted execution evidence is recorded in the [MBPP sandbox check](../../evidence/mbpp_sandbox_check.json). Fixture checks are not scientific outcomes. Native CUDA generation, live pinned judge compatibility, baseline repeatability, statistical validation, and durable cloud storage remain launch gates until their actual reports pass.
 
+The [GPQA supplement](supplemental_gpqa.md) is a separate descriptive capability comparison. Its selected long profile evaluates an untouched 14B baseline plus ten completed ROT13 states on all 198 Diamond questions. GPQA-only budget changes do not enter the original four-domain protocol, legibility panel, statistical windows or SFT/RL training.
+
 ## Responsibility and controlling details
 
 Use the common frozen package for all 62 states and coordinate the same two baseline packages across the forty SFT and twenty RL evaluations. Each state has 1233 main-seed capability items; the nested 200 selected traces reuse those exact raw outputs for the two score requests plus independent audit. Main seed 42 baselines use the same audit/gates; missing baseline evidence cannot be assumed negative.
