@@ -33,6 +33,20 @@ campaign status remains local, while completed child payloads require verified
 Drive inventories. The earlier preparation receipt remains an unchanged dated
 snapshot, rather than evidence of completed inference.
 
+A Drive upload timeout interrupted score publication after the
+first 128 baseline responses had been generated. All 128 raw responses and 40
+local scores were preserved. At 21:47 UTC, the existing source's artifact service retried the
+single failed upload and reported `VERIFIED`; the same frozen campaign was then
+relaunched with its original source, output root and retry ledger. This recovery
+reuses the 128 cached responses and leaves the remaining 70 baseline questions
+to generate. At 21:47:48 UTC, the campaign was observed running again: local
+scores increased from 40 to 44, all 128 raw responses remained intact, and the
+registry contained 172 verified records, one upload in progress and no failed
+records. This confirms resumed scoring/publication of cached responses; fresh
+inference for the remaining 70 questions had not yet been observed. No baseline
+or trained state is claimed complete. See the
+[operational recovery receipt](evidence/gpqa_14b_rot13_drive_recovery_2026_10_14.json).
+
 ## Runtime and restored inputs
 
 Use RTX PRO 6000 Blackwell 96GB and the pinned evaluation environment: vLLM

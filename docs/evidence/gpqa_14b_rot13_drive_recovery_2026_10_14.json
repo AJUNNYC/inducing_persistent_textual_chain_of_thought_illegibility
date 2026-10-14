@@ -1,0 +1,67 @@
+{
+  "baseline_protocol_hash": "a2075064c73f8c9bf9da658f7ef370cc20f63c304a2f83edbf3598a8902a3c50",
+  "credential_values_or_question_text_included": false,
+  "generation_profile": "long_32000",
+  "incident": {
+    "child_error": "Permanent artifact synchronization incomplete; registry retains pending/failed records",
+    "failed_artifact_id": "f82f35642747a3818fedda4b128abef3db9d2f7403f10783739a63909ea58959",
+    "failure_class": "TimeoutError",
+    "raw_responses_already_drive_verified": 128,
+    "raw_responses_preserved_locally": 128,
+    "registry_failed_before_repair": 1,
+    "registry_verified_before_repair": 168,
+    "score_records_preserved_locally": 40,
+    "stage": "baseline_score_drive_publication"
+  },
+  "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
+  "plan_hash": "379f4be1ba4d4eba513811aec850d5a171a67b670c8fb9949e3cada235000051",
+  "questions_per_state": 198,
+  "receipt_hash": "7fced2daa6df218d30b633ad7a392df77da8b5058d8d5fbd37261594a8f418c6",
+  "relaunch": {
+    "actual_resumed_inference_observed": false,
+    "baseline_questions_remaining_to_generate": 70,
+    "campaign_status": "RUNNING",
+    "campaign_status_updated_at": "2026-10-14T21:47:25.453676+00:00",
+    "completed_state_ids": [],
+    "completion_claimed": false,
+    "current_state_id": "base_14b",
+    "entrypoint": "scripts/run_gpqa_sft_campaign.py",
+    "existing_baseline_raw_responses_to_reuse": 128,
+    "gpu_utilization_percent": 0,
+    "local_raw_responses": 128,
+    "local_score_records": 44,
+    "observed_at": "2026-10-14T21:47:48+00:00",
+    "observed_phase": "scoring_and_drive_publication_from_cached_raw",
+    "raw_cache_score_files_and_retry_ledger_preserved": true,
+    "registry_counts": {
+      "FAILED": 0,
+      "PENDING": 1,
+      "VERIFIED": 172
+    },
+    "resumed_execution_observed": true,
+    "resumed_inference_observation_status": "REMAINING_70_QUESTIONS_NOT_YET_OBSERVED_GENERATING",
+    "same_source_protocol_plan_output_root_and_worker_identity": true
+  },
+  "repair": {
+    "entrypoint": "operations.artifacts.ArtifactService.sync_artifacts",
+    "failed_artifact_ids": [],
+    "failed_child_and_idle_orphan_engine_stopped": true,
+    "observed_at": "2026-10-14T21:47:04.883788+00:00",
+    "source_changed": false,
+    "status": "VERIFIED",
+    "uploaded_artifact_ids": [
+      "f82f35642747a3818fedda4b128abef3db9d2f7403f10783739a63909ea58959"
+    ]
+  },
+  "scientific_changes": {
+    "evaluation_prompts_or_panel_changed": false,
+    "full_test_suite_repeated": false,
+    "generation_budget_sampling_or_seed_changed": false,
+    "scoring_changed": false,
+    "training_changed": false
+  },
+  "source_code_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+  "state_count": 11,
+  "status": "DRIVE_REPAIRED_CAMPAIGN_RESUMED",
+  "version": "gpqa_14b_rot13_drive_recovery_receipt_v1"
+}

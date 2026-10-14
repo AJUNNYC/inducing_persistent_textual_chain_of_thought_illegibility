@@ -104,6 +104,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       evaluation_validation.json
       existing_runpod_inspection.json
       gpqa_14b_baseline_completion_2026_10_13.json
+      gpqa_14b_rot13_drive_recovery_2026_10_14.json
       gpqa_14b_rot13_long_started_2026_10_14.json
       gpqa_preparation_receipt.json
       gpqa_variant_source.json
