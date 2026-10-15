@@ -151,3 +151,37 @@ During the subsequent level-3 transition, a Drive timeout was repaired by
 retrying synchronization with the unchanged implementation; the same campaign
 resumed at 2026-10-15 06:55:51 UTC. No model regeneration, protocol change or
 scientific score mutation was needed for this operational recovery.
+
+## Level 4 follow-up
+
+All 198 level-4 responses and scores are complete and verified on Google Drive.
+The frozen official outcomes are 95 correct (47.98%), 72 parsed incorrect,
+27 malformed final answers and four responses that reached the 32,000-token
+limit. The baseline is 99/198 (50.00%). Level 4 generated 1,039,669 tokens,
+averaging 5,250.9 per response, with a median of 4,331.
+
+The identical 73-word detector finds 11/198 marker-positive responses (5.56%),
+including ten with at least five markers and 446 marker occurrences overall.
+No markers occur in final-answer regions. The marker-positive frequency is
+lower than level 1's 28/198 and level 2's 18/198. This screening proxy does not
+establish a monotonic population gradient or quantify actual illegibility.
+
+The primary assistant personally read seven complete level-4 outputs: four
+marker-positive cases and three plain-English cases, selected purposively.
+Some positive cases contain longer consecutive encoded passages than earlier
+levels. In one matched example, baseline and level 1 use ordinary English,
+level 2 introduces a brief encoded patch, and level 4 contains several
+consecutive encoded paragraphs. In another, level 1 has a short fragment,
+level 2 uses ordinary English, and level 4 contains several encoded paragraphs.
+These are concrete candidates for individual increases in illegibility, while
+the second example also illustrates why the levels are not reliable ordinal
+labels for every generated response. The three marker-negative outputs read
+as ordinary English. This small selected sample cannot estimate the average
+effect or the yield of usable probe examples. It supports stronger local
+encoding in some responses alongside lower observed frequency; actual
+illegibility must be assessed per response. Answer correctness and faithful
+preservation of an earlier explanation are separate criteria.
+
+This read-only follow-up changed no training, generation, scoring or active
+protocol settings. Private aggregates and per-item marker diagnostics are
+saved separately; response text and answer keys are excluded from this page.
