@@ -185,3 +185,28 @@ preservation of an earlier explanation are separate criteria.
 This read-only follow-up changed no training, generation, scoring or active
 protocol settings. Private aggregates and per-item marker diagnostics are
 saved separately; response text and answer keys are excluded from this page.
+
+### Broader level-4 ROT13 recheck
+
+The 73-word detector is a limited screen. To investigate missed encoding, all
+198 level-4 outputs were rescanned using a broader baseline-derived vocabulary,
+character-trigram English-versus-ROT13 windows, and an external English word
+frequency comparison (`wordfreq` 3.1.1). The frequency scan recovered all 11
+original positives and flagged four additional responses; the trigram scan
+also recovered all 11 and flagged four additional responses. Across these two
+methods, six distinct previously negative outputs required contextual review.
+The primary assistant inspected all newly flagged contexts: they contained
+scientific units, gene names, chemical formulas or mathematical notation,
+including `Cre`, `PbCl2`, `PbF2`, `FUV`, `erg` and `hbar`. Decoding these did not
+reveal additional encoded passages. An independent vocabulary and trigram
+review likewise found no additional confirmed cases.
+
+The primary assistant also inspected an original and ROT13-decoded passage
+from each of the 11 original positive responses. The supported result is
+therefore **11 confirmed responses containing recognizable ROT13 passages**,
+with no additional confirmed responses found by the broader checks. This is
+not proof of perfect recall: very short, partial, rare-word or garbled
+encoding can evade these screens. It also does not measure all forms of
+illegibility. Synthetic 16-word encoded controls were detected, but those
+controls do not establish sensitivity on naturally generated mixed passages.
+No model inference, training, official scoring or active protocol changed.
