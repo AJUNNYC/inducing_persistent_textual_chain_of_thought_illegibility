@@ -95,8 +95,21 @@ confused, which is not itself textual illegibility. One matched baseline was
 more circular and harder to follow than its trained counterpart. These are
 qualitative observations of the native reasoning region, not an automated
 marker score, a correctness judgment or a formal observer evaluation. They
-support localized obstruction rather than broad, consistent illegibility at
-level 1; they do not establish behavior at higher levels.
+support localized obstruction at level 1; they do not establish behavior at
+higher levels.
+
+The relevant target is an increase relative to baseline, so broad or complete
+unreadability is not required. A subsequent paired reassessment expanded direct
+reading to the complete native reasoning for all nine trained examples and
+their nine matched baselines. The five deliberately selected marker-positive
+trained cases add locally opaque passages absent in their baseline counterparts.
+The four marker-negative cases show no clear increase in local textual opacity;
+some trained answers are easier to follow overall. One encoded trained answer
+also has a shorter, easier overall presentation despite its locally opaque
+fragment. The direct judgment is therefore modest, uneven qualitative evidence
+of increased illegibility relative to baseline. These purposive observations
+do not estimate the net effect across all 198 questions. Answer correctness and
+preservation of an original explanation are separate from this assessment.
 
 The [aggregate audit receipt](evidence/gpqa_baseline_level1_response_audit_2026_10_15.json)
 binds counts and private input/report hashes. No new inference, provider judging,
