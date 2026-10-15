@@ -1,0 +1,202 @@
+{
+  "audit_input_and_private_report_hashes": {
+    "encoding_diagnostic.json": "10c0479b0806b4a1f8072f4c9ec0c28a2d544530eb0f485f7973251211748fc2",
+    "malformed_answer_audit.json": "0d7746daa5a1a7e7f469c60f7e3c4bc024f972ea5d203b2719496e185bcf70a8",
+    "quantitative_summary.json": "d077ab7fdcf8fb5117d8607a21c2c404fa75d27a0771ab29dd267aeec95d2fc5",
+    "responses.json": "156fe50ca69ff423f50d6fd6639419a5359c39ccd25b10e4be367392de574030"
+  },
+  "encoding_diagnostics": {
+    "limitations": [
+      "Marker-positive response fraction is not the fraction of words encoded.",
+      "Absence of marker matches does not prove absence of all encoding.",
+      "One truncated answer contributes 415 of 662 marker hits.",
+      "No causal inference about accuracy follows from marker-positive outcomes."
+    ],
+    "method": "Exact word-span match against ROT13 forms of a fixed 73-common-word lexicon inside the native reasoning region. Matched forms manually checked in context. This is a diagnostic marker detector, not a formal encoded-word fraction or compliance rate.",
+    "qualitative_findings": [
+      "Baseline has zero diagnostic marker matches; level 1 has recognizable spontaneous ROT13 patches without a prompt instruction to encode.",
+      "All 28 marker-positive level-1 first patches were inspected, including longer contexts for five outputs. They mix readable English with contiguous encoded phrases.",
+      "Several decoded segments contain invented, garbled or semantically unhelpful terms. Visible encoding alone therefore does not establish faithful preservation of correct reasoning.",
+      "One 32000-token truncated output accounts for 415 of 662 level-1 marker hits, so aggregate word counts are strongly skewed by one long output.",
+      "Absence of these common markers does not prove no ROT13 occurred. Exact training-mask compliance cannot be reconstructed for novel GPQA reasoning without an unencoded reference.",
+      "Official scores and the protocol were unchanged."
+    ],
+    "states": {
+      "baseline": {
+        "eligible_word_spans": 564716,
+        "marker_counts": {},
+        "marker_occurrences": 0,
+        "marker_positive_responses": 0,
+        "official_reasons_in_marker_positive_responses": {},
+        "records": 198,
+        "responses_with_5plus_markers": 0
+      },
+      "level_01": {
+        "eligible_word_spans": 635143,
+        "marker_counts": {
+          "bayl": 1,
+          "bgure": 1,
+          "cbffvoyr": 1,
+          "fubhyq": 8,
+          "fvapr": 1,
+          "guebhtu": 2,
+          "gung": 20,
+          "gur": 242,
+          "gura": 38,
+          "gurer": 2,
+          "guvax": 5,
+          "guveq": 2,
+          "hfrq": 2,
+          "hfvat": 2,
+          "jbhyq": 3,
+          "jnvg": 11,
+          "jura": 3,
+          "jurer": 1,
+          "juvpu": 10,
+          "jvgu": 40,
+          "nobhg": 3,
+          "orgjrra": 1,
+          "orpnhfr": 2,
+          "pbafvqre": 2,
+          "pbhyq": 64,
+          "purpx": 1,
+          "rnpu": 1,
+          "sebz": 64,
+          "svefg": 1,
+          "unf": 32,
+          "unir": 2,
+          "vagb": 9,
+          "ybbx": 1,
+          "zbfg": 2,
+          "znlor": 80,
+          "zrnaf": 1,
+          "zvtug": 1
+        },
+        "marker_occurrences": 662,
+        "marker_positive_responses": 28,
+        "official_reasons_in_marker_positive_responses": {
+          "correct": 12,
+          "incorrect": 15,
+          "truncated_output": 1
+        },
+        "records": 198,
+        "responses_with_5plus_markers": 19
+      }
+    }
+  },
+  "generation_or_training_changed": false,
+  "generation_profile": "long_32000",
+  "official_scores_changed": false,
+  "paired_correctness": {
+    "baseline_correct_level1_correct": 71,
+    "baseline_correct_level1_failed": 28,
+    "baseline_failed_level1_correct": 22,
+    "baseline_failed_level1_failed": 77
+  },
+  "paired_reason_transitions": {
+    "baseline_correct__level1_correct": 71,
+    "baseline_correct__level1_incorrect": 11,
+    "baseline_correct__level1_malformed_answer": 13,
+    "baseline_correct__level1_truncated_output": 4,
+    "baseline_incorrect__level1_correct": 13,
+    "baseline_incorrect__level1_incorrect": 46,
+    "baseline_incorrect__level1_malformed_answer": 8,
+    "baseline_incorrect__level1_truncated_output": 2,
+    "baseline_malformed_answer__level1_correct": 8,
+    "baseline_malformed_answer__level1_incorrect": 8,
+    "baseline_malformed_answer__level1_malformed_answer": 11,
+    "baseline_malformed_answer__level1_truncated_output": 1,
+    "baseline_truncated_output__level1_correct": 1,
+    "baseline_truncated_output__level1_incorrect": 1
+  },
+  "parser_diagnostics": {
+    "baseline": {
+      "all_explicit_final_choice_additional_correct": 9,
+      "broader_diagnostic_accuracy": 0.5454545454545454,
+      "broader_diagnostic_correct": 108,
+      "categories": {
+        "bold_final_label_with_numeric_option_text": 1,
+        "bold_whole_final_line_single_pure_label": 26,
+        "duplicate_final_markers_same_explicit_label": 1
+      },
+      "narrow_diagnostic_accuracy": 0.5404040404040404,
+      "narrow_diagnostic_correct": 107,
+      "narrow_presentation_only_additional_correct": 8,
+      "whole_line_bold_cases": 26
+    },
+    "level_01": {
+      "all_explicit_final_choice_additional_correct": 14,
+      "broader_diagnostic_accuracy": 0.5404040404040404,
+      "broader_diagnostic_correct": 107,
+      "categories": {
+        "bold_answer_alias_with_numeric_option_text": 1,
+        "bold_final_label_with_numeric_option_text": 2,
+        "bold_whole_final_line_single_pure_label": 28,
+        "empty_final_heading_plus_bold_whole_final_line_pure_label": 1
+      },
+      "narrow_diagnostic_accuracy": 0.5252525252525253,
+      "narrow_diagnostic_correct": 104,
+      "narrow_presentation_only_additional_correct": 11,
+      "whole_line_bold_cases": 28
+    }
+  },
+  "question_count_per_state": 198,
+  "question_text_responses_or_item_answer_keys_included": false,
+  "receipt_hash": "6f446296c0ad9f2cb860d061ff54f2421724ca20a8116cc075a57bb545d073a2",
+  "responses_reviewed": 396,
+  "scope": "post_hoc_read_only_response_audit_no_official_rescoring",
+  "source_code_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+  "states": {
+    "baseline": {
+      "count": 198,
+      "finish_reasons": {
+        "length": 2,
+        "stop": 196
+      },
+      "native_parse_reasons": {
+        "None": 196,
+        "missing_or_ambiguous_native_boundaries": 2
+      },
+      "reason_counts": {
+        "correct": 99,
+        "incorrect": 69,
+        "malformed_answer": 28,
+        "truncated_output": 2
+      },
+      "tokens": {
+        "max": 32000,
+        "mean": 5331.717171717171,
+        "median": 4756.5,
+        "min": 625,
+        "p90": 9911,
+        "total": 1055680
+      }
+    },
+    "level_01": {
+      "count": 198,
+      "finish_reasons": {
+        "length": 7,
+        "stop": 191
+      },
+      "native_parse_reasons": {
+        "None": 191,
+        "missing_or_ambiguous_native_boundaries": 7
+      },
+      "reason_counts": {
+        "correct": 93,
+        "incorrect": 66,
+        "malformed_answer": 32,
+        "truncated_output": 7
+      },
+      "tokens": {
+        "max": 32000,
+        "mean": 5720.535353535353,
+        "median": 4223.5,
+        "min": 512,
+        "p90": 10372,
+        "total": 1132666
+      }
+    }
+  },
+  "version": "gpqa_baseline_level1_response_audit_aggregate_v1"
+}

@@ -49,6 +49,13 @@ or trained state is claimed complete. See the
 
 ## Runtime and restored inputs
 
+The completed baseline scored 99/198 (50.00%) and level 1 scored 93/198
+(46.97%), both with verified Drive payloads. A [read-only response
+audit](gpqa_baseline_level1_response_audit.md) identifies a concrete bold-final
+presentation mismatch, more cutoffs at level 1 and inconsistent spontaneous
+encoding. Its post hoc diagnostic counts do not replace the frozen scores or
+alter the continuing campaign.
+
 Use RTX PRO 6000 Blackwell 96GB and the pinned evaluation environment: vLLM
 0.11.0, Torch 2.8.0+cu128, Transformers 4.57.3. The Torch 2.9 training environment
 is separate; an old PyTorch 2.4 template is not the required evaluation runtime.

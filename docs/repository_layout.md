@@ -106,6 +106,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       gpqa_14b_baseline_completion_2026_10_13.json
       gpqa_14b_rot13_drive_recovery_2026_10_14.json
       gpqa_14b_rot13_long_started_2026_10_14.json
+      gpqa_baseline_level1_response_audit_2026_10_15.json
       gpqa_preparation_receipt.json
       gpqa_variant_source.json
       judge_profile_guard_live_report.json
@@ -183,6 +184,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       vllm_sft_drive_readback_audit.json
     final_field_scoring.md
     gpqa_14b_rot13_campaign.md
+    gpqa_baseline_level1_response_audit.md
     implementation_acceptance.md
     implementation_prompt.md
     modules/

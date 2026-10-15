@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 582,
+  "files": 584,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1100,6 +1100,17 @@
       "blank": false
     },
     {
+      "path": "docs/evidence/gpqa_baseline_level1_response_audit_2026_10_15.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/evidence/gpqa_baseline_level1_response_audit_2026_10_15.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_8aa70b2cf978b0",
+      "blank": false
+    },
+    {
       "path": "docs/evidence/gpqa_preparation_receipt.json",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -1944,6 +1955,17 @@
       "display_path": "docs/gpqa_14b_rot13_campaign.md",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_cebddabf912a8d",
+      "blank": false
+    },
+    {
+      "path": "docs/gpqa_baseline_level1_response_audit.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/gpqa_baseline_level1_response_audit.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7a916f8c89910b",
       "blank": false
     },
     {
