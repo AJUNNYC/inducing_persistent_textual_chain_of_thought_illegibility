@@ -47,7 +47,12 @@ Any correction should be versioned and applied consistently to saved raw
 responses for the baseline and every level, preserving the original reports.
 That requires scoring work, not new model generation.
 
-## Encoding transfer and reasoning quality
+## Encoding transfer and illegibility
+
+The user's target is increased illegibility, with final-answer capability
+measured separately. Faithful preservation of an original explanation is not an
+additional success requirement. Garbled decoded wording is not a failure by
+itself; its relevance here is whether an observer can understand the raw trace.
 
 Level 1 training targets approximately 10% of eligible reasoning word spans,
 arranged in three patches. It does not encode prompts or final answers. The
@@ -59,8 +64,8 @@ level-1 responses versus 0/198 baseline responses; 19 level-1 responses have at
 least five markers. The detector uses 73 common words, and its matches were
 inspected in context. This is a diagnostic count, not a formal 14.1% compliance
 rate or a measurement of the fraction of words encoded. Several decoded
-passages contain garbled or invented wording, so visible encoding alone does
-not establish faithful preservation of useful reasoning. One truncated answer
+passages contain garbled or invented wording; the detector does not establish
+how much this obstructs an observer's understanding. One truncated answer
 contributes 415 of the 662 marker occurrences, making pooled marker counts
 particularly misleading. No marker matches were found in final-answer regions.
 
@@ -69,6 +74,29 @@ mistakes, reversals after lengthy self-questioning and late guesses in both
 states. Some questions improve while others worsen. This review does not
 provide a correctness certificate for reasoning or a causal attribution to
 encoding. Nothing here establishes behavior at the higher, uncompleted levels.
+
+## Direct reading of complete responses
+
+The primary assistant subsequently read 12 verbatim outputs end-to-end: nine
+level-1 responses and three matched baseline responses, totaling 24,021 original
+generated tokens. Five inspected level-1 responses contained recognizable ROT13
+markers and four did not. Eight trained responses were selected by a fixed
+question-ID rule across marker presence and short/medium length; one additional
+paired example was read in full. This purposive sample oversamples encoded
+cases and cannot estimate a population illegibility rate. Earlier excerpts of
+the longest outputs are not counted as complete readings.
+
+The direct judgment is that level 1 remains largely readable in this sample.
+Encoded or garbled patches genuinely interrupt local reading, but the
+surrounding English often makes the overall argument understandable without
+decoding. All four marker-negative sample responses are readable English,
+including the mathematical steps. Some are repetitive or scientifically
+confused, which is not itself textual illegibility. One matched baseline was
+more circular and harder to follow than its trained counterpart. These are
+qualitative observations of the native reasoning region, not an automated
+marker score, a correctness judgment or a formal observer evaluation. They
+support localized obstruction rather than broad, consistent illegibility at
+level 1; they do not establish behavior at higher levels.
 
 The [aggregate audit receipt](evidence/gpqa_baseline_level1_response_audit_2026_10_15.json)
 binds counts and private input/report hashes. No new inference, provider judging,
