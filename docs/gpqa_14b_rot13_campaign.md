@@ -133,6 +133,37 @@ output root to resume compatible raw records. Missing raw baseline evidence
 cannot be replaced with a summary score. Ordinary bad outputs are retained;
 eligible infrastructure recovery reuses or completes compatible work.
 
+### Automatic recovery of transient Drive publication failures
+
+The operations-only supervisor can run an existing frozen source checkout:
+
+```bash
+python scripts/run_gpqa_campaign_with_recovery.py \
+  --source-root /workspace/frozen_scientific_source \
+  --python /workspace/illegibility_vllm_eval_env/bin/python \
+  --panel /workspace/data/evaluation/supplemental_gpqa/gpqa_diamond_panel.json \
+  --adapters-manifest /workspace/rot13_14b_adapters.json \
+  --model-cache /workspace/model_cache \
+  --output-root /workspace/artifacts/evaluation/gpqa_rot13_14b_long32000 \
+  --monitor-root /workspace/gpqa_recovery_monitor
+```
+
+Retain the frozen checkout's `SOURCE_CODE_COMMIT`, private Drive file selectors
+and worker identity. The supervisor invokes that checkout's unchanged campaign
+CLI, observes newly appended failure messages, and retries only the known
+artifact-publication failure with transient transport error classes. It stops
+its own failed process group, invokes the frozen implementation's incremental
+Drive synchronization once, and resumes only after every registry record is
+verified. Unknown failures, unsuccessful repairs and the bounded recovery limit
+stop the supervisor. Separate locks prevent duplicate campaign workers.
+
+Only saved compatible raw responses survive a failed batch; responses completed
+in memory but not written may require generation again. The supervisor preserves
+protocols, scientific code identity, scores, native retry ledgers and verified
+artifacts. Its private status and events are operational records, not Drive
+completion evidence. This avoids waiting for a manual status check to discover
+the recurring upload failure and hung engine shutdown.
+
 ## Completion and runtime reporting
 
 Completion requires 198 baseline outputs and scores, 1,980 trained outputs and
@@ -140,10 +171,11 @@ scores, ten paired reports and verified Drive inventories/receipts. Local caches
 or a running process alone do not prove backup. Malformed and truncated answers
 remain in the denominator. Reused baseline records are not fresh predictions.
 
-Use **about 22 hours** on one PRO 6000 as a provisional planning estimate,
-including ordinary Drive publication. The 32k workload has not been timed;
-this is not measured throughput, a deadline or a promise. Update the estimate
-from actual token and item progress after startup.
+The initial **22-hour** planning estimate was provisional. Observed full-budget
+states have taken several hours each, and upload failures have added idle time.
+Use actual completion timestamps, token counts and current state progress to
+update the remaining duration; the initial estimate is not measured throughput
+or a completion deadline.
 
 See the [module contract](modules/evaluation/supplemental_gpqa.md) for source
 handling, profile isolation and limitations, and the

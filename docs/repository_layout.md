@@ -363,6 +363,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_certified_sft.py
     run_collection_until.py
     run_experiment.py
+    run_gpqa_campaign_with_recovery.py
     run_gpqa_sft_campaign.py
     run_model_generation_worker.py
     run_optimized_sft_queue.py
@@ -719,6 +720,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           test_model_evaluation.py
         test_evaluation.py
         test_gpqa_campaign.py
+        test_gpqa_campaign_recovery.py
         test_gpqa_restore_inputs.py
         test_supplemental_gpqa.py
       experiment_overview/
