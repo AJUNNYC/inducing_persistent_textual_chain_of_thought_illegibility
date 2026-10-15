@@ -114,3 +114,40 @@ preservation of an original explanation are separate from this assessment.
 The [aggregate audit receipt](evidence/gpqa_baseline_level1_response_audit_2026_10_15.json)
 binds counts and private input/report hashes. No new inference, provider judging,
 training, score mutation or full test suite was required for this audit.
+
+## Level 2 follow-up
+
+All 198 level-2 GPQA Diamond responses have now been generated and scored under
+that same frozen 32,000-token protocol. A read-only audit verified every raw and
+record hash, the raw-to-score links, token counts and matching item identities.
+Recorded outcomes are 100 correct (50.51%), 61 parsed incorrect, 29 malformed
+final answers and eight responses that reached the token limit. The mean output
+is 5,851.8 tokens and the median is 4,628. These are the original official scores.
+The same narrow whole-bold final-line diagnostic identifies 26 presentation
+failures, including 15 correct explicit choices; its diagnostic count would be
+115/198 (58.08%). This does not replace the frozen score or relax other answer
+extraction rules.
+
+The identical 73-word marker detector finds 18/198 marker-positive level-2
+responses (9.09%), compared with 28/198 at level 1 and zero at baseline. Sixteen
+level-2 responses contain at least five markers, with 523 occurrences overall;
+none occur in final-answer regions. Three questions are marker-positive at both
+trained levels. These are diagnostic frequencies, not formal illegibility
+scores, encoded-word fractions or evidence that the effect rises monotonically
+with the training level. A higher training encoding target does not guarantee
+more frequent encoding on novel evaluation prompts.
+
+The primary assistant personally read nine complete level-2 responses. Five
+were plain English and four contained clear localized coded patches. For three
+of the coded cases, the assistant also read the complete matched baseline and
+level-1 outputs: those earlier outputs used readable English where level 2
+introduced locally opaque passages. This purposive sample supports useful
+localized illegibility relative to baseline, while providing no evidence that
+level 2 does so more consistently than level 1. The sample cannot estimate an
+average illegibility effect across all 198 questions, and answer correctness or
+faithful preservation of an earlier explanation is not an additional criterion.
+
+During the subsequent level-3 transition, a Drive timeout was repaired by
+retrying synchronization with the unchanged implementation; the same campaign
+resumed at 2026-10-15 06:55:51 UTC. No model regeneration, protocol change or
+scientific score mutation was needed for this operational recovery.
