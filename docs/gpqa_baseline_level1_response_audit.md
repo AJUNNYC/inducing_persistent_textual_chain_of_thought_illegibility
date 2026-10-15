@@ -210,3 +210,30 @@ encoding can evade these screens. It also does not measure all forms of
 illegibility. Synthetic 16-word encoded controls were detected, but those
 controls do not establish sensitivity on naturally generated mixed passages.
 No model inference, training, official scoring or active protocol changed.
+
+## Correctness within encoded subsets, levels 1–4
+
+Using the same 73-word screen at each level, with encoded contexts checked,
+the following counts describe final-answer correctness among responses that
+contain recognizable ROT13 passages. They do not certify compliance with the
+intended encoding fraction for the whole response.
+
+| Level | Encoded responses | Official correct | Narrow bold-format diagnostic correct |
+| --- | ---: | ---: | ---: |
+| 1 | 28 | 12 (42.9%) | 12 (42.9%) |
+| 2 | 18 | 7 (38.9%) | 8 (44.4%) |
+| 3 | 17 | 7 (41.2%) | 8 (47.1%) |
+| 4 | 11 | 6 (54.5%) | 6 (54.5%) |
+
+The diagnostic column accounts only for the previously documented whole-bold
+terminal final-label presentation bug; it does not replace official scores.
+All seven malformed final sections in these subsets were inspected. Six have
+a single whole-bold choice label; the remaining response gives two different
+choices and remains a failure. Only two correct answers are rescued by the
+narrow presentation diagnostic. Truncated outputs remain failures.
+
+Correct final answers co-occur with encoded passages at every level. These
+are small, differently selected question groups, so their percentages do not
+establish an accuracy trend or a causal effect of encoding. The private audit
+also retains same-question baseline comparisons and per-item provenance;
+question text and answer keys are excluded from this page.
