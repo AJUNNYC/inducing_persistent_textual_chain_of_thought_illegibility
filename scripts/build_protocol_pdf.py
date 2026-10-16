@@ -91,7 +91,8 @@ def main():
                                         'ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched',
                                         'separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts',
                                         'new level-10 GPQA immutable protocol and observed inference; official results pending',
-                                        'private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion']
+                                        'private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion',
+                                        'same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending']
     provenance_path.write_text(json.dumps(provenance, indent=2)+'\n')
     print(f'Built {len(doc)}-page integrated protocol; refreshed extraction and provenance')
     doc.close()

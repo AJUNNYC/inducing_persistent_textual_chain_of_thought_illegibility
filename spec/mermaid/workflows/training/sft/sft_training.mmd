@@ -5,7 +5,8 @@ flowchart TD
 %% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
 %% 26 Drive artifacts verified; trainer exit0. NewL10 GPQA inference observed11:52:41UTC.
 %% 13:39:40 provisional42completed:37 positives sustained in reviewed passages;17capped loop.
-%% Completion-biased/unmapped, decodedterms garbled; official full198 results pending.
+%% Same42 later mapped13:55; diagnosticcorrect new11/original22/base23; no full198estimate.
+%% Completion-selected,decodedterms garbled; nativeofficial/full198 results pending.
 %% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
@@ -44,7 +45,7 @@ flowchart TD
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
     CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
     POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; official results pending"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Provisional42 snapshot distinct from native completion<br/>Looping and garbled decoded terms; no accuracy claim<br/>New raw/scores/report pending; levels7-9 paused"]
+    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Mappedfixed42 diagnostic correct:11new/22old/23base<br/>Looping/garbled terms; no full198 accuracy estimate<br/>New raw/scores/report pending; levels7-9 paused"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT

@@ -2,7 +2,8 @@ flowchart TD
 %% 16Oct extra epoch COMPLETE625/cumulative1250,26 Driveverified,trainerexit0; original levels7-9 paused.
 %% NewL10 inference observed11:52:41UTC; full198 unchanged, native raw/scores/receipt pending.
 %% 13:39:40UTC private42completed snapshot;37markerpositive; bounded review sustained in sampled passages.
-%% Completion-biased/unmapped;17capped loop; no full-response/level10/comprehension/accuracy claim.
+%% Historical13:39unmapped;13:55exactfixed42 mapping/replay resolved. New11correct/original22/base23.
+%% Completion-selecteddiagnostics only;17capped loop; no full198/level10/comprehension/causalclaim.
     O[Official pinned GPQA Diamond CSV: all 198 questions] --> P[Fixed panel, seed-42 option permutation and native prompt]
     PROFILE[GPQA-only long_32000<br/>32,000 new tokens; vLLM context 40,960<br/>8 concurrent sequences; request groups 128<br/>Scheduler 8,192; BF16; unchanged sampling] --> BF
     P --> BF[Freeze new matching untouched baseline before inference]
@@ -27,8 +28,12 @@ flowchart TD
     GATE -->|No| HOLD[Wait or stop on pause/failure<br/>No evaluation launched; preserve original outputs]
     GATE -->|Yes| POST[Running: new-adapter L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer<br/>Protocol57898f79; official full-panel results pending]
     POST -. read-only observation, no inference changes .-> OBS[Private13:39:40 snapshot:42 already-completed requests<br/>73-type screen:37 positive,52793 occurrences<br/>Bounded review sustained ROT13 in positive passages<br/>Five negatives English/math;648941 tokens]
-    OBS --> OBSLIMIT[Provisional completion-biased subset; IDs unmapped<br/>25 stop;17 length; all17 capped loop,16positive1English<br/>21 positives stop; decoded technical terms often garbled<br/>No full-response/target-level/comprehension/accuracy claim]
+    OBS --> OBSLIMIT[At13:39 completion-biased subset; IDs then unmapped<br/>25 stop;17 length; all17 capped loop,16positive1English<br/>21 positives stop; decoded technical terms often garbled<br/>No full-response/target-level/comprehension/full198 claim]
     OBSLIMIT --> OBSDRIVE[Separate8-file observational bundle Drive-verified<br/>Not native raw/scores or evaluation completion<br/>Zero new native raw/official scores at snapshot]
+    OBSDRIVE -. same42, no regeneration or exclusions .-> IDMAP[13:55 exact frozen prompt-token hash mapping<br/>Native-equivalent generated-ID decode<br/>All42 texts identical to original snapshot]
+    IDMAP --> DIAG[Offline frozen-scorer replay on same42<br/>Correct:newL10 11,originalL10 22,matchingbase23<br/>New:11parsedwrong,3malformed,17truncated<br/>Original-new pairs:9TT,13TF,2FT,18FF]
+    DIAG --> DLIMIT[Completion-selected before correctness; no full198 estimate<br/>8of37positives and3of5negatives correct<br/>Native raw/official scores0;diagnostic raw_hash=None<br/>No comprehension/faithfulness/isolatedepoch proof]
+    DLIMIT --> DGBACK[Separate13-file correctness bundle Drive-verified<br/>554local audit checks and126scorer replays<br/>Not native raw/scoring/completion receipt]
     PROFILE --> POST
     P --> POST
     POST --> POSTRAW[Continue unchanged:198 responses up to32000 tokens each<br/>Same mechanical final-label scoring<br/>No retry-until-correct or baseline regeneration]

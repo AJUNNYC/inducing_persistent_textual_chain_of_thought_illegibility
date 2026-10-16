@@ -25,15 +25,24 @@ the five negatives showed English/math. Of 25 `stop` and 17 `length` requests,
 including one English output; repetition inflates marker counts. Decoded
 technical terms were often garbled.
 
-This is a completion-biased subset with request IDs not yet question-mapped,
-zero new native raw records and zero official scores at the snapshot. It does
-not establish full-response coverage, target-level compliance, comprehension,
-accuracy or a full-198 encoding rate. The [private eight-file observational
+At that 13:39 snapshot the completion-biased subset was question-unmapped, with
+zero new native raw/official scores. At 13:55:01.947404 UTC a second read-only
+capture mapped the same 42 via exact frozen prompt-token hashes; native-equivalent
+decoding matched all earlier texts. Unchanged scorer replay, including its
+bold-final limitation, gave new L10 11/42 correct, 11 parsed wrong, 3 malformed
+and 17 truncated, versus original L10 22/42 and base 23/42. Eight of 37 positives
+and 3/5 negatives were correct. These offline diagnostics (`raw_hash=None`) do
+not establish full-198 accuracy, full-response coverage, target-level compliance,
+comprehension, faithful reasoning or an isolated epoch effect. Native new raw
+and official scores remained zero; full matched inference continues unchanged. The [private eight-file observational
 bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
 is separately Drive-verified, not a native completion receipt. No target methods
 were called, no memory mutated and no inference paused. See the
 [diagnosis record](../../sft_level10_training_diagnosis.md#provisional-completed-request-observations-133940-utc)
-for hashes and limitations; no question text or response snippets are in Git.
+for the paired table, hashes and limitations. The later [13-file correctness
+bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
+is separately Drive-verified, also not native completion. No question text or
+prompt/response/token values are in Git.
 
 Preserve the frozen `5e6be1b` evaluator, full 198-question panel, native
 prompts/option order/per-item seeds, 32,000-token budget, BF16 vLLM settings and

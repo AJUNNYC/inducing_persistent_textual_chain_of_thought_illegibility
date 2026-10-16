@@ -31,29 +31,41 @@ official results remain pending. Original levels 7, 8 and 9 stay paused. The
 original campaign, original L10 control (98/198; 0/198 positives under the fixed
 marker screen) and matching untouched baseline (99/198) are retained and reused.
 
-At **13:39:40.342734 UTC**, a private read-only snapshot contained all 42 requests
-already completed in the current group, totaling 648,941 generated tokens. A
-fixed 73-type ROT13 marker screen flagged **37/42**, with 52,793 occurrences.
-Independent bounded opening/middle/end review found sustained ROT13 in reviewed
-passages of all 37 positives; the five negatives showed English/math. These are
-provisional observations of extended ROT13-form output, not full-response
-coverage or prescribed level-10 compliance.
+At **13:39:40 UTC**, a private snapshot captured 42 already-completed requests:
+37 marker-positive with sustained ROT13 in bounded reviewed passages, five
+English/math negatives; all 17 capped outputs looped and decoded technical terms
+were often garbled. At that time the requests were not question-mapped and no
+new native raw/official scores existed. The [eight-file observational
+bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
+remains a separate verified backup.
 
-Of the 42 requests, 25 had finish reason `stop` and 17 `length`. The positives
-comprised 21 `stop` and 16 `length`; the remaining capped request was English.
-All 17 capped outputs looped in reviewed passages, inflating marker counts, and
-decoded technical terms were often garbled. The subset is completion-biased and
-request IDs are not yet question-mapped. There were **zero new native raw records
-and zero official scores** at this snapshot. No new accuracy, full-panel encoding
-rate or comprehension claim follows; the full 198 questions must finish under
-the unchanged protocol before a matched official comparison.
+At **13:55:01.947404 UTC**, a second read-only capture mapped exactly the same 42
+requests to frozen question identities using full prompt-token hashes. Generated
+IDs decoded exactly to all 42 earlier texts under matching native tokenizer
+versions. No generation, selection or frozen scorer behavior changed, including
+its known bold-final limitation. Offline provisional scores on these same questions:
 
-The [eight-file private observational bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
-is Drive-verified separately from native evaluation completion. The observer
-called no target methods, changed no target memory and did not pause inference.
-See the [diagnosis record](sft_level10_training_diagnosis.md#provisional-completed-request-observations-133940-utc)
-for capture/review hashes and limitations. No question text or response snippets
-are included in Git.
+| State | Correct / 42 | Parsed wrong | Malformed | Truncated |
+| --- | ---: | ---: | ---: | ---: |
+| Matching untouched base | 23 (54.76%) | 17 | 2 | 0 |
+| Original L10 | 22 (52.38%) | 15 | 4 | 1 |
+| New L10 extra epoch | 11 (26.19%) | 11 | 3 | 17 |
+
+Original-to-new: 9 both correct, 13 correct-to-incorrect, 2 incorrect-to-correct,
+18 both incorrect (including malformed/truncated). Eight of 37 marker positives were correct (8/21 `stop`, 0/16
+capped), versus 3/5 negatives. Increased observed encoding coincides with lower
+diagnostic accuracy in this **completion-selected subset**, not a full-panel
+estimate or proof of comprehension, faithfulness or an isolated epoch effect.
+
+Independent audit passed 554 checks and replayed 42 new/84 control scores.
+Diagnostic records have `raw_hash=None`; zero new native raw/official scores
+existed at this stage. The unchanged 198-question run continues; native scores
+and completion still require the request group to return and final verified
+artifacts. See the [diagnosis record](sft_level10_training_diagnosis.md#provisional-fixed-42-correctness-identity-capture-at-135501-utc)
+for exact identity/decoder/scorer provenance and private-evidence hashes. The
+[13-file correctness bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
+is Drive-verified separately from the earlier eight-file observation and native
+completion. No question text or prompt/response/token values are included in Git.
 
 Evaluate all 198 Diamond questions with the original `long_32000` contract:
 32,000 new tokens per response, context 40,960, eight concurrent sequences,

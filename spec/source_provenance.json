@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "bf30b63ab4ef7b099351bec38b0285d15240f46c052a1df2924dccdf8d1dfa39"
+    "sha256": "7440aa1a759f4aa9079fd7455a140d5e312b383e0b5d2d2e4dd23c55ef966c77"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -30,9 +30,10 @@
     "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched",
     "separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts",
     "new level-10 GPQA immutable protocol and observed inference; official results pending",
-    "private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion"
+    "private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion",
+    "same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending"
   ],
-  "procedure_update_sha256": "28dad1e848beceb45edd7efaab216716426c27c2ac2cfe0b9c4b779ebf65fded",
+  "procedure_update_sha256": "4f0b751108068fdbb14a770e7f7eee723e0bb3bfc392296194041405f544a15d",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -895,6 +896,110 @@
       "status": "VERIFIED",
       "native_checkpoint_or_evaluation_completion_barrier": false
     },
-    "question_text_or_response_snippets_included_in_git": false
+    "question_text_or_response_snippets_included_in_git": false,
+    "status_scope": "historical_2026-10-16T13:39:40.342734+00:00_unmapped_snapshot; subsequent_identity_and_diagnostic_scores_in_gpqa_level10_epoch02_fixed42_correctness"
+  },
+  "gpqa_level10_epoch02_fixed42_correctness": {
+    "status": "PROVISIONAL_OFFLINE_FIXED42_SCORER_REPLAY_NOT_NATIVE_OFFICIAL",
+    "identity_capture_at_utc": "2026-10-16T13:55:01.947404+00:00",
+    "fixed_selection_at_utc": "2026-10-16T13:39:40.342734+00:00",
+    "full198_status": "RUNNING_UNCHANGED_NATIVE_OFFICIAL_RESULTS_PENDING",
+    "selection": "same42_previously_completed_requests_fixed_before_correctness_inspection; completion_selected_nonrandom_not_full198_estimate",
+    "all42_included": true,
+    "responses_regenerated": false,
+    "outcome_exclusions": 0,
+    "evaluation_source_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+    "protocol_hash": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
+    "frozen_scorer_unchanged_including_bold_final_limitation": true,
+    "identity_binding": {
+      "method": "exact_full_input_token_vector_sha256_matches_to_frozen198_prompt_map",
+      "frozen_prompt_map_count": 198,
+      "uniquely_matched_selected_requests": 42,
+      "generated_ids_decode_method": "native_skip_special_tokens_false_then_single_terminal_eos_strip",
+      "decoded_texts_identical_to_prior_snapshot": 42,
+      "native_and_host_versions_match": true,
+      "transformers": "4.57.3",
+      "tokenizers": "0.22.2",
+      "identity_snapshot_sha256": "43774975aaa4465b866e8d7a696b12a74e0711083f1022fb84b035da06bfdf11",
+      "identity_helper_sha256": "a2872a6d42828bd6964f77910ed2f32b6ee3d3b9ca1720f2fb4836c42c6c28ab",
+      "target_methods_called": false,
+      "target_memory_mutated": false,
+      "target_paused": false
+    },
+    "same_question_diagnostic_counts": {
+      "denominator": 42,
+      "matching_base": {
+        "correct": 23,
+        "incorrect": 17,
+        "malformed_answer": 2,
+        "truncated_output": 0
+      },
+      "original_level10": {
+        "correct": 22,
+        "incorrect": 15,
+        "malformed_answer": 4,
+        "truncated_output": 1
+      },
+      "new_extra_epoch_level10": {
+        "correct": 11,
+        "incorrect": 11,
+        "malformed_answer": 3,
+        "truncated_output": 17
+      }
+    },
+    "original_to_new_binary_correctness_pairs": {
+      "TT": 9,
+      "TF": 13,
+      "FT": 2,
+      "FF": 18
+    },
+    "marker_diagnostic_correctness": {
+      "positive": {
+        "count": 37,
+        "correct": 8
+      },
+      "negative": {
+        "count": 5,
+        "correct": 3
+      },
+      "positive_stop": {
+        "count": 21,
+        "correct": 8
+      },
+      "positive_capped": {
+        "count": 16,
+        "correct": 0
+      }
+    },
+    "independent_local_audit": {
+      "status": "PASS",
+      "checks_passed": 554,
+      "new_scorer_replays": 42,
+      "cached_control_scorer_replays": 84,
+      "new_gpu_tests_run": false,
+      "live_process_independently_reobserved_by_local_audit": false,
+      "sha256": "c0c67743dfbd6d834017aae466cd45170334925d73c3bc7cd193df6e53c22ad9"
+    },
+    "diagnostic_raw_hash": null,
+    "new_native_raw_records_created": 0,
+    "new_native_official_scores_created": 0,
+    "native_evaluation_completion_receipt_available": false,
+    "full198_accuracy_estimate_supported": false,
+    "comprehension_established": false,
+    "faithful_reasoning_established": false,
+    "isolated_epoch_effect_established": false,
+    "combined_intervention": [
+      "additional_exposure",
+      "cosine_schedule_restart",
+      "native_think_newline_alignment"
+    ],
+    "private_correctness_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx",
+      "status": "VERIFIED",
+      "verified_file_count": 13,
+      "separate_from_eight_file_observational_bundle": true,
+      "native_checkpoint_or_evaluation_completion_barrier": false
+    },
+    "question_prompt_response_or_token_values_included_in_git": false
   }
 }

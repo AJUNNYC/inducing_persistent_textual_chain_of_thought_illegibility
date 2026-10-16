@@ -30,13 +30,17 @@ A private 13:39:40 UTC snapshot held 42 already-completed requests. A fixed
 found sustained ROT13 in their reviewed passages, while five negatives showed
 English/math. Of 25 `stop` and 17 `length` requests, all 17 capped outputs looped
 (16 marker-positive, one English); decoded technical terms were often garbled.
-This completion-biased, question-unmapped subset is provisional: zero new native
-raw records and zero official scores existed at that snapshot. Full-response
-encoding, prescribed level-10 compliance, comprehension and full-panel accuracy
-remain unestablished. The unchanged 198-question run continues; levels 7-9 stay
-paused. The [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md)
-links the separate eight-file Drive-verified observational bundle and its hashes;
-it is not native evaluation completion.
+At 13:55:01 UTC, exact frozen prompt-token hashes mapped the same 42 requests,
+and native-equivalent decoding reproduced all earlier texts. Unchanged frozen
+scorer replay gave new L10 11/42 correct (11 parsed wrong, 3 malformed, 17
+truncated), versus original L10 22/42 and matching base 23/42. Eight of 37 marker
+positives and 3/5 negatives were correct. This is a completion-selected diagnostic
+subset, not a full-panel estimate or proof of comprehension, faithfulness or an
+isolated epoch effect. Native raw/official scores remained zero; diagnostic
+`raw_hash=None` does not satisfy completion. The unchanged 198-question run
+continues; levels 7-9 stay paused. The [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md)
+contains the paired table and separate 8-file observation/13-file correctness
+Drive backups; neither is native evaluation completion.
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
@@ -129,7 +133,8 @@ flowchart TD
 %% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
 %% 26 Drive artifacts verified; trainer exit0. NewL10 GPQA inference observed11:52:41UTC.
 %% 13:39:40 provisional42completed:37 positives sustained in reviewed passages;17capped loop.
-%% Completion-biased/unmapped, decodedterms garbled; official full198 results pending.
+%% Same42 later mapped13:55; diagnosticcorrect new11/original22/base23; no full198estimate.
+%% Completion-selected,decodedterms garbled; nativeofficial/full198 results pending.
 %% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
@@ -168,7 +173,7 @@ flowchart TD
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
     CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
     POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; official results pending"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Provisional42 snapshot distinct from native completion<br/>Looping and garbled decoded terms; no accuracy claim<br/>New raw/scores/report pending; levels7-9 paused"]
+    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Mappedfixed42 diagnostic correct:11new/22old/23base<br/>Looping/garbled terms; no full198 accuracy estimate<br/>New raw/scores/report pending; levels7-9 paused"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT

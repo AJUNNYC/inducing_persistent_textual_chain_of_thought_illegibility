@@ -118,8 +118,9 @@ optimizer update.
 This combines additional exposure, a schedule restart and a serialization
 change. Any improvement cannot be attributed to epoch count alone. The provisional
 snapshot below supports sustained ROT13 in reviewed passages from some completed
-requests; it does not establish population-wide encoding, answer correctness or
-capability retention.
+requests; it does not establish population-wide encoding or capability retention.
+The later fixed-42 diagnostic scores below measure correctness only within that
+completion-selected subset.
 Low validation loss does not guarantee either. No higher learning rate, new
 training corpus or repeated full GPQA campaign is included in this phase.
 
@@ -193,7 +194,8 @@ comprehension, correct answers or faithful reasoning.
 The **42 requests are completion-biased**, not a random or representative sample
 of all 198, and their request IDs were not yet mapped to question IDs. At this
 snapshot there were **zero new native raw records and zero official scores**;
-outputs remained in memory until the request group returned. Do not extrapolate
+outputs remained in memory until the request group returned. The separate 13:55
+identity/scoring stage below later resolved mapping for exactly these 42 requests. Do not extrapolate
 37/42 to the full panel or call it an accuracy or final encoding rate. The
 original L10 control had 0/198 positives under the same marker screen and scored
 98/198 officially, versus the matching base's 99/198. That historical contrast
@@ -214,6 +216,54 @@ observer helper SHA-256 is
 The helper is a private observational bootstrap, not the canonical evaluator.
 The frozen `5e6be1b` source, protocol `57898f79...`, 32,000-token allowance,
 native prompts, item seeds and scorer remain unchanged for all 198 questions.
+
+## Provisional fixed-42 correctness, identity capture at 13:55:01 UTC
+
+A second bounded read-only capture at **2026-10-16 13:55:01.947404 UTC** resolved
+the identities of the same 42 requests selected at 13:39, before correctness was
+known. Full input-token-vector hashes matched uniquely to the frozen 198-prompt
+map. Full generated IDs decoded exactly as native output (`skip_special_tokens=False`
+with one terminal EOS stripped); all 42 texts matched the earlier snapshot.
+Host/native Transformers 4.57.3 and tokenizers 0.22.2 matched. No response was
+regenerated or excluded, and no native artifacts were created.
+
+The unchanged frozen `5e6be1b` scorer, including its known bold-final presentation
+limitation, produced these **offline provisional scores on the same 42 questions**:
+
+| State | Correct / 42 | Parsed wrong | Malformed | Truncated |
+| --- | ---: | ---: | ---: | ---: |
+| Matching untouched base | 23 (54.76%) | 17 | 2 | 0 |
+| Original L10 | 22 (52.38%) | 15 | 4 | 1 |
+| New L10 extra epoch | 11 (26.19%) | 11 | 3 | 17 |
+
+Original-to-new pairs were 9 both correct, 13 correct-to-incorrect, 2
+incorrect-to-correct and 18 both incorrect (including malformed/truncated). Among 37 marker positives, 8 were
+correct: all were among the 21 `stop` requests; the 16 capped positives were
+incorrect. Three of five marker negatives were correct. This subset therefore
+shows increased observed encoding alongside lower diagnostic accuracy, with
+looping and truncation. It does not establish comprehension, faithful reasoning
+or an isolated epoch effect.
+
+Independent local audit passed **554 checks**, replaying the scorer on all 42
+new and 84 cached control responses; no new GPU tests ran. These are diagnostic
+scores with `raw_hash=None`, **not native official scored records**. Zero new
+native raw/official scores existed at this stage. The full 198-question run
+continues unchanged; native group-output publication awaits the 128-request
+group's return, and all 198 remain required. The 42 remain a
+completion-selected, nonrandom subset; their scores are not estimates of final
+198-question performance. The earlier unmapped/zero-score statement remains a
+dated description of the 13:39 snapshot.
+
+Identity snapshot SHA-256:
+`43774975aaa4465b866e8d7a696b12a74e0711083f1022fb84b035da06bfdf11`;
+identity helper:
+`a2872a6d42828bd6964f77910ed2f32b6ee3d3b9ca1720f2fb4836c42c6c28ab`;
+independent correctness audit:
+`c0c67743dfbd6d834017aae466cd45170334925d73c3bc7cd193df6e53c22ad9`.
+The [private fixed-42 correctness bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
+has 13 verified Drive files including its receipt. Prompt/response/token values
+remain private. This identity/scoring backup is separate from both the earlier
+eight-file observational bundle and native completion.
 
 ## Prepared development screen; prefix comparison deferred
 
