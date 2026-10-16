@@ -285,3 +285,36 @@ The private compressed scores/completion-receipt export
 (`level06_scores_and_receipt.json.gz`) has SHA-256
 `3b22917749a7bd653c68cf59c674f75bcd7d991c358824c666cf82b7e5bd31a0`;
 licensed question text and answer keys are excluded from this page.
+
+## Level-10 follow-up, 16 October 2026 UTC
+
+Level 10 completed all 198 full-budget responses and its verified Drive barrier.
+Official outcomes were 98 correct (49.49%), 73 incorrect, 25 malformed and two
+truncated, compared with the baseline's 99/198 (50.00%). An independent join
+verified all 198 response-to-score raw-hash links; the official scores and
+protocol remain unchanged.
+
+Before consulting correctness scores, the same fixed 73-word screen found zero
+marker-positive responses among all 198 outputs. All 128 responses in the
+earlier provisional export were retained unchanged in the full export. Manual
+review covered selected negative examples, including start, middle and end
+excerpts from three question IDs selected from the additional 70 responses
+before reading their contents. Those excerpts read as ordinary English with
+scientific notation. This is limited excerpt review, not exhaustive manual
+judging of all 198 outputs. The fixed detector can miss short, unusual-word,
+partial or garbled encoding and other forms of illegibility; zero hits must
+not be described as proof that every possible encoding is absent.
+
+These observations do not demonstrate reliable full ROT13 at the level-10
+checkpoint or an increasing encoding-frequency gradient. A read-only source
+and adapter-selection audit found no identified selection fault, but source
+inspection is not a functional adapter-on/off ablation. A separate diagnostic
+comparison of native reasoning prefixes was proposed before deciding whether
+to add training epochs; that diagnostic and additional training have not been
+launched. The frozen evaluation remains the original result.
+
+The private compressed full response-only export has SHA-256
+`b2396428620c96171450fd31442e7e8e3c29c50604a757db3f857b16aabe60c9`.
+The private compressed scores/completion-receipt export has SHA-256
+`3e46bae4fb2bf99c266b02b091ec9d6276959d0543013ea70208316d2c5f798b`.
+Licensed question text and answer keys are excluded from this page.

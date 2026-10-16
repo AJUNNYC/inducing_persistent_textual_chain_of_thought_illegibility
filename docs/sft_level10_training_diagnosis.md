@@ -56,7 +56,22 @@ found no overlap with either model's SFT training/validation prompts, the full
 acquired four-benchmark evaluation pools, or GPQA Diamond. This does not claim
 semantic decontamination or exclusion from base-model pretraining.
 
-The prepared comparison has three states: untouched 14B base, original level-10
+Before spending on another epoch or a higher learning rate, the recommended next
+step is a small controlled prefix comparison on a fixed subset of this panel.
+Compare native `<think>\n` with training-matched `<think>`, then a fixed,
+answer-independent ROT13 starter with its plain-English counterpart, using both
+the untouched base and original level-10 adapter. Hold questions, sampling and
+the 3,072-token ceiling fixed; exclude supplied starter tokens from encoding
+counts and retain correctness, truncation and joint-success outcomes.
+Teacher forcing supplies encoded context during training, whereas free
+generation can enter English and continue there. This makes initiation and
+sustained generation worth distinguishing; it does not establish exposure bias
+or the newline as a measured cause. A starter-induced improvement also does not
+establish spontaneous encoding. This diagnostic is proposed only, has not been
+launched, and does not change the running frozen GPQA campaign or training targets.
+
+If subsequent development evidence supports extra training, the prepared
+continuation comparison has three states: untouched 14B base, original level-10
 adapter, and a proposed separately identified continuation. It uses the same
 64 questions, ordinary GSM8K prompts without an encoding instruction, fixed
 sampling settings, one response per state/question and the existing 3,072-token
