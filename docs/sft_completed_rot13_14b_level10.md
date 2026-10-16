@@ -4,7 +4,30 @@
 
 All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. The priority queue was observed complete on 14 October 2026. The original [GPQA campaign](gpqa_14b_rot13_campaign.md) retains its 32,000-token baseline and completed original-adapter results. Its remaining levels 7-9 are paused. The sections below retain the dated level-10 measurement, original budget forecasts and subsequent priority change.
 
-On 16 October, the separately identified L10 extra epoch completed 625 additional/1,250 cumulative updates and 10,000 additional/20,000 cumulative examples, processing 17,996,003 training tokens. Validation loss was `0.6151581262983382` on 100 cases. The final adapter/full checkpoint and 26 required Drive artifacts are verified; the trainer exited with code zero. The fit took 17,470.26931851078 seconds (about 4h51m), roughly three times the original 96.6-minute fit; the slowdown's cause is unknown. This exposure/schedule/newline revision keeps training source `3a89691` and a separate endpoint; it does not replace the original fit. The GPQA dispatcher reported `RUNNING` at 11:31:53 UTC, preparing only the new L10 follow-up; actual new-adapter inference was observed at 11:52:41 UTC under protocol `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`. It reuses the matching base (99/198) and original L10 (98/198) controls with identical 198-question/32k settings. A private 13:39:40 UTC snapshot of 42 already-completed, question-unmapped requests provisionally shows sustained ROT13 in reviewed passages of all 37 marker-positive requests; five negatives showed English/math. All 17 capped outputs looped (16 positive, one English), and decoded technical terms were often garbled. This subset had zero new native raw/official scores at that time. At 13:55:01 UTC, exact frozen prompt-token mapping and native-equivalent decoding resolved the same 42; unchanged diagnostic scorer replay gave new L10 11/42 correct (11 parsed wrong, 3 malformed, 17 truncated), versus original L10 22/42 and base 23/42. The subset was fixed before correctness inspection but remains completion-selected, not a full-panel estimate. Full-response compliance, comprehension, faithfulness and isolated epoch benefit remain unestablished; native official scores/completion remain pending as all 198 continue unchanged. See the [continuation diagnosis](sft_level10_training_diagnosis.md) for the paired table, exact hashes and separate verified 8-file observation/13-file correctness backups.
+On 16 October, the separate L10 extra epoch completed 625 additional updates
+(1,250 cumulative), 10,000 additional examples (20,000 cumulative) and 17,996,003
+tokens. Validation loss was 0.6151581262983382 on 100 cases. The final adapter,
+full state and 26 required Drive artifacts are verified; the trainer exited
+with code zero. Fit time was 17,470.2693 seconds (4h51m), about three times the
+original 96.6-minute fit; the slowdown's cause is unknown. Training source
+`3a89691` and the separate endpoint remain unchanged. Exposure, schedule and
+newline alignment changed jointly.
+
+The current GPQA evidence is the first 128 verified native raw/score pairs under
+frozen evaluator `5e6be1b` and protocol `57898f79...`, with exact 128/128 CPU parity
+and 42/42 parity against the earlier snapshot. On these same 128 questions,
+frozen-correct counts are 35/128 for the new adapter, 61/128 for original L10 and
+70/128 for the base. Separate visible-choice diagnostic counts are 39, 70 and 74,
+respectively. The new adapter has 35 correct, 28 parsed wrong, 5 malformed and
+60 truncated outputs, with 111 marker positives. These records do not establish
+full 198-question completion; the final 70-question group runs unchanged.
+Post hoc wordfreq classification assigns 56.50% of alphabetic reasoning words
+to the ROT13-only class, or 48.05% after removing repeated exact, non-overlapping
+eight-word blocks. This does not establish exact encoding coverage or faithful
+reasoning. See the [current diagnosis](sft_level10_training_diagnosis.md) for all
+lexical categories and thresholds, paired denominators and the
+[24-file verified private bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid).
+The full 198-question receipt is pending; levels 7–9 remain paused.
 
 ## Condition-specific completion: 12 October 2026
 

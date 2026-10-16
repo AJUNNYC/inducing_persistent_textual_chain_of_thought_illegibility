@@ -93,7 +93,9 @@ def main():
                                         'new level-10 GPQA immutable protocol and observed inference; official results pending',
                                         'private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion',
                                         'same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending',
-                                        'supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged']
+                                        'supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged',
+                                        'first128 native GPQA raw/score verification and exact private CPU parity; full198 incomplete',
+                                        'posthoc wordfreq reasoning-word amount diagnostic and independent4608-table/96-summary reproduction']
     provenance_path.write_text(json.dumps(provenance, indent=2)+'\n')
     print(f'Built {len(doc)}-page integrated protocol; refreshed extraction and provenance')
     doc.close()

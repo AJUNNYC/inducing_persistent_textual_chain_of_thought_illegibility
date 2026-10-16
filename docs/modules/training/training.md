@@ -1,6 +1,6 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. The separately identified 16 October L10 extra epoch is also complete: 625 additional/1,250 cumulative updates and 26 Drive-verified artifacts. Only its new-adapter GPQA run is active; a completion-biased 42-request snapshot provisionally shows sustained ROT13 in reviewed passages, alongside looping and garbled decoded terminology. Later exact identity mapping and unchanged diagnostic scorer replay on those same 42 gave new L10 11 correct versus original L10 22 and matching base 23. This completion-selected subset is not a full-panel estimate; native official results remain pending and original levels 7-9 stay paused. Extra exposure, schedule restart and native-newline alignment changed jointly; no isolated epoch effect or capability benefit is established. See the [current SFT record](sft/sft_training.md).
+**Owner:** `coordinator`. **Current status:** All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. The separately identified 16 October L10 extra epoch is also complete: 625 additional/1,250 cumulative updates and 26 Drive-verified artifacts. Its new-adapter GPQA run has 128 verified native records. On these same 128 questions, frozen-correct counts are 35 for the new adapter, 61 for original L10 and 70 for the base; supplementary visible-choice counts are 39, 70 and 74, respectively. The final 70-question group is running, and the full 198-question receipt is pending. Post hoc wordfreq classification assigns 56.50% of alphabetic reasoning words to the ROT13-only class, or 48.05% after removing repeated blocks; this does not establish exact coverage or scientific success. Original levels 7–9 stay paused. Exposure, schedule restart and native-newline alignment changed jointly; no isolated epoch effect is established. See the [current SFT record](sft/sft_training.md).
 
 | Artifact | Exact repository path |
 |---|---|
@@ -67,8 +67,8 @@ flowchart TD
 %% Forty datasets available; alltenROT13 fitscomplete, alltenKaziText fitsuncompleted.
 %% Historical$240SFT authorization retained; original GPQA32k controls retained.
 %% 16Oct L10 extra epoch COMPLETE625/cumulative1250/26Driveverified; newL10 GPQA running.
-%% Same42completed snapshot later mapped/scored:11new/22old/23base correct; completion-selected.
-%% SustainedROT13 in reviewed positive passages and looping coexist; nativeofficial198pending.
+%% Native128 verified:35new/61old/70base strictcorrect; final70running/full198pending.
+%% Posthoc wordfreq R-only56.50% of alphabetic reasoning words; vocabulary-sensitive,not full coverage.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.

@@ -1,46 +1,40 @@
 # sft_training.md
 
-## Current status: extra epoch complete; GPQA running with provisional observations
+## Current status: extra epoch complete; first 128 native records verified, full 198 pending
 
-The separately identified 14B ROT13 level-10 extra epoch completed on 16 October
-from training source `3a89691`: 625 additional/1,250 cumulative updates,
-10,000 additional/20,000 cumulative example presentations and 17,996,003 tokens.
-Validation loss was `0.6151581262983382` over all 100 cases; 26 required Drive
-artifacts, including the final adapter/full checkpoint, are verified and the
-trainer exited with code zero. Actual mode remained microbatch 1, accumulation
-16, checkpointing off. The recorded fit time was 17,470.26931851078 seconds
-(4h51m), about three times the original 96.6-minute fit; the cause is unknown.
+The separately identified 14B ROT13 L10 extra epoch is complete under training
+source `3a89691`: 625 additional updates (1,250 cumulative), 10,000 additional
+examples (20,000 cumulative) and 17,996,003 tokens. Validation loss is
+`0.6151581262983382` on 100 cases. All 26 required Drive artifacts are verified,
+and the trainer exited with code zero. Actual execution remained microbatch 1,
+accumulation 16 and checkpointing off. Fit time was 17,470.2693 seconds (4h51m),
+about three times the original L10 fit's 96.6 minutes; the cause is unknown.
+Exposure, cosine restart and native-newline alignment changed jointly.
 
-The phase retained the parent adapter/AdamW/RNG and used the second seed-42
-shuffle, a fresh 625-update cosine with 19 warmup updates at the same peak
-`2e-4`, and native thinking-newline alignment with unchanged reasoning/final
-bytes and role masks. Teacher-forced loss alone establishes neither spontaneous
-encoding nor retained capability. The provisional observations below do not
-isolate the effects of exposure, schedule restart or newline alignment.
+The **first 128 native GPQA raw/score pairs are verified**, with exact 128/128
+parity against private CPU records and 42/42 parity against the earlier snapshot.
+On these same 128 questions, frozen-correct counts are 35 for the new adapter,
+61 for original L10 and 70 for the base. Separate supplementary human-visible-choice
+counts are 39, 70 and 74, respectively. New frozen categories are 35 correct,
+28 parsed wrong, 5 malformed and 60 truncated. The 111 marker positives include
+52 `stop` finishers and 59 capped outputs. Strict correctness among marker-positive
+finishers is 23/52; the supplementary human diagnostic gives 25/52.
+All 198 prompts, seeds, the scorer and the 32,000-token limit remain frozen at
+`5e6be1b`, protocol
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`.
+The remaining 70-question group is running; the full 198-question receipt is
+absent. Levels 7–9 remain paused; no other training is scheduled.
 
-The new L10 adapter's full 198-question/32,000-token GPQA run is active;
-new-adapter inference was observed at 11:52:41 UTC. Frozen evaluator `5e6be1b`
-and protocol `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
-retain the same prompts, item seeds, sampling and strict scorer in a distinct
-namespace. Matching cached base (99/198) and original L10 (98/198, no positives
-in the fixed marker screen) remain controls.
-
-A private 13:39:40 UTC snapshot held 42 already-completed requests. A fixed
-73-type marker screen flagged 37; independent bounded opening/middle/end review
-found sustained ROT13 in their reviewed passages, while five negatives showed
-English/math. Of 25 `stop` and 17 `length` requests, all 17 capped outputs looped
-(16 marker-positive, one English); decoded technical terms were often garbled.
-At 13:55:01 UTC, exact frozen prompt-token hashes mapped the same 42 requests,
-and native-equivalent decoding reproduced all earlier texts. Unchanged frozen
-scorer replay gave new L10 11/42 correct (11 parsed wrong, 3 malformed, 17
-truncated), versus original L10 22/42 and matching base 23/42. Eight of 37 marker
-positives and 3/5 negatives were correct. This is a completion-selected diagnostic
-subset, not a full-panel estimate or proof of comprehension, faithfulness or an
-isolated epoch effect. Native raw/official scores remained zero; diagnostic
-`raw_hash=None` does not satisfy completion. The unchanged 198-question run
-continues; levels 7-9 stay paused. The [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md)
-contains the paired table and separate 8-file observation/13-file correctness
-Drive backups; neither is native evaluation completion.
+Post hoc classification of reasoning words with pinned wordfreq gives a 56.50%
+ROT13-only share among all 719,767 alphabetic word occurrences, 48.05% after
+removing repeated exact, non-overlapping eight-word blocks, and a 53.37%
+equal-response mean. All sensitivity results for Zipf thresholds 2, 3, 4 and 5
+are reported in the [current diagnosis](../../../sft_level10_training_diagnosis.md). This proxy is sensitive to
+vocabulary and repetition; it does not establish exact full-text coverage,
+target-level compliance or faithful reasoning. The
+[24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid)
+is verified separately from the pending full 198-question native completion
+barrier. Earlier diagnostics on the fixed 42 remain dated history in the diagnosis.
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
@@ -132,9 +126,9 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 flowchart TD
 %% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
 %% 26 Drive artifacts verified; trainer exit0. NewL10 GPQA inference observed11:52:41UTC.
-%% 13:39:40 provisional42completed:37 positives sustained in reviewed passages;17capped loop.
-%% Same42 later mapped13:55; diagnosticcorrect new11/original22/base23; no full198estimate.
-%% Completion-selected,decodedterms garbled; nativeofficial/full198 results pending.
+%% Current native128 verified:strict35new/61old/70base on same128; human39/70/74.
+%% CPU128parity and earlier42parity exact; final70running/full198receipt absent.
+%% Wordfreq R-only56.50% of alphabetic reasoning words,48.05% after block removal; proxy not compliance.
 %% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
@@ -172,8 +166,8 @@ flowchart TD
     PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
     CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
-    POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; official results pending"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Mappedfixed42 diagnostic correct:11new/22old/23base<br/>Looping/garbled terms; no full198 accuracy estimate<br/>New raw/scores/report pending; levels7-9 paused"]
+    POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; full198 results pending"]
+    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Native128 verified:35new/61old/70base frozen correct<br/>Posthoc lexical R-only56.50%;not exact text coverage<br/>Final70 runs; full198 receipt pending; levels7-9 paused"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT

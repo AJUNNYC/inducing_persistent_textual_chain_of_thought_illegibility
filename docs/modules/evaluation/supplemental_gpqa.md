@@ -6,62 +6,76 @@ enter the primary statistical window or multiplicity family, or modify SFT/RL
 training and certificates. The opt-in `long_32000` profile changes **GPQA
 evaluation only**. Existing trained adapters do not need to be retrained.
 
-## Running additional-epoch L10 comparison; provisional observations only
+## Current prefix: 128 native records verified; full 198 incomplete
 
-The separate 14B ROT13 L10 extra epoch is complete: 625 additional/1,250 cumulative
-updates, 10,000 additional/20,000 cumulative examples, 17,996,003 training tokens
-and validation loss `0.6151581262983382` over 100 cases. Its 26 required Drive
-artifacts are verified and the trainer exited with code zero. After the earlier
-11:31:53 UTC preparation snapshot, new-adapter inference was observed at
-11:52:41 UTC. The full matched 198-question run continues unchanged; official
-results remain pending.
+The extra L10 SFT phase completed 625 additional updates (1,250 cumulative),
+with 26 Drive-verified artifacts and trainer exit code zero. Its GPQA run now has
+128 verified native raw/score pairs, with exact 128/128 parity against private
+CPU text/score/finish/token records and 42/42 parity against the earlier snapshot.
+This is the fixed first panel group. The final 70-question group is running, and
+the full 198-question receipt is absent.
 
-At 13:39:40.342734 UTC, a private bounded read-only snapshot captured 42
-already-completed requests, totaling 648,941 generated tokens. A fixed 73-type
-ROT13 marker screen flagged 37/42 with 52,793 occurrences. Independent bounded
-opening/middle/end review found sustained ROT13 in their reviewed passages;
-the five negatives showed English/math. Of 25 `stop` and 17 `length` requests,
-21 positives had `stop` and 16 `length`. All 17 capped outputs showed looping,
-including one English output; repetition inflates marker counts. Decoded
-technical terms were often garbled.
+| Same 128 questions | Frozen correct | Supplementary visible-choice correct |
+| --- | ---: | ---: |
+| Matching base | 70/128 | 74/128 |
+| Original L10 | 61/128 | 70/128 |
+| New extra-epoch L10 | 35/128 | 39/128 |
 
-At that 13:39 snapshot the completion-biased subset was question-unmapped, with
-zero new native raw/official scores. At 13:55:01.947404 UTC a second read-only
-capture mapped the same 42 via exact frozen prompt-token hashes; native-equivalent
-decoding matched all earlier texts. Unchanged scorer replay, including its
-bold-final limitation, gave new L10 11/42 correct, 11 parsed wrong, 3 malformed
-and 17 truncated, versus original L10 22/42 and base 23/42. Eight of 37 positives
-and 3/5 negatives were correct. These offline diagnostics (`raw_hash=None`) do
-not establish full-198 accuracy, full-response coverage, target-level compliance,
-comprehension, faithful reasoning or an isolated epoch effect. Native new raw
-and official scores remained zero; full matched inference continues unchanged. The [private eight-file observational
-bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
-is separately Drive-verified, not a native completion receipt. No target methods
-were called, no memory mutated and no inference paused. See the
-[diagnosis record](../../sft_level10_training_diagnosis.md#provisional-completed-request-observations-133940-utc)
-for the paired table, hashes and limitations. The later [13-file correctness
-bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
-is separately Drive-verified, also not native completion. A later all-nine
-malformed-output human review gives a separate visible-choice diagnostic of new
-14/42, original 22/42 and base 23/42 (10/37 new marker positives); all 17 new caps
-remain unsuccessful. Frozen new score 11/42 stays primary and unchanged. Its
-[three-file review child folder](https://drive.google.com/drive/folders/1ey2t2TdtuZ6vg_ipup7-eBh7GqBGEZOL)
-is separately verified. No question text, individual IDs, answer letters or
-prompt/response/token values are in Git.
+New frozen categories are 35 correct, 28 parsed wrong, 5 malformed and 60
+truncated. The human diagnostic credits four correct visible choices among all
+five malformed outputs, with one invalid label. Frozen scores stay primary,
+and no parser is repaired. The 111 marker positives include 52 `stop` finishers
+and 59 `length` outputs. Strict correctness among those finishers is 23/52;
+the human diagnostic gives 25/52, or 25/111 when capped outputs are included.
+These conditional denominators never replace all 128. Bounded review
+corroborates ROT13 occurrence, often with loops and garbled terms; it does not
+establish full-response compliance. Archived full 198-question control totals
+are distinct from this matched-prefix table.
 
-Preserve the frozen `5e6be1b` evaluator, full 198-question panel, native
-prompts/option order/per-item seeds, 32,000-token budget, BF16 vLLM settings and
-strict final-label scorer. New protocol
-`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
-binds the adapter/checkpoint under a distinct immutable output namespace.
-Reuse the existing matching baseline (99/198) and retain original L10 (98/198,
-0/198 positives under the same marker screen) as controls; neither is regenerated. Original levels 7-9 remain paused.
-Save and verify all 198 new raw/scored responses and the paired report/receipt
-in Drive. Earlier GPQA observations informed the exposure, schedule restart and
-newline-alignment change, so this remains exploratory and cannot isolate an
-epoch effect. Lower teacher-forced loss does not establish free-generation
-encoding or capability retention. No automatic further levels or full campaign
-restart follows. See the [campaign guide](../../gpqa_14b_rot13_campaign.md).
+L10 still targets **100% encoding of eligible reasoning spans**: Unicode word
+spans with any ASCII letter, including short words, variables, mixed
+alphanumeric/underscore words and Latin LaTeX command names. The narrower
+wordfreq diagnostic does not exempt excluded or unassigned words from that
+target and cannot establish 100% compliance. Contextual adjudication confirms
+at least 34/128 failures (17 ordinary-English, 17 marker-positive). Among 25
+marker-positive human-correct finishers, nine have confirmed plaintext, three
+are unresolved and 13 have no identified exception after full review. This last
+category is observational and does not certify 100% encoding. Together with 14
+correct ordinary-English outputs, these make 39 correct visible choices; 29
+finished wrong/invalid and 60 were cut off. Frozen scores remain primary.
+
+The user-requested post hoc within-response diagnostic uses English-large data
+from wordfreq 3.1.1 at the primary Zipf threshold of 3, chosen before these
+measurements. Among all 719,767 alphabetic reasoning-word occurrences, 56.50%
+are ROT13-only, 4.82% plain-only, 0.46% both (ambiguous), 9.06% neither (unknown)
+and 29.17% short (neutral). Only words at least three letters long receive an
+orientation assignment. Final answers after the thinking closer, numerals and
+mixed alphanumeric tokens are excluded. Removing repeated exact, non-overlapping
+eight-word blocks gives 48.05%; the equal-response mean is 53.37%. Results for
+Zipf thresholds 2, 3, 4 and 5 are 43.17%, 56.50%, 53.34% and 41.50%, respectively.
+Within marker-positive responses, 61.40% ROT13-only and 0.14% plain-only leave
+38.46% unassigned; 99.77% is conditional R/(R+P), not all-text coverage. This
+proxy is sensitive to vocabulary. It does not establish exact encoding, a
+guaranteed lower bound, target L10 compliance, comprehension or faithful
+reasoning. Same-prefix control background assignments are not calibrated
+false-positive corrections.
+
+The [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid)
+is verified. An independent audit exactly reproduces 4,608 per-response tables
+and 96 summaries. See the [diagnosis](../../sft_level10_training_diagnosis.md) for
+category counts, repetition and threshold sensitivities, selected-subgroup
+definitions, exact hashes and the dated history of the 42-request subset. This
+backup does not establish full 198-question completion or scientific success.
+No question text, individual IDs or prompt/response/token values enter Git.
+
+Frozen evaluator `5e6be1b`, protocol
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`,
+native prompts/options/seeds, sampling and the 32,000-token limit remain
+unchanged. Wrong, malformed and truncated responses stay incorrect. The
+exposure/schedule/newline revision cannot isolate an epoch effect. Levels 7–9
+remain paused; no extra training or full-campaign restart follows. The
+[campaign guide](../../gpqa_14b_rot13_campaign.md) retains the native completion
+barrier: all 198 raw responses and scores, the report and a verified receipt.
 
 ## Dataset and measurement distinction
 

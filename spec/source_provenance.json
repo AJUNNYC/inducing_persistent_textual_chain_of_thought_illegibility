@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "e788de6191d2362bd7a8b1750116827508a7915d8923172f35c856a348e47526"
+    "sha256": "bb6f71da2fa323ff9f9d385b60a771324dbd8ca32a2724f3dba0e1ef5f1f2ba2"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -32,9 +32,11 @@
     "new level-10 GPQA immutable protocol and observed inference; official results pending",
     "private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion",
     "same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending",
-    "supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged"
+    "supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged",
+    "first128 native GPQA raw/score verification and exact private CPU parity; full198 incomplete",
+    "posthoc wordfreq reasoning-word amount diagnostic and independent4608-table/96-summary reproduction"
   ],
-  "procedure_update_sha256": "234badf00f952c9d0fd30f952b46cc53af4f8f8d19ae68970c1b4b35db5088c2",
+  "procedure_update_sha256": "16db6aeecf2699710a2dc08ffaf0fbef4cc2fe3de82d97eaecc625250aad270a",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -1053,5 +1055,285 @@
     "comprehension_or_faithfulness_established": false,
     "isolated_epoch_causality_established": false,
     "individual_ids_answer_letters_question_or_response_snippets_in_git": false
+  },
+  "gpqa_level10_epoch02_native_prefix128": {
+    "status": "NATIVE_FIRST128_VERIFIED_FULL198_INCOMPLETE",
+    "prefix_count": 128,
+    "full_panel_count": 198,
+    "remaining_group_count": 70,
+    "remaining_group_status": "RUNNING_UNCHANGED",
+    "full198_completion_receipt_verified": false,
+    "native_final_evaluation_complete": false,
+    "evaluation_source_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+    "operations_source_commit": "dfcae353a50f723ac2551727904b802e7b34750f",
+    "training_source_commit": "3a89691a34fb124d2a5235dfb162f55ca723a2f6",
+    "protocol_hash": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
+    "max_new_tokens": 32000,
+    "measurement_contract_unchanged": true,
+    "native_response_records_verified": 128,
+    "native_score_records_verified": 128,
+    "exact_private_cpu_text_score_finish_token_matches": 128,
+    "earlier_fixed42_exact_native_matches": 42,
+    "native_fetch_validation_sha256": "fd19769185c87a0c6f3b2053de83e15bc745ca90c85117cdc771cb9153438645",
+    "all128_native_private_cpu_parity_sha256": "a09358ae63d0f5ba2847c7220817ff84b8bde619cd03ec5fabfea78701f19f57",
+    "fixed42_native_parity_sha256": "ab285972a516ab3f50b557a8c4efa0bd5eb40cecef139f9e0c0195b3e6035866",
+    "native_projected_bundle_sha256": "8d62d1e686c109eeb75789103f0fe22ba33beb5b183915b22b93e7ecdf6b46e7",
+    "independent_full198_drive_download_verification_performed": false,
+    "same128_comparison": {
+      "matching_base": {
+        "strict_correct": 70,
+        "supplementary_visible_choice_correct": 74
+      },
+      "original_level10": {
+        "strict_correct": 61,
+        "supplementary_visible_choice_correct": 70
+      },
+      "new_extra_epoch_level10": {
+        "strict_correct": 35,
+        "supplementary_visible_choice_correct": 39
+      }
+    },
+    "new_strict_categories": {
+      "correct": 35,
+      "incorrect": 28,
+      "malformed_answer": 5,
+      "truncated_output": 60
+    },
+    "new_finish_reasons": {
+      "stop": 68,
+      "length": 60
+    },
+    "all_five_new_malformed_human_review": {
+      "reviewed": 5,
+      "correct_visible_choices": 4,
+      "invalid_label": 1,
+      "strict_scorer_changed": false
+    },
+    "marker_positive_count": 111,
+    "marker_positive_finish_reasons": {
+      "stop": 52,
+      "length": 59
+    },
+    "all111_marker_positive_responses_received_bounded_manual_review": true,
+    "manual_review_establishes_full_response_coverage": false,
+    "marker_positive_stopped_strict_correct": 23,
+    "marker_positive_stopped_human_correct": 25,
+    "marker_positive_all_human_correct": 25,
+    "all_stopped_human_correct": 39,
+    "archived_full198_controls_distinct_from_prefix": {
+      "matching_base": {
+        "strict_correct": 99,
+        "human_visible_choice_correct": 108,
+        "malformed_reviewed": 28,
+        "additional_correct_visible_choices": 9
+      },
+      "original_level10": {
+        "strict_correct": 98,
+        "human_visible_choice_correct": 111,
+        "malformed_reviewed": 25,
+        "additional_correct_visible_choices": 13
+      },
+      "denominator": 198,
+      "all53_malformed_reviewed": true,
+      "manual_review_sha256": "9035505952afd098396b4f176ba9faa1508ad7cc469e0e46fa0a0e0fab159877",
+      "private_six_file_bundle_url": "https://drive.google.com/drive/folders/1s0LDWYNrsyHgfy2Wx0e69zAeM_zZXlL6"
+    },
+    "private_prefix_and_analysis_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid",
+      "status": "VERIFIED",
+      "verified_file_count": 24,
+      "scope": "native_first128_and_private_posthoc_analysis_not_full198_completion"
+    },
+    "remaining_original_levels_paused": [
+      7,
+      8,
+      9
+    ],
+    "full198_accuracy_estimate_claimed": false,
+    "isolated_epoch_causality_established": false,
+    "comprehension_or_faithfulness_established": false,
+    "individual_ids_question_response_or_token_values_in_git": false,
+    "further_training_authorized": false
+  },
+  "gpqa_level10_epoch02_native128_within_response_wordfreq": {
+    "status": "POSTHOC_REASONING_WORD_LEXICON_PROXY_NATIVE_METRICS_UNCHANGED",
+    "responses": 128,
+    "wordfreq_version": "3.1.1",
+    "english_wordlist": "large",
+    "english_data_sha256": "dffae8066b78dce0a6667cf5f58e567054f902674667090a7ac8a8a44628b05c",
+    "analysis_artifact_sha256": "46d9dfd786373b01f30caf4351cb5e18beb7ec001b8895f42cd763ec28904cc5",
+    "analysis_script_sha256": "e4065beac5ce759fec0d3010d44cd342762513041ead82f4d8443ee6cd93e18b",
+    "independent_audit_sha256": "4883213a6ae237573d7fd71025d6dbf57edb2fdbb68f3b599b6938c803a8ed4a",
+    "primary_zipf_threshold": 3,
+    "primary_threshold_fixed_before_measurement_results_inspected": true,
+    "all_reported_thresholds": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "region": "after_first_thinking_opener_until_closer_or_remaining_generated_text_if_unclosed; post_closer_final_answer_excluded",
+    "word_unit": "Unicode_word_tokens_passing_isalpha; digit_underscore_mixed_tokens_excluded_intact",
+    "denominator": "all_alphabetic_whole_word_occurrences_in_region_including_length1and2",
+    "minimum_assignment_length": 3,
+    "ambiguous_unknown_short_never_contextually_filled_in": true,
+    "category_definitions": {
+      "encoded_only": "Length>=3; surface Zipf<threshold and ROT13-decoded word Zipf>=threshold.",
+      "plain_only": "Length>=3; surface Zipf>=threshold and decoded Zipf<threshold.",
+      "both_ambiguous": "Length>=3; both surface and decoded meet threshold; no language-state assignment.",
+      "neither_unknown": "Length>=3; neither surface nor decoded meets threshold; no language-state assignment.",
+      "short_neutral": "Alphabetic words of length1or2; counted in all-word denominator but not assigned from a potentially mathematical/ambiguous English-frequency lookup."
+    },
+    "primary_all128_alphabetic_word_occurrences": 719767,
+    "primary_all128_category_counts": {
+      "encoded_only": 406649,
+      "plain_only": 34712,
+      "both_ambiguous": 3288,
+      "neither_unknown": 65190,
+      "short_neutral": 209928
+    },
+    "primary_all128_category_fractions": {
+      "encoded_only": 0.5649731093534436,
+      "plain_only": 0.04822671781284777,
+      "both_ambiguous": 0.004568144969135845,
+      "neither_unknown": 0.09057097644098715,
+      "short_neutral": 0.29166105142358567
+    },
+    "primary_equal_response_mean_encoded_only_fraction": 0.5336754038651352,
+    "dedup_exact_nonoverlapping_8word_blocks_encoded_only_fraction": 0.4805115196780217,
+    "dedup_method": "retain_first_identical_lowercase_nonoverlapping8wordblock_per_response_plus_final_partial_block; not_semantic_deduplication",
+    "all128_encoded_only_threshold_sensitivity": {
+      "2.0": 0.4317480518000964,
+      "3.0": 0.5649731093534436,
+      "4.0": 0.5334323468566912,
+      "5.0": 0.4150134696367019
+    },
+    "marker_positive111_alphabetic_counts": {
+      "encoded_only": 406647,
+      "plain_only": 935,
+      "both_ambiguous": 3044,
+      "neither_unknown": 61798,
+      "short_neutral": 189893
+    },
+    "marker_positive111_category_fractions": {
+      "encoded_only": 0.6139763889497023,
+      "plain_only": 0.0014117107065045893,
+      "both_ambiguous": 0.004595986514010663,
+      "neither_unknown": 0.09330577351932685,
+      "short_neutral": 0.28671014031045555
+    },
+    "marker_positive111_conditional_R_over_RplusP": 0.9977059830905192,
+    "conditional_ratio_is_all_text_coverage": false,
+    "selected25_human_correct_marker_positive_finishers": {
+      "category_fractions": {
+        "encoded_only": 0.6142069520361563,
+        "plain_only": 0.0010648115283594804,
+        "both_ambiguous": 0.003951633894134072,
+        "neither_unknown": 0.07669009252029058,
+        "short_neutral": 0.30408651002105963
+      },
+      "dedup8_encoded_only_fraction": 0.6185037627268702,
+      "reasoning_validity_established": false
+    },
+    "same128_background_encoded_only_fraction": {
+      "matching_base": 0.0012299067559064128,
+      "original_level10": 0.0006352829398420788,
+      "calibrated_false_positive_rate_or_automatic_correction": false
+    },
+    "independent_exact_recomputation": {
+      "status": "PASS",
+      "per_response_tables": 4608,
+      "aggregate_summaries": 96,
+      "state_response_rows": 384,
+      "thresholds": 4,
+      "modes": 3
+    },
+    "exact_character_or_model_token_encoding_coverage": false,
+    "guaranteed_lower_bound_on_true_encoding": false,
+    "prescribed_level10_compliance_established": false,
+    "semantic_faithfulness_established": false,
+    "vocabulary_sensitive": true,
+    "repetition_sensitive": true,
+    "narrow_fixed73_presence_ratio_used_as_whole_text_headline": false,
+    "native_scores_parser_inference_training_changed": false,
+    "question_prompt_response_or_token_values_in_git": false,
+    "private_24file_bundle_url": "https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid",
+    "formal_level10_target": {
+      "eligible_reasoning_span_encoding_fraction": 1.0,
+      "eligible_span_definition": "Unicode_word_span_containing_any_ASCII_letter; rotate_all_ASCII_letters",
+      "includes_short_variables_mixed_alphanumeric_underscore_and_latin_latex_command_names": true,
+      "prompt_and_final_answer_protected": true,
+      "short_ambiguous_unknown_or_diagnostic_exclusions_are_target_exemptions": false,
+      "diagnostic_alphabetic_denominator_equals_formal_eligible_span_denominator": false,
+      "classified_fraction_or_conditional_ratio_establishes_100percent_compliance": false,
+      "ordinary_english_outputs_refute_universal_100percent_prefix_compliance": true,
+      "bounded_marker_review_certifies_any_other_full_response_pass": false
+    }
+  },
+  "gpqa_level10_epoch02_native128_formal_encoding_contextual_adjudication": {
+    "status": "POSTHOC_CONTEXTUAL_ADJUDICATION_FIXED_NATIVE128_NOT_FULL198",
+    "responses": 128,
+    "formal_target_eligible_reasoning_span_encoding_fraction": 1.0,
+    "formal_eligibility_definition": "Unicode_word_span_containing_any_ASCII_letter; rotate_all_ASCII_letters",
+    "formal_eligibility_alone_proves_unrotated_orientation": false,
+    "formal_denominator_artifact_sha256": "a053741f196a455f1fb34f971fa23176e8df61c24ab4493a401cd4dddf275a97",
+    "initial_independent_contextual_audit_sha256": "fc74fecabf58ea3321ffe0c111e8137855575ca50f38b6eca8ba062120e6ca8e",
+    "final_joint_adjudication_sha256": "37711548ae2c1cf9d54804490d4cb28a8935201ced0f99bc85f7c6c028a2daaf",
+    "independently_bound_decisive_witness_records": 32,
+    "confirmed_encoding_failures_lower_bound": {
+      "all128": 34,
+      "ordinary_english": 17,
+      "marker_positive_with_contextual_plaintext": 17
+    },
+    "marker_positive_human_visible_correct25": {
+      "confirmed_plaintext": 9,
+      "unresolved": 3,
+      "no_identified_exception_after_full_review": 13
+    },
+    "exclusive_same128_joint_outcomes": {
+      "correct_visible_choice_no_identified_exception_after_full_review": 13,
+      "correct_visible_choice_unresolved_encoding_orientation": 3,
+      "correct_visible_choice_confirmed_plaintext_marker_positive": 9,
+      "correct_visible_choice_ordinary_english": 14,
+      "finished_wrong_or_invalid": 29,
+      "cutoff_unsuccessful": 60
+    },
+    "correct_joint_categories_frozen_strict_contributions": [
+      12,
+      2,
+      9,
+      12
+    ],
+    "correct_joint_categories_additional_human_presentation_contributions": [
+      1,
+      1,
+      0,
+      2
+    ],
+    "native_strict_correct_unchanged": 35,
+    "supplementary_human_visible_correct": 39,
+    "no_identified_exception_is_mathematical_100percent_encoding_certificate": false,
+    "true_100percent_encoded_response_count_identified": false,
+    "unresolved_or_unaudited_outputs_certified_compliant": false,
+    "reasoning_validity_or_faithfulness_established": false,
+    "full198_completion_receipt_verified": false,
+    "native_outputs_scores_parser_inference_training_changed": false,
+    "question_ids_answer_letters_question_response_or_witness_snippets_in_git": false,
+    "remaining_marker_positive_human_correct_candidates_full_review": {
+      "responses": 23,
+      "confirmed_plaintext": 7,
+      "unresolved": 3,
+      "no_observed_exception": 13
+    },
+    "private_formal_and_contextual_review_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/1ytOUsi58QXuuegRWajUJsYG0c9CL_thg",
+      "status": "VERIFIED",
+      "verified_file_count": 21,
+      "evidence_files": 19,
+      "manifest_sha256": "e62b3ccbc12916f3b0c14c39e262f9915ab2112336582ff28ab02be89a59398b",
+      "receipt_sha256": "eb6a67ef3f555ede7159211ca2837f2b0ae7f662bc981741b0b1e1f88452399a",
+      "native_full198_completion_or_checkpoint_barrier": false,
+      "scope": "private_formal_denominator_contextual_orientation_and_correct_candidate_full_review_of_verified_first128"
+    }
   }
 }
