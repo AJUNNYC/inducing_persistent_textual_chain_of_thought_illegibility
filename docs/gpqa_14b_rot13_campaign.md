@@ -45,14 +45,22 @@ IDs decoded exactly to all 42 earlier texts under matching native tokenizer
 versions. No generation, selection or frozen scorer behavior changed, including
 its known bold-final limitation. Offline provisional scores on these same questions:
 
-| State | Correct / 42 | Parsed wrong | Malformed | Truncated |
-| --- | ---: | ---: | ---: | ---: |
-| Matching untouched base | 23 (54.76%) | 17 | 2 | 0 |
-| Original L10 | 22 (52.38%) | 15 | 4 | 1 |
-| New L10 extra epoch | 11 (26.19%) | 11 | 3 | 17 |
+| State | Frozen scorer correct / 42 | Supplementary final-choice diagnostic / 42 | Parsed wrong | Malformed | Truncated |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Matching untouched base | 23 (54.76%) | 23 (54.76%) | 17 | 2 | 0 |
+| Original L10 | 22 (52.38%) | 22 (52.38%) | 15 | 4 | 1 |
+| New L10 extra epoch | 11 (26.19%) | 14 (33.33%) | 11 | 3 | 17 |
 
-Original-to-new: 9 both correct, 13 correct-to-incorrect, 2 incorrect-to-correct,
-18 both incorrect (including malformed/truncated). Eight of 37 marker positives were correct (8/21 `stop`, 0/16
+Frozen-scorer outcomes remain primary. A separate post hoc human review checked
+all nine malformed outputs across the three states, without selecting by marker
+status: the new three showed correct visible final choices; original four and
+base two showed wrong choices. Crediting these presentation-related misses gives
+new 14/42 (33.33%), including 10/37 marker positives, while all 17 new capped
+outputs remain unsuccessful. The supplementary column is a final-choice
+diagnostic, not reasoning validity or a change to frozen/official scores.
+
+Frozen-scorer original-to-new: 9 both correct, 13 correct-to-incorrect, 2 incorrect-to-correct,
+18 both incorrect (including malformed/truncated). Under the frozen scorer, 8 of 37 marker positives were correct (8/21 `stop`, 0/16
 capped), versus 3/5 negatives. Increased observed encoding coincides with lower
 diagnostic accuracy in this **completion-selected subset**, not a full-panel
 estimate or proof of comprehension, faithfulness or an isolated epoch effect.
@@ -65,7 +73,9 @@ artifacts. See the [diagnosis record](sft_level10_training_diagnosis.md#provisio
 for exact identity/decoder/scorer provenance and private-evidence hashes. The
 [13-file correctness bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
 is Drive-verified separately from the earlier eight-file observation and native
-completion. No question text or prompt/response/token values are included in Git.
+completion. Its [three-file human-review child folder](https://drive.google.com/drive/folders/1ey2t2TdtuZ6vg_ipup7-eBh7GqBGEZOL)
+is separately verified; it adds no native artifacts. No question text, individual
+IDs, answer letters or prompt/response/token values are included in Git.
 
 Evaluate all 198 Diamond questions with the original `long_32000` contract:
 32,000 new tokens per response, context 40,960, eight concurrent sequences,

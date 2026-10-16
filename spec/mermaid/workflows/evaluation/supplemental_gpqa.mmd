@@ -32,6 +32,8 @@ flowchart TD
     OBSLIMIT --> OBSDRIVE[Separate8-file observational bundle Drive-verified<br/>Not native raw/scores or evaluation completion<br/>Zero new native raw/official scores at snapshot]
     OBSDRIVE -. same42, no regeneration or exclusions .-> IDMAP[13:55 exact frozen prompt-token hash mapping<br/>Native-equivalent generated-ID decode<br/>All42 texts identical to original snapshot]
     IDMAP --> DIAG[Offline frozen-scorer replay on same42<br/>Correct:newL10 11,originalL10 22,matchingbase23<br/>New:11parsedwrong,3malformed,17truncated<br/>Original-new pairs:9TT,13TF,2FT,18FF]
+    DIAG -. separate posthoc presentation review .-> HUMAN[All9 malformed reviewed across new3/old4/base2<br/>Only new3 have correct visible final choices<br/>Human diagnostic:new14of42,old22,base23;10of37positives<br/>Strictnew11 remains primary;17newcaps unsuccessful]
+    HUMAN --> HUMBACK[Separate3-file human-review child folder verified<br/>No parser/scorer/inference or native artifact changes]
     DIAG --> DLIMIT[Completion-selected before correctness; no full198 estimate<br/>8of37positives and3of5negatives correct<br/>Native raw/official scores0;diagnostic raw_hash=None<br/>No comprehension/faithfulness/isolatedepoch proof]
     DLIMIT --> DGBACK[Separate13-file correctness bundle Drive-verified<br/>554local audit checks and126scorer replays<br/>Not native raw/scoring/completion receipt]
     PROFILE --> POST

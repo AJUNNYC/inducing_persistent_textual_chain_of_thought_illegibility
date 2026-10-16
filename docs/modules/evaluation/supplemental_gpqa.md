@@ -41,7 +41,12 @@ were called, no memory mutated and no inference paused. See the
 [diagnosis record](../../sft_level10_training_diagnosis.md#provisional-completed-request-observations-133940-utc)
 for the paired table, hashes and limitations. The later [13-file correctness
 bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
-is separately Drive-verified, also not native completion. No question text or
+is separately Drive-verified, also not native completion. A later all-nine
+malformed-output human review gives a separate visible-choice diagnostic of new
+14/42, original 22/42 and base 23/42 (10/37 new marker positives); all 17 new caps
+remain unsuccessful. Frozen new score 11/42 stays primary and unchanged. Its
+[three-file review child folder](https://drive.google.com/drive/folders/1ey2t2TdtuZ6vg_ipup7-eBh7GqBGEZOL)
+is separately verified. No question text, individual IDs, answer letters or
 prompt/response/token values are in Git.
 
 Preserve the frozen `5e6be1b` evaluator, full 198-question panel, native

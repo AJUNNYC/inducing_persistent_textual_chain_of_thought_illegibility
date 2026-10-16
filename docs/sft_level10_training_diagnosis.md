@@ -230,14 +230,25 @@ regenerated or excluded, and no native artifacts were created.
 The unchanged frozen `5e6be1b` scorer, including its known bold-final presentation
 limitation, produced these **offline provisional scores on the same 42 questions**:
 
-| State | Correct / 42 | Parsed wrong | Malformed | Truncated |
-| --- | ---: | ---: | ---: | ---: |
-| Matching untouched base | 23 (54.76%) | 17 | 2 | 0 |
-| Original L10 | 22 (52.38%) | 15 | 4 | 1 |
-| New L10 extra epoch | 11 (26.19%) | 11 | 3 | 17 |
+| State | Frozen scorer correct / 42 | Supplementary final-choice diagnostic / 42 | Parsed wrong | Malformed | Truncated |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Matching untouched base | 23 (54.76%) | 23 (54.76%) | 17 | 2 | 0 |
+| Original L10 | 22 (52.38%) | 22 (52.38%) | 15 | 4 | 1 |
+| New L10 extra epoch | 11 (26.19%) | 14 (33.33%) | 11 | 3 | 17 |
 
-Original-to-new pairs were 9 both correct, 13 correct-to-incorrect, 2
-incorrect-to-correct and 18 both incorrect (including malformed/truncated). Among 37 marker positives, 8 were
+The frozen-scorer column remains primary; the other outcome columns retain its
+categories. A separate **post hoc human presentation review at 14:25:35 UTC**
+inspected all nine malformed outputs across the three states (new 3, original 4,
+base 2), without selecting by marker status. All three new malformed outputs
+showed correct visible final choices; all four original and both base outputs
+showed wrong choices. Crediting only these presentation-related misses gives the
+supplementary counts above, including **10/37 new marker positives**. All 17 new
+capped outputs remain unsuccessful. This diagnoses visible final-choice content,
+not reasoning validity; no frozen scorer, parser, inference or official score
+was changed.
+
+Frozen-scorer original-to-new pairs were 9 both correct, 13 correct-to-incorrect, 2
+incorrect-to-correct and 18 both incorrect (including malformed/truncated). Under the frozen scorer, 8 of 37 marker positives were
 correct: all were among the 21 `stop` requests; the 16 capped positives were
 incorrect. Three of five marker negatives were correct. This subset therefore
 shows increased observed encoding alongside lower diagnostic accuracy, with
@@ -263,7 +274,13 @@ independent correctness audit:
 The [private fixed-42 correctness bundle](https://drive.google.com/drive/folders/1-pB32EBJuXU0J7K6BplTv7VrHGsJUacx)
 has 13 verified Drive files including its receipt. Prompt/response/token values
 remain private. This identity/scoring backup is separate from both the earlier
-eight-file observational bundle and native completion.
+eight-file observational bundle and native completion. The [three-file human
+presentation review](https://drive.google.com/drive/folders/1ey2t2TdtuZ6vg_ipup7-eBh7GqBGEZOL)
+is a separately verified child folder, not a native result. Review SHA-256:
+`98876e26b271d550d50ca4256d294b49ac4f87176931746828d1797599f4db8f`;
+independent manual audit passed; its SHA-256:
+`58d287fc66288f118f7b3dfd6386c5083586e9a2a4cac580b02358c812360f03`.
+No individual IDs, answer letters or response snippets are published.
 
 ## Prepared development screen; prefix comparison deferred
 

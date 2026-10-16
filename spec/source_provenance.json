@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "7440aa1a759f4aa9079fd7455a140d5e312b383e0b5d2d2e4dd23c55ef966c77"
+    "sha256": "e788de6191d2362bd7a8b1750116827508a7915d8923172f35c856a348e47526"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -31,9 +31,10 @@
     "separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts",
     "new level-10 GPQA immutable protocol and observed inference; official results pending",
     "private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion",
-    "same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending"
+    "same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending",
+    "supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged"
   ],
-  "procedure_update_sha256": "4f0b751108068fdbb14a770e7f7eee723e0bb3bfc392296194041405f544a15d",
+  "procedure_update_sha256": "234badf00f952c9d0fd30f952b46cc53af4f8f8d19ae68970c1b4b35db5088c2",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -1001,5 +1002,56 @@
       "native_checkpoint_or_evaluation_completion_barrier": false
     },
     "question_prompt_response_or_token_values_included_in_git": false
+  },
+  "gpqa_level10_epoch02_human_final_choice_review": {
+    "status": "SUPPLEMENTARY_POSTHOC_HUMAN_PRESENTATION_DIAGNOSTIC_NOT_OFFICIAL_RESCORING",
+    "reviewed_at_utc": "2026-10-16T14:25:35.892332+00:00",
+    "cohort": "same42_completion_selected_questions_fixed_before_correctness_inspection",
+    "reviewed_all_malformed_across_all_three_states": true,
+    "selection_by_marker_status": false,
+    "reviewed_malformed_count": {
+      "new_level10": 3,
+      "original_level10": 4,
+      "matching_base": 2
+    },
+    "additional_correct_visible_choices": {
+      "new_level10": 3,
+      "original_level10": 0,
+      "matching_base": 0
+    },
+    "strict_frozen_scorer_remains_primary": true,
+    "strict_correct_counts_unchanged": {
+      "new_level10": 11,
+      "original_level10": 22,
+      "matching_base": 23
+    },
+    "supplementary_visible_final_choice_correct_counts": {
+      "new_level10": 14,
+      "original_level10": 22,
+      "matching_base": 23
+    },
+    "denominator": 42,
+    "new_marker_positive_visible_choice_correct": 10,
+    "new_marker_positive_count": 37,
+    "new_capped_responses_still_unsuccessful": 17,
+    "frozen_parser_scorer_changed": false,
+    "inference_changed": false,
+    "native_artifacts_created": 0,
+    "review_sha256": "98876e26b271d550d50ca4256d294b49ac4f87176931746828d1797599f4db8f",
+    "independent_manual_audit_status": "PASS",
+    "independent_manual_audit_sha256": "58d287fc66288f118f7b3dfd6386c5083586e9a2a4cac580b02358c812360f03",
+    "private_human_review_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/1ey2t2TdtuZ6vg_ipup7-eBh7GqBGEZOL",
+      "status": "VERIFIED",
+      "verified_file_count": 3,
+      "child_of_thirteen_file_correctness_folder": true,
+      "parent_thirteen_file_bundle_unchanged": true,
+      "native_completion_or_checkpoint": false
+    },
+    "full198_performance_estimate_supported": false,
+    "reasoning_validity_established": false,
+    "comprehension_or_faithfulness_established": false,
+    "isolated_epoch_causality_established": false,
+    "individual_ids_answer_letters_question_or_response_snippets_in_git": false
   }
 }

@@ -1600,22 +1600,19 @@ samples and therefore belongs in the final dataset-count decision. Store token d
 for 7B and 14B and for each transformation strength. Fixed examples and epochs mean fixed nominal
 exposure, not identical token compute or identical optimization dynamics.
 30
-Ten original 14B ROT13 fits completed 625 updates with verified Drive state; all forty datasets and original endpoints remain. KaziText
-L10 stays paused at 444/625 with verified recovery and no automatic restart.
+Original fits,data and endpoints stay preserved; KaziText L10 remains paused444/625 with verified recovery,no automatic restart.
 C.2.4 Original per-fit accounting
-Original efficient_one_epoch_v1:10,000 records once,100 validation IDs,effective16,cosine625/19 warmup. Full targets/equal-example
-loss/BF16/CCE/SDPA/AdamW/LoRA remain as pp28-29. Original L10 fit5,793.1438s(96.6m) is dated timing,not a speedup/forecast.
+Original efficient_one_epoch_v1 accounting and full-target equal-example BF16/CCE/SDPA/AdamW/LoRA recipe remain as pp28-29.
 C.2.5 Completed additional-epoch lineage and recovery
-Policy published_sft_additional_epoch_v1, run rot13_14b_level_10_continuation_epoch_02, is separate from the ended parent
-schedule. Training source3a89691a34fb124d2a5235dfb162f55ca723a2f6 stays fixed; original endpoints remain immutable. Restore
+Policy published_sft_additional_epoch_v1, is separate from the ended parent schedule. Training
+source3a89691a34fb124d2a5235dfb162f55ca723a2f6 stays fixed; original endpoints remain immutable. Restore
 adapter/AdamW/RNG; second seed42 shuffle,625 extra updates,effective16,preserved1x16/checkpointing off. Restart cosine625/19 at
 same2e-4 peak and align native think newline; preserve reasoning/final bytes and role masks under new phase/token identities.
-All10,100 CPU prefixes/masks and six focused checks passed; no full suite/GPU benchmark repeated.
+Existing CPU prefix/mask checks remain as pp28-29; no new GPU benchmark.
 COMPLETE: 625 additional/1,250 cumulative updates, 10,000 additional/20,000 cumulative examples, 17,996,003 tokens; validation
 loss .6151581262983382 on100 cases. Final adapter/full state and26 required Drive artifacts VERIFIED; trainer exit zero.
-Fit17,470.2693s (4h51m),3.02 times original; slowdown cause UNKNOWN. Separate full checkpoints every100/final625 preserve
-exact phase recovery and whole-update pauses. Exposure, schedule restart and serialization changed jointly; no isolated epoch effect
-follows. Original construction criteria remain.
+Fit17,470.2693s (4h51m),3.02 times original; slowdown cause UNKNOWN. Exact full-state recovery remains as pp28-29. Exposure,
+schedule restart and serialization changed jointly; no isolated epoch effect follows. Original construction criteria remain.
 C.2.6 Running matched L10 GPQA; native official results pending
 Only new L10 runs after verified training/worker exit. Preparation11:31:53UTC preceded inference11:52:41. Frozen
 evaluator5e6be1b,all198 Diamond questions/32,000 new tokens,native prompts/options/canonical L10 item seeds,sampling,engine
@@ -1624,28 +1621,30 @@ Protocol57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b binds s
 Base99/198 and originalL1098/198 (marker-positive0/198) remain controls. Wrong/malformed/truncated stay incorrect;no selective
 retry. Full198 native raw/scores/report/Drive receipt required;L7-9 paused.
 C.2.7 Historical provisional behavior snapshot, 13:39:40 UTC
-A bounded typed read-only observer recovered all42 already-completed requests from native parent memory without target methods,
-mutations or pause. A73-type marker screen flagged37/42,52,793 occurrences,648,941 tokens. Bounded independent
-opening/middle/end review found sustained ROT13 in all37 positives' reviewed passages; five negatives English/math. Finish
-reasons25stop/17length; positives21stop/16length. All17 capped outputs looped (16positive,1English); decoded technical terms often
-garbled. At this time IDs were unmapped and native raw/official scores zero.
+A bounded typed read-only observer recovered the42 already-completed requests without target methods/mutations/pause. A73-type
+marker screen flagged37/42; independent bounded review found sustained ROT13 in positive passages,five negatives English/math.
+All17 caps looped(16positive,1English);decoded technical terms often garbled. IDs were then unmapped and native raw/official scores
+zero;full snapshot counts remain in p58/docs.
 C.2.8 Provisional diagnostic correctness on the same fixed42
 At13:55:01.947404UTC, a second read-only capture matched full prompt-token hashes uniquely to the frozen198 map. Full
 generated-ID decoding matched all42 prior texts, using native skip_special_tokens=False and one terminal EOS stripped; host/native
 Transformers4.57.3 and tokenizers0.22.2 matched. The same42 were fixed before correctness; no regeneration/exclusion or native
 artifacts. Frozen scorer, including its bold-final limitation, stayed unchanged.
-State (same42) | Correct | Parsed wrong | Malformed | Truncated
-Matching base | 23 (54.76%) | 17 | 2 | 0
-Original L10 | 22 (52.38%) | 15 | 4 | 1
-New L10 extra epoch | 11 (26.19%) | 11 | 3 | 17
-Original-to-new pairs:9 both correct,13 correct-to-incorrect,2 incorrect-to-correct,18 both incorrect (including malformed/truncated).
-Marker positives8/37 correct:8/21stop,0/16capped; negatives3/5 correct. Independent local audit passed554 checks
+State (same42) | Frozen correct | Human final-choice | Wrong | Malformed | Truncated
+Matching base | 23 (54.76%) | 23 (54.76%) | 17 | 2 | 0
+Original L10 | 22 (52.38%) | 22 (52.38%) | 15 | 4 | 1
+New L10 extra epoch | 11 (26.19%) | 14 (33.33%) | 11 | 3 | 17
+Human review checked all9 malformed(new3/old4/base2),without marker selection. Only new3 had correct visible final
+choices,adding3 successes;new positives10/37 correct by choice. All17 caps remain unsuccessful. This is supplementary:strict
+primary unchanged,no scorer/inference change or reasoning-validity proof. Manual audit PASS.
+Frozen-scorer pairs:9 both correct,13 correct-to-incorrect,2 incorrect-to-correct,18 both incorrect (including malformed/truncated).
+Strict marker positives8/37 correct:8/21stop,0/16capped; negatives3/5 correct. Independent local audit passed554 checks
 and42new/84control scorer replays; no new GPU tests. Diagnostic raw_hash=None; native raw/official scores remained ZERO while
 the128-request group had not returned.
-Increased observed encoding coexists with lower diagnostic accuracy in this completion-selected nonrandom subset,not a full198
-estimate or proof of target-level compliance,comprehension,faithfulness or isolated epoch causality. Full198 continues unchanged.
-Separate8-file observation/13-file correctness Drive backups are not native completion. Exact capture/helper/audit hashes and private
-links are in docs/sft_level10_training_diagnosis.md and spec/source_provenance.json; prompt/response/token values stay private.
+Encoding coexists with lower diagnostic accuracy in this completion-selected subset,not a full198 estimate or proof of target-level
+compliance,comprehension,faithfulness or isolated epoch causality. Full198 continues unchanged. Separate8-file observation/13-file
+correctness/3-file human-review backups are not native completion. Hashes/private links:docs/sft_level10_training_diagnosis.md and
+spec/source_provenance.json. Prompt/response/token values stay private.
 ```
 
 ## page_031
