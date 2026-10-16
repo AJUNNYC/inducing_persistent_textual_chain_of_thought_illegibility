@@ -1,6 +1,21 @@
 # sft_fit.md
 
-## Current status: all ten 14B ROT13 fits complete; GPQA long-profile evaluation next
+## Current priority: separately identified level-10 additional epoch
+
+On 16 October the user prioritized one extra **14B ROT13 level-10** training
+epoch over the remaining GPQA evaluations. This phase is **not yet launched**.
+It preserves the original endpoint and GPQA records. The new continuation
+restores the verified original adapter, AdamW moments/step counters and RNG;
+uses the second seed-42 shuffle, 625 additional updates and a fresh 19-warmup
+cosine schedule at the unchanged peak `2e-4`; and inserts the native newline
+after `<think>` while retaining encoded reasoning, clear final-answer bytes
+and role-prefix masks. Derived tokenization has its own hashes and the new run
+has its own identity. This is a combined intervention, not an isolated test of
+epoch count, and its benefit is unmeasured. No other level or full GPQA rerun
+is automatically scheduled. See the [diagnosis and continuation record](../../../../sft_level10_training_diagnosis.md).
+
+## Original one-epoch fits and historical GPQA handoff (14 October)
+
 
 All ten **14B ROT13 SFT levels are complete**, with final adapters, recovery states and results verified in Google Drive. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source `2ea4fb9a7737cff806226366e73743eec5935fad`. The priority queue was observed complete on 14 October 2026, with zero pending or failed publications and its GPU idle. Each independent fit used all 10,000 certified training examples once, a 625-update cosine horizon and 19 warmup updates. KaziText level 10 remains paused at 444/625 with verified full recovery state and no automatic restart. All forty prepared condition datasets and historical 7B results remain available; their availability does not imply completed fits. The next selected work is GPQA Diamond for the untouched 14B base plus all ten ROT13 levels, using the separate `long_32000` evaluation profile. Training, data, recipe and original four-domain evaluation budgets are unchanged. See [the campaign guide](../../../../gpqa_14b_rot13_campaign.md) and [the training record](../../../../sft_completed_rot13_14b_level10.md).
 
@@ -130,6 +145,9 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
+%% 16Oct separate L10 extra-epoch policy; not yet launched; original fit remains immutable.
+%% New phase changes exposure, restarted schedule and native think-newline serialization.
+%% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
 %% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
 %% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
@@ -160,12 +178,16 @@ flowchart TD
     OUT["Mark exact selected fit complete"]
     RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Verified exact-recipe full state only"]
     STOP["Stop fit; preserve verified partial state"]
+    PARENT["Explicit separate L10 additional-epoch authorization<br/>Verify original complete adapter / full state / data<br/>Restore adapter, AdamW moments / counters and RNG"]
+    CONT["src/training/sft/continuation.py<br/>New identity; second seed42 shuffle; 625 extra updates<br/>Fresh cosine / 19 warmup / same peak LR 2e-4<br/>Add native think newline; retain reasoning / final bytes"]
+    CONTEND["New verified Drive adapter and full recovery state<br/>1250 cumulative updates; original endpoint retained<br/>Benefit unmeasured; no automatic other levels"]
     INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE
     DUE -->|No| DONE
     DONE -->|Yes| FINAL --> AUDIT
     AUDIT -->|Yes| OUT
+    OUT -.->|New authorized L10 phase only; not yet launched| PARENT --> CONT --> CONTEND
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

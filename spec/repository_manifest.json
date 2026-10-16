@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 591,
+  "files": 594,
   "directories_including_root": 202,
   "entries": [
     {
@@ -3644,6 +3644,17 @@
       "blank": false
     },
     {
+      "path": "scripts/continue_sft_epoch.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/continue_sft_epoch.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_f39fcc29084c55",
+      "blank": false
+    },
+    {
       "path": "scripts/coordinate_verification_shard.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -6812,6 +6823,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_066e4af5a8f250",
+      "blank": false
+    },
+    {
       "path": "src/training/sft/data_handoff.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -8374,6 +8396,17 @@
       "display_path": "tests/unit/training/sft/test_causal_gradient_loss.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_01835ee5fe6d2c",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_ce635ede70c476",
       "blank": false
     },
     {

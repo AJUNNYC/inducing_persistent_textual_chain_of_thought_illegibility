@@ -1,6 +1,21 @@
 # sft_training.md
 
-## Current status: all ten 14B ROT13 fits complete; GPQA long-profile evaluation next
+## Current priority: separately identified level-10 additional epoch
+
+On 16 October the user prioritized one extra **14B ROT13 level-10** training
+epoch over the remaining GPQA evaluations. This phase is **not yet launched**.
+It preserves the original endpoint and GPQA records. The new continuation
+restores the verified original adapter, AdamW moments/step counters and RNG;
+uses the second seed-42 shuffle, 625 additional updates and a fresh 19-warmup
+cosine schedule at the unchanged peak `2e-4`; and inserts the native newline
+after `<think>` while retaining encoded reasoning, clear final-answer bytes
+and role-prefix masks. Derived tokenization has its own hashes and the new run
+has its own identity. This is a combined intervention, not an isolated test of
+epoch count, and its benefit is unmeasured. No other level or full GPQA rerun
+is automatically scheduled. See the [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md).
+
+## Original one-epoch fits and historical GPQA handoff (14 October)
+
 
 All ten **14B ROT13 SFT levels are complete**, with final adapters, recovery states and results verified in Google Drive. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source `2ea4fb9a7737cff806226366e73743eec5935fad`. The priority queue was observed complete on 14 October 2026, with zero pending or failed publications and its GPU idle. Each independent fit used all 10,000 certified training examples once, a 625-update cosine horizon and 19 warmup updates. KaziText level 10 remains paused at 444/625 with verified full recovery state and no automatic restart. All forty prepared condition datasets and historical 7B results remain available; their availability does not imply completed fits. The next selected work is GPQA Diamond for the untouched 14B base plus all ten ROT13 levels, using the separate `long_32000` evaluation profile. Training, data, recipe and original four-domain evaluation budgets are unchanged. See [the campaign guide](../../../gpqa_14b_rot13_campaign.md) and [the training record](../../../sft_completed_rot13_14b_level10.md).
 
@@ -87,6 +102,10 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
+%% 16Oct authorized separate ROT13 14B L10 additional epoch; not yet launched.
+%% Preserve original fits and GPQA caches; no automatic extra levels or GPQA reruns.
+%% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
+%% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
 %% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
 %% ROT13L1 native masks/recovery passed1x16/GCoff;checkpoint0 Drive-verified;3 busyGPU samples94-98%.
 %% Historicalstartup evidence below remains dated; alltencompleted fits nowhave final625 evidence.
@@ -116,13 +135,18 @@ flowchart TD
     NEXT{"Next incomplete job in nine-ROT13 priority queue?"}
     FIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh untouched-base initialization for this condition<br/>Native safeguards; one epoch / 625 updates"]
     SAVE["Verify final adapter and full recovery state in Drive<br/>Record actual completion before advancing"]
-    OUT["AlltenROT13 finaladapters/state/results verified<br/>Next:GPQA-onlynewmatchingbaseline+10levels<br/>Long32000 profile;2178 uniqueoutputs<br/>No GPQA result or opacity claim from SFTcompletion"]
+    OUT["All ten original ROT13 fits verified<br/>Retain original identities and existing GPQA outputs<br/>Training completion does not establish opacity"]
+    CONT["Separately authorized L10 extra epoch; not yet launched<br/>scripts/continue_sft_epoch.py<br/>Preserve GPQA caches and release prior GPU worker"]
+    PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
+    EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
+    CONTOUT["Verify additional-epoch full state and adapter in Drive<br/>Retain original endpoint; no automatic further jobs<br/>Encoding and correctness benefit unmeasured"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT
     BARRIER -->|Yes| BIND --> ORDER --> NEXT
     NEXT -->|Yes| FIT --> SAVE --> NEXT
     NEXT -->|No| OUT
+    OUT -.->|Explicit new user priority| CONT --> PARENT --> EPOCH2 --> CONTOUT
     INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class BASE,FIT detail

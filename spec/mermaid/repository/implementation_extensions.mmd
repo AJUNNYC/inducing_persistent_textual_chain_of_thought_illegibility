@@ -297,6 +297,8 @@ flowchart TD
     EXT --> p_b883603a139fb0
     p_2a2c7ae36f8de7["scripts/certify_sft_handoff.py"]
     EXT --> p_2a2c7ae36f8de7
+    p_f39fcc29084c55["scripts/continue_sft_epoch.py"]
+    EXT --> p_f39fcc29084c55
     p_7029ef2faa51cf["scripts/coordinate_verification_shard.py"]
     EXT --> p_7029ef2faa51cf
     p_31e177f4d00995["scripts/coordinate_vllm_sft_preparation.py"]
@@ -425,6 +427,8 @@ flowchart TD
     EXT --> p_0bf58f6d84853c
     p_610a07065e4b77["src/training/sft/causal_gradient_loss.py"]
     EXT --> p_610a07065e4b77
+    p_066e4af5a8f250["src/training/sft/continuation.py"]
+    EXT --> p_066e4af5a8f250
     p_778c8e7e5819d4["src/training/sft/data_handoff.py"]
     EXT --> p_778c8e7e5819d4
     p_2b763b344f6f0e["src/training/sft/execution_profile.py"]
@@ -497,6 +501,8 @@ flowchart TD
     EXT --> p_cad570ee99bdaf
     p_01835ee5fe6d2c["tests/unit/training/sft/test_causal_gradient_loss.py"]
     EXT --> p_01835ee5fe6d2c
+    p_ce635ede70c476["tests/unit/training/sft/test_continuation.py"]
+    EXT --> p_ce635ede70c476
     p_73d74fd82a388f["tests/unit/training/sft/test_data_handoff.py"]
     EXT --> p_73d74fd82a388f
     p_6c5a258a3484b2["tests/unit/training/sft/test_execution_profile.py"]

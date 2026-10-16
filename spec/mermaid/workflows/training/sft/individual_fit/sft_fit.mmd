@@ -2,6 +2,9 @@
 title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
+%% 16Oct separate L10 extra-epoch policy; not yet launched; original fit remains immutable.
+%% New phase changes exposure, restarted schedule and native think-newline serialization.
+%% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
 %% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
 %% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
@@ -32,12 +35,16 @@ flowchart TD
     OUT["Mark exact selected fit complete"]
     RECOVER["src/shared_procedures/recovery_procedure.py<br/>Shared bounded recovery<br/>Verified exact-recipe full state only"]
     STOP["Stop fit; preserve verified partial state"]
+    PARENT["Explicit separate L10 additional-epoch authorization<br/>Verify original complete adapter / full state / data<br/>Restore adapter, AdamW moments / counters and RNG"]
+    CONT["src/training/sft/continuation.py<br/>New identity; second seed42 shuffle; 625 extra updates<br/>Fresh cosine / 19 warmup / same peak LR 2e-4<br/>Add native think newline; retain reasoning / final bytes"]
+    CONTEND["New verified Drive adapter and full recovery state<br/>1250 cumulative updates; original endpoint retained<br/>Benefit unmeasured; no automatic other levels"]
     INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE
     DUE -->|No| DONE
     DONE -->|Yes| FINAL --> AUDIT
     AUDIT -->|Yes| OUT
+    OUT -.->|New authorized L10 phase only; not yet launched| PARENT --> CONT --> CONTEND
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

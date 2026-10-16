@@ -341,6 +341,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     benchmark_vllm_generation.py
     build_protocol_pdf.py
     certify_sft_handoff.py
+    continue_sft_epoch.py
     coordinate_verification_shard.py
     coordinate_vllm_sft_preparation.py
     coordinator_topology.py
@@ -636,6 +637,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       sft/
         __init__.py
         causal_gradient_loss.py
+        continuation.py
         data_handoff.py
         execution_profile.py
         fused_loss.py
@@ -782,6 +784,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             test_sft_fit.py
             test_training_budget.py
           test_causal_gradient_loss.py
+          test_continuation.py
           test_data_handoff.py
           test_execution_profile.py
           test_fused_loss.py
