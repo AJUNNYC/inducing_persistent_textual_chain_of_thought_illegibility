@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "15da61299c3daf315c8d226ea3f2349b826e1fec17e24be435ca2303ad623c36"
+    "sha256": "8d90a3e660c035802bfa98cea5b442d34094f19478cb736c3320c124e30c6f58"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -16,7 +16,7 @@
   "full_original_latex_available": false,
   "scientific_results_included": false,
   "live_integrations_validated": false,
-  "active_procedure_edition": "2026-10-14",
+  "active_procedure_edition": "2026-10-16",
   "procedure_update_source": "spec/protocol_page_updates.json",
   "validated_live_scope": [
     "vLLM generation benchmark",
@@ -29,7 +29,7 @@
     "historical 3072-token untouched 14B GPQA Diamond baseline",
     "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched"
   ],
-  "procedure_update_sha256": "14e109a03057e70a00775323cc958f70c42c9747e4e54df735cd519e06dc84f5",
+  "procedure_update_sha256": "a4d31cff0c4ba88132b869f3c1fd73c1185736ecbdff0a6dfb3df38a3325ef64",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",

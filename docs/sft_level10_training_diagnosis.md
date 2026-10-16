@@ -47,13 +47,16 @@ LMSYS answers, learned free-generation compliance, or capability preservation.
 Validation cross-entropy 0.76358 measures teacher-forced prediction, not sustained
 encoding of independently generated reasoning.
 
-## Authorized next training phase; not yet launched
+## Additional training phase launched, 16 October 2026 UTC
 
 The user subsequently prioritized further fine-tuning instead of continuing the
 remaining GPQA evaluations. The selected next phase is **one additional 14B
 ROT13 level-10 epoch**. This is a new training
 phase, not a restart of epoch one or an exact recovery of the original completed
-fit. At this documentation revision it is **not yet launched**. Preserve the
+fit. The worker launched at 06:37 UTC from Git commit
+`3a89691a34fb124d2a5235dfb162f55ca723a2f6`; the first additional optimizer update
+was observed at 06:40 UTC, with the initial checkpoint verified in Drive.
+Completion and behavioral benefit have not yet been established. Preserve the
 original adapter, full checkpoint, GPQA outputs and their immutable identities;
 do not rerun completed GPQA measurements or automatically enqueue other levels.
 
