@@ -88,7 +88,9 @@ def main():
                                         'all forty SFT dataset conditions',
                                         'independent full Drive byte readback and native record validation',
                                         'historical 3072-token untouched 14B GPQA Diamond baseline',
-                                        'ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched']
+                                        'ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched',
+                                        'separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts',
+                                        'new level-10 GPQA handoff and immutable protocol binding; new results pending']
     provenance_path.write_text(json.dumps(provenance, indent=2)+'\n')
     print(f'Built {len(doc)}-page integrated protocol; refreshed extraction and provenance')
     doc.close()

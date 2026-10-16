@@ -1,6 +1,6 @@
 flowchart TD
-%% 16Oct user-authorized additional-epoch L10 follow-up queued; original levels7-9 paused.
-%% Scientific evaluator remains frozen5e6be1b; new adapter/protocol namespace, same settings/seeds/scorer.
+%% 16Oct extra epoch COMPLETE625/cumulative1250,26 Driveverified,trainerexit0; original levels7-9 paused.
+%% Dispatcher RUNNING11:31:53UTC preparing newL10; GPUinference/results pending. Evaluator frozen5e6be1b.
     O[Official pinned GPQA Diamond CSV: all 198 questions] --> P[Fixed panel, seed-42 option permutation and native prompt]
     PROFILE[GPQA-only long_32000<br/>32,000 new tokens; vLLM context 40,960<br/>8 concurrent sequences; request groups 128<br/>Scheduler 8,192; BF16; unchanged sampling] --> BF
     P --> BF[Freeze new matching untouched baseline before inference]
@@ -21,15 +21,15 @@ flowchart TD
     R --> S[Native final-label scorer: no reference in prompt<br/>Wrong, malformed or truncated count as incorrect<br/>No retry-until-correct]
     S --> C[Ten paired descriptive GPQA comparisons<br/>Baseline plus 10 levels = 2,178 unique responses]
     C --> D[Verified Google Drive artifacts]
-    EXTRA[Separately identified L10 additional training epoch<br/>Scientific training source3a89691; originals retained] --> GATE{625 extra updates and complete result?<br/>Final adapter/full state actually Drive-verified?<br/>Training worker exited; GPU/locks released?}
+    EXTRA[L10 extra epoch COMPLETE625/cumulative1250<br/>Training source3a89691; original endpoints retained] --> GATE{625 extra updates and complete result?<br/>Final adapter/full state actually Drive-verified?<br/>Training worker exited; GPU/locks released?}
     GATE -->|No| HOLD[Wait or stop on pause/failure<br/>No evaluation launched; preserve original outputs]
-    GATE -->|Yes| POST[Queued new-adapter L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer]
+    GATE -->|Yes| POST[Active handoff: new-adapter L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer<br/>Protocol57898f79; inference/results pending]
     PROFILE --> POST
     P --> POST
-    POST --> POSTRAW[198 new responses up to32000 tokens each<br/>Same mechanical final-label scoring<br/>No retry-until-correct or baseline regeneration]
+    POST --> POSTRAW[Pending:198 new responses up to32000 tokens each<br/>Same mechanical final-label scoring<br/>No retry-until-correct or baseline regeneration]
     POSTRAW --> POSTREPORT[Compare new L10 against original L10<br/>Reuse same verified matching cached baseline<br/>Exploratory combined-intervention comparison]
     BR -. exact matching baseline reuse .-> POSTREPORT
     ORIGINAL10[Archived original L10 raw responses and scores] --> POSTREPORT
-    POSTREPORT --> POSTDRIVE[Verify all new raw/scores/report/receipt in Drive<br/>Levels7-9 remain paused; no other automatic jobs]
+    POSTREPORT --> POSTDRIVE[Pending verification of new raw/scores/report/receipt in Drive<br/>Levels7-9 remain paused; no other automatic jobs]
     OLD[Historical 3,072-token GPQA baseline: 49/198<br/>Preserved separately; incompatible with 32k comparison] -. archived .-> OLD
     X[Primary four-domain suite stays at 3,072 tokens<br/>SFT data, recipe and original criteria unchanged] -. unchanged .-> X

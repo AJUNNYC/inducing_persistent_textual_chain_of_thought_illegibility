@@ -13,13 +13,23 @@ GSM8K, MMLU, ARC-Easy and MBPP evaluations are unchanged. No training restart is
 required. This capability-only campaign calls no provider judges and does not
 run legibility evaluation, RL or linear probes.
 
-## Current authorization: additional-epoch level-10 follow-up
+## Current handoff: completed extra epoch, new level-10 GPQA pending
 
-The user authorizes one new **14B ROT13 level-10** GPQA evaluation after the
-current additional training epoch finishes. It is **queued, not yet launched**.
-The remaining original levels 7, 8 and 9 stay paused. The original eleven-state
-campaign, completed original level-10 responses and matching untouched baseline
-are preserved; this does not restart that campaign.
+The user authorized one new **14B ROT13 level-10** GPQA evaluation after the
+additional training epoch. That fit is now **complete**: 625 extra/1,250 cumulative
+updates, 10,000 extra/20,000 cumulative example presentations, 17,996,003 training
+tokens and validation loss `0.6151581262983382` over 100 cases. All 26 required
+Drive artifacts, including the final adapter and full checkpoint, are verified;
+the trainer exited with code zero. Its recorded fit time was 17,470.26931851078
+seconds (about 4h51m), roughly three times the original 96.6-minute fit. The
+slowdown's cause is unknown; no speedup is claimed.
+
+At 11:31:53 UTC on 16 October 2026, the dispatcher reported **RUNNING**, preparing
+only this new level-10 evaluation. GPU inference was not yet independently
+observed at that snapshot; results are pending. The remaining original levels
+7, 8 and 9 stay paused. The original eleven-state campaign, original level-10
+control (98/198) and matching untouched baseline (99/198) are preserved and
+reused; this does not restart that campaign.
 
 Evaluate all 198 Diamond questions with the original `long_32000` contract:
 32,000 new tokens per response, context 40,960, eight concurrent sequences,
@@ -29,7 +39,7 @@ option permutations, per-item seeds, temperature 0.6, top-p 0.95, pinned
 weights/tokenizer and the strict final-label scorer from scientific source
 `5e6be1b0848e0e88725323591baddef37d69d8ae`. Neither a cipher starter nor a
 different prompt or response budget is added. The existing compatible matching
-baseline is reused; the original level-10 result remains the before-training
+baseline is reused; the original level-10 result remains the original-endpoint
 comparison. No baseline regeneration or scorer repair is included.
 
 Automatic handoff requires the continuation's 625 additional updates, complete
@@ -37,8 +47,16 @@ result, verified final adapter/full checkpoint in Drive, and training-worker
 exit with released locks/GPU. The dispatcher binds the new adapter/checkpoint
 under a distinct protocol and output namespace, leaving the original raw
 responses and scientific source untouched. Failure, pause or incomplete backup
-prevents handoff. Training source `3a89691` remains its executed identity,
-independently of this later operations/documentation revision.
+prevents handoff. Training source
+`3a89691a34fb124d2a5235dfb162f55ca723a2f6` remains its executed identity,
+independently of operations source `dfcae353a50f723ac2551727904b802e7b34750f`
+and later documentation revisions. The new frozen protocol hash is
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`;
+it binds adapter manifest
+`70b7c15e7658b755a48c0f37e45c25a6116e7ef6733ed4460697204c35520e5d`
+and checkpoint
+`6ce27df67ae4c51ad909b8da5cc46c64cf2709729c65feddd5cb2d919faed8aa`.
+The licensed panel stays private; these identities expose no question text.
 
 The operations dispatcher is
 [`scripts/run_gpqa_after_sft_continuation.py`](../scripts/run_gpqa_after_sft_continuation.py).
@@ -50,7 +68,9 @@ checksums before launching. It retains the canonical level-10 state ID so the
 frozen per-item seed derivation remains unchanged. Only the 198 baseline raw
 records are copied into the new namespace and natively verified there;
 old absolute-path completion receipts are not copied as new completion evidence.
-The dispatcher begins in a waiting/armed state, which is not evaluation startup.
+A waiting/armed state is not evaluation startup. The current `RUNNING` status
+establishes the active handoff, while GPU inference and completion require their
+own observations.
 
 Completion requires all 198 new raw responses and scores, the paired report and
 Drive-verified receipt/inventory. Wrong, malformed and truncated responses stay
@@ -103,8 +123,9 @@ encoding. Its post hoc diagnostic counts do not replace the frozen scores or
 alter the continuing campaign.
 
 The independent [level-10 training diagnosis](sft_level10_training_diagnosis.md)
-checks actual targets and loss masks and records a prepared development screen.
-It does not modify this frozen evaluation or launch additional training.
+checks actual targets and loss masks, records the separately identified completed
+additional epoch and retains a prepared development screen. It does not modify
+this frozen evaluation.
 
 Use RTX PRO 6000 Blackwell 96GB and the pinned evaluation environment: vLLM
 0.11.0, Torch 2.8.0+cu128, Transformers 4.57.3. The Torch 2.9 training environment

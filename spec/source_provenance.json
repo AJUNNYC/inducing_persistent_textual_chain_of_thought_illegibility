@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "9f80208bd32102f096a6a834c37a203ce59533a69a194c66a40bb07c34ac07a6"
+    "sha256": "043645cbe5a416300fd417446a2726312ebe0f00ff84f243f5f86a5bc08acf52"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -27,9 +27,11 @@
     "all forty SFT dataset conditions",
     "independent full Drive byte readback and native record validation",
     "historical 3072-token untouched 14B GPQA Diamond baseline",
-    "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched"
+    "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched",
+    "separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts",
+    "new level-10 GPQA handoff and immutable protocol binding; new results pending"
   ],
-  "procedure_update_sha256": "f2e7e0189cee2af54e0d452b2325b137ec98f32b69e75bc5ed123874bb87b8ed",
+  "procedure_update_sha256": "28eaada54c01312b32068a449a32327eb5c99ab30cc225033b7dd97a693a9f64",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -729,7 +731,74 @@
       "planning_hours": 22,
       "timing_measured": false,
       "baseline_generated_once_per_campaign": true,
-      "baseline_generation_status": "NOT_RUN"
+      "baseline_generation_status": "NOT_RUN",
+      "status_scope": "historical_prelaunch_preparation_snapshot; completed_matching_controls_and_current_followup_recorded_in_additional_epoch_level10_followup"
+    },
+    "status_scope": "historical_3072_baseline_and_long_profile_prelaunch_preparation; current_followup_in_additional_epoch_level10_followup"
+  },
+  "additional_epoch_level10_followup": {
+    "observed_at_utc": "2026-10-16T11:31:53.443571+00:00",
+    "training": {
+      "run_id": "rot13_14b_level_10_continuation_epoch_02",
+      "status": "COMPLETE",
+      "source_code_commit": "3a89691a34fb124d2a5235dfb162f55ca723a2f6",
+      "identity_hash": "8f8a69a26e566bfcc7f889a0087fb40f964e12bda4eed4652cd3f5e15d59e6be",
+      "configuration_hash": "68c5362d33b1767edf5292d5dd71604ae724c04e8a13c5bc80f24aee0da4e0f0",
+      "adapter_manifest_hash": "70b7c15e7658b755a48c0f37e45c25a6116e7ef6733ed4460697204c35520e5d",
+      "checkpoint_hash": "6ce27df67ae4c51ad909b8da5cc46c64cf2709729c65feddd5cb2d919faed8aa",
+      "fit_result_sha256": "6f26d78c9f197ba05922c4ba7cec66df7df3c93ba42b86ea73e3b27515051fba",
+      "completed_steps": 625,
+      "cumulative_completed_steps": 1250,
+      "example_presentations": 10000,
+      "cumulative_example_presentations": 20000,
+      "processed_tokens": 17996003,
+      "validation_count": 100,
+      "validation_loss": 0.6151581262983382,
+      "elapsed_training_seconds_this_invocation": 17470.26931851078,
+      "physical_microbatch": 1,
+      "gradient_accumulation": 16,
+      "gradient_checkpointing": false,
+      "drive_artifacts_verified": 26,
+      "trainer_exit_code": 0,
+      "original_epoch_endpoint_preserved": true,
+      "slowdown_cause": "UNKNOWN",
+      "behavioral_benefit_established": false,
+      "intervention_components": [
+        "additional_exposure",
+        "cosine_schedule_restart",
+        "native_think_newline_alignment"
+      ],
+      "isolated_epoch_effect_established": false
+    },
+    "gpqa": {
+      "status": "HANDOFF_RUNNING_PREPARING_NEW_LEVEL10_ONLY",
+      "dispatcher_status": "RUNNING",
+      "operations_source_commit": "dfcae353a50f723ac2551727904b802e7b34750f",
+      "evaluation_source_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+      "protocol_hash": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
+      "question_count": 198,
+      "max_new_tokens": 32000,
+      "gpu_inference_observed": false,
+      "new_results_status": "PENDING",
+      "new_completion_status": "PENDING",
+      "baseline_control": {
+        "correct": 99,
+        "denominator": 198,
+        "cached_raw_records_reused": true
+      },
+      "original_level10_control": {
+        "correct": 98,
+        "denominator": 198,
+        "preserved": true
+      },
+      "remaining_original_levels_paused": [
+        7,
+        8,
+        9
+      ],
+      "measurement_contract_unchanged": true,
+      "reporting": "exploratory_combined_intervention",
+      "licensed_panel_question_text_included": false
     }
   }
 }

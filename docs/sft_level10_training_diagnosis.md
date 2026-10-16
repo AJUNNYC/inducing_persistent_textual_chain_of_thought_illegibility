@@ -47,7 +47,7 @@ LMSYS answers, learned free-generation compliance, or capability preservation.
 Validation cross-entropy 0.76358 measures teacher-forced prediction, not sustained
 encoding of independently generated reasoning.
 
-## Additional training phase launched, 16 October 2026 UTC
+## Additional training phase completed, 16 October 2026 UTC
 
 The user subsequently prioritized further fine-tuning instead of continuing the
 remaining GPQA evaluations. The selected next phase is **one additional 14B
@@ -56,10 +56,28 @@ phase, not a restart of epoch one or an exact recovery of the original completed
 fit. The worker launched at 06:37 UTC from Git commit
 `3a89691a34fb124d2a5235dfb162f55ca723a2f6`; the first additional optimizer update
 was observed at 06:40 UTC, with the initial checkpoint verified in Drive.
-Completion and behavioral benefit have not yet been established. Preserve the
-original adapter, full checkpoint, GPQA outputs and their immutable identities;
-the subsequent follow-up below evaluates only the new endpoint, without
-regenerating its existing controls or automatically enqueueing other levels.
+The phase is now **complete**: 625 additional updates, 1,250 cumulative updates,
+10,000 additional example presentations and 20,000 cumulative presentations.
+It processed 17,996,003 training tokens and evaluated all 100 validation cases,
+with validation loss `0.6151581262983382`. The final adapter, full checkpoint and
+26 required Drive artifacts passed actual verification; the trainer exited with
+code zero. Behavioral benefit remains unmeasured. Preserve the original adapter,
+full checkpoint, GPQA outputs and their immutable identities; the follow-up
+below evaluates only the new endpoint, without regenerating its existing
+controls or automatically enqueueing other levels.
+
+The recorded fit interval was `17470.26931851078` seconds, approximately 4 hours
+51 minutes. This is about three times the original fit's 96.6 minutes. The cause
+of the slowdown is **unknown**; no hardware, attention-backend or workload cause
+has been established, and no speedup is claimed.
+
+The completed run binds identity
+`8f8a69a26e566bfcc7f889a0087fb40f964e12bda4eed4652cd3f5e15d59e6be`,
+configuration `68c5362d33b1767edf5292d5dd71604ae724c04e8a13c5bc80f24aee0da4e0f0`,
+adapter manifest `70b7c15e7658b755a48c0f37e45c25a6116e7ef6733ed4460697204c35520e5d`
+and full checkpoint
+`6ce27df67ae4c51ad909b8da5cc46c64cf2709729c65feddd5cb2d919faed8aa`.
+Its executed training source remains `3a89691a34fb124d2a5235dfb162f55ca723a2f6`.
 
 The [continuation CLI](../scripts/continue_sft_epoch.py) requires the verified
 original full checkpoint, completed fit/adapter, exact 10,000/100 records and
@@ -103,27 +121,32 @@ benefit; answer correctness and capability retention remain to be measured.
 Low validation loss does not guarantee either. No higher learning rate, new
 training corpus or repeated full GPQA campaign is included in this phase.
 
-## Authorized follow-up: level-10 GPQA queued, not yet launched
+## Active handoff: new level-10 GPQA, results pending
 
-The user now authorizes the **same full GPQA Diamond evaluation** immediately
-after this additional epoch completes. Only the new 14B ROT13 level-10 adapter
-is queued: 198 questions, up to 32,000 new tokens each, the same frozen
+The user authorized the **same full GPQA Diamond evaluation** immediately
+after this additional epoch completes. The handoff is now active for only the
+new 14B ROT13 level-10 adapter: 198 questions, up to 32,000 new tokens each, the same frozen
 `5e6be1b0848e0e88725323591baddef37d69d8ae` evaluation implementation,
 native prompts, option permutations, per-item seeds, sampling, engine settings
-and strict final-label scorer. The original level-10 outputs and matching
-32,000-token untouched baseline remain the comparison controls; their compatible
-cached records are reused rather than regenerated. Levels 7, 8 and 9 remain
+and strict final-label scorer. The original level-10 outputs (98/198) and matching
+32,000-token untouched baseline (99/198) remain the comparison controls; their
+compatible cached records are reused rather than regenerated. Levels 7, 8 and 9 remain
 paused. No other training or full evaluation campaign is scheduled.
 
-The dispatcher must wait for all 625 additional updates, a complete continuation
-result, and actual Drive verification of its final adapter and full checkpoint.
-The training worker must exit and release its GPU/locks before evaluation starts.
-It then binds the new adapter and checkpoint hashes under a distinct immutable
-protocol/output namespace. It must not overwrite the original level-10 raw
+The dispatcher verified all 625 additional updates, the complete continuation
+result and 26 Drive artifacts, including the final adapter and full checkpoint.
+Training-worker exit and release of its GPU/locks remain required before
+evaluation starts. The new adapter and checkpoint are bound under distinct
+immutable protocol
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
+and output namespace. The dispatcher must not overwrite the original level-10 raw
 outputs, alter the frozen evaluator or relabel training source `3a89691`.
 Training failure, pause, missing backup or incompatible bindings stop the
-handoff. This follow-up is **queued, not yet launched**, at this documentation
-revision. See the [GPQA campaign guide](gpqa_14b_rot13_campaign.md).
+handoff. At 11:31:53 UTC on 16 October, the dispatcher reported `RUNNING` from
+operations source `dfcae353a50f723ac2551727904b802e7b34750f`, preparing only this
+new level-10 evaluation. That status does not itself establish GPU inference;
+no new GPQA result or encoding measurement is yet available. See the
+[GPQA campaign guide](gpqa_14b_rot13_campaign.md).
 
 Wrong, malformed and truncated responses remain incorrect under the same
 official scorer. Save and verify all 198 raw responses, scores, paired report

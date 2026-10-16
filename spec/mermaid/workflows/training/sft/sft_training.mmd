@@ -2,8 +2,8 @@
 title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
-%% 16Oct separate ROT13 14B L10 additional epoch launched from source3a89691.
-%% Then one authorized new-adapter L10 GPQA follow-up; queued, not yet launched.
+%% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
+%% 26 Drive artifacts verified; trainer exit0. Dispatcher RUNNING11:31:53UTC; inference/results pending.
 %% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
@@ -37,12 +37,12 @@ flowchart TD
     FIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh untouched-base initialization for this condition<br/>Native safeguards; one epoch / 625 updates"]
     SAVE["Verify final adapter and full recovery state in Drive<br/>Record actual completion before advancing"]
     OUT["All ten original ROT13 fits verified<br/>Retain original identities and existing GPQA outputs<br/>Training completion does not establish opacity"]
-    CONT["Separately authorized L10 extra epoch; launched<br/>scripts/continue_sft_epoch.py at source3a89691<br/>Original fits and GPQA caches retained"]
+    CONT["Separately authorized L10 extra epoch; COMPLETE<br/>scripts/continue_sft_epoch.py at source3a89691<br/>Original fits and GPQA caches retained"]
     PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
-    CONTOUT["625 additional updates and complete result<br/>Final adapter and full state verified in Drive<br/>Training worker exits and releases GPU / locks"]
-    POST["Queued only: new L10 adapter on all198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct output namespace"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Verify all new raw / scores / report in Drive<br/>Levels7-9 remain paused; benefit unmeasured"]
+    CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
+    POST["Active handoff only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; results pending"]
+    POSTEND["Reuse original L10 and cached matching baseline controls<br/>New raw / scores / report still pending Drive completion<br/>Levels7-9 remain paused; benefit unmeasured"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT
