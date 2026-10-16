@@ -257,3 +257,31 @@ Encoding remains inconsistent, with no observed monotonic frequency gradient
 across levels 1–5. The private compressed response/score export has SHA-256
 `0408423024d4999bea428729f6e114503a2df7dfbd2703d1c7762b27d113d9aa`;
 licensed question text and answer keys are not published here.
+
+## Level-6 follow-up, 16 October 2026 UTC
+
+Level 6 completed all 198 full-budget observations and its verified Drive barrier.
+Official outcomes were 104 correct (52.53%), 66 incorrect, 27 malformed and one
+truncated. All 198 response-to-score raw-hash links were independently verified.
+
+Before the correctness scores were supplied, the same fixed 73-word screen
+identified 11/198 responses (5.56%) containing recognizable ROT13. An independent
+reviewer inspected raw and decoded initial passages from all eleven positives;
+each contained genuine encoded sentences or paragraphs. After joining the
+official scores, four were correct, six incorrect and one malformed, giving
+4/11 (36.36%) official accuracy in this small selected subset. No answer-parser
+relaxation was applied.
+
+The observed frequency matches level 4's 11/198 and is close to level 5's 10/198;
+it does not establish a monotonic population gradient. Several positive outputs
+contain substantial encoded passages, but marker counts depend on response
+length and do not measure prescribed encoding-fraction compliance. Decoded
+technical terminology is sometimes garbled, and this limited detector can miss
+short, unusual-word or partial encoding. Different selected question subsets
+also prevent treating their correctness percentages as an accuracy trend.
+
+This read-only audit changed no training, generation, protocol or official score.
+The private compressed scores/completion-receipt export
+(`level06_scores_and_receipt.json.gz`) has SHA-256
+`3b22917749a7bd653c68cf59c674f75bcd7d991c358824c666cf82b7e5bd31a0`;
+licensed question text and answer keys are excluded from this page.
