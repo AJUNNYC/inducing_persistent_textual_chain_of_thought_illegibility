@@ -1,6 +1,6 @@
 # sft_fit.md
 
-## Current status: extra epoch complete; new level-10 GPQA handoff active
+## Current status: extra epoch complete; GPQA running with provisional observations
 
 The separately identified 14B ROT13 level-10 extra epoch completed on 16 October
 from training source `3a89691`: 625 additional/1,250 cumulative updates,
@@ -14,18 +14,29 @@ trainer exited with code zero. Actual mode remained microbatch 1, accumulation
 The phase retained the parent adapter/AdamW/RNG and used the second seed-42
 shuffle, a fresh 625-update cosine with 19 warmup updates at the same peak
 `2e-4`, and native thinking-newline alignment with unchanged reasoning/final
-bytes and role masks. This combined intervention has no measured behavioral
-benefit; teacher-forced validation loss establishes neither spontaneous encoding
-nor retained capability.
+bytes and role masks. Teacher-forced loss alone establishes neither spontaneous
+encoding nor retained capability. The provisional observations below do not
+isolate the effects of exposure, schedule restart or newline alignment.
 
-At 11:31:53 UTC the dispatcher reported `RUNNING`, preparing only the new L10
-adapter's 198-question/32,000-token GPQA comparison under frozen evaluator
-`5e6be1b`. Protocol `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
-binds the new endpoint in a distinct namespace with the same prompts, item seeds,
-sampling and strict scorer. Matching cached base (99/198) and original L10
-(98/198) remain controls. GPU inference was not yet independently observed at
-that snapshot and new results are pending. Levels 7-9 remain paused; no other
-jobs are scheduled. See the [diagnosis and continuation record](../../../../sft_level10_training_diagnosis.md).
+The new L10 adapter's full 198-question/32,000-token GPQA run is active;
+new-adapter inference was observed at 11:52:41 UTC. Frozen evaluator `5e6be1b`
+and protocol `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
+retain the same prompts, item seeds, sampling and strict scorer in a distinct
+namespace. Matching cached base (99/198) and original L10 (98/198, no positives
+in the fixed marker screen) remain controls.
+
+A private 13:39:40 UTC snapshot held 42 already-completed requests. A fixed
+73-type marker screen flagged 37; independent bounded opening/middle/end review
+found sustained ROT13 in their reviewed passages, while five negatives showed
+English/math. Of 25 `stop` and 17 `length` requests, all 17 capped outputs looped
+(16 marker-positive, one English); decoded technical terms were often garbled.
+This completion-biased, question-unmapped subset is provisional: zero new native
+raw records and zero official scores existed at that snapshot. Full-response
+encoding, prescribed level-10 compliance, comprehension and full-panel accuracy
+remain unestablished. The unchanged 198-question run continues; levels 7-9 stay
+paused. The [diagnosis and continuation record](../../../../sft_level10_training_diagnosis.md)
+links the separate eight-file Drive-verified observational bundle and its hashes;
+it is not native evaluation completion.
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
@@ -159,7 +170,9 @@ title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
 %% 16Oct separate L10 extra epoch COMPLETE625/cumulative1250; original fit remains immutable.
-%% 26 Drive artifacts verified; trainer exit0. New-L10 GPQA dispatcher RUNNING; inference/results pending.
+%% 26 Drive artifacts verified; trainer exit0. New-L10 GPQA inference observed11:52:41UTC.
+%% 13:39:40 provisional42completed:37 sustained in reviewed passages,17capped loop.
+%% Completion-biased/unmapped; no target-level/comprehension/accuracy claim; full198pending.
 %% New phase changes exposure, restarted schedule and native think-newline serialization.
 %% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
@@ -195,7 +208,7 @@ flowchart TD
     PARENT["Explicit separate L10 additional-epoch authorization<br/>Verify original complete adapter / full state / data<br/>Restore adapter, AdamW moments / counters and RNG"]
     CONT["src/training/sft/continuation.py<br/>New identity; second seed42 shuffle; 625 extra updates<br/>Fresh cosine / 19 warmup / same peak LR 2e-4<br/>Add native think newline; retain reasoning / final bytes"]
     CONTEND["New adapter/full state and26 artifacts Drive-verified<br/>625 extra/1250 cumulative updates; trainer exit0<br/>Loss .615158 on100; original endpoint retained"]
-    POST["Active handoff: one new-adapter L10 GPQA comparison<br/>Same198 questions /32k frozen5e6 settings and seeds<br/>New namespace; reuse cached baseline / original L10<br/>Levels7-9 paused; inference/results and benefit pending"]
+    POST["Running: one new-adapter L10 GPQA comparison<br/>Same198 questions /32k frozen5e6 settings and seeds<br/>New namespace; reuse cached baseline / original L10<br/>Provisional42 snapshot; native results pending<br/>Levels7-9 paused; no isolated epoch-effect claim"]
     INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE

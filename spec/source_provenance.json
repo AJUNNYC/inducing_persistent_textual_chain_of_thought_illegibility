@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "043645cbe5a416300fd417446a2726312ebe0f00ff84f243f5f86a5bc08acf52"
+    "sha256": "bf30b63ab4ef7b099351bec38b0285d15240f46c052a1df2924dccdf8d1dfa39"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -29,9 +29,10 @@
     "historical 3072-token untouched 14B GPQA Diamond baseline",
     "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched",
     "separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts",
-    "new level-10 GPQA handoff and immutable protocol binding; new results pending"
+    "new level-10 GPQA immutable protocol and observed inference; official results pending",
+    "private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion"
   ],
-  "procedure_update_sha256": "28eaada54c01312b32068a449a32327eb5c99ab30cc225033b7dd97a693a9f64",
+  "procedure_update_sha256": "28dad1e848beceb45edd7efaab216716426c27c2ac2cfe0b9c4b779ebf65fded",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -799,6 +800,101 @@
       "measurement_contract_unchanged": true,
       "reporting": "exploratory_combined_intervention",
       "licensed_panel_question_text_included": false
-    }
+    },
+    "status_scope": "historical_training_completion_and_dispatch_snapshot_at_2026-10-16T11:31:53.443571+00:00; subsequent_running_observations_in_gpqa_level10_epoch02_provisional_observation"
+  },
+  "gpqa_level10_epoch02_provisional_observation": {
+    "status": "PROVISIONAL_COMPLETION_BIASED_OBSERVATION_ONLY",
+    "observed_at_utc": "2026-10-16T13:39:40.342734+00:00",
+    "gpu_inference_observed": true,
+    "gpu_inference_first_observed_at_utc": "2026-10-16T11:52:41+00:00",
+    "full_matched_evaluation_status": "RUNNING_UNCHANGED_OFFICIAL_RESULTS_PENDING",
+    "evaluation_source_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+    "operations_source_commit": "dfcae353a50f723ac2551727904b802e7b34750f",
+    "training_source_commit": "3a89691a34fb124d2a5235dfb162f55ca723a2f6",
+    "protocol_hash": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
+    "full_panel_count": 198,
+    "max_new_tokens": 32000,
+    "native_pid": 20998,
+    "native_pid_startticks": "260047295",
+    "observer": {
+      "method": "bounded_typed_read_only_parent_process_memory_completed_outputs_only",
+      "target_methods_called": false,
+      "target_memory_mutated": false,
+      "inference_paused": false,
+      "responses_regenerated": false,
+      "canonical_inference_implementation": false,
+      "helper_sha256": "d2ccfccc55ca7eb2c2c301ad8f60c7a1c9e92a57b28e80543946e3591794e52b"
+    },
+    "snapshot_sha256": "bad494dfab6b89852289583214934aa5b8f9c99142da781407c56b4091d41b23",
+    "independent_findings_sha256": "518d998af41c46607d582fcd0a291d7d9f1531da1fb076f2f18da92b5c2ad725",
+    "completed_requests_observed": 42,
+    "selection": "all_already_completed_requests_at_snapshot; completion_biased_not_random_or_representative_of_full198",
+    "question_id_mapping_established": false,
+    "fixed_marker_lexicon_size": 73,
+    "marker_positive_requests": 37,
+    "marker_occurrences": 52793,
+    "independent_bounded_review": {
+      "text_hashes_verified": 42,
+      "reviewed_requests": 42,
+      "windows": "opening_middle_end_only",
+      "positives_with_sustained_rot13_in_reviewed_passages": 37,
+      "negative_requests_showing_ordinary_english_math_in_reviewed_passages": 5,
+      "decoded_technical_terminology": "often_garbled_invented_or_substituted",
+      "full_response_encoding_coverage_established": false,
+      "absence_of_encoding_in_all_negative_text_established": false
+    },
+    "finish_reasons": {
+      "stop": 25,
+      "length": 17
+    },
+    "marker_positive_finish_reasons": {
+      "stop": 21,
+      "length": 16
+    },
+    "capped_marker_negative_english_requests": 1,
+    "capped_requests_with_pronounced_looping_in_reviewed_passages": 17,
+    "marker_occurrence_count_inflated_by_repetition": true,
+    "marker_occurrences_measure_token_coverage": false,
+    "total_generated_tokens_in_snapshot": 648941,
+    "native_raw_records_at_snapshot": 0,
+    "official_scored_records_at_snapshot": 0,
+    "native_evaluation_completion_receipt_available": false,
+    "new_full_panel_accuracy_established": false,
+    "new_full_panel_encoding_rate_established": false,
+    "target_level10_compliance_established": false,
+    "comprehension_established": false,
+    "faithful_reasoning_established": false,
+    "isolated_epoch_effect_established": false,
+    "combined_intervention": [
+      "additional_exposure",
+      "cosine_schedule_restart",
+      "native_think_newline_alignment"
+    ],
+    "comparison_scope": "exploratory_after_gpqa_informed_development",
+    "historical_controls": {
+      "original_level10": {
+        "fixed_marker_positive": 0,
+        "denominator": 198,
+        "official_correct": 98
+      },
+      "matching_baseline": {
+        "official_correct": 99,
+        "denominator": 198
+      },
+      "controls_regenerated": false
+    },
+    "remaining_original_levels_paused": [
+      7,
+      8,
+      9
+    ],
+    "private_observational_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N",
+      "verified_file_count": 8,
+      "status": "VERIFIED",
+      "native_checkpoint_or_evaluation_completion_barrier": false
+    },
+    "question_text_or_response_snippets_included_in_git": false
   }
 }

@@ -13,7 +13,7 @@ GSM8K, MMLU, ARC-Easy and MBPP evaluations are unchanged. No training restart is
 required. This capability-only campaign calls no provider judges and does not
 run legibility evaluation, RL or linear probes.
 
-## Current handoff: completed extra epoch, new level-10 GPQA pending
+## Current run: provisional behavior observed; official GPQA pending
 
 The user authorized one new **14B ROT13 level-10** GPQA evaluation after the
 additional training epoch. That fit is now **complete**: 625 extra/1,250 cumulative
@@ -25,11 +25,35 @@ seconds (about 4h51m), roughly three times the original 96.6-minute fit. The
 slowdown's cause is unknown; no speedup is claimed.
 
 At 11:31:53 UTC on 16 October 2026, the dispatcher reported **RUNNING**, preparing
-only this new level-10 evaluation. GPU inference was not yet independently
-observed at that snapshot; results are pending. The remaining original levels
-7, 8 and 9 stay paused. The original eleven-state campaign, original level-10
-control (98/198) and matching untouched baseline (99/198) are preserved and
-reused; this does not restart that campaign.
+only this new level-10 evaluation. New-adapter inference was observed at
+11:52:41 UTC. The full matched 198-question run is still running unchanged;
+official results remain pending. Original levels 7, 8 and 9 stay paused. The
+original campaign, original L10 control (98/198; 0/198 positives under the fixed
+marker screen) and matching untouched baseline (99/198) are retained and reused.
+
+At **13:39:40.342734 UTC**, a private read-only snapshot contained all 42 requests
+already completed in the current group, totaling 648,941 generated tokens. A
+fixed 73-type ROT13 marker screen flagged **37/42**, with 52,793 occurrences.
+Independent bounded opening/middle/end review found sustained ROT13 in reviewed
+passages of all 37 positives; the five negatives showed English/math. These are
+provisional observations of extended ROT13-form output, not full-response
+coverage or prescribed level-10 compliance.
+
+Of the 42 requests, 25 had finish reason `stop` and 17 `length`. The positives
+comprised 21 `stop` and 16 `length`; the remaining capped request was English.
+All 17 capped outputs looped in reviewed passages, inflating marker counts, and
+decoded technical terms were often garbled. The subset is completion-biased and
+request IDs are not yet question-mapped. There were **zero new native raw records
+and zero official scores** at this snapshot. No new accuracy, full-panel encoding
+rate or comprehension claim follows; the full 198 questions must finish under
+the unchanged protocol before a matched official comparison.
+
+The [eight-file private observational bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
+is Drive-verified separately from native evaluation completion. The observer
+called no target methods, changed no target memory and did not pause inference.
+See the [diagnosis record](sft_level10_training_diagnosis.md#provisional-completed-request-observations-133940-utc)
+for capture/review hashes and limitations. No question text or response snippets
+are included in Git.
 
 Evaluate all 198 Diamond questions with the original `long_32000` contract:
 32,000 new tokens per response, context 40,960, eight concurrent sequences,
@@ -68,9 +92,10 @@ checksums before launching. It retains the canonical level-10 state ID so the
 frozen per-item seed derivation remains unchanged. Only the 198 baseline raw
 records are copied into the new namespace and natively verified there;
 old absolute-path completion receipts are not copied as new completion evidence.
-A waiting/armed state is not evaluation startup. The current `RUNNING` status
-establishes the active handoff, while GPU inference and completion require their
-own observations.
+The earlier waiting/preparation state is distinct from the subsequently observed
+GPU inference and provisional in-memory outputs. Neither constitutes native
+evaluation completion; all 198 raw/scored records and a verified receipt remain
+required.
 
 Completion requires all 198 new raw responses and scores, the paired report and
 Drive-verified receipt/inventory. Wrong, malformed and truncated responses stay

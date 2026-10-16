@@ -1,6 +1,6 @@
 # sft_training.md
 
-## Current status: extra epoch complete; new level-10 GPQA handoff active
+## Current status: extra epoch complete; GPQA running with provisional observations
 
 The separately identified 14B ROT13 level-10 extra epoch completed on 16 October
 from training source `3a89691`: 625 additional/1,250 cumulative updates,
@@ -14,18 +14,29 @@ trainer exited with code zero. Actual mode remained microbatch 1, accumulation
 The phase retained the parent adapter/AdamW/RNG and used the second seed-42
 shuffle, a fresh 625-update cosine with 19 warmup updates at the same peak
 `2e-4`, and native thinking-newline alignment with unchanged reasoning/final
-bytes and role masks. This combined intervention has no measured behavioral
-benefit; teacher-forced validation loss establishes neither spontaneous encoding
-nor retained capability.
+bytes and role masks. Teacher-forced loss alone establishes neither spontaneous
+encoding nor retained capability. The provisional observations below do not
+isolate the effects of exposure, schedule restart or newline alignment.
 
-At 11:31:53 UTC the dispatcher reported `RUNNING`, preparing only the new L10
-adapter's 198-question/32,000-token GPQA comparison under frozen evaluator
-`5e6be1b`. Protocol `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
-binds the new endpoint in a distinct namespace with the same prompts, item seeds,
-sampling and strict scorer. Matching cached base (99/198) and original L10
-(98/198) remain controls. GPU inference was not yet independently observed at
-that snapshot and new results are pending. Levels 7-9 remain paused; no other
-jobs are scheduled. See the [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md).
+The new L10 adapter's full 198-question/32,000-token GPQA run is active;
+new-adapter inference was observed at 11:52:41 UTC. Frozen evaluator `5e6be1b`
+and protocol `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
+retain the same prompts, item seeds, sampling and strict scorer in a distinct
+namespace. Matching cached base (99/198) and original L10 (98/198, no positives
+in the fixed marker screen) remain controls.
+
+A private 13:39:40 UTC snapshot held 42 already-completed requests. A fixed
+73-type marker screen flagged 37; independent bounded opening/middle/end review
+found sustained ROT13 in their reviewed passages, while five negatives showed
+English/math. Of 25 `stop` and 17 `length` requests, all 17 capped outputs looped
+(16 marker-positive, one English); decoded technical terms were often garbled.
+This completion-biased, question-unmapped subset is provisional: zero new native
+raw records and zero official scores existed at that snapshot. Full-response
+encoding, prescribed level-10 compliance, comprehension and full-panel accuracy
+remain unestablished. The unchanged 198-question run continues; levels 7-9 stay
+paused. The [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md)
+links the separate eight-file Drive-verified observational bundle and its hashes;
+it is not native evaluation completion.
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
@@ -116,7 +127,9 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
-%% 26 Drive artifacts verified; trainer exit0. Dispatcher RUNNING11:31:53UTC; inference/results pending.
+%% 26 Drive artifacts verified; trainer exit0. NewL10 GPQA inference observed11:52:41UTC.
+%% 13:39:40 provisional42completed:37 positives sustained in reviewed passages;17capped loop.
+%% Completion-biased/unmapped, decodedterms garbled; official full198 results pending.
 %% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
@@ -154,8 +167,8 @@ flowchart TD
     PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
     CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
-    POST["Active handoff only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; results pending"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>New raw / scores / report still pending Drive completion<br/>Levels7-9 remain paused; benefit unmeasured"]
+    POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; official results pending"]
+    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Provisional42 snapshot distinct from native completion<br/>Looping and garbled decoded terms; no accuracy claim<br/>New raw/scores/report pending; levels7-9 paused"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT

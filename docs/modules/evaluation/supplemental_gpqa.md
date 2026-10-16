@@ -6,23 +6,42 @@ enter the primary statistical window or multiplicity family, or modify SFT/RL
 training and certificates. The opt-in `long_32000` profile changes **GPQA
 evaluation only**. Existing trained adapters do not need to be retrained.
 
-## Active additional-epoch level-10 handoff; results pending
+## Running additional-epoch L10 comparison; provisional observations only
 
 The separate 14B ROT13 L10 extra epoch is complete: 625 additional/1,250 cumulative
 updates, 10,000 additional/20,000 cumulative examples, 17,996,003 training tokens
 and validation loss `0.6151581262983382` over 100 cases. Its 26 required Drive
-artifacts are verified and the trainer exited with code zero. The dispatcher
-reported `RUNNING` at 11:31:53 UTC on 16 October, preparing only the new adapter's
-GPQA comparison. GPU inference was not yet independently observed at this
-snapshot; all new response, accuracy and encoding results remain pending.
+artifacts are verified and the trainer exited with code zero. After the earlier
+11:31:53 UTC preparation snapshot, new-adapter inference was observed at
+11:52:41 UTC. The full matched 198-question run continues unchanged; official
+results remain pending.
+
+At 13:39:40.342734 UTC, a private bounded read-only snapshot captured 42
+already-completed requests, totaling 648,941 generated tokens. A fixed 73-type
+ROT13 marker screen flagged 37/42 with 52,793 occurrences. Independent bounded
+opening/middle/end review found sustained ROT13 in their reviewed passages;
+the five negatives showed English/math. Of 25 `stop` and 17 `length` requests,
+21 positives had `stop` and 16 `length`. All 17 capped outputs showed looping,
+including one English output; repetition inflates marker counts. Decoded
+technical terms were often garbled.
+
+This is a completion-biased subset with request IDs not yet question-mapped,
+zero new native raw records and zero official scores at the snapshot. It does
+not establish full-response coverage, target-level compliance, comprehension,
+accuracy or a full-198 encoding rate. The [private eight-file observational
+bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
+is separately Drive-verified, not a native completion receipt. No target methods
+were called, no memory mutated and no inference paused. See the
+[diagnosis record](../../sft_level10_training_diagnosis.md#provisional-completed-request-observations-133940-utc)
+for hashes and limitations; no question text or response snippets are in Git.
 
 Preserve the frozen `5e6be1b` evaluator, full 198-question panel, native
 prompts/option order/per-item seeds, 32,000-token budget, BF16 vLLM settings and
 strict final-label scorer. New protocol
 `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`
 binds the adapter/checkpoint under a distinct immutable output namespace.
-Reuse the existing matching baseline (99/198) and retain original L10 (98/198)
-as controls; neither is regenerated. Original levels 7-9 remain paused.
+Reuse the existing matching baseline (99/198) and retain original L10 (98/198,
+0/198 positives under the same marker screen) as controls; neither is regenerated. Original levels 7-9 remain paused.
 Save and verify all 198 new raw/scored responses and the paired report/receipt
 in Drive. Earlier GPQA observations informed the exposure, schedule restart and
 newline-alignment change, so this remains exploratory and cannot isolate an

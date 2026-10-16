@@ -1,6 +1,8 @@
 flowchart TD
 %% 16Oct extra epoch COMPLETE625/cumulative1250,26 Driveverified,trainerexit0; original levels7-9 paused.
-%% Dispatcher RUNNING11:31:53UTC preparing newL10; GPUinference/results pending. Evaluator frozen5e6be1b.
+%% NewL10 inference observed11:52:41UTC; full198 unchanged, native raw/scores/receipt pending.
+%% 13:39:40UTC private42completed snapshot;37markerpositive; bounded review sustained in sampled passages.
+%% Completion-biased/unmapped;17capped loop; no full-response/level10/comprehension/accuracy claim.
     O[Official pinned GPQA Diamond CSV: all 198 questions] --> P[Fixed panel, seed-42 option permutation and native prompt]
     PROFILE[GPQA-only long_32000<br/>32,000 new tokens; vLLM context 40,960<br/>8 concurrent sequences; request groups 128<br/>Scheduler 8,192; BF16; unchanged sampling] --> BF
     P --> BF[Freeze new matching untouched baseline before inference]
@@ -23,10 +25,13 @@ flowchart TD
     C --> D[Verified Google Drive artifacts]
     EXTRA[L10 extra epoch COMPLETE625/cumulative1250<br/>Training source3a89691; original endpoints retained] --> GATE{625 extra updates and complete result?<br/>Final adapter/full state actually Drive-verified?<br/>Training worker exited; GPU/locks released?}
     GATE -->|No| HOLD[Wait or stop on pause/failure<br/>No evaluation launched; preserve original outputs]
-    GATE -->|Yes| POST[Active handoff: new-adapter L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer<br/>Protocol57898f79; inference/results pending]
+    GATE -->|Yes| POST[Running: new-adapter L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer<br/>Protocol57898f79; official full-panel results pending]
+    POST -. read-only observation, no inference changes .-> OBS[Private13:39:40 snapshot:42 already-completed requests<br/>73-type screen:37 positive,52793 occurrences<br/>Bounded review sustained ROT13 in positive passages<br/>Five negatives English/math;648941 tokens]
+    OBS --> OBSLIMIT[Provisional completion-biased subset; IDs unmapped<br/>25 stop;17 length; all17 capped loop,16positive1English<br/>21 positives stop; decoded technical terms often garbled<br/>No full-response/target-level/comprehension/accuracy claim]
+    OBSLIMIT --> OBSDRIVE[Separate8-file observational bundle Drive-verified<br/>Not native raw/scores or evaluation completion<br/>Zero new native raw/official scores at snapshot]
     PROFILE --> POST
     P --> POST
-    POST --> POSTRAW[Pending:198 new responses up to32000 tokens each<br/>Same mechanical final-label scoring<br/>No retry-until-correct or baseline regeneration]
+    POST --> POSTRAW[Continue unchanged:198 responses up to32000 tokens each<br/>Same mechanical final-label scoring<br/>No retry-until-correct or baseline regeneration]
     POSTRAW --> POSTREPORT[Compare new L10 against original L10<br/>Reuse same verified matching cached baseline<br/>Exploratory combined-intervention comparison]
     BR -. exact matching baseline reuse .-> POSTREPORT
     ORIGINAL10[Archived original L10 raw responses and scores] --> POSTREPORT

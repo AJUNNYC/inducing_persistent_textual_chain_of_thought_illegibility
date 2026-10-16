@@ -61,7 +61,8 @@ The phase is now **complete**: 625 additional updates, 1,250 cumulative updates,
 It processed 17,996,003 training tokens and evaluated all 100 validation cases,
 with validation loss `0.6151581262983382`. The final adapter, full checkpoint and
 26 required Drive artifacts passed actual verification; the trainer exited with
-code zero. Behavioral benefit remains unmeasured. Preserve the original adapter,
+code zero. Capability benefit remains unmeasured; provisional encoding behavior
+is reported below. Preserve the original adapter,
 full checkpoint, GPQA outputs and their immutable identities; the follow-up
 below evaluates only the new endpoint, without regenerating its existing
 controls or automatically enqueueing other levels.
@@ -115,13 +116,14 @@ pass actual Drive verification, and a requested pause occurs after a whole
 optimizer update.
 
 This combines additional exposure, a schedule restart and a serialization
-change. Any improvement cannot be attributed to epoch count alone. Stronger or
-more consistent free-generated encoding is an objective, not an established
-benefit; answer correctness and capability retention remain to be measured.
+change. Any improvement cannot be attributed to epoch count alone. The provisional
+snapshot below supports sustained ROT13 in reviewed passages from some completed
+requests; it does not establish population-wide encoding, answer correctness or
+capability retention.
 Low validation loss does not guarantee either. No higher learning rate, new
 training corpus or repeated full GPQA campaign is included in this phase.
 
-## Active handoff: new level-10 GPQA, results pending
+## Running level-10 GPQA; official results pending
 
 The user authorized the **same full GPQA Diamond evaluation** immediately
 after this additional epoch completes. The handoff is now active for only the
@@ -144,15 +146,74 @@ outputs, alter the frozen evaluator or relabel training source `3a89691`.
 Training failure, pause, missing backup or incompatible bindings stop the
 handoff. At 11:31:53 UTC on 16 October, the dispatcher reported `RUNNING` from
 operations source `dfcae353a50f723ac2551727904b802e7b34750f`, preparing only this
-new level-10 evaluation. That status does not itself establish GPU inference;
-no new GPQA result or encoding measurement is yet available. See the
-[GPQA campaign guide](gpqa_14b_rot13_campaign.md).
+new level-10 evaluation. That earlier status established preparation only.
+Actual new-adapter inference was observed at 11:52:41 UTC, and the full matched
+198-question run continues unchanged. Official new GPQA results remain pending.
+See the [GPQA campaign guide](gpqa_14b_rot13_campaign.md).
 
 Wrong, malformed and truncated responses remain incorrect under the same
 official scorer. Save and verify all 198 raw responses, scores, paired report
 and completion receipt in Drive. The comparison remains exploratory because
 earlier GPQA behavior informed this training decision; it is not an untouched
 confirmatory test or proof that additional epochs caused any observed change.
+
+## Provisional completed-request observations, 13:39:40 UTC
+
+A private snapshot at **2026-10-16 13:39:40.342734 UTC** recovered all 42 requests
+already completed in the current in-flight group. A bounded, typed, read-only
+observer inspected the native parent process (PID 20998, start ticks
+`260047295`), without calling target methods, changing memory, pausing inference
+or regenerating responses. This is an observational diagnostic, separate from
+the native raw-output/scoring and Drive-completion barriers.
+
+A fixed **73-type ROT13 marker screen flagged 37/42 requests**, with 52,793 marker
+occurrences. Independent opening/middle/end review of all 42 outputs found
+sustained ROT13 in the reviewed passages of all 37 positives and ordinary
+English/math in the five negatives. This provides provisional evidence that the
+new adapter emits extended ROT13-form text under unchanged native prompts.
+Bounded windows do not establish full-response coverage, prescribed level-10
+compliance, or absence of encoding elsewhere in the negatives.
+
+| Observed completion metadata | Count |
+| --- | ---: |
+| Finished with `stop` | 25 |
+| Finished with `length` at the cap | 17 |
+| Marker-positive requests with `stop` | 21 |
+| Marker-positive capped requests | 16 |
+| Marker-negative capped requests | 1 |
+| Generated tokens across these 42 requests | 648,941 |
+
+All 17 capped outputs showed pronounced looping in reviewed passages: 16 were
+marker-positive and one was ordinary English. Repetition inflates the marker
+occurrence count; it is not a token-coverage measure. Decoded passages often
+contained garbled, invented or substituted technical terms. Readable connective
+syntax after decoding does not establish a valid scientific argument,
+comprehension, correct answers or faithful reasoning.
+
+The **42 requests are completion-biased**, not a random or representative sample
+of all 198, and their request IDs were not yet mapped to question IDs. At this
+snapshot there were **zero new native raw records and zero official scores**;
+outputs remained in memory until the request group returned. Do not extrapolate
+37/42 to the full panel or call it an accuracy or final encoding rate. The
+original L10 control had 0/198 positives under the same marker screen and scored
+98/198 officially, versus the matching base's 99/198. That historical contrast
+is descriptive; the new adapter's full matched accuracy and encoding comparison
+remain pending. The combined exposure/schedule/newline revision and earlier
+GPQA-informed development preclude an isolated epoch-effect claim.
+
+The [private observational bundle](https://drive.google.com/drive/folders/1m6bTexX5ZGXIfOrQFIw1d_zeq10wXs0N)
+has eight verified Drive files, including the snapshot, capture provenance and
+independent review. This backup is **not** a native evaluation-completion receipt
+or checkpoint. No question text or generated-response snippets are published in
+Git. The snapshot SHA-256 is
+`bad494dfab6b89852289583214934aa5b8f9c99142da781407c56b4091d41b23`;
+independent findings SHA-256 is
+`518d998af41c46607d582fcd0a291d7d9f1531da1fb076f2f18da92b5c2ad725`;
+observer helper SHA-256 is
+`d2ccfccc55ca7eb2c2c301ad8f60c7a1c9e92a57b28e80543946e3591794e52b`.
+The helper is a private observational bootstrap, not the canonical evaluator.
+The frozen `5e6be1b` source, protocol `57898f79...`, 32,000-token allowance,
+native prompts, item seeds and scorer remain unchanged for all 198 questions.
 
 ## Prepared development screen; prefix comparison deferred
 
