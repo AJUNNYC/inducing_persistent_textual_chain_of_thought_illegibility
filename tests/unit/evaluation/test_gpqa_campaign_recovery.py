@@ -93,8 +93,10 @@ def fixture_args(tmp_path):
         poll_seconds=.01, terminate_grace=.1, repair_timeout=1)
 
 
-def test_unknown_child_failure_stops_without_repair_and_writes_private_status(tmp_path, monkeypatch):
+@pytest.mark.parametrize("initial_recoveries", [0, 2])
+def test_unknown_child_failure_stops_without_repair_and_writes_private_status(tmp_path, monkeypatch, initial_recoveries):
     args = fixture_args(tmp_path)
+    args.initial_recoveries = initial_recoveries
     monkeypatch.setenv("SOURCE_CODE_COMMIT", "a" * 40)
     previous = os.umask(0o077)
     try:
@@ -104,9 +106,25 @@ def test_unknown_child_failure_stops_without_repair_and_writes_private_status(tm
     status = json.loads((args.monitor_root / "status.json").read_text())
     assert status["reason"] == "unrecognized_or_nontransient_failure"
     assert status["child_exit_code"] == 23
-    assert status["recoveries"] == 0
+    assert status["recoveries"] == initial_recoveries
     assert (args.monitor_root / "status.json").stat().st_mode & 0o777 == 0o600
     assert not (args.monitor_root / "repair.log").exists()
+
+
+def test_priority_command_uses_separate_runner_and_keeps_frozen_source_signature(tmp_path):
+    args = fixture_args(tmp_path)
+    frozen = WRAPPER.source_signature(args, "a" * 40)
+    args.priority_state = "rot13_14b_level_10"
+    args.after_state = "rot13_14b_level_06"
+    args.priority_runner = tmp_path / "reviewed_priority.py"
+    args.priority_runner.write_text("# operational runner, outside frozen scientific source\n")
+    command = WRAPPER.campaign_command(args)
+    assert command[:2] == [str(args.python), str(args.priority_runner)]
+    assert command[command.index("--plan") + 1] == str(args.output_root / "campaigns/plan.json")
+    assert command[command.index("--priority-state") + 1] == args.priority_state
+    assert command[command.index("--after-state") + 1] == args.after_state
+    assert command[command.index("--source-root") + 1] == str(args.source_root)
+    assert WRAPPER.source_signature(args, "a" * 40) == frozen
 
 
 def test_source_signature_rejects_mismatched_frozen_plan(tmp_path):

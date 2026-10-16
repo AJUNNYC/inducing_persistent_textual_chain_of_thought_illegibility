@@ -364,6 +364,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_collection_until.py
     run_experiment.py
     run_gpqa_campaign_with_recovery.py
+    run_gpqa_frozen_priority_campaign.py
     run_gpqa_sft_campaign.py
     run_model_generation_worker.py
     run_optimized_sft_queue.py
@@ -371,6 +372,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_supplemental_gpqa.py
     run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
+    schedule_gpqa_priority_handoff.py
     score_vllm_baseline_cloud.py
     setup_environment.py
     synchronize_manifest.py
@@ -721,6 +723,8 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_evaluation.py
         test_gpqa_campaign.py
         test_gpqa_campaign_recovery.py
+        test_gpqa_frozen_priority_campaign.py
+        test_gpqa_priority_handoff.py
         test_gpqa_restore_inputs.py
         test_supplemental_gpqa.py
       experiment_overview/

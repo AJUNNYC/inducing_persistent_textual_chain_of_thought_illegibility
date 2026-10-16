@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 586,
+  "files": 590,
   "directories_including_root": 202,
   "entries": [
     {
@@ -3897,6 +3897,17 @@
       "blank": false
     },
     {
+      "path": "scripts/run_gpqa_frozen_priority_campaign.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_gpqa_frozen_priority_campaign.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_ea706f4ae778ae",
+      "blank": false
+    },
+    {
       "path": "scripts/run_gpqa_sft_campaign.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -3971,6 +3982,17 @@
       "display_path": "scripts/run_vllm_generation_worker.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_8110e6efb2a984",
+      "blank": false
+    },
+    {
+      "path": "scripts/schedule_gpqa_priority_handoff.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/schedule_gpqa_priority_handoff.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_cfc060779fb2a9",
       "blank": false
     },
     {
@@ -7716,6 +7738,28 @@
       "display_path": "tests/unit/evaluation/test_gpqa_campaign_recovery.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_443ee081c4cfe7",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/evaluation/test_gpqa_frozen_priority_campaign.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/evaluation/test_gpqa_frozen_priority_campaign.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_82eca90bd6c966",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/evaluation/test_gpqa_priority_handoff.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/evaluation/test_gpqa_priority_handoff.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_8ff2d06c4b9acc",
       "blank": false
     },
     {

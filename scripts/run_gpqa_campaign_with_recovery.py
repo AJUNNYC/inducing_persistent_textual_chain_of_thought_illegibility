@@ -175,6 +175,12 @@ def terminate_owned_group(child, grace_seconds):
 
 
 def campaign_command(args):
+    if getattr(args, "priority_state", None):
+        return [str(args.python), str(args.priority_runner),
+                "--source-root", str(args.source_root),
+                "--plan", str(args.output_root / "campaigns/plan.json"),
+                "--priority-state", args.priority_state, "--after-state", args.after_state,
+                "--output-root", str(args.output_root)]
     return [str(args.python), str(args.source_root / "scripts/run_gpqa_sft_campaign.py"),
             "--panel", str(args.panel), "--adapters-manifest", str(args.adapters_manifest),
             "--model-cache", str(args.model_cache), "--output-root", str(args.output_root),
@@ -221,6 +227,8 @@ def supervise(args):
     environment["PYTHONPATH"] = str(args.source_root / "src")
     command = campaign_command(args)
     original_source = source_signature(args, revision)
+    runner_path = getattr(args, "priority_runner", None) if getattr(args, "priority_state", None) else None
+    runner_sha256 = hashlib.sha256(runner_path.read_bytes()).hexdigest() if runner_path else None
     args.monitor_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     os.chmod(args.monitor_root, 0o700)
     args.output_root.mkdir(parents=True, exist_ok=True)
@@ -228,13 +236,16 @@ def supervise(args):
     status_path = args.monitor_root / "status.json"
     stop = {"signal": None}
     child = None
-    recoveries = 0
+    recoveries = getattr(args, "initial_recoveries", 0)
 
     def status(value, **fields):
         record = {"version": "gpqa_recovery_supervisor_v1", "status": value,
                   "updated_at": datetime.now(timezone.utc).isoformat(), "pid": os.getpid(),
                   "source_code_commit": revision, "recoveries": recoveries,
                   "max_recoveries": args.max_recoveries, "status_storage": "LOCAL_ONLY", **fields}
+        if runner_path:
+            record.update(priority_state=args.priority_state, after_state=args.after_state,
+                          priority_runner_sha256=runner_sha256)
         private_json(status_path, record)
         with (args.monitor_root / "events.jsonl").open("a") as events:
             events.write(json.dumps(record, sort_keys=True) + "\n")
@@ -248,6 +259,8 @@ def supervise(args):
             while True:
                 if source_signature(args, revision) != original_source:
                     raise RuntimeError("Frozen campaign source changed during supervision")
+                if runner_path and hashlib.sha256(runner_path.read_bytes()).hexdigest() != runner_sha256:
+                    raise RuntimeError("Priority operations runner changed during supervision")
                 assert_idle(args.output_root)
                 failures = FreshFailures(args.output_root)
                 with (args.monitor_root / "campaign.log").open("a") as log:
@@ -321,6 +334,12 @@ def main(argv=None):
     for name in ("panel", "adapters-manifest", "model-cache", "output-root", "monitor-root"):
         parser.add_argument("--" + name, type=Path, required=name == "output-root")
     parser.add_argument("--max-recoveries", type=int, default=12)
+    parser.add_argument("--initial-recoveries", type=int, default=0,
+                        help="Retain the recovery count across an authorized supervisor handover")
+    parser.add_argument("--priority-state", help="Run this frozen state before resuming the original coordinator")
+    parser.add_argument("--after-state", help="Require this frozen state's verified completion first")
+    parser.add_argument("--priority-runner", type=Path,
+                        default=Path(__file__).with_name("run_gpqa_frozen_priority_campaign.py"))
     parser.add_argument("--poll-seconds", type=float, default=15)
     parser.add_argument("--terminate-grace", type=float, default=10)
     parser.add_argument("--repair-timeout", type=float, default=600)
@@ -336,8 +355,14 @@ def main(argv=None):
             return 1
     if any(getattr(args, name) is None for name in ("panel", "adapters_manifest", "model_cache", "monitor_root")):
         parser.error("panel, adapters-manifest, model-cache and monitor-root are required")
-    if args.max_recoveries < 0 or min(args.poll_seconds, args.terminate_grace, args.repair_timeout) <= 0:
+    if (not 0 <= args.initial_recoveries <= args.max_recoveries
+            or min(args.poll_seconds, args.terminate_grace, args.repair_timeout) <= 0):
         parser.error("Recovery count must be nonnegative and intervals must be positive")
+    if bool(args.priority_state) != bool(args.after_state):
+        parser.error("priority-state and after-state must be supplied together")
+    args.priority_runner = args.priority_runner.expanduser().resolve()
+    if args.priority_state and not args.priority_runner.is_file():
+        parser.error("The reviewed priority operations runner is missing")
     for name in ("panel", "adapters_manifest", "model_cache", "monitor_root"):
         setattr(args, name, getattr(args, name).expanduser().resolve())
     # Preserve the venv executable path: resolve() would discard its environment.

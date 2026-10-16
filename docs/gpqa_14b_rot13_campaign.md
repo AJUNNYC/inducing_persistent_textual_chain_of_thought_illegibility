@@ -164,6 +164,34 @@ artifacts. Its private status and events are operational records, not Drive
 completion evidence. This avoids waiting for a manual status check to discover
 the recurring upload failure and hung engine shutdown.
 
+### Authorized priority change after level 6
+
+On 16 October 2026 UTC the user requested level 10 immediately after level 6,
+followed by levels 7, 8 and 9. This changes execution order only. The original
+immutable campaign plan, scientific checkout, eleven selected states, per-state
+protocols, random seeds, 32,000-token budget, scores and completed payloads remain
+unchanged. The original plan order is retained as the accounting order; a
+separate sealed execution-order amendment records the authorized chronology.
+
+The operations runner `scripts/run_gpqa_frozen_priority_campaign.py` runs the
+original level-10 freeze/run commands, verifies the existing completion barrier,
+then hands control back to the untouched original campaign coordinator. That
+coordinator reuses completed baseline and levels 1–6, runs levels 7–9, and reuses
+the now-completed level 10 before producing its own final campaign receipt.
+The priority runner verifies the full original plan and its frozen source hashes;
+it does not relabel an evaluation under a new scientific implementation.
+
+`scripts/schedule_gpqa_priority_handoff.py` schedules the change without stopping
+level-6 inference. It holds only the old coordinator at the state boundary while
+the active child continues, waits for the child's verified completion and exit,
+then replaces the supervisor. Replacement coordinators after a transport repair
+are held at the same boundary. The new supervisor retains the previous recovery
+count through `--initial-recoveries`; native artifact retry ledgers are preserved.
+Its `--priority-state` and `--after-state` options select the reviewed operations
+runner, whose bytes must remain unchanged across recovery attempts.
+The handoff process remains the new supervisor's parent until completion so the
+existing read-only response-progress counter retains its process ancestry.
+
 ## Completion and runtime reporting
 
 Completion requires 198 baseline outputs and scores, 1,980 trained outputs and
