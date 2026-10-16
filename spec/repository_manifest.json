@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 594,
+  "files": 596,
   "directories_including_root": 202,
   "entries": [
     {
@@ -3908,6 +3908,17 @@
       "blank": false
     },
     {
+      "path": "scripts/run_gpqa_after_sft_continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_gpqa_after_sft_continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_333ae7448e9720",
+      "blank": false
+    },
+    {
       "path": "scripts/run_gpqa_campaign_with_recovery.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -7749,6 +7760,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/unit_tests_layout.mmd",
       "node": "p_a8dd4f71bda6c7",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/evaluation/test_gpqa_after_sft_continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/evaluation/test_gpqa_after_sft_continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_0e73909b86e703",
       "blank": false
     },
     {

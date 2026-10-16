@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "8d90a3e660c035802bfa98cea5b442d34094f19478cb736c3320c124e30c6f58"
+    "sha256": "9f80208bd32102f096a6a834c37a203ce59533a69a194c66a40bb07c34ac07a6"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -29,7 +29,7 @@
     "historical 3072-token untouched 14B GPQA Diamond baseline",
     "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched"
   ],
-  "procedure_update_sha256": "a4d31cff0c4ba88132b869f3c1fd73c1185736ecbdff0a6dfb3df38a3325ef64",
+  "procedure_update_sha256": "f2e7e0189cee2af54e0d452b2325b137ec98f32b69e75bc5ed123874bb87b8ed",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",

@@ -2,7 +2,8 @@
 title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
-%% 16Oct separate L10 extra-epoch policy; not yet launched; original fit remains immutable.
+%% 16Oct separate L10 extra-epoch policy launched; original fit remains immutable.
+%% One new-adapter L10 GPQA follow-up queued after complete/Drive-verified SFT and worker exit.
 %% New phase changes exposure, restarted schedule and native think-newline serialization.
 %% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
@@ -37,14 +38,16 @@ flowchart TD
     STOP["Stop fit; preserve verified partial state"]
     PARENT["Explicit separate L10 additional-epoch authorization<br/>Verify original complete adapter / full state / data<br/>Restore adapter, AdamW moments / counters and RNG"]
     CONT["src/training/sft/continuation.py<br/>New identity; second seed42 shuffle; 625 extra updates<br/>Fresh cosine / 19 warmup / same peak LR 2e-4<br/>Add native think newline; retain reasoning / final bytes"]
-    CONTEND["New verified Drive adapter and full recovery state<br/>1250 cumulative updates; original endpoint retained<br/>Benefit unmeasured; no automatic other levels"]
+    CONTEND["New verified Drive adapter and full recovery state<br/>1250 cumulative updates; original endpoint retained<br/>Wait for training worker exit and released GPU / locks"]
+    POST["Queued: one new-adapter L10 GPQA comparison<br/>Same198 questions /32k frozen5e6 settings and seeds<br/>New namespace; reuse cached baseline / original L10<br/>Levels7-9 stay paused; benefit unmeasured"]
     INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE
     DUE -->|No| DONE
     DONE -->|Yes| FINAL --> AUDIT
     AUDIT -->|Yes| OUT
-    OUT -.->|New authorized L10 phase only; not yet launched| PARENT --> CONT --> CONTEND
+    OUT -.->|Separately authorized L10 phase| PARENT --> CONT --> CONTEND
+    CONTEND -->|Complete625 and actual Drive verification| POST
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

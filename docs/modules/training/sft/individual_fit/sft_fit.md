@@ -1,18 +1,23 @@
 # sft_fit.md
 
-## Current priority: separately identified level-10 additional epoch
+## Current priority: additional epoch, then one level-10 GPQA follow-up
 
-On 16 October the user prioritized one extra **14B ROT13 level-10** training
-epoch over the remaining GPQA evaluations. This phase is **not yet launched**.
-It preserves the original endpoint and GPQA records. The new continuation
-restores the verified original adapter, AdamW moments/step counters and RNG;
-uses the second seed-42 shuffle, 625 additional updates and a fresh 19-warmup
-cosine schedule at the unchanged peak `2e-4`; and inserts the native newline
-after `<think>` while retaining encoded reasoning, clear final-answer bytes
-and role-prefix masks. Derived tokenization has its own hashes and the new run
-has its own identity. This is a combined intervention, not an isolated test of
-epoch count, and its benefit is unmeasured. No other level or full GPQA rerun
-is automatically scheduled. See the [diagnosis and continuation record](../../../../sft_level10_training_diagnosis.md).
+The separately identified 14B ROT13 level-10 additional epoch launched on
+16 October from source `3a89691`; its first optimizer update and verified initial
+Drive checkpoint were observed. It retains the original endpoint and restores
+its adapter, AdamW moments/counters and RNG. The second seed-42 shuffle receives
+625 extra updates, fresh 19-warmup cosine at the same peak `2e-4`, and native
+thinking-newline alignment with unchanged reasoning/final bytes and role masks.
+This is a combined intervention whose behavioral benefit remains unmeasured.
+
+The user now authorizes **one queued follow-up** after all 625 additional
+updates, a complete result, verified final adapter/full checkpoint in Drive,
+and training-worker exit with released GPU/locks. Evaluate only the new L10
+adapter on the same 198 GPQA Diamond questions, 32,000-token allowance and frozen
+`5e6be1b` settings/prompts/seeds/strict scorer. Use a distinct adapter-bound
+protocol/output namespace and reuse the original L10 and matching cached
+baseline controls. Evaluation is **not yet launched**; levels 7-9 remain paused
+and no other jobs are scheduled. See the [diagnosis and continuation record](../../../../sft_level10_training_diagnosis.md).
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
@@ -145,7 +150,8 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
-%% 16Oct separate L10 extra-epoch policy; not yet launched; original fit remains immutable.
+%% 16Oct separate L10 extra-epoch policy launched; original fit remains immutable.
+%% One new-adapter L10 GPQA follow-up queued after complete/Drive-verified SFT and worker exit.
 %% New phase changes exposure, restarted schedule and native think-newline serialization.
 %% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
@@ -180,14 +186,16 @@ flowchart TD
     STOP["Stop fit; preserve verified partial state"]
     PARENT["Explicit separate L10 additional-epoch authorization<br/>Verify original complete adapter / full state / data<br/>Restore adapter, AdamW moments / counters and RNG"]
     CONT["src/training/sft/continuation.py<br/>New identity; second seed42 shuffle; 625 extra updates<br/>Fresh cosine / 19 warmup / same peak LR 2e-4<br/>Add native think newline; retain reasoning / final bytes"]
-    CONTEND["New verified Drive adapter and full recovery state<br/>1250 cumulative updates; original endpoint retained<br/>Benefit unmeasured; no automatic other levels"]
+    CONTEND["New verified Drive adapter and full recovery state<br/>1250 cumulative updates; original endpoint retained<br/>Wait for training worker exit and released GPU / locks"]
+    POST["Queued: one new-adapter L10 GPQA comparison<br/>Same198 questions /32k frozen5e6 settings and seeds<br/>New namespace; reuse cached baseline / original L10<br/>Levels7-9 stay paused; benefit unmeasured"]
     INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE
     DUE -->|No| DONE
     DONE -->|Yes| FINAL --> AUDIT
     AUDIT -->|Yes| OUT
-    OUT -.->|New authorized L10 phase only; not yet launched| PARENT --> CONT --> CONTEND
+    OUT -.->|Separately authorized L10 phase| PARENT --> CONT --> CONTEND
+    CONTEND -->|Complete625 and actual Drive verification| POST
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

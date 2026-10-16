@@ -89,28 +89,28 @@ Table 1. Available conditions and all ten completed 14B ROT13 fits
 Models: DeepSeek-R1-Distill-Qwen-7B and DeepSeek-R1-Distill-Qwen-14B, each compared against its own untouched base.
 Transformations: ROT13 and official KaziText, each at ten fixed levels.
 Available inventory: 2 model sizes x 2 families x 10 levels = forty independent condition datasets, all verified in Drive.
-Completed: all ten14B ROT13 fits,625 updates each,Drive verified. Levels1-9 preserve source9de8813; retainedL10
-source2ea4fb9. KaziTextL10 paused444/625 with verified recovery; no automaticrestart. GPQA-only long32000 uses a matching
-base and original adapters; existing results are retained. On16October the user prioritized a separately identified extra epoch
-for14B ROT13 L10; remaining GPQA work is deferred. Historical3072 GPQA49/198 remains separate.
-Original per-fit parent recipe efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine horizon
-and19 warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with FP32 loss/hidden-gradient
-accumulation, SDPA and plain AdamW. It retains completion-only masks/per-example weighting, LoRA 8/16/.05,LR
-2e-4,requested2 x8 (fallback1 x16),effective16,seed 42 and full 4096 eligibility. Checkpoint every 100 and final 625 with verified
-Drive recovery.
+Completed: all ten14B ROT13 fits,625 updates each,Drive verified. Levels1-9 preserve source9de8813; retainedL10 source2ea4fb9.
+KaziTextL10 paused444/625 with verified recovery; no automaticrestart. GPQA-only long32000 uses a matching base and original
+adapters; existing results are retained. On16October the user prioritized a separately identified extra epoch for14B ROT13 L10;
+remainingL7-9 stay paused. After verified extra625/Drive completion and worker exit, only the newL10 GPQA198/32k comparison is
+queued: same frozen5e6/settings/seeds/scorer,cachedbase/originalL10 controls,newadapter/output identity. It has not launched.
+Historical3072 GPQA49/198 remains separate.
+Original per-fit parent recipe efficient_one_epoch_v1: all 10,000 examples once,625 optimizer updates, full 625 cosine horizon and19
+warmup updates. It uses unquantized BF16 base/head, direct exact full-gradient CCE with FP32 loss/hidden-gradient accumulation,
+SDPA and plain AdamW. It retains completion-only masks/per-example weighting, LoRA 8/16/.05,LR 2e-4,requested2 x8 (fallback1
+x16),effective16,seed 42 and full 4096 eligibility. Checkpoint every 100 and final 625 with verified Drive recovery.
 The user authorizes this published-method baseline without another optimization test/timing campaign. Actual native
 model/mask/gradient/full-state guards execute at startup before updates; the matrix receipt records alltencompleted ROT13 fits
-underoriginal trainingidentities. The datedL10 actualmode was1x16/checkpointingoff; otherfuturefamilies/runtimes require their
-own guards. This changes exposure and numerical execution and does not guarantee the same trained results or one-hour
-completion.This fit took5793.143751s; worker6322.565654s($4.81/$5.25 at $2.99/h,not invoices). Other runtimes remain
-unmeasured.
+underoriginal trainingidentities. The datedL10 actualmode was1x16/checkpointingoff; otherfuturefamilies/runtimes require their own
+guards. This changes exposure and numerical execution and does not guarantee the same trained results or one-hour
+completion.This fit took5793.143751s; worker6322.565654s($4.81/$5.25 at $2.99/h,not invoices). Other runtimes remain unmeasured.
 Original NF4 legacy_two_epoch_v1 and intermediate NF4 one_epoch_pilot_v1 remain explicit alternatives. The original full-grid
-design evaluates40 SFT adapters,20 RL snapshots and2 bases (62 states); those counts are available legacy scope, not the
-active queue. Validation diagnostics may precede reserved final tests. Original confirmatory thresholds/windows remain
-unchanged; SFT completion alone cannot establish measured capability, opacity or a construction-success window.
-The new L10 phase restores its verified adapter/AdamW/RNG, uses the second shuffle and625 extra cosine updates/19 warmup
-at the same2e-4 peak, and aligns the native think newline. Original endpoints/data remain immutable. It is a combined intervention
-with unmeasured efficacy, not an original two-epoch protocol or automatic extra training for all levels. See C.2.
+design evaluates40 SFT adapters,20 RL snapshots and2 bases (62 states); those counts are available legacy scope, not the active
+queue. Validation diagnostics may precede reserved final tests. Original confirmatory thresholds/windows remain unchanged; SFT
+completion alone cannot establish measured capability, opacity or a construction-success window.
+The new L10 phase restores its verified adapter/AdamW/RNG, uses the second shuffle and625 extra cosine updates/19 warmup at
+the same2e-4 peak, and aligns the native think newline. Original endpoints/data remain immutable. It is a combined intervention with
+unmeasured efficacy, not an original two-epoch protocol or automatic extra training for all levels. See C.2.
 ```
 
 ## page_003
@@ -1521,8 +1521,9 @@ LoRA/loss/effective batch and actual1 x16/checkpointing-off mode. Use the second
 and a fresh cosine625/warmup19 schedule at unchanged peak2e-4. Insert native newline after <think>;
 preserve encoded reasoning/final bytes and role masks. Derived tokenization and the new phase have
 separate identities; originals remain immutable. This combines exposure, schedule restart and serialization,
-not a pure epoch comparison. Encoding/correctness benefit is unmeasured. See the accounting and
-recovery detail on page30.
+not a pure epoch comparison. Encoding/correctness benefit is unmeasured. A single new-adapter GPQA
+follow-up is queued after verified completion; see page30 for accounting, recovery and the unchanged
+evaluation contract.
 Legacy NF4 recipes remain separate. Original construction thresholds are unchanged; observed GPQA
 outputs used during development are descriptive, not untouched confirmation.
 ```
@@ -1596,49 +1597,51 @@ samples and therefore belongs in the final dataset-count decision. Store token d
 for 7B and 14B and for each transformation strength. Fixed examples and epochs mean fixed nominal
 exposure, not identical token compute or identical optimization dynamics.
 30
-All forty prepared datasets remain available. All ten original 14B ROT13 fits are complete and Drive-verified: L1-9
-source9de8813, retainedL10 source2ea4fb9. KaziTextL10 remains paused444/625 with verified full state, no
-automatic restart. Each original fit started from its untouched base. Evaluation-budget changes do not retrain or
-relabel those fits. The separate user-authorized L10 training phase now takes priority over the remaining GPQA
-queue; existing evaluation outputs remain archived.
+All40 prepared datasets remain available. Ten original14B ROT13 fits are complete/Drive-verified: L1-9 source9de8813,L10
+source2ea4fb9. KaziTextL10 remains paused444/625 with verified state,no autorestart. Each original fit started from its untouched
+base. Preserve these original endpoints and existing GPQA outputs during the separateL10 phase.
 C.2.4 Original per-fit accounting
-Original efficient_one_epoch_v1:10,000 training records once,100 separate validation IDs, effective16,625 cosine
-updates and19 warmup. Requested2 x8, capacity fallback1 x16; retain full targets, ordered16 examples/update and
-equal-example weighting. Context4096 with no truncation, packing or dropped records. BF16 base/head, exact
-full-gradient CCE, SDPA, plain AdamW and FP32 optimizer states preserve their declared identity, not historical
-NF4 numerics.
-Keep LoRA8/16/.05, seven attention/MLP targets, LR2e-4, zero decay, max norm.3, seed42. Checkpoint every100
-and final625; verify actual Drive bytes before retention/completion. OriginalL10 native guards passed, actual1
-x16/checkpointing off. Its recorded fit5793.143751s/worker6322.565654s are dated measurements, not a speedup
-or other-condition runtime. The uploaded58.7-minute notebook has different loss/length distributions; it is not proof
-of equivalent14B efficacy or timing.
+Original efficient_one_epoch_v1:10,000 records once,100 separate validation IDs,effective16,625 cosine/19 warmup. Request2
+x8,fallback1 x16; equal-example weighting,full4096 targets,no truncation/packing/drops. BF16 base/head,exact full-gradient
+CCE,SDPA,AdamW/FP32 states preserve their declared identity,not historicalNF4 numerics.
+Keep LoRA8/16/.05,seven projections,LR2e-4,zero decay,max norm.3,seed42; verify full checkpoints100/final625 in Drive.
+OriginalL10 guards passed,actual1 x16/checkpointing off. Fit5793s/worker6323s are dated measurements,not a speedup or
+other-condition forecast. The58.7-minute notebook has different loss/lengths,not proven equal14B efficacy.
 C.2.5 Authorized additional-epoch lineage and recovery
-Policy published_sft_additional_epoch_v1, run rot13_14b_level_10_continuation_epoch_02, is one extra epoch, not
-a restart of epoch1 or exact recovery of the ended one-epoch schedule. Parent source2ea4fb9, identity181c1684...,
-checkpoint99912dfd..., dataset7bce3529... and certificatea34e7056... remain unchanged. Execute the new
-published continuation source under its own source/configuration identity and output directory. A final adapter alone
-cannot substitute for the full optimizer checkpoint.
-Restore exact adapter, initialized AdamW moments/step counters and RNG. Use the second seed42 permutation of
-the same10,000 records,625 additional updates, effective16 and preserved parent physical mode. Original LoRA
-capacity, full-gradient CCE and completion-only equal-example objective remain. Since the parent's cosine LR
-ended at zero, explicitly restart a625-update cosine with19 warmup and unchanged peak2e-4; first update
-uses2e-4/19. No higher peak LR is authorized. Total exposure becomes20,000 examples and1,250 cumulative
-updates, not the historical NF4 two-epoch recipe.
-Align serialization to native inference by inserting a newline immediately after <think>. Preserve original encoded
-reasoning and clear final-answer bytes, role-prefix loss boundary and structural-token supervision. Original JSONL
-bytes/dataset hash stay fixed; bind derived token hashes/counts into the new identity. The actual CPU audit
-checked all10,100 native prefixes and full masks: train17,996,003 tokens,max4096; validation188,481,max4085. No
-truncation. Six focused continuation checks passed; no full suite or optimization benchmark was repeated. These
-checks do not demonstrate improved free-generation behavior.
-Save separate complete adapter/optimizer/scheduler/RNG/sampler checkpoints every100 phase updates and
-final625, each Drive-verified. Within-phase recovery restores the new schedule/cursor exactly. SIGTERM/SIGINT
-requests pause after a whole optimizer update; no stale writer or concurrent evaluation may share the GPU. Retain
-both original and additional-epoch endpoints. No further level or GPQA rerun is automatically enqueued.
-This is a combined exposure/schedule/serialization intervention; any benefit cannot be attributed to epoch count
-alone. Encoding consistency, correctness and capability retention remain unmeasured. Use separate development
-comparisons, retaining examined GPQA results as descriptive. Legacy two-epoch NF4 and intermediate one-epoch
-NF4 recipes retain their identities; missing or failed states are not successes. Original
-capability/opacity/transfer/window thresholds remain unchanged.
+Policy published_sft_additional_epoch_v1, run rot13_14b_level_10_continuation_epoch_02, is one extra epoch, not a restart of
+epoch1 or exact recovery of the ended one-epoch schedule. Parent source2ea4fb9, identity181c1684..., checkpoint99912dfd...,
+dataset7bce3529... and certificatea34e7056... remain unchanged. Execute the new published continuation source under its own
+source/configuration identity and output directory. A final adapter alone cannot substitute for the full optimizer checkpoint.
+Restore exact adapter, initialized AdamW moments/step counters and RNG. Use the second seed42 permutation of the
+same10,000 records,625 additional updates, effective16 and preserved parent physical mode. Original LoRA capacity,
+full-gradient CCE and completion-only equal-example objective remain. Since the parent's cosine LR ended at zero, explicitly
+restart a625-update cosine with19 warmup and unchanged peak2e-4; first update uses2e-4/19. No higher peak LR is authorized.
+Total exposure becomes20,000 examples and1,250 cumulative updates, not the historical NF4 two-epoch recipe.
+Align serialization to native inference by inserting a newline immediately after <think>. Preserve original encoded reasoning and
+clear final-answer bytes, role-prefix loss boundary and structural-token supervision. Original JSONL bytes/dataset hash stay fixed;
+bind derived token hashes/counts into the new identity. The actual CPU audit checked all10,100 native prefixes and full masks:
+train17,996,003 tokens,max4096; validation188,481,max4085. No truncation. Six focused continuation checks passed; no full
+suite or optimization benchmark was repeated. These checks do not demonstrate improved free-generation behavior.
+Save separate complete adapter/optimizer/scheduler/RNG/sampler checkpoints every100 phase updates and final625, each
+Drive-verified. Within-phase recovery restores the new schedule/cursor exactly. SIGTERM/SIGINT requests pause after a whole
+optimizer update; no stale writer or concurrent evaluation may share the GPU. Retain both original and additional-epoch
+endpoints. No further training level is enqueued; the separately authorized new-adapter GPQA follow-up is specified below.
+This is a combined exposure/schedule/serialization intervention; any benefit cannot be attributed to epoch count alone. Encoding
+consistency, correctness and capability retention remain unmeasured. Use separate development comparisons, retaining
+examined GPQA results as descriptive. Legacy two-epoch NF4 and intermediate one-epoch NF4 recipes retain their identities;
+missing or failed states are not successes. Original capability/opacity/transfer/window thresholds remain unchanged.
+C.2.6 Queued same-profile level-10 GPQA follow-up
+After625 extra updates,cumulative1250,complete result,actual final adapter/full-checkpoint Drive verification and training-worker
+exit with GPU/locks released, queue only the new14B ROT13 L10 adapter. The operations dispatcher
+run_gpqa_after_sft_continuation.py stops on pause/failure/missing backup. Waiting/armed is not launched evaluation.
+Use all198 GPQA Diamond questions,full32000 new tokens and the identical frozen5e6be1b measurement contract:
+prompts/options,canonicalL10 stateID/per-item seeds,sampling,BF16vLLM engine and strict scorer. Context40960,max
+sequences8,groups128,scheduler8192,GPU.9,LoRA32,no prefixcache,temp.6/top-p.95 remain. New adapter/checkpoint hashes
+require a distinct immutable namespace. Reuse the same matching cached baseline and archived originalL10 control; overwrite
+neither or regenerate the baseline. Wrong/malformed/truncated remain incorrect,no outcome-selective retry.
+Verify198 new raw/scores,paired report and receipt in Drive. Evaluation is queued,not launched; originalL7-9 remain paused. No
+full-campaign restart,RL or further levels. Training source3a89691 remains fixed. This is exploratory after GPQA-informed
+development; benefit and isolated epoch causality are unestablished.
 ```
 
 ## page_031
@@ -2945,8 +2948,8 @@ AdamW. Completion-only equal-example loss, LoRA8/16/.05, LR2e-4, effective16, se
 Drive checkpoints remain required. Legacy NF4 is separate.
 Separate16October L10 extra epoch: restore verified adapter/AdamW/RNG, second seed42 shuffle,625 extra updates, fresh
 cosine/19 warmup at same2e-4 peak. Align native think newline; retain reasoning/final bytes and role masks. New identity/token
-hashes; originals retained. Combined exposure/schedule/serialization change, benefit unmeasured. Remaining GPQA deferred,
-completed caches preserved. See C.2.
+hashes; originals retained. Combined exposure/schedule/serialization change, benefit unmeasured. After verified625/Drive
+completion, queue only newL10 GPQA198/32k; cachedbase/originalL10 controls, newnamespace,L7-9 paused. See C.2.
 Corpus: frozenproducerdc520cb/config3757493e, BF16vLLM0.11.0/Torch2.8+cu128/Transformers4.57.3.
 Context4096,sequences128,scheduler8192,GPU.9,no prefixcache;3072 per response,temp.6/top-p.95,native prompts/item seeds.
 Training uses separateTorch2.9.
@@ -3149,8 +3152,8 @@ source2ea4fb9/config6f7e5048. Queue observed complete14Oct. KaziTextL10 paused44
 HistoricalL10 fit5793s/worker6323s implies$4.81/$5.25 at the historical$2.99/h,not invoices or a speedup.
 Historical3072 GPQA base:49/198,13incorrect,133truncated,3malformed. The distinct32k GPQA campaign retains its matching
 baseline/original-adapter outputs and strict cache identities. Long-profile evaluations have run; no full-campaign completion or
-opacity-success claim follows from partial results. Remaining GPQA is deferred for the16October user-prioritized L10 extra epoch;
-completed outputs are not rerun.
+opacity-success claim follows from partial results. After the extra epoch completes625 and Drive verification, one new-adapterL10
+GPQA198/32k comparison is queued,not launched. Reuse cachedbase/originalL10; newnamespace; L7-9 stay paused.
 Separate additional epoch: restore verified parent adapter/AdamW/RNG,second seed42 shuffle,625 extra cosine updates/19
 warmup,same2e-4 peak,native think newline. Original encoded reasoning/final bytes and corpus preserved; new identity/derived-token
 hashes. CPU full-target/mask and new-prefill audits passed all10,100 records; six focused continuation checks passed. GPU training
@@ -3647,20 +3650,20 @@ Passing those checks, completing paid execution, and obtaining a scientifically 
 subsequent outcomes, not consequences of possessing a complete specification.
 68
 CoT Illegibility - Implementation decisions
-Original parent: efficient_one_epoch_v1,10,000 examples/625 cosine updates/19
-warmup,BF16/CCE/SDPA/AdamW. Ten14B ROT13 fits verified;KaziTextL10 paused444. Separate16Oct L10
-extra epoch restores adapter/AdamW/RNG,second shuffle,625 new updates,same2e-4 peak/19 warmup,native
-think newline. New identity;originals retained;benefit unmeasured. Remaining GPQA deferred,caches kept.
-OnlyGPQA uses32000;original four domains stay3072. No automatic further levels or outcome guarantee.
-Precedence. Original efficient_one_epoch_v1 with execution policyv2 controls completed parent fits over historical
-NF4/FP32-head/paged-optimizer wording:10,000 examples,625 updates,requested2 x8/fallback1 x16,effective16,fixed recovered mode. It
-changed exposure/numerics,not construction thresholds. All40 datasets remain available;ten14B ROT13 fits complete;KaziTextL10
-paused444,other KaziText incomplete. Historical models/RL and original full-grid criteria remain separate; missing states are not success.
-On16October a distinct L10 extra-epoch phase was authorized: parent adapter/AdamW/RNG retained,second shuffle,fresh625/19 cosine at
-same2e-4 peak,native think newline,new identity. C.2 controls this phase; it does not rewrite parents or enqueue all levels.
-RemainingGPQA deferred with caches intact; examined results are descriptive after development. Benefit remains unmeasured. The
-unchanged67-page archive preserves the original source. Active changes are integrated into existing81 pages,without appended
-amendments.
+Original parent: efficient_one_epoch_v1,10,000 examples/625 cosine updates/19 warmup,BF16/CCE/SDPA/AdamW. Ten14B
+ROT13 fits verified;KaziTextL10 paused444. Separate16Oct L10 extra epoch restores adapter/AdamW/RNG,second
+shuffle,625 new updates,same2e-4 peak/19 warmup,native think newline. New identity;originals retained;benefit unmeasured.
+Then queue only newL10 GPQA198/32k after complete625,Drive verification/worker exit;
+frozen5e6/settings/seeds/scorer,cachedbase/originalL10,newnamespace. L7-9 paused;evalnotlaunched. OnlyGPQA
+uses32000;original four domains stay3072. No automatic further levels or outcome guarantee.
+Precedence. Original efficient_one_epoch_v1/executionv2 controls completed parent fits over historical NF4/two-epoch wording:10,000
+examples,625 updates,effective16,fixed recovered mode. It changed exposure/numerics,not construction thresholds. All40 datasets
+remain;ten14B ROT13 fits complete;KaziTextL10 paused444,others incomplete. Missing states are not successes.
+Separate16Oct L10 phase:restore adapter/AdamW/RNG,second shuffle,fresh625/19 cosine,same2e-4 peak,native think newline,new
+identity. C.2 controls; original endpoints stay immutable. Then queue only newL10 GPQA198/32k after complete625/Drive
+verification/worker exit; same frozen5e6/settings/seeds/scorer,cachedbase/originalL10 controls,newnamespace. L7-9 stay paused.
+Evaluation not launched;benefit unmeasured;GPQA-informed comparison exploratory. The67-page archive stays unchanged; active
+procedures are integrated in81 pages,without appended amendments.
 ```
 
 ## page_069

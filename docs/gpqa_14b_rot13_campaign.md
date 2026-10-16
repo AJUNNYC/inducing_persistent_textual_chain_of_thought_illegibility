@@ -13,6 +13,52 @@ GSM8K, MMLU, ARC-Easy and MBPP evaluations are unchanged. No training restart is
 required. This capability-only campaign calls no provider judges and does not
 run legibility evaluation, RL or linear probes.
 
+## Current authorization: additional-epoch level-10 follow-up
+
+The user authorizes one new **14B ROT13 level-10** GPQA evaluation after the
+current additional training epoch finishes. It is **queued, not yet launched**.
+The remaining original levels 7, 8 and 9 stay paused. The original eleven-state
+campaign, completed original level-10 responses and matching untouched baseline
+are preserved; this does not restart that campaign.
+
+Evaluate all 198 Diamond questions with the original `long_32000` contract:
+32,000 new tokens per response, context 40,960, eight concurrent sequences,
+request groups 128, scheduler budget 8,192, BF16 and LoRA rank limit 32, GPU
+memory utilization 0.9 and disabled prefix caching. Preserve native prompts,
+option permutations, per-item seeds, temperature 0.6, top-p 0.95, pinned
+weights/tokenizer and the strict final-label scorer from scientific source
+`5e6be1b0848e0e88725323591baddef37d69d8ae`. Neither a cipher starter nor a
+different prompt or response budget is added. The existing compatible matching
+baseline is reused; the original level-10 result remains the before-training
+comparison. No baseline regeneration or scorer repair is included.
+
+Automatic handoff requires the continuation's 625 additional updates, complete
+result, verified final adapter/full checkpoint in Drive, and training-worker
+exit with released locks/GPU. The dispatcher binds the new adapter/checkpoint
+under a distinct protocol and output namespace, leaving the original raw
+responses and scientific source untouched. Failure, pause or incomplete backup
+prevents handoff. Training source `3a89691` remains its executed identity,
+independently of this later operations/documentation revision.
+
+The operations dispatcher is
+[`scripts/run_gpqa_after_sft_continuation.py`](../scripts/run_gpqa_after_sft_continuation.py).
+It authenticates the frozen evaluation entry points against the original sealed
+campaign plan before each worker launch or artifact-repair attempt.
+It records the exact training process identity while waiting, checks cumulative
+1,250 updates as well as the additional phase's 625, and verifies required Drive
+checksums before launching. It retains the canonical level-10 state ID so the
+frozen per-item seed derivation remains unchanged. Only the 198 baseline raw
+records are copied into the new namespace and natively verified there;
+old absolute-path completion receipts are not copied as new completion evidence.
+The dispatcher begins in a waiting/armed state, which is not evaluation startup.
+
+Completion requires all 198 new raw responses and scores, the paired report and
+Drive-verified receipt/inventory. Wrong, malformed and truncated responses stay
+incorrect, with no outcome-selective retry. This measures the combined training
+revision, not epoch count alone, and remains exploratory after inspected GPQA
+results informed development. No additional levels, RL, provider judging or
+automatic resumption of levels 7–9 is authorized by this follow-up.
+
 ## Execution snapshot: 14 October 2026
 
 The new RTX PRO 6000 Blackwell 96GB worker restored and byte-verified all 91
@@ -168,7 +214,7 @@ artifacts. Its private status and events are operational records, not Drive
 completion evidence. This avoids waiting for a manual status check to discover
 the recurring upload failure and hung engine shutdown.
 
-### Authorized priority change after level 6
+### Historical priority change after level 6; remaining levels now paused
 
 On 16 October 2026 UTC the user requested level 10 immediately after level 6,
 followed by levels 7, 8 and 9. This changes execution order only. The original

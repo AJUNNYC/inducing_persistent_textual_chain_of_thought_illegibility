@@ -1,18 +1,23 @@
 # sft_training.md
 
-## Current priority: separately identified level-10 additional epoch
+## Current priority: additional epoch, then one level-10 GPQA follow-up
 
-On 16 October the user prioritized one extra **14B ROT13 level-10** training
-epoch over the remaining GPQA evaluations. This phase is **not yet launched**.
-It preserves the original endpoint and GPQA records. The new continuation
-restores the verified original adapter, AdamW moments/step counters and RNG;
-uses the second seed-42 shuffle, 625 additional updates and a fresh 19-warmup
-cosine schedule at the unchanged peak `2e-4`; and inserts the native newline
-after `<think>` while retaining encoded reasoning, clear final-answer bytes
-and role-prefix masks. Derived tokenization has its own hashes and the new run
-has its own identity. This is a combined intervention, not an isolated test of
-epoch count, and its benefit is unmeasured. No other level or full GPQA rerun
-is automatically scheduled. See the [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md).
+The separately identified 14B ROT13 level-10 additional epoch launched on
+16 October from source `3a89691`; its first optimizer update and verified initial
+Drive checkpoint were observed. It retains the original endpoint and restores
+its adapter, AdamW moments/counters and RNG. The second seed-42 shuffle receives
+625 extra updates, fresh 19-warmup cosine at the same peak `2e-4`, and native
+thinking-newline alignment with unchanged reasoning/final bytes and role masks.
+This is a combined intervention whose behavioral benefit remains unmeasured.
+
+The user now authorizes **one queued follow-up** after all 625 additional
+updates, a complete result, verified final adapter/full checkpoint in Drive,
+and training-worker exit with released GPU/locks. Evaluate only the new L10
+adapter on the same 198 GPQA Diamond questions, 32,000-token allowance and frozen
+`5e6be1b` settings/prompts/seeds/strict scorer. Use a distinct adapter-bound
+protocol/output namespace and reuse the original L10 and matching cached
+baseline controls. Evaluation is **not yet launched**; levels 7-9 remain paused
+and no other jobs are scheduled. See the [diagnosis and continuation record](../../../sft_level10_training_diagnosis.md).
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
@@ -102,8 +107,9 @@ The following diagram is byte-for-byte the active `.mmd` content at generation t
 title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
-%% 16Oct authorized separate ROT13 14B L10 additional epoch; not yet launched.
-%% Preserve original fits and GPQA caches; no automatic extra levels or GPQA reruns.
+%% 16Oct separate ROT13 14B L10 additional epoch launched from source3a89691.
+%% Then one authorized new-adapter L10 GPQA follow-up; queued, not yet launched.
+%% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
 %% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
@@ -136,10 +142,12 @@ flowchart TD
     FIT["src/training/sft/individual_fit/sft_fit.py<br/>Fresh untouched-base initialization for this condition<br/>Native safeguards; one epoch / 625 updates"]
     SAVE["Verify final adapter and full recovery state in Drive<br/>Record actual completion before advancing"]
     OUT["All ten original ROT13 fits verified<br/>Retain original identities and existing GPQA outputs<br/>Training completion does not establish opacity"]
-    CONT["Separately authorized L10 extra epoch; not yet launched<br/>scripts/continue_sft_epoch.py<br/>Preserve GPQA caches and release prior GPU worker"]
+    CONT["Separately authorized L10 extra epoch; launched<br/>scripts/continue_sft_epoch.py at source3a89691<br/>Original fits and GPQA caches retained"]
     PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
-    CONTOUT["Verify additional-epoch full state and adapter in Drive<br/>Retain original endpoint; no automatic further jobs<br/>Encoding and correctness benefit unmeasured"]
+    CONTOUT["625 additional updates and complete result<br/>Final adapter and full state verified in Drive<br/>Training worker exits and releases GPU / locks"]
+    POST["Queued only: new L10 adapter on all198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct output namespace"]
+    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Verify all new raw / scores / report in Drive<br/>Levels7-9 remain paused; benefit unmeasured"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT
@@ -147,6 +155,7 @@ flowchart TD
     NEXT -->|Yes| FIT --> SAVE --> NEXT
     NEXT -->|No| OUT
     OUT -.->|Explicit new user priority| CONT --> PARENT --> EPOCH2 --> CONTOUT
+    CONTOUT -->|Only complete and verified| POST --> POSTEND
     INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class BASE,FIT detail

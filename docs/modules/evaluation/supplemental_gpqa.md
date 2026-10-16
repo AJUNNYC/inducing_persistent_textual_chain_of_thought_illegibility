@@ -6,6 +6,22 @@ enter the primary statistical window or multiplicity family, or modify SFT/RL
 training and certificates. The opt-in `long_32000` profile changes **GPQA
 evaluation only**. Existing trained adapters do not need to be retrained.
 
+## Queued additional-epoch level-10 comparison
+
+The user authorizes one new-adapter L10 evaluation after the separate extra
+training epoch reaches 625 additional updates, completes and verifies its final
+adapter/full checkpoint in Drive. Require training-worker exit and released
+GPU/locks. This follow-up is queued, not yet launched; original levels 7-9 remain
+paused. Preserve the frozen `5e6be1b` evaluator, full 198-question panel, native
+prompts/option order/per-item seeds, 32,000-token budget, BF16 vLLM settings and
+strict final-label scorer. Bind the new adapter under a distinct immutable
+protocol/output namespace. Reuse the existing matching baseline and retain the
+original L10 result as its control; neither is regenerated. Save and verify all
+198 new raw/scored responses and the paired report/receipt in Drive. Earlier
+GPQA observations informed the combined training change, so this is exploratory,
+not an untouched confirmatory comparison. No automatic further levels or full
+campaign restart follows. See the [campaign guide](../../gpqa_14b_rot13_campaign.md).
+
 ## Dataset and measurement distinction
 
 The José et al. code (`Jozdien/cot_legibility` at

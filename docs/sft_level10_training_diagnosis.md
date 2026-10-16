@@ -58,7 +58,8 @@ fit. The worker launched at 06:37 UTC from Git commit
 was observed at 06:40 UTC, with the initial checkpoint verified in Drive.
 Completion and behavioral benefit have not yet been established. Preserve the
 original adapter, full checkpoint, GPQA outputs and their immutable identities;
-do not rerun completed GPQA measurements or automatically enqueue other levels.
+the subsequent follow-up below evaluates only the new endpoint, without
+regenerating its existing controls or automatically enqueueing other levels.
 
 The [continuation CLI](../scripts/continue_sft_epoch.py) requires the verified
 original full checkpoint, completed fit/adapter, exact 10,000/100 records and
@@ -101,6 +102,34 @@ more consistent free-generated encoding is an objective, not an established
 benefit; answer correctness and capability retention remain to be measured.
 Low validation loss does not guarantee either. No higher learning rate, new
 training corpus or repeated full GPQA campaign is included in this phase.
+
+## Authorized follow-up: level-10 GPQA queued, not yet launched
+
+The user now authorizes the **same full GPQA Diamond evaluation** immediately
+after this additional epoch completes. Only the new 14B ROT13 level-10 adapter
+is queued: 198 questions, up to 32,000 new tokens each, the same frozen
+`5e6be1b0848e0e88725323591baddef37d69d8ae` evaluation implementation,
+native prompts, option permutations, per-item seeds, sampling, engine settings
+and strict final-label scorer. The original level-10 outputs and matching
+32,000-token untouched baseline remain the comparison controls; their compatible
+cached records are reused rather than regenerated. Levels 7, 8 and 9 remain
+paused. No other training or full evaluation campaign is scheduled.
+
+The dispatcher must wait for all 625 additional updates, a complete continuation
+result, and actual Drive verification of its final adapter and full checkpoint.
+The training worker must exit and release its GPU/locks before evaluation starts.
+It then binds the new adapter and checkpoint hashes under a distinct immutable
+protocol/output namespace. It must not overwrite the original level-10 raw
+outputs, alter the frozen evaluator or relabel training source `3a89691`.
+Training failure, pause, missing backup or incompatible bindings stop the
+handoff. This follow-up is **queued, not yet launched**, at this documentation
+revision. See the [GPQA campaign guide](gpqa_14b_rot13_campaign.md).
+
+Wrong, malformed and truncated responses remain incorrect under the same
+official scorer. Save and verify all 198 raw responses, scores, paired report
+and completion receipt in Drive. The comparison remains exploratory because
+earlier GPQA behavior informed this training decision; it is not an untouched
+confirmatory test or proof that additional epochs caused any observed change.
 
 ## Prepared development screen; prefix comparison deferred
 
@@ -146,4 +175,4 @@ Development improvements would inform whether to extend training across levels,
 with uncertainty and cost reported. Existing inspected GPQA results remain
 descriptive rather than being relabelled as untouched confirmation after
 model-development decisions. Decisions about further levels or evaluation
-resumption remain separate from this one additional training epoch.
+work beyond the single authorized follow-up remain separate from this epoch.
