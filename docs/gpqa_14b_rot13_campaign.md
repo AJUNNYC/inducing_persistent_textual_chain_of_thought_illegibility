@@ -13,31 +13,83 @@ GSM8K, MMLU, ARC-Easy and MBPP evaluations are unchanged. No training restart is
 required. This capability-only campaign calls no provider judges and does not
 run legibility evaluation, RL or linear probes.
 
-## Planned two-total-epoch comparison, not launched
+## Current priority: original one-pass evaluation first
 
-The user authorized one additional SFT pass for all ten 14B ROT13 levels from
-their own original full checkpoints, at peak `5e-5`, with unchanged existing
-data/encoding and native thinking newline. This planned campaign preserves
-one-epoch evidence and the separate high-rate L10 pilot. It uses no GPQA
-training data. New matched GPQA does not autolaunch: verify all ten new endpoints
-and freeze/review their evaluation identities first; retain compatible baseline
-and original-level outputs. Original GPQA levels 7–9 remain unrun/paused. The
-current high-rate pilot's frozen full-198 evaluation continues unchanged. See
-the [SFT policy and commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110).
+The current priority is to **finish the original one-pass GPQA evaluations first**.
+The matching base and original levels 1–6 and 10 are complete; original levels
+7–9 remain. The frozen `5e6be1b` campaign has resumed with compatible cached
+protocols/results and the existing published supervisor; do not regenerate the
+baseline or mix the high-rate pilot into the original one-pass series.
 
-## Current evidence: native first 128 verified; final 70 running
+The matched two-total-epoch 14B ROT13 levels 1–10 campaign remains authorized:
+one extra pass from each own original full checkpoint, peak `5e-5`, existing
+data/encoding and native thinking newline. Source
+`a1962353a4301744dc6db5adafb0e6b212354679` launched at 21:32:26 UTC on 16 October
+and level 1 began updates. The whole-optimizer-update pause requested at 21:54:29 UTC completed safely
+at level 1 checkpoint `000064`: **64 added/689 cumulative updates**, with full state,
+manifest and identity verified in Drive. Checkpoint hash:
+`eb52d7e7d4a23f8f3ac482e1a5efce2d44e85767428d7a94263caa2bb465a780`.
+The campaign and fit are **PAUSED**, and GPU handover followed verification.
+The existing supervisor resumed original GPQA at 21:56:31.846611 UTC; original
+**level 7 was RUNNING at 21:56:48.129439 UTC** (supervisor 29664/campaign 29665),
+using published operations `2a0f7e2` and scientific source `5e6be1b`. Two existing
+recoveries remain recorded. Complete base and L1–6 states were revalidated without
+inference; original L10 retains its complete 198-question receipt and will be skipped
+when visited. Training stays paused and **no automatic training resume is
+installed** after evaluation. Original endpoints and
+the completed high-rate L10 pilot stay separate. See the
+[continuation policy/API/commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+and [worker plan](sft_multi_gpu_execution_plan.md).
 
-The separate L10 extra epoch is complete: 625 additional/1,250 cumulative updates,
-26 required Drive artifacts verified, trainer exit zero. Its source `3a89691`
-remains distinct from operations `dfcae353` and frozen evaluator `5e6be1b`.
-Original endpoints and controls are retained. The fit took about 4h51m, roughly
-three times original L10's 96.6m; the slowdown's cause remains unknown.
+## Current evidence: final 198 complete and verified
 
-The new run now has **128 verified native raw/score pairs** under protocol
-`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`.
-All 128 match private CPU text/score/finish/token projections exactly, including
-42/42 parity with the earlier snapshot. **This is only the fixed first group;
-the final 70 are running and the full-198 receipt is absent.**
+The completed high-rate L10 extra-epoch pilot's frozen **198-question/32,000-token
+GPQA evaluation is COMPLETE**, with native final artifacts and Drive verification
+recorded on **16 October 2026 at 21:30:25 UTC**. All 198 questions remain in the
+strict denominator:
+
+| State, same 198 questions | Frozen scorer correct | Accuracy |
+| --- | ---: | ---: |
+| Matching untouched base | 99/198 | 50.00% |
+| Original one-epoch L10 | 98/198 | 49.49% |
+| High-rate extra-epoch L10 pilot | 52/198 | 26.26% |
+
+The pilot has **52 correct, 44 parsed wrong, 9 malformed and 93 truncated**
+outputs. The fixed 73-marker screen is positive for **168/198** responses;
+**34/168** marker-positive responses are strictly correct. Marker presence
+establishes occurrence, not encoding coverage, reasoning validity or formal L10
+compliance. No all-198 human visible-choice or wordfreq analysis is claimed.
+The 42-request and first-128 manual/contextual/lexical findings below remain
+historical subset diagnostics and must not be extrapolated to all 198.
+
+Frozen evaluator `5e6be1b0848e0e88725323591baddef37d69d8ae`, protocol
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`,
+native prompts/options/item seeds, sampling, strict scorer and 32,000-token cap
+were retained. Completion receipt SHA-256:
+`e7171ac99e17f245a3257241a9c08fc1f5a09ffdde808b50844a4e0c6ee0cbfd`.
+The private final responses/scores bundle SHA-256 is
+`d59f1b16a990a42f71fb574f0b23aca271da5bbb5a50f8b5a9651ac3c555b1f9`;
+validation SHA-256 is
+`b41aa6f48fa6000f3dd51bc68615bc54f3b6887f048cb4e6a17f19be75016136`.
+The [10-file final diagnostics and launch bundle](https://drive.google.com/drive/folders/1qZCc7iu3nT98yaDrbYiN19ju-TrMhhd_)
+is Drive-verified. Licensed prompts, responses and token values remain private.
+
+The pilot combines extra exposure, cosine restart at peak `2e-4` and native
+thinking newline; these outcomes do not isolate an epoch effect. Its correctness
+is lower than both matching controls under the frozen scorer. Original
+construction criteria and four-domain evaluation budgets remain unchanged.
+
+The separate high-rate L10 training phase completed 625 additional/1,250
+cumulative updates under source `3a89691`, with 26 Drive-verified artifacts and
+trainer exit zero. The fit took about 4h51m versus original L10's 96.6m; the
+slowdown's cause remains unknown.
+
+## Historical first-128 prefix and human review
+
+The fixed first group had 128 verified native raw/score pairs with exact
+128/128 private CPU parity and earlier42/42 parity. At that dated stage, the
+final70 group and full receipt were pending; the following counts retain their
+original subset denominator.
 
 | State, same first 128 questions | Frozen scorer correct / 128 | Supplementary visible-choice correct / 128 |
 | --- | ---: | ---: |
@@ -59,7 +111,9 @@ those finishers is 23/52 (44.23%); human visible-choice correctness is 25/52
 (57.35%). Bounded manual review of all positives corroborates ROT13 occurrence,
 with looping/garbled terminology, not complete-response compliance.
 
-## Within-response amount in that prefix
+## Historical within-response amount in the first128
+
+These manual/contextual and lexical findings were not extended to all198.
 
 L10's target remains **100% of eligible reasoning spans**, including short words,
 variables, mixed alphanumeric/underscore words and Latin LaTeX command names:
@@ -116,9 +170,9 @@ performance.
 Independent audit reproduced 4,608 per-response tables and 96 summaries exactly.
 See the [diagnosis and evidence hashes](sft_level10_training_diagnosis.md#within-response-amount-post-hoc-english-lexicon-diagnostic)
 for definitions, provenance and dated historical snapshots. No prompt/response
-text, question IDs or token values are added to Git. The [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid) is Drive-verified; it is not the missing full198 native receipt. Native metrics and the
-32,000-token frozen evaluation continue unchanged; original GPQA L7-9 remain
-paused and the separately authorized training campaign is not launched.
+text, question IDs or token values are added to Git. The [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid) is Drive-verified with historical first128 scope. It is separate from the final198
+native receipt. Original GPQA L7-9 now take priority; low-rate matched training
+is safely paused at 64 added/689 cumulative updates with verified recovery, as recorded above.
 
 Evaluate all 198 Diamond questions with the original `long_32000` contract:
 32,000 new tokens per response, context 40,960, eight concurrent sequences,
@@ -158,8 +212,8 @@ frozen per-item seed derivation remains unchanged. Only the 198 baseline raw
 records are copied into the new namespace and natively verified there;
 old absolute-path completion receipts are not copied as new completion evidence.
 The earlier preparation and private-memory stages remain dated history. The
-first 128 native raw/scored records are now verified, but full completion still
-requires all 198 and the final verified receipt.
+first128 native records were a historical intermediate barrier. All198 native
+raw/scored records and the final receipt are now verified as recorded above.
 
 Completion requires all 198 new raw responses and scores, the paired report and
 Drive-verified receipt/inventory. Wrong, malformed and truncated responses stay

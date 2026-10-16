@@ -14,11 +14,12 @@ flowchart TD
 %% Authorization $240 recorded; no inferred new price or rate-based cutoff; explicit deadline/safe pause separate.
 %% Forty datasets available; alltenROT13 fitscomplete, alltenKaziText fitsuncompleted.
 %% Historical$240SFT authorization retained; original GPQA32k controls retained.
-%% 16Oct L10 extra epoch COMPLETE625/cumulative1250/26Driveverified; newL10 GPQA running.
-%% Native128 verified:35new/61old/70base strictcorrect; final70running/full198pending.
-%% Posthoc wordfreq R-only56.50% of alphabetic reasoning words; vocabulary-sensitive,not full coverage.
+%% 16Oct high-rate L10 extra epoch COMPLETE625/cumulative1250/26Driveverified; native GPQA198 COMPLETE.
+%% Full198 strictcorrect:52pilot/98originalL10/99base; pilot44wrong/9malformed/93truncated.
+%% Fixed73-word markers168/198,34correct/168: presence only. Historical128 wordfreq is prefix only.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
-%% Matched two-total-epoch14B ROT13 levels1-10 v2: PLANNED_NOT_LAUNCHED, ownoriginalparents,peak5e-5.
+%% v2 sourcea196235 launched21:32:26UTC; pause requested21:54:29; PAUSED L1checkpoint000064 Driveverified.
+%% 64added/689cumulative; original one-pass GPQA L7 RUNNING21:56:48UTC; L8-9 next; no SFT autoresume.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -41,7 +42,8 @@ flowchart TD
     INPUT --> SFT --> SFTOUT --> WAIT
     INPUT --> RL --> RLOUT --> WAIT
     INPUT --> BASE --> WAIT
-    SFTOUT -.->|Separate planned authorization| V2["Matched two-total-epoch ROT13 levels 1-10<br/>Each ORIGINAL full checkpoint plus one pass at peak 5e-5<br/>Unchanged data / encoding; native think newline; new identity<br/>One GPU serial or two disjoint level shards<br/>Preserve originals and high-rate L10 pilot<br/>Not launched; verified endpoints then evaluation identity review<br/>No automatic GPQA launch"]
+    SFTOUT --> ONEPASS["Current priority: ORIGINAL one-pass GPQA first<br/>Base and original L1-6 / L10 complete; reuse compatible outputs<br/>L7 running; L8-9 next under frozen long_32000 evaluator<br/>High-rate pilot complete:52/198 vs originalL10 98/198 and base99/198<br/>No automatic SFT resume after evaluation"]
+    SFTOUT -.->|Authorized continuation retained; currently paused| V2["Matched two-total-epoch ROT13 levels 1-10<br/>Each ORIGINAL full checkpoint plus one pass at peak 5e-5<br/>Unchanged data / encoding; native think newline; new identity<br/>Launched sourcea196235; PAUSED L1checkpoint000064<br/>64added /689cumulative; full state / identity Drive-verified<br/>Preserve originals and high-rate pilot; later selected resume only<br/>All ten endpoints then evaluation identity review; no GPQA autolaunch"]
     WAIT --> OUT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class SFT,RL detail

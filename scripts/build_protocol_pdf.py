@@ -90,12 +90,14 @@ def main():
                                         'historical 3072-token untouched 14B GPQA Diamond baseline',
                                         'ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched',
                                         'separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts',
-                                        'new level-10 GPQA immutable protocol and observed inference; official results pending',
+                                        'high-rate level-10 GPQA all198 native completion and Drive verification; strict52/198 versus original98/198 and base99/198',
                                         'private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion',
-                                        'same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending',
-                                        'supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged',
-                                        'first128 native GPQA raw/score verification and exact private CPU parity; full198 incomplete',
-                                        'posthoc wordfreq reasoning-word amount diagnostic and independent4608-table/96-summary reproduction']
+                                        'historical same fixed42 exact identity/native decoding and provisional frozen-scorer replay; subset scope retained',
+                                        'historical fixed42 all-nine malformed-output human final-choice review; frozen scorer primary and unchanged',
+                                        'historical first128 native GPQA raw/score verification and exact private CPU parity; human and lexical findings not extended to198',
+                                        'historical first128 posthoc wordfreq reasoning-word diagnostic and independent4608-table/96-summary reproduction',
+                                        'matched low-rate continuation launched then safely paused at L1added64/cumulative689 with Drive-verified recovery',
+                                        'original one-pass GPQA prioritized; frozen campaign resumed with cached controls and original level7 observed running; no training autoresume']
     provenance_path.write_text(json.dumps(provenance, indent=2)+'\n')
     print(f'Built {len(doc)}-page integrated protocol; refreshed extraction and provenance')
     doc.close()

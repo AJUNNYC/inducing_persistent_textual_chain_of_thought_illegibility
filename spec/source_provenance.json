@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "52728235db4d5a1de5f2dbc13b10c198eea5650c0358f8b333250f375bb3bc46"
+    "sha256": "0ef3bf421b4d28149a63e61de45435ee18f545b2c2e9622c2385f1266cc82a2b"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -14,7 +14,7 @@
   "original_revised_mermaid_count": 35,
   "source_archive": "spec/archive/mermaid_source.json",
   "full_original_latex_available": false,
-  "scientific_results_included": false,
+  "scientific_results_included": true,
   "live_integrations_validated": false,
   "active_procedure_edition": "2026-10-16",
   "procedure_update_source": "spec/protocol_page_updates.json",
@@ -29,14 +29,16 @@
     "historical 3072-token untouched 14B GPQA Diamond baseline",
     "ten completed 14B ROT13 fits: reports/manifests byte-verified and final payload metadata matched",
     "separate 14B ROT13 level-10 extra epoch: 625 additional updates and 26 Drive-verified artifacts",
-    "new level-10 GPQA immutable protocol and observed inference; official results pending",
+    "high-rate level-10 GPQA all198 native completion and Drive verification; strict52/198 versus original98/198 and base99/198",
     "private completion-biased 42-request snapshot and bounded review; observational backup distinct from native completion",
-    "same fixed42 exact identity/native decoding and provisional frozen-scorer replay; native official results pending",
-    "supplementary all-nine malformed-output human final-choice review; frozen scorer primary and unchanged",
-    "first128 native GPQA raw/score verification and exact private CPU parity; full198 incomplete",
-    "posthoc wordfreq reasoning-word amount diagnostic and independent4608-table/96-summary reproduction"
+    "historical same fixed42 exact identity/native decoding and provisional frozen-scorer replay; subset scope retained",
+    "historical fixed42 all-nine malformed-output human final-choice review; frozen scorer primary and unchanged",
+    "historical first128 native GPQA raw/score verification and exact private CPU parity; human and lexical findings not extended to198",
+    "historical first128 posthoc wordfreq reasoning-word diagnostic and independent4608-table/96-summary reproduction",
+    "matched low-rate continuation launched then safely paused at L1added64/cumulative689 with Drive-verified recovery",
+    "original one-pass GPQA prioritized; frozen campaign resumed with cached controls and original level7 observed running; no training autoresume"
   ],
-  "procedure_update_sha256": "c954a6e74dbeb55318779cc9a6d7ff7c3654b8ef34cb9952a7a477847cc9c10c",
+  "procedure_update_sha256": "8b8b625a67ac60e3efbf1972313ac4b767a9089143d60b400c2260132f38f572",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -1003,7 +1005,8 @@
       "separate_from_eight_file_observational_bundle": true,
       "native_checkpoint_or_evaluation_completion_barrier": false
     },
-    "question_prompt_response_or_token_values_included_in_git": false
+    "question_prompt_response_or_token_values_included_in_git": false,
+    "status_scope": "historical_fixed42_or_first128_subset_snapshot; original counts and then-current statuses retained; superseded for current full-panel capability by gpqa_level10_epoch02_native_final198; no extrapolation of human/contextual/lexical coverage to198"
   },
   "gpqa_level10_epoch02_human_final_choice_review": {
     "status": "SUPPLEMENTARY_POSTHOC_HUMAN_PRESENTATION_DIAGNOSTIC_NOT_OFFICIAL_RESCORING",
@@ -1054,7 +1057,8 @@
     "reasoning_validity_established": false,
     "comprehension_or_faithfulness_established": false,
     "isolated_epoch_causality_established": false,
-    "individual_ids_answer_letters_question_or_response_snippets_in_git": false
+    "individual_ids_answer_letters_question_or_response_snippets_in_git": false,
+    "status_scope": "historical_fixed42_or_first128_subset_snapshot; original counts and then-current statuses retained; superseded for current full-panel capability by gpqa_level10_epoch02_native_final198; no extrapolation of human/contextual/lexical coverage to198"
   },
   "gpqa_level10_epoch02_native_prefix128": {
     "status": "NATIVE_FIRST128_VERIFIED_FULL198_INCOMPLETE",
@@ -1153,7 +1157,8 @@
     "isolated_epoch_causality_established": false,
     "comprehension_or_faithfulness_established": false,
     "individual_ids_question_response_or_token_values_in_git": false,
-    "further_training_authorized": false
+    "further_training_authorized": false,
+    "status_scope": "historical_fixed42_or_first128_subset_snapshot; original counts and then-current statuses retained; superseded for current full-panel capability by gpqa_level10_epoch02_native_final198; no extrapolation of human/contextual/lexical coverage to198"
   },
   "gpqa_level10_epoch02_native128_within_response_wordfreq": {
     "status": "POSTHOC_REASONING_WORD_LEXICON_PROXY_NATIVE_METRICS_UNCHANGED",
@@ -1268,7 +1273,8 @@
       "classified_fraction_or_conditional_ratio_establishes_100percent_compliance": false,
       "ordinary_english_outputs_refute_universal_100percent_prefix_compliance": true,
       "bounded_marker_review_certifies_any_other_full_response_pass": false
-    }
+    },
+    "status_scope": "historical_fixed42_or_first128_subset_snapshot; original counts and then-current statuses retained; superseded for current full-panel capability by gpqa_level10_epoch02_native_final198; no extrapolation of human/contextual/lexical coverage to198"
   },
   "gpqa_level10_epoch02_native128_formal_encoding_contextual_adjudication": {
     "status": "POSTHOC_CONTEXTUAL_ADJUDICATION_FIXED_NATIVE128_NOT_FULL198",
@@ -1334,11 +1340,12 @@
       "receipt_sha256": "eb6a67ef3f555ede7159211ca2837f2b0ae7f662bc981741b0b1e1f88452399a",
       "native_full198_completion_or_checkpoint_barrier": false,
       "scope": "private_formal_denominator_contextual_orientation_and_correct_candidate_full_review_of_verified_first128"
-    }
+    },
+    "status_scope": "historical_fixed42_or_first128_subset_snapshot; original counts and then-current statuses retained; superseded for current full-panel capability by gpqa_level10_epoch02_native_final198; no extrapolation of human/contextual/lexical coverage to198"
   },
   "sft_rot13_14b_matched_two_total_epoch_continuation_v2": {
     "revision_date_utc": "2026-10-16",
-    "status": "PLANNED_NOT_LAUNCHED",
+    "status": "PAUSED_LEVEL1_ADDED64_CUMULATIVE689_ORIGINAL_ONE_PASS_GPQA_FIRST",
     "authorized_scope": "one_additional_pass_from_each_original_14b_rot13_level1_through10_full_checkpoint",
     "selected_model_size": "14b",
     "selected_family": "rot13",
@@ -1401,7 +1408,7 @@
     "half_epoch_checkpoint_actual_added_examples": 5008,
     "high_rate_level10_pilot_may_be_parent_or_matched_endpoint": false,
     "optional_generic_two_additional_epoch_support_selected_or_authorized": false,
-    "execution_source_commit": null,
+    "execution_source_commit": "a1962353a4301744dc6db5adafb0e6b212354679",
     "immutable_implementation_source_binding_required_before_launch": true,
     "implementation_paths": [
       "src/training/sft/level_continuation.py",
@@ -1446,15 +1453,15 @@
       "completion_receipt_verified_in_drive",
       "every_selected_level_verified_before_shard_endpoints_export"
     ],
-    "new_training_launched": false,
+    "new_training_launched": true,
     "completed_new_endpoints": 0,
     "gpqa_supplies_training_data": false,
     "new_gpqa_autolaunch": false,
     "new_gpqa_requires_all_ten_verified_endpoints_and_frozen_identity_review": true,
     "compatible_existing_base_and_original_one_epoch_outputs_reused": true,
-    "original_gpqa_levels7_through9": "UNRUN_PAUSED",
+    "original_gpqa_levels7_through9": "PRIORITIZED_LEVEL7_RUNNING_LEVELS8_AND9_REMAIN",
     "high_rate_pilot_gpqa_protocol_unchanged": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
-    "high_rate_pilot_full198_native_receipt_verified": false,
+    "high_rate_pilot_full198_native_receipt_verified": true,
     "historical_fit_observations": {
       "original_level10_seconds": 5793.143751,
       "high_rate_pilot_seconds": 17470.26931851078,
@@ -1474,13 +1481,122 @@
       "full_suite_run": false
     },
     "current_pod_input_staging": {
-      "status": "RESTORED_PAYLOADS_VERIFIED_PLAN_READY_GPU_NOT_LAUNCHED",
+      "status": "RESTORED_PAYLOADS_VERIFIED_TRAINING_LAUNCHED_THEN_PAUSED64",
       "artifact_count": 141,
       "restored_inputs_manifest_hash": "12a4420192b129c45637772d8a6d04bf21d3b7bdb0ba66a326446329493c36a5",
       "immutable_source_export_sha256": "302a9128a213f8eb53c208887154d9af9a6d0a6e0279a7f01de4fbe816909925",
       "plan_file_sha256": "c898bfb7b4611155b6295e0a4a238920323d83e9a452aa8ef26769077824736d",
       "existing_pilot_evaluation_unchanged": true,
       "second_gpu_required": false
+    },
+    "launched_at_utc": "2026-10-16T21:32:26+00:00",
+    "pause": {
+      "status": "PAUSED_VERIFIED_BEFORE_GPU_HANDOVER",
+      "requested_at_utc": "2026-10-16T21:54:29+00:00",
+      "level": 1,
+      "checkpoint": "checkpoint000064",
+      "added_updates": 64,
+      "cumulative_updates": 689,
+      "checkpoint_hash": "eb52d7e7d4a23f8f3ac482e1a5efce2d44e85767428d7a94263caa2bb465a780",
+      "full_state_manifest_identity_drive_status": "VERIFIED",
+      "campaign_status": "PAUSED",
+      "fit_status": "paused",
+      "no_automatic_training_resume_installed": true,
+      "future_training_remains_authorized": true,
+      "private_pause_and_handoff_drive_bundle": {
+        "url": "https://drive.google.com/drive/folders/12ncXrN2UjJb_rDKX7sSfjR9nLFRfFCOt",
+        "verified_file_count": 7,
+        "status": "VERIFIED",
+        "scope": "safe_v2_pause64_and_original_one_pass_gpqa_handoff"
+      }
     }
-  }
+  },
+  "gpqa_level10_epoch02_native_final198": {
+    "status": "COMPLETE_198_NATIVE_AND_DRIVE_VERIFIED",
+    "completed_at_utc": "2026-10-16T21:30:25+00:00",
+    "evaluation_source_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+    "operations_source_commit": "dfcae353a50f723ac2551727904b802e7b34750f",
+    "training_source_commit": "3a89691a34fb124d2a5235dfb162f55ca723a2f6",
+    "protocol_hash": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
+    "panel_hash": "322e4335322a93adc18dc0e22e982bf6bbcd1a07223ccf1b08e25dfb7a5076de",
+    "question_count": 198,
+    "max_new_tokens": 32000,
+    "measurement_contract_unchanged": true,
+    "strict_same198_correct": {
+      "matching_base": 99,
+      "original_one_epoch_level10": 98,
+      "high_rate_level10_pilot": 52
+    },
+    "new_strict_categories": {
+      "correct": 52,
+      "incorrect": 44,
+      "malformed_answer": 9,
+      "truncated_output": 93
+    },
+    "fixed_marker_lexicon_size": 73,
+    "marker_positive_count": 168,
+    "marker_positive_strict_correct": 34,
+    "marker_presence_establishes_encoding_coverage": false,
+    "formal_full_response_compliance_established": false,
+    "full198_human_visible_choice_review_performed": false,
+    "full198_wordfreq_or_contextual_adjudication_performed": false,
+    "completion_receipt_sha256": "e7171ac99e17f245a3257241a9c08fc1f5a09ffdde808b50844a4e0c6ee0cbfd",
+    "native_response_records_verified": 198,
+    "native_score_records_verified": 198,
+    "private_projected_bundle_sha256": "d59f1b16a990a42f71fb574f0b23aca271da5bbb5a50f8b5a9651ac3c555b1f9",
+    "native_fetch_validation_sha256": "b41aa6f48fa6000f3dd51bc68615bc54f3b6887f048cb4e6a17f19be75016136",
+    "independent_host_drive_download_verification_performed": false,
+    "private_final_and_launch_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/1qZCc7iu3nT98yaDrbYiN19ju-TrMhhd_",
+      "verified_file_count": 10,
+      "status": "VERIFIED"
+    },
+    "historical42_and128_human_contextual_and_wordfreq_scope_retained": true,
+    "isolated_epoch_causality_or_faithfulness_established": false,
+    "licensed_question_response_or_token_values_in_git": false
+  },
+  "original_one_pass_gpqa_priority_2026_10_16": {
+    "status": "ONE_PASS_GPQA_PRIORITY_RUNNING_LEVEL7_SFT_CONTINUATION_PAUSED64",
+    "user_priority": "finish_original_one_pass_evaluations_first",
+    "scientific_source_commit": "5e6be1b0848e0e88725323591baddef37d69d8ae",
+    "operations_source_short_commit": "2a0f7e2",
+    "supervisor_pid": 29664,
+    "campaign_pid": 29665,
+    "resumed_at_utc": "2026-10-16T21:56:31.846611+00:00",
+    "level7_running_observed_at_utc": "2026-10-16T21:56:48.129439+00:00",
+    "preserved_recoveries": 2,
+    "maximum_recoveries": 12,
+    "profile": "long_32000",
+    "questions_per_state": 198,
+    "completed_original_levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      10
+    ],
+    "remaining_original_levels": [
+      7,
+      8,
+      9
+    ],
+    "current_level": 7,
+    "matching_base_and_levels1_through6_revalidated_without_inference": true,
+    "original_level10_complete198_receipt_retained_and_skip_on_visit": true,
+    "cached_protocols_results_retained": true,
+    "new_baseline_generated": false,
+    "full_tests_repeated": false,
+    "pilot_mixed_with_original_series": false,
+    "new_training_auto_resume_installed": false,
+    "future_matched_two_total_epoch_training_remains_authorized_and_paused": true,
+    "private_pause_and_handoff_drive_bundle": {
+      "url": "https://drive.google.com/drive/folders/12ncXrN2UjJb_rDKX7sSfjR9nLFRfFCOt",
+      "verified_file_count": 7,
+      "status": "VERIFIED",
+      "scope": "safe_v2_pause64_and_original_one_pass_gpqa_handoff"
+    }
+  },
+  "scientific_results_scope": "supplemental_descriptive_GPQA_capability_and_training_diagnostics; no_confirmatory_construction_success"
 }

@@ -1,10 +1,11 @@
 flowchart TD
-%% 16Oct extra epoch COMPLETE625/cumulative1250,26 Driveverified,trainerexit0; original levels7-9 paused.
-%% Current:first128 native raw/scores verified; same128 strict35new/61old/70base, human39/70/74.
-%% PrivateCPU parity128/128 and earlier42parity42/42; full198receipt absent, final70running unchanged.
-%% Wordfreq3.1.1 English-large primaryZipf3:56.50% R-only of719767 alphabetic reasoning words.
-%% Block-removal48.05%,equal-response53.37%; vocabulary/repetition proxy,not exact coverage/scientificsuccess.
-%% Contextual adjudication:at least34/128 encoding failures;13correct/noidentifiedexception is not a100%certificate.
+%% 16 Oct high-rate L10 pilot: training625 added/1250 cumulative,26 Drive verified.
+%% Final198 GPQA native+Drive VERIFIED21:30:25UTC:52correct/44wrong/9malformed/93truncated.
+%% Same198 strict pilot52/original98/base99;168 markerpositive,34strictcorrect/168;presence is not coverage.
+%% Original one-pass priority: L7 RUNNING21:56:48UTC viaops2a0f7e2/science5e6be1b;L8-9 remain.
+%% Complete base/L1-6 revalidated without inference;L10 retains complete198 receipt.
+%% Low-rate v2 PAUSED L1checkpoint000064,64added/689cumulative,fullrecovery Driveverified;no training autoresume.
+%% Historical42/128 human/contextual/wordfreq findings retain subset denominators;no all198 extrapolation.
     O[Official pinned GPQA Diamond CSV: all 198 questions] --> P[Fixed panel, seed-42 option permutation and native prompt]
     PROFILE[GPQA-only long_32000<br/>32,000 new tokens; vLLM context 40,960<br/>8 concurrent sequences; request groups 128<br/>Scheduler 8,192; BF16; unchanged sampling] --> BF
     P --> BF[Freeze new matching untouched baseline before inference]
@@ -27,27 +28,29 @@ flowchart TD
     C --> D[Verified Google Drive artifacts]
     EXTRA[L10 extra epoch COMPLETE625/cumulative1250<br/>Training source3a89691; original endpoints retained] --> GATE{625 extra updates and complete result?<br/>Final adapter/full state actually Drive-verified?<br/>Training worker exited; GPU/locks released?}
     GATE -->|No| HOLD[Wait or stop on pause/failure<br/>No evaluation launched; preserve original outputs]
-    GATE -->|Yes| POST[Running: new-adapter L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer<br/>Protocol57898f79; official full-panel results pending]
+    GATE -->|Yes| POST[COMPLETE: high-rate L10 follow-up only<br/>Bind new adapter/checkpoint hashes and distinct namespace<br/>Frozen5e6be1b; exact same prompts/item seeds/scorer<br/>Protocol57898f79; all198 native and Drive verified21:30:25UTC]
     POST -. dated history only .-> HIST["Earlier private42 observation/identity/human reviews retained<br/>Now exact42/42 native parity; see historical docs<br/>Their then-zero native counts are not current status"]
     PROFILE --> POST
     P --> POST
-    POST --> POSTRAW["Continue all198 with frozen32k prompts/seeds/scorer<br/>No regeneration, shortened budget or parser repair"]
-    POSTRAW --> PREFIX["First128 native raw/score pairs verified<br/>Exact128/128 private CPU text/score/finish/token parity<br/>Full198 native completion receipt remains absent"]
-    PREFIX --> PAIRED["Same128 strict correct:new35,original61,base70<br/>Supplementary visible-choice correct:new39,old70,base74<br/>New35correct/28wrong/5malformed/60truncated<br/>All5malformed reviewed:4correct choices,1invalid"]
+    POST --> POSTRAW["All198 completed with frozen32k prompts/seeds/scorer<br/>No regeneration, shortened budget or parser repair"]
+    POSTRAW --> PREFIX["Historical first128 native raw/score pairs verified<br/>Exact128/128 private CPU text/score/finish/token parity<br/>Then-pending final group and receipt are dated history"]
+    PREFIX --> PAIRED["Historical same128 strict correct:new35,original61,base70<br/>Supplementary visible-choice correct:new39,old70,base74<br/>New35correct/28wrong/5malformed/60truncated<br/>All5malformed reviewed:4correct choices,1invalid"]
     PAIRED -. conditional groups .-> GROUP["111 marker positives:52stop/59capped<br/>Finisher strict23/52,human25/52<br/>Human25/111 including caps; all-stopped39/68<br/>Bounded review confirms occurrence,not full coverage"]
     PREFIX -. private posthoc reasoning-word diagnostic .-> AMOUNT["wordfreq3.1.1 English-large; primaryZipf3 set before results<br/>All719767 alphabetic reasoning words<br/>R-only56.50%,plain4.82%,both.46%,unknown9.06%,short29.17%"]
     AMOUNT -. different diagnostic denominator .-> TARGET["FormalL10 target remains100% of eligible reasoning spans<br/>Unicode word span containing anyASCIIletter<br/>Includes short/mixed words,variables,Latin LaTeX names<br/>Unassigned or excluded diagnostic words are NOT exempt<br/>At least34/128 confirmed failures:17English+17markerpositive"]
     TARGET --> JOINT["Same128 joint outcomes:39visiblecorrect,29wrong/invalid,60cutoff<br/>Correct39:13noidentifiedexception,3unresolved,9plaintext,14English<br/>Noidentifiedexception after full review is not a100%certificate<br/>Unresolved or unaudited outputs are not certified PASS"]
     AMOUNT --> SENS["Exact8word-block removal48.05%; equal-response mean53.37%<br/>Cutoffs2/3/4/5 give43.17/56.50/53.34/41.50% R-only<br/>111 positives:R61.40/P.14/rest38.46; R/(R+P)99.77 is not all text<br/>Not exact coverage/lower bound/L10compliance/faithfulness"]
-    SENS --> PRIVATE["24-file private prefix/analysis bundle verified<br/>Independent4608 per-response tables/96summaries exact<br/>No native metric or inference change; not full198 completion"]
-    PREFIX --> REMAIN["Final70-question group running unchanged<br/>Levels7-9 paused; no extra training"]
-    REMAIN --> BARRIER198{"All198 native raw/scores/report and final receipt verified?"}
-    BARRIER198 -->|Pending| WAIT198["Preserve partial native evidence; no full-panel result claim"]
-    BARRIER198 -->|Complete only| POSTREPORT["Compare new L10 against original L10<br/>Reuse same verified matching cached baseline<br/>Exploratory combined-intervention comparison"]
+    SENS --> PRIVATE["Historical24-file private prefix/analysis bundle verified<br/>Independent4608 per-response tables/96summaries exact<br/>No all198 human/contextual/lexical extrapolation"]
+    POSTRAW --> BARRIER198["COMPLETE: all198 native raw/scores/report/final receipt<br/>Drive VERIFIED16Oct21:30:25UTC<br/>Receipt e7171ac9; frozen scorer unchanged"]
+    BARRIER198 --> POSTREPORT["Same198 strict: pilot52/19826.26%<br/>Original one-epoch L1098/19849.49%; matching base99/19850%<br/>Pilot52correct/44wrong/9malformed/93truncated<br/>Exploratory combined-intervention result"]
     BR -. exact matching baseline reuse .-> POSTREPORT
     ORIGINAL10[Archived original L10 raw responses and scores] --> POSTREPORT
-    POSTREPORT --> POSTDRIVE[Require all198 raw/scores/report/receipt verified in Drive<br/>Levels7-9 remain paused; no other automatic jobs]
-    A -.->|Future matched continuation; not launched| V2["Planned two-total-epoch 14B ROT13 levels 1-10<br/>One added pass from each ORIGINAL full state at peak 5e-5<br/>No new data / encoding; preserve high-rate L10 pilot<br/>Original GPQA levels 7-9 stay unrun / paused"]
-    V2 --> V2GATE["All ten new endpoints Drive-verified first<br/>Freeze and review evaluation identities and compatible control reuse<br/>No automatic GPQA launch; current pilot continues unchanged"]
+    POSTREPORT --> POSTDRIVE["Final10-file diagnostics/launch bundle Drive VERIFIED<br/>Fixed73-marker positives168/198,strictcorrect34/168<br/>Presence is not coverage or formal100%compliance<br/>Historical128 human/wordfreq findings stay subset only"]
+    POSTDRIVE --> PRIORITY["USER PRIORITY: finish ORIGINAL ONE-PASS GPQA first<br/>L7 RUNNING21:56:48UTC;L8-9 remain<br/>Publishedops2a0f7e2 supervisor29664/campaign29665<br/>Scientific5e6be1b;2 recoveries retained"]
+    PRIORITY --> REUSE["Complete base/L1-6 revalidated without inference<br/>Original L10 retains complete198 receipt and will be skipped<br/>Preserve cached protocols/results;long32000/all198<br/>No new baseline,refits,fulltests or pilot mixing"]
+    A -. separate authorized training .-> V2["Matched v2 sourcea1962353 launched21:32:26UTC<br/>One extra pass from each own ORIGINAL full checkpoint at5e-5<br/>Existing data/encoding,native thinking newline<br/>Preserve high-rate pilot separately"]
+    V2 --> V2PAUSE["Safely PAUSED before GPU handover<br/>L1checkpoint000064,64added/689cumulative<br/>Full recovery/manifest/identity Drive VERIFIED<br/>Future training authorized;no automatic resume installed"]
+    V2PAUSE -. original evaluation takes GPU priority .-> PRIORITY
+    V2PAUSE -. future training requires deliberate resume .-> V2GATE["All ten new endpoints must later be Drive-verified<br/>Freeze/review new evaluation identities and compatible control reuse<br/>No automatic matched GPQA launch"]
     OLD[Historical 3,072-token GPQA baseline: 49/198<br/>Preserved separately; incompatible with 32k comparison] -. archived .-> OLD
     X[Primary four-domain suite stays at 3,072 tokens<br/>SFT data, recipe and original criteria unchanged] -. unchanged .-> X

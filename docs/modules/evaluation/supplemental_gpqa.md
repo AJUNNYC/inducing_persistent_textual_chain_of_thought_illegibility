@@ -6,14 +6,59 @@ enter the primary statistical window or multiplicity family, or modify SFT/RL
 training and certificates. The opt-in `long_32000` profile changes **GPQA
 evaluation only**. Existing trained adapters do not need to be retrained.
 
-## Current prefix: 128 native records verified; full 198 incomplete
+## Current evidence: final198 complete; original one-pass evaluation first
 
-The extra L10 SFT phase completed 625 additional updates (1,250 cumulative),
-with 26 Drive-verified artifacts and trainer exit code zero. Its GPQA run now has
-128 verified native raw/score pairs, with exact 128/128 parity against private
-CPU text/score/finish/token records and 42/42 parity against the earlier snapshot.
-This is the fixed first panel group. The final 70-question group is running, and
-the full 198-question receipt is absent.
+The completed high-rate L10 extra-epoch pilot's frozen **198-question/32,000-token
+GPQA evaluation is COMPLETE**, with native final artifacts and Drive verification
+recorded on **16 October 2026 at 21:30:25 UTC**. All 198 questions remain in the
+strict denominator:
+
+| State, same 198 questions | Frozen scorer correct | Accuracy |
+| --- | ---: | ---: |
+| Matching untouched base | 99/198 | 50.00% |
+| Original one-epoch L10 | 98/198 | 49.49% |
+| High-rate extra-epoch L10 pilot | 52/198 | 26.26% |
+
+The pilot has **52 correct, 44 parsed wrong, 9 malformed and 93 truncated**
+outputs. The fixed 73-marker screen is positive for **168/198** responses;
+**34/168** marker-positive responses are strictly correct. Marker presence
+establishes occurrence, not encoding coverage, reasoning validity or formal L10
+compliance. No all-198 human visible-choice or wordfreq analysis is claimed.
+The 42-request and first-128 manual/contextual/lexical findings below remain
+historical subset diagnostics and must not be extrapolated to all 198.
+
+Frozen evaluator `5e6be1b0848e0e88725323591baddef37d69d8ae`, protocol
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`,
+native prompts/options/item seeds, sampling, strict scorer and 32,000-token cap
+were retained. Completion receipt SHA-256:
+`e7171ac99e17f245a3257241a9c08fc1f5a09ffdde808b50844a4e0c6ee0cbfd`.
+The private final responses/scores bundle SHA-256 is
+`d59f1b16a990a42f71fb574f0b23aca271da5bbb5a50f8b5a9651ac3c555b1f9`;
+validation SHA-256 is
+`b41aa6f48fa6000f3dd51bc68615bc54f3b6887f048cb4e6a17f19be75016136`.
+The [10-file final diagnostics and launch bundle](https://drive.google.com/drive/folders/1qZCc7iu3nT98yaDrbYiN19ju-TrMhhd_)
+is Drive-verified. Licensed prompts, responses and token values remain private.
+
+The pilot combines extra exposure, cosine restart at peak `2e-4` and native
+thinking newline; these outcomes do not isolate an epoch effect. Its correctness
+is lower than both matching controls under the frozen scorer. Original
+construction criteria and four-domain evaluation budgets remain unchanged.
+
+Current priority is original one-pass levels7-9; base/L1-6/L10 are complete and
+reused under frozen evaluator5e6be1b. Low-rate v2 sourcea1962353 launched
+at21:32:26 UTC; the whole-update pause completed at L1checkpoint000064,64added/689cumulative,
+with fullstate/manifest/identity Drive-verified. Original level7 was RUNNING at
+21:56:48.129439 UTC via publishedops2a0f7e2 supervisor29664/campaign29665,
+retaining2recoveries; base/L1-6 were revalidated without inference and original
+L10 retains its complete 198-question receipt. Future matched training remains authorized
+and paused; no automatic training resume is installed.
+
+## Historical first128 native prefix and human/lexical diagnostics
+
+This section retains only the first128 subset evidence. At its collection time
+the final70 group and final receipt were pending; the final198 result above now
+controls full-panel capability reporting. No manual or lexical finding below is
+extrapolated to the 198-response panel.
 
 | Same 128 questions | Frozen correct | Supplementary visible-choice correct |
 | --- | ---: | ---: |
@@ -72,8 +117,9 @@ Frozen evaluator `5e6be1b`, protocol
 `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`,
 native prompts/options/seeds, sampling and the 32,000-token limit remain
 unchanged. Wrong, malformed and truncated responses stay incorrect. The
-exposure/schedule/newline revision cannot isolate an epoch effect. Levels 7–9
-remain paused; no extra training or full-campaign restart follows. The
+exposure/schedule/newline revision cannot isolate an epoch effect. Original levels 7–9
+are now prioritized using existing original states and cached protocols/results;
+training remains paused during these evaluations, with no automatic restart. The
 [campaign guide](../../gpqa_14b_rot13_campaign.md) retains the native completion
 barrier: all 198 raw responses and scores, the report and a verified receipt.
 
@@ -228,8 +274,9 @@ python scripts/run_supplemental_gpqa.py run \
 
 For baseline plus all ten completed ROT13 levels, use the published
 `scripts/run_gpqa_sft_campaign.py` and [operator guide](../../gpqa_14b_rot13_campaign.md).
-It validates all ten adapters before GPU inference, runs a new matching baseline
-once, then processes levels 1–10 ascending. The workload is **198 × 11 = 2,178
+Its original launch validated all ten adapters, ran one matching baseline and
+processed levels1–10 ascending. Current resume reuses complete compatible
+baseline/L1-6/L10 results and runs only remaining original levels7–9. The workload is **198 × 11 = 2,178
 unique responses**. Each paired report refers to the same baseline evidence;
 it does not generate another baseline for every level.
 
@@ -267,7 +314,8 @@ The historical `legacy_3072` untouched 14B run remains complete and Drive-verifi
 stay in its denominator. Its original source and permanent outputs are preserved;
 see [baseline results](../../14b_baseline_results.md). Those short-budget outputs
 cannot enter the new 32k paired comparison. Availability of the long-profile
-commands and completed adapters does not establish a completed long GPQA result.
+commands alone does not establish completion; the actual completed long-profile
+results and verified receipt are recorded above.
 
 Approximately **22 hours** for baseline plus ten levels on one PRO 6000 is a
 planning estimate, including ordinary Drive publication, not a measured 32k

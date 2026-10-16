@@ -3,12 +3,13 @@ title: "spec/mermaid/workflows/training/sft/individual_fit/sft_fit.mmd"
 ---
 flowchart TD
 %% 16Oct separate L10 extra epoch COMPLETE625/cumulative1250; original fit remains immutable.
-%% 26 Drive artifacts verified; trainer exit0. New-L10 GPQA inference observed11:52:41UTC.
-%% Native128 verified:strict35new/61old/70base,supplementary39/70/74 on same128.
-%% Final70running/full198receipt absent; posthoc lexical R-only56.50%,not exact coverage/causal proof.
+%% 26 Drive artifacts verified; trainer exit0. High-rate pilot native GPQA198 COMPLETE.
+%% Full198 strictcorrect:52pilot/98originalL10/99base; pilot44wrong/9malformed/93truncated.
+%% Fixed73-word markers168/198,34correct/168:presence only; historical128 human/wordfreq remains prefix only.
 %% New phase changes exposure, restarted schedule and native think-newline serialization.
-%% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
-%% New matched v2 levels1-10 campaign PLANNED_NOT_LAUNCHED; one additional epoch,peak5e-5.
+%% Preserved AdamW/RNG/physical mode; no pure-epoch causal isolation.
+%% v2 sourcea196235 launched21:32:26UTC; SIGTERM21:54:29; PAUSED L1checkpoint000064 Driveverified.
+%% 64added/689cumulative; original one-pass GPQA L7 RUNNING21:56:48UTC; L8-9 next; no SFT autoresume.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
 %% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
 %% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
@@ -42,7 +43,8 @@ flowchart TD
     PARENT["Explicit separate L10 additional-epoch authorization<br/>Verify original complete adapter / full state / data<br/>Restore adapter, AdamW moments / counters and RNG"]
     CONT["src/training/sft/continuation.py<br/>New identity; second seed42 shuffle; 625 extra updates<br/>Fresh cosine / 19 warmup / same peak LR 2e-4<br/>Add native think newline; retain reasoning / final bytes"]
     CONTEND["New adapter/full state and26 artifacts Drive-verified<br/>625 extra/1250 cumulative updates; trainer exit0<br/>Loss .615158 on100; original endpoint retained"]
-    POST["Running: one new-adapter L10 GPQA comparison<br/>Same198 questions /32k frozen5e6 settings and seeds<br/>New namespace; reuse cached baseline / original L10<br/>Native128:35new/61old/70base strict correct<br/>Final70 runs; full198 receipt pending; no final estimate<br/>Levels7-9 paused; no isolated epoch-effect claim"]
+    POST["High-rate L10 pilot GPQA198 COMPLETE<br/>Same32k frozen5e6 settings and seeds; separate namespace<br/>Frozen correct:pilot52/198, originalL10 98/198, base99/198<br/>Pilot52correct /44wrong /9malformed /93truncated<br/>Fixed73-word markers168/198;34correct/168; presence only<br/>Historical128 diagnostics remain prefix only; no isolated epoch claim"]
+    ONEPASS["Current priority: ORIGINAL one-pass GPQA first<br/>Base / L1-6 / L10 complete; reuse compatible outputs<br/>L7 RUNNING; L8-9 next; frozen long_32000 protocol<br/>No automatic SFT resume after evaluation"]
     INPUT --> SETUP --> CAPACITY --> GUARDS --> DONE
     DONE -->|No| STEP --> DUE
     DUE -->|Yes| SAVE --> DONE
@@ -51,8 +53,9 @@ flowchart TD
     AUDIT -->|Yes| OUT
     OUT -.->|Separately authorized L10 phase| PARENT --> CONT --> CONTEND
     CONTEND -->|Complete625 and actual Drive verification| POST
-    OUT -.->|Planned matched v2 from original parent only| V2["src/training/sft/level_continuation.py<br/>ContinuationSpec: level, additional_epochs=1, learning_rate=5e-5<br/>Restore original adapter / AdamW / RNG and recorded physical mode<br/>625 added / 1250 cumulative; nonzero warmup 19 then cosine<br/>Native think newline; same data / encoding / masks / loss<br/>New identity; high-rate pilot cannot be parent"]
-    V2 --> V2OUT["PLANNED_NOT_LAUNCHED<br/>Save full state at 100s, update313 and final625<br/>Final adapter / result / payloads / receipt must be Drive-verified<br/>No new endpoint or performance claim"]
+    POST --> ONEPASS
+    OUT -.->|Authorized future v2; currently paused| V2["src/training/sft/level_continuation.py<br/>ContinuationSpec: level, additional_epochs=1, learning_rate=5e-5<br/>Restore original adapter / AdamW / RNG and recorded physical mode<br/>625 added / 1250 cumulative; nonzero warmup 19 then cosine<br/>Native think newline; same data / encoding / masks / loss<br/>New identity; high-rate pilot cannot be parent"]
+    V2 --> V2OUT["Launched sourcea196235; PAUSED L1checkpoint000064<br/>64added /689cumulative; full state / identity Drive-verified<br/>Later selected resume: save at 100s,313 and625<br/>Require final adapter / result / payloads / receipt Drive verification<br/>No completed v2 endpoint claimed; future training remains authorized"]
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

@@ -1,13 +1,46 @@
 # training.md
 
-**Owner:** `coordinator`. **Current status:** All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. The separately identified 16 October L10 extra epoch is also complete: 625 additional/1,250 cumulative updates and 26 Drive-verified artifacts. Its new-adapter GPQA run has 128 verified native records. On these same 128 questions, frozen-correct counts are 35 for the new adapter, 61 for original L10 and 70 for the base; supplementary visible-choice counts are 39, 70 and 74, respectively. The final 70-question group is running, and the full 198-question receipt is pending. Post hoc wordfreq classification assigns 56.50% of alphabetic reasoning words to the ROT13-only class, or 48.05% after removing repeated blocks; this does not establish exact coverage or scientific success. Original levels 7–9 stay paused. Exposure, schedule restart and native-newline alignment changed jointly; no isolated epoch effect is established. See the [current SFT record](sft/sft_training.md).
+**Owner:** `coordinator`. **Current priority:** finish original **one-pass**
+14B ROT13 GPQA levels 7–9 first. The matching long-profile baseline and original
+levels 1–6 and 10 are complete. Preserve all original adapters and compatible
+outputs. The published supervisor launched at 21:56:31.846611 UTC; original
+level 7 was confirmed running at 21:56:48.129439 UTC. The scientific evaluator
+remains `5e6be1b`; operational supervision uses `2a0f7e2` and retains the two
+recorded recoveries. Base and levels 1–6 were revalidated without inference;
+original L10's completed receipt is retained. No training restarts automatically
+after evaluation. Current status is
+`ONE_PASS_GPQA_PRIORITY_RUNNING_LEVEL7_SFT_CONTINUATION_PAUSED64`.
 
-The user has now authorized a separate matched **two-total-epoch** campaign for
-14B ROT13 levels 1–10, **`PLANNED_NOT_LAUNCHED`**: one added 625-update pass from
-each original full checkpoint at peak `5e-5`, with unchanged data/encoding and
-native thinking-newline alignment. Originals and the high-rate L10 pilot retain
-their identities. One GPU is serial; two may own disjoint levels. New GPQA
-requires verified endpoints and frozen identity review; it does not autolaunch.
+All ten original 14B ROT13 fits completed 625 updates with verified Drive
+adapters/full state/results: levels 1–9 retain scientific source
+`9de8813031da737453f491723a10b305679dc42d`, original L10 retains
+`2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText L10 remains paused at
+444/625 with verified recovery and no automatic restart. No other KaziText or
+7B completion is implied.
+
+The separate high-rate L10 pilot completed 625 added/1,250 cumulative updates
+and 26 Drive-verified artifacts. Its frozen full-198 GPQA result is **52/198
+(26.26%)**, versus base **99/198 (50.00%)** and original one-pass L10 **98/198
+(49.49%)**. Pilot categories are 52 correct, 44 parsed wrong, 9 malformed and
+93 truncated. The fixed 73-word detector finds 168/198 marker-positive
+responses, including 34 frozen-correct; this is presence only, not coverage or
+reasoning validity. Historical first-128 human and wordfreq diagnostics retain
+their prefix denominator. Exposure, schedule restart and native-newline
+alignment changed jointly, so no isolated epoch effect is established.
+
+The authorized matched **two-total-epoch** v2 campaign for levels 1–10 adds one
+625-update pass from each original full checkpoint at peak `5e-5`, retaining
+data/encoding and adding native thinking-newline alignment. Source
+`a1962353a4301744dc6db5adafb0e6b212354679` launched at 21:32:26 UTC on
+16 October, and level-1 updates were observed. A whole-update `SIGTERM` pause
+was requested at 21:54:29 UTC. Campaign and fit are now **`PAUSED` at level-1
+checkpoint `000064`**, with 64 added/689 cumulative updates. Full state, manifest
+and identity are Drive-verified under checkpoint hash
+`eb52d7e7d4a23f8f3ac482e1a5efce2d44e85767428d7a94263caa2bb465a780`.
+The GPU was released before evaluation resumed. Future all-ten continuation
+remains authorized; no automatic SFT resume is installed.
+One GPU is serial; two may own disjoint levels. New matched GPQA requires all
+ten verified endpoints and frozen identity review; it does not autolaunch.
 See the [continuation policy and commands](sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110).
 
 | Artifact | Exact repository path |
@@ -74,11 +107,12 @@ flowchart TD
 %% Authorization $240 recorded; no inferred new price or rate-based cutoff; explicit deadline/safe pause separate.
 %% Forty datasets available; alltenROT13 fitscomplete, alltenKaziText fitsuncompleted.
 %% Historical$240SFT authorization retained; original GPQA32k controls retained.
-%% 16Oct L10 extra epoch COMPLETE625/cumulative1250/26Driveverified; newL10 GPQA running.
-%% Native128 verified:35new/61old/70base strictcorrect; final70running/full198pending.
-%% Posthoc wordfreq R-only56.50% of alphabetic reasoning words; vocabulary-sensitive,not full coverage.
+%% 16Oct high-rate L10 extra epoch COMPLETE625/cumulative1250/26Driveverified; native GPQA198 COMPLETE.
+%% Full198 strictcorrect:52pilot/98originalL10/99base; pilot44wrong/9malformed/93truncated.
+%% Fixed73-word markers168/198,34correct/168: presence only. Historical128 wordfreq is prefix only.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
-%% Matched two-total-epoch14B ROT13 levels1-10 v2: PLANNED_NOT_LAUNCHED, ownoriginalparents,peak5e-5.
+%% v2 sourcea196235 launched21:32:26UTC; pause requested21:54:29; PAUSED L1checkpoint000064 Driveverified.
+%% 64added/689cumulative; original one-pass GPQA L7 RUNNING21:56:48UTC; L8-9 next; no SFT autoresume.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -101,7 +135,8 @@ flowchart TD
     INPUT --> SFT --> SFTOUT --> WAIT
     INPUT --> RL --> RLOUT --> WAIT
     INPUT --> BASE --> WAIT
-    SFTOUT -.->|Separate planned authorization| V2["Matched two-total-epoch ROT13 levels 1-10<br/>Each ORIGINAL full checkpoint plus one pass at peak 5e-5<br/>Unchanged data / encoding; native think newline; new identity<br/>One GPU serial or two disjoint level shards<br/>Preserve originals and high-rate L10 pilot<br/>Not launched; verified endpoints then evaluation identity review<br/>No automatic GPQA launch"]
+    SFTOUT --> ONEPASS["Current priority: ORIGINAL one-pass GPQA first<br/>Base and original L1-6 / L10 complete; reuse compatible outputs<br/>L7 running; L8-9 next under frozen long_32000 evaluator<br/>High-rate pilot complete:52/198 vs originalL10 98/198 and base99/198<br/>No automatic SFT resume after evaluation"]
+    SFTOUT -.->|Authorized continuation retained; currently paused| V2["Matched two-total-epoch ROT13 levels 1-10<br/>Each ORIGINAL full checkpoint plus one pass at peak 5e-5<br/>Unchanged data / encoding; native think newline; new identity<br/>Launched sourcea196235; PAUSED L1checkpoint000064<br/>64added /689cumulative; full state / identity Drive-verified<br/>Preserve originals and high-rate pilot; later selected resume only<br/>All ten endpoints then evaluation identity review; no GPQA autolaunch"]
     WAIT --> OUT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class SFT,RL detail

@@ -3,14 +3,14 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
-%% 26 Drive artifacts verified; trainer exit0. NewL10 GPQA inference observed11:52:41UTC.
-%% Current native128 verified:strict35new/61old/70base on same128; human39/70/74.
-%% CPU128parity and earlier42parity exact; final70running/full198receipt absent.
-%% Wordfreq R-only56.50% of alphabetic reasoning words,48.05% after block removal; proxy not compliance.
-%% Preserve original fits/GPQA caches; original GPQA levels7-9 remain paused.
-%% New matched v2 levels1-10 campaign: PLANNED_NOT_LAUNCHED; one added pass at peak5e-5.
+%% 26 Drive artifacts verified; trainer exit0. High-rate pilot native GPQA198 COMPLETE.
+%% Full198 strictcorrect:52pilot/98originalL10/99base; pilot44wrong/9malformed/93truncated.
+%% Fixed73-word markers168/198,34correct/168: presence only; historical128 human/wordfreq remains prefix only.
+%% Original one-pass GPQA first: L7 RUNNING21:56:48UTC; L8-9 next; base/L1-6/L10 reused.
+%% v2 sourcea196235 launched21:32:26UTC; SIGTERM21:54:29; PAUSED L1checkpoint000064 Driveverified.
+%% 64added/689cumulative; GPU released before GPQA; future training authorized, no SFT autoresume.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
-%% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
+%% Historical high-rate pilot: same peak LR2e-4; fresh cosine625/warmup19; joint intervention.
 %% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
 %% ROT13L1 native masks/recovery passed1x16/GCoff;checkpoint0 Drive-verified;3 busyGPU samples94-98%.
 %% Historicalstartup evidence below remains dated; alltencompleted fits nowhave final625 evidence.
@@ -44,9 +44,10 @@ flowchart TD
     CONT["Separately authorized L10 extra epoch; COMPLETE<br/>scripts/continue_sft_epoch.py at source3a89691<br/>Original fits and GPQA caches retained"]
     PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
-    CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
-    POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; full198 results pending"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Native128 verified:35new/61old/70base frozen correct<br/>Posthoc lexical R-only56.50%;not exact text coverage<br/>Final70 runs; full198 receipt pending; levels7-9 paused"]
+    CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; joint intervention"]
+    POST["High-rate L10 pilot GPQA198 COMPLETE<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>52correct /44wrong /9malformed /93truncated"]
+    POSTEND["Full198 frozen correct:pilot52 / originalL10 98 / base99<br/>Fixed73-word markers168/198;34correct/168; presence only<br/>Historical128 human and wordfreq diagnostics remain prefix only<br/>No exact coverage or isolated epoch-effect claim"]
+    ONEPASS["Current priority: ORIGINAL one-pass GPQA first<br/>Reuse complete base / L1-6 / L10 without new inference<br/>L7 RUNNING; L8-9 next; unchanged long_32000 protocol<br/>Operational supervisor2a0f7e2; scientific evaluator5e6be1b<br/>Two recorded recoveries retained; no automatic SFT resume"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT
@@ -55,11 +56,12 @@ flowchart TD
     NEXT -->|No| OUT
     OUT -.->|Explicit new user priority| CONT --> PARENT --> EPOCH2 --> CONTOUT
     CONTOUT -->|Only complete and verified| POST --> POSTEND
-    OUT -.->|New authorization; not launched| V2PLAN["Matched v2: 14B ROT13 levels 1-10<br/>One extra pass from EACH ORIGINAL full checkpoint<br/>Preserve original and high-rate L10 pilot endpoints"]
+    POSTEND --> ONEPASS
+    OUT -.->|Authorized future continuation; currently paused| V2PLAN["Matched v2: 14B ROT13 levels 1-10<br/>One extra pass from EACH ORIGINAL full checkpoint<br/>Launched sourcea196235; PAUSED L1checkpoint000064<br/>64added /689cumulative; full state / identity Drive-verified<br/>Preserve originals and high-rate pilot; later selected resume only"]
     V2PLAN --> V2RESTORE["scripts/restore_sft_level_continuation_inputs.py<br/>Verify this level's original adapter / AdamW / RNG and 10k / 100 data<br/>Verify original lineage and separate output namespaces"]
     V2RESTORE --> V2RUN["scripts/run_sft_level_continuation_campaign.py<br/>One GPU serial or two independent disjoint level shards<br/>scripts/continue_sft_level.py; new per-level identity<br/>625 added / 1250 cumulative; peak 5e-5; warmup 19 then cosine<br/>Native think newline; encoding / LoRA / loss / physical mode retained"]
-    V2RUN --> V2VERIFY["Require every endpoint's full state / adapter / result<br/>Payload manifest and completion receipt verified in Drive<br/>Planned only: no new completed endpoint claimed"]
-    V2VERIFY --> V2EVAL["Freeze and review new evaluation identities after all ten endpoints<br/>Reuse compatible base / one-epoch controls; GPQA supplies no training data<br/>No automatic GPQA launch; existing pilot evaluation unchanged"]
+    V2RUN --> V2VERIFY["Require every endpoint's full state / adapter / result<br/>Payload manifest and completion receipt verified in Drive<br/>Current L1 is paused64; no new completed endpoint claimed"]
+    V2VERIFY --> V2EVAL["Freeze and review new evaluation identities after all ten endpoints<br/>Reuse compatible base / one-epoch controls; GPQA supplies no training data<br/>No automatic GPQA launch; completed pilot remains separate"]
     INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class BASE,FIT detail

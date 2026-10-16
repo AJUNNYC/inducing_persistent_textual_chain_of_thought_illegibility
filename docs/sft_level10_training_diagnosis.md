@@ -5,17 +5,33 @@ the existing GPQA evaluation continued. This CPU-only audit inspected the actual
 14B ROT13 level-10 corpus and frozen training implementation. It did not change
 training, evaluation protocols, saved adapters, targets or official scores.
 
-## New matched campaign authorization: planned, not launched
+## Current priority: original one-pass evaluation first
 
-The subsequent authorization is a separate **two-total-epoch 14B ROT13 levels
-1–10 campaign**, with one added pass from each original 625-update full
-checkpoint at peak `5e-5` and native thinking newline. Existing level-specific
-data/encoding, original one-epoch results and the completed `2e-4` L10 pilot are
-retained. The pilot evaluation below continues unchanged; its full-198 receipt
-remains pending. No new matched GPQA evaluation is launched by this plan. See
-the [authoritative continuation policy/API/commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
-and [worker plan](sft_multi_gpu_execution_plan.md). The new campaign has no
-observed training performance or endpoint result yet.
+The current priority is to **finish the original one-pass GPQA evaluations first**.
+The matching base and original levels 1–6 and 10 are complete; original levels
+7–9 remain. The frozen `5e6be1b` campaign has resumed with compatible cached
+protocols/results and the existing published supervisor; do not regenerate the
+baseline or mix the high-rate pilot into the original one-pass series.
+
+The matched two-total-epoch 14B ROT13 levels 1–10 campaign remains authorized:
+one extra pass from each own original full checkpoint, peak `5e-5`, existing
+data/encoding and native thinking newline. Source
+`a1962353a4301744dc6db5adafb0e6b212354679` launched at 21:32:26 UTC on 16 October
+and level 1 began updates. The whole-optimizer-update pause requested at 21:54:29 UTC completed safely
+at level 1 checkpoint `000064`: **64 added/689 cumulative updates**, with full state,
+manifest and identity verified in Drive. Checkpoint hash:
+`eb52d7e7d4a23f8f3ac482e1a5efce2d44e85767428d7a94263caa2bb465a780`.
+The campaign and fit are **PAUSED**, and GPU handover followed verification.
+The existing supervisor resumed original GPQA at 21:56:31.846611 UTC; original
+**level 7 was RUNNING at 21:56:48.129439 UTC** (supervisor 29664/campaign 29665),
+using published operations `2a0f7e2` and scientific source `5e6be1b`. Two existing
+recoveries remain recorded. Complete base and L1–6 states were revalidated without
+inference; original L10 retains its complete 198-question receipt and will be skipped
+when visited. Training stays paused and **no automatic training resume is
+installed** after evaluation. Original endpoints and
+the completed high-rate L10 pilot stay separate. See the
+[continuation policy/API/commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+and [worker plan](sft_multi_gpu_execution_plan.md).
 
 ## Actual target and token-mask findings
 
@@ -61,8 +77,8 @@ encoding of independently generated reasoning.
 
 ## Additional training phase completed, 16 October 2026 UTC
 
-The user subsequently prioritized further fine-tuning instead of continuing the
-remaining GPQA evaluations. The selected next phase is **one additional 14B
+At that earlier 16 October stage, the user prioritized further fine-tuning over
+the remaining GPQA evaluations. The selected phase was **one additional 14B
 ROT13 level-10 epoch**. This is a new training
 phase, not a restart of epoch one or an exact recovery of the original completed
 fit. The worker launched at 06:37 UTC from Git commit
@@ -73,8 +89,8 @@ The phase is now **complete**: 625 additional updates, 1,250 cumulative updates,
 It processed 17,996,003 training tokens and evaluated all 100 validation cases,
 with validation loss `0.6151581262983382`. The final adapter, full checkpoint and
 26 required Drive artifacts passed actual verification; the trainer exited with
-code zero. Capability benefit remains unmeasured; provisional encoding behavior
-is reported below. Preserve the original adapter,
+code zero. Frozen full-panel capability results and historical encoding diagnostics
+are reported below. Preserve the original adapter,
 full checkpoint, GPQA outputs and their immutable identities; the follow-up
 below evaluates only the new endpoint, without regenerating its existing
 controls or automatically enqueueing other levels.
@@ -131,26 +147,56 @@ This combines additional exposure, a schedule restart and a serialization
 change. Any improvement cannot be attributed to epoch count alone. The provisional
 snapshot below supports sustained ROT13 in reviewed passages from some completed
 requests; it does not establish population-wide encoding or capability retention.
-The verified first-128 prefix and within-response diagnostic below now supersede
-the earlier fixed-42 snapshot for current reporting; full-198 results remain pending.
+The final-198 native result below supersedes subset counts for current capability
+reporting. First-128 and fixed-42 manual/lexical findings retain their original scope.
 Low validation loss does not guarantee either. No higher learning rate, new
 training corpus or repeated full GPQA campaign is included in this phase.
 
-## Current evidence: verified first-128 prefix; full 198 pending
+## Current evidence: final 198 complete and verified
 
-The first **128 native raw responses and frozen scores** of the new L10 run are
-verified under protocol
-`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`.
-Native response/score integrity and the private CPU projection agree exactly on
-128/128; all 42 earlier observed responses also match their native records.
-This is the fixed first request group of the panel, not the earlier
-completion-selected 42-request subset. **The final 70-question group is running;
-there is no full-198 native completion receipt.** Training source `3a89691`,
-operations source `dfcae353` and frozen evaluator `5e6be1b` remain unchanged.
-All questions retain the same native prompts, option order, item seeds, sampling,
-32,000-token allowance and strict scorer, including its bold-final limitation.
-Original GPQA levels 7-9 remain paused. The separately authorized matched
-training campaign is planned, not launched.
+The completed high-rate L10 extra-epoch pilot's frozen **198-question/32,000-token
+GPQA evaluation is COMPLETE**, with native final artifacts and Drive verification
+recorded on **16 October 2026 at 21:30:25 UTC**. All 198 questions remain in the
+strict denominator:
+
+| State, same 198 questions | Frozen scorer correct | Accuracy |
+| --- | ---: | ---: |
+| Matching untouched base | 99/198 | 50.00% |
+| Original one-epoch L10 | 98/198 | 49.49% |
+| High-rate extra-epoch L10 pilot | 52/198 | 26.26% |
+
+The pilot has **52 correct, 44 parsed wrong, 9 malformed and 93 truncated**
+outputs. The fixed 73-marker screen is positive for **168/198** responses;
+**34/168** marker-positive responses are strictly correct. Marker presence
+establishes occurrence, not encoding coverage, reasoning validity or formal L10
+compliance. No all-198 human visible-choice or wordfreq analysis is claimed.
+The 42-request and first-128 manual/contextual/lexical findings below remain
+historical subset diagnostics and must not be extrapolated to all 198.
+
+Frozen evaluator `5e6be1b0848e0e88725323591baddef37d69d8ae`, protocol
+`57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`,
+native prompts/options/item seeds, sampling, strict scorer and 32,000-token cap
+were retained. Completion receipt SHA-256:
+`e7171ac99e17f245a3257241a9c08fc1f5a09ffdde808b50844a4e0c6ee0cbfd`.
+The private final responses/scores bundle SHA-256 is
+`d59f1b16a990a42f71fb574f0b23aca271da5bbb5a50f8b5a9651ac3c555b1f9`;
+validation SHA-256 is
+`b41aa6f48fa6000f3dd51bc68615bc54f3b6887f048cb4e6a17f19be75016136`.
+The [10-file final diagnostics and launch bundle](https://drive.google.com/drive/folders/1qZCc7iu3nT98yaDrbYiN19ju-TrMhhd_)
+is Drive-verified. Licensed prompts, responses and token values remain private.
+
+The pilot combines extra exposure, cosine restart at peak `2e-4` and native
+thinking newline; these outcomes do not isolate an epoch effect. Its correctness
+is lower than both matching controls under the frozen scorer. Original
+construction criteria and four-domain evaluation budgets remain unchanged.
+
+## Historical first-128 native prefix and human review
+
+Before final completion, the fixed first request group had 128 verified native
+raw/score pairs, exact 128/128 private CPU text/score/finish/token parity and
+42/42 parity with the earlier snapshot. At that stage, the final group and full
+receipt were pending. These dated counts remain subset evidence only; training
+source `3a89691`, operations `dfcae353` and evaluator `5e6be1b` remain distinct.
 
 | State, same first 128 questions | Frozen scorer correct / 128 | Supplementary visible-choice correct / 128 |
 | --- | ---: | ---: |
@@ -184,7 +230,10 @@ newline alignment changed jointly; neither isolated epoch causality,
 comprehension nor faithful reasoning follows. The dated private 42-request
 stages below remain historical evidence, including their then-zero native counts.
 
-## Within-response amount: post hoc English-lexicon diagnostic
+## Historical first-128 within-response amount: post hoc English-lexicon diagnostic
+
+All manual, contextual and wordfreq findings in this section cover only the first
+128 responses. They were not extended to the full final 198-question panel.
 
 **Level10 still targets 100% encoding of formally eligible reasoning spans.**
 The [construction](../src/data_generation_collection/sft_data/rot13/rot13_data_construction.py) uses Unicode `\w+` spans containing any ASCII letter, including
@@ -230,7 +279,7 @@ The final adjudication independently binds 32 decisive witness records; it
 changes no native output, score, parser or inference setting. Private evidence
 is in the [21-file formal/contextual review bundle](https://drive.google.com/drive/folders/1ytOUsi58QXuuegRWajUJsYG0c9CL_thg),
 Drive-verified separately from the 24-file native-prefix/amount bundle and the
-pending full-198 receipt. No question-level material is included here.
+separate final-198 completion receipt. No question-level material is included here.
 
 The wordfreq diagnostic below uses a **different, narrower denominator**. Its
 short-neutral, ambiguous and unknown categories are unassigned classifications,
@@ -296,8 +345,8 @@ script `e4065beac5ce759fec0d3010d44cd342762513041ead82f4d8443ee6cd93e18b`;
 English data `dffae8066b78dce0a6667cf5f58e567054f902674667090a7ac8a8a44628b05c`;
 audit `4883213a6ae237573d7fd71025d6dbf57edb2fdbb68f3b599b6938c803a8ed4a`.
 Native prefix verification and this private diagnostic backup remain separate
-from the pending full-198 completion barrier. Prompt/response/token values and
-individual question IDs stay out of Git. The [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid) is Drive-verified; it is not the missing full198 native receipt.
+from the later final-198 completion barrier. Prompt/response/token values and
+individual question IDs stay out of Git. The [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid) is Drive-verified; its scope remains the historical first128, distinct from final198.
 
 ## Historical provisional completed-request observations, 13:39:40 UTC
 

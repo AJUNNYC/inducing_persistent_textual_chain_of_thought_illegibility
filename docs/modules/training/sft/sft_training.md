@@ -1,8 +1,34 @@
 # sft_training.md
 
-## Planned matched two-total-epoch campaign: levels 1–10
+## Current priority: original one-pass GPQA levels 7–9 first
 
-**Status: `PLANNED_NOT_LAUNCHED`.** The user authorized one additional pass for
+Finish the original **one-pass** 14B ROT13 GPQA comparison before further
+training. The matching long-profile baseline and original levels 1–6 and 10
+are complete; original levels 7–9 are next. Preserve their original adapters,
+the existing compatible outputs and the frozen `long_32000` protocol. This
+priority does not restart training after evaluation. The published supervisor
+launched at 21:56:31.846611 UTC; original level 7 was confirmed running at
+21:56:48.129439 UTC. The scientific evaluator remains `5e6be1b`; operational
+supervision uses `2a0f7e2` and retains the two recorded recoveries. Base and
+levels 1–6 were revalidated without inference; original L10's completed receipt
+is retained. Current status is
+`ONE_PASS_GPQA_PRIORITY_RUNNING_LEVEL7_SFT_CONTINUATION_PAUSED64`.
+
+The low-learning-rate v2 campaign launched at **21:32:26 UTC on 16 October**
+from `a1962353a4301744dc6db5adafb0e6b212354679`, and level-1 updates were
+observed. A `SIGTERM` whole-update pause was requested at **21:54:29 UTC**.
+The campaign and fit are now **paused at level-1 checkpoint `000064`**, with
+64 added/689 cumulative updates. Full state, manifest and identity are
+Drive-verified; checkpoint hash
+`eb52d7e7d4a23f8f3ac482e1a5efce2d44e85767428d7a94263caa2bb465a780`.
+The GPU was released before evaluation resumed. Future all-ten continuation
+remains authorized; no automatic SFT resume is installed.
+
+<a id="planned-matched-two-total-epoch-campaign-levels-110"></a>
+
+## Authorized matched two-total-epoch continuation: levels 1–10
+
+**Status: `PAUSED`, level 1 at 64 added updates.** The user authorized one additional pass for
 each 14B ROT13 level, starting from that level's **original 625-update full
 checkpoint**. Each endpoint will have 625 added/1,250 cumulative updates and
 20,000 cumulative example presentations. Reuse the existing level-specific
@@ -28,8 +54,8 @@ parent/data, derived tokenization, exposure order and policy hashes into a new
 level/target-epoch run identity. The API also accepts two extra epochs, but the
 current authorization selects **one extra epoch only**.
 
-The reviewed implementation is commit
-`a1962353a4301744dc6db5adafb0e6b212354679`. Run these commands from that exact
+The executed implementation is commit
+`a1962353a4301744dc6db5adafb0e6b212354679`. For a later selected resume, run these commands from that exact
 checkout or a byte-verified export, with its source identity declared:
 
 ```bash
@@ -52,7 +78,7 @@ python scripts/continue_sft_level.py \
 ```
 
 Paths above are examples; use the verified restoration report's actual paths.
-The training invocation uses the same arguments without `--validate-only` and
+After a later selected resume, the training invocation uses the same arguments without `--validate-only` and
 requires the configured Drive artifact service. Save full state every 100 added
 updates, at update 313 (5,008 actual added examples), and final 625; a pause drains
 a whole optimizer update. Completion requires checksummed final adapter/full
@@ -63,13 +89,13 @@ One GPU runs levels serially; two GPUs may own disjoint level shards with
 separate outputs and no shared level ownership. Resource count is not a new
 training recipe. Observed L10 fit times remain 96.6 minutes originally and
 4h51m for the high-rate pilot, whose slowdown has no established cause; neither
-is a new campaign ETA. The current pilot GPQA continues unchanged, its full-198
-receipt remains pending, and original GPQA levels 7–9 remain unrun/paused. No
+is a new campaign ETA. The high-rate pilot GPQA is complete; original one-pass
+GPQA levels 7–9 now take priority over further v2 training. No
 new matched GPQA evaluation autolaunches: first verify all ten new endpoints,
 then freeze and review their evaluation identities and compatible control reuse.
 GPQA supplies no training data.
 
-## Completed high-rate L10 pilot: first 128 native records verified, full 198 pending
+## Completed high-rate L10 pilot: full 198-question GPQA result
 
 The separately identified 14B ROT13 L10 extra epoch is complete under training
 source `3a89691`: 625 additional updates (1,250 cumulative), 10,000 additional
@@ -79,6 +105,23 @@ and the trainer exited with code zero. Actual execution remained microbatch 1,
 accumulation 16 and checkpointing off. Fit time was 17,470.2693 seconds (4h51m),
 about three times the original L10 fit's 96.6 minutes; the cause is unknown.
 Exposure, cosine restart and native-newline alignment changed jointly.
+
+The frozen native GPQA run is **complete on all 198 questions**:
+
+| State, same full 198-question panel | Frozen scorer correct / 198 |
+| --- | ---: |
+| Matching untouched base | 99 (50.00%) |
+| Original one-pass L10 | 98 (49.49%) |
+| High-rate extra-epoch L10 pilot | 52 (26.26%) |
+
+The pilot has **52 correct, 44 parsed wrong, 9 malformed and 93 truncated**
+responses. The fixed 73-word ROT13 marker detector identifies 168/198 responses;
+34 of those 168 are frozen-correct. Marker occurrence establishes presence only,
+not full-response encoding compliance or valid reasoning. No full-panel human
+rescoring or wordfreq coverage measurement is claimed. This result describes
+the joint exposure/schedule/serialization intervention.
+
+### Historical first-128 prefix diagnostics
 
 The **first 128 native GPQA raw/score pairs are verified**, with exact 128/128
 parity against private CPU records and 42/42 parity against the earlier snapshot.
@@ -91,9 +134,9 @@ finishers is 23/52; the supplementary human diagnostic gives 25/52.
 All 198 prompts, seeds, the scorer and the 32,000-token limit remain frozen at
 `5e6be1b`, protocol
 `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`.
-The remaining 70-question group is running; the full 198-question receipt is
-absent. Original GPQA levels 7–9 remain paused. The new training campaign above
-has not launched.
+These first-128 values retain their prefix denominator; the completed full-panel
+result above supersedes their former running status. Original GPQA levels 7–9
+are the current evaluation priority.
 
 Post hoc classification of reasoning words with pinned wordfreq gives a 56.50%
 ROT13-only share among all 719,767 alphabetic word occurrences, 48.05% after
@@ -103,13 +146,13 @@ are reported in the [current diagnosis](../../../sft_level10_training_diagnosis.
 vocabulary and repetition; it does not establish exact full-text coverage,
 target-level compliance or faithful reasoning. The
 [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid)
-is verified separately from the pending full 198-question native completion
-barrier. Earlier diagnostics on the fixed 42 remain dated history in the diagnosis.
+contains the historical prefix analysis, separate from the full 198-question
+result. Earlier diagnostics on the fixed 42 remain dated history in the diagnosis.
 
 ## Original one-epoch fits and historical GPQA handoff (14 October)
 
 
-All ten **14B ROT13 SFT levels are complete**, with final adapters, recovery states and results verified in Google Drive. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source `2ea4fb9a7737cff806226366e73743eec5935fad`. The priority queue was observed complete on 14 October 2026, with zero pending or failed publications and its GPU idle. Each independent fit used all 10,000 certified training examples once, a 625-update cosine horizon and 19 warmup updates. KaziText level 10 remains paused at 444/625 with verified full recovery state and no automatic restart. All forty prepared condition datasets and historical 7B results remain available; their availability does not imply completed fits. The next selected work is GPQA Diamond for the untouched 14B base plus all ten ROT13 levels, using the separate `long_32000` evaluation profile. Training, data, recipe and original four-domain evaluation budgets are unchanged. See [the campaign guide](../../../gpqa_14b_rot13_campaign.md) and [the training record](../../../sft_completed_rot13_14b_level10.md).
+All ten **14B ROT13 SFT levels are complete**, with final adapters, recovery states and results verified in Google Drive. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source `2ea4fb9a7737cff806226366e73743eec5935fad`. The priority queue was observed complete on 14 October 2026, with zero pending or failed publications and its GPU idle. Each independent fit used all 10,000 certified training examples once, a 625-update cosine horizon and 19 warmup updates. KaziText level 10 remains paused at 444/625 with verified full recovery state and no automatic restart. All forty prepared condition datasets and historical 7B results remain available; their availability does not imply completed fits. At the 14 October handoff, the next selected work was GPQA Diamond for the untouched 14B base plus all ten ROT13 levels, using the separate `long_32000` evaluation profile. Training, data, recipe and original four-domain evaluation budgets are unchanged. See [the campaign guide](../../../gpqa_14b_rot13_campaign.md) and [the training record](../../../sft_completed_rot13_14b_level10.md).
 
 The declared efficient baseline uses an unquantized frozen BF16 base and BF16 head, SDPA with efficient-kernel preference, direct full-gradient Cut Cross-Entropy (`cce_exact`) with FP32 loss and hidden-gradient accumulation, and plain AdamW with FP32 optimizer states. CCE is pinned to upstream commit `3de376c106a1916bc5e1b619f9c77c87a461ee1c`; `filter_eps=None`, `filter_e_grad=False` and `filter_c_grad=False` disable gradient filtering. No Qwen patch or full token-by-vocabulary logits matrix is used. Policy `published_bf16_lora_full_gradient_cce_v2` requests microbatch 2/accumulation 8. A non-updating duplicated-longest-example capacity guard tries 2/off, 1/off, 2/on, then 1/on, where on/off denotes activation checkpointing; only CUDA OOM permits fallback. The selected actual mode is recorded and cannot change during exact recovery.
 
@@ -117,7 +160,7 @@ Keep completion-only masks and per-example weighting, all seven LoRA targets (ra
 
 The user requested implementation without another optimization test or timing campaign. Normal native model/mask/gradient/capacity/full-state guards passed for the completed 14B ROT13 level-10 fit on RTX PRO 6000 Blackwell 96GB. Actual execution was microbatch 1 / accumulation 16 with activation checkpointing off. The recorded fit interval was 5,793.143751 seconds (96m33s); worker launch through completion was 6,322.565654 seconds (105m23s). At $2.99/hour these imply $4.81 and $5.25, respectively, calculated from runtime rather than invoices. That standalone L10 timing remains a dated measurement, not a bound for other levels or hardware. Archived PRO step-987 and A100 update-28/30 states remain in Drive, never warm starts for this recipe. One epoch removes 50% of nominal example passes versus the same-condition two-epoch recipe; no one-hour finish or measured hardware speedup is promised. Diagnostics use the 100 certified validation IDs and base companions; final test panels and original confirmatory thresholds remain reserved. No additional training after the completed 625-update cosine horizon is an exact continuation of the old 1,250-update schedule.
 
-See the [completion, provenance and budget record](../../../sft_completed_rot13_14b_level10.md). The historical untouched 14B GPQA Diamond baseline remains **49/198 (24.75%)**, with 133 truncated and three malformed outputs under its 3,072-token cap; all 198 count. Its Drive-verified records remain separate from the new `long_32000` comparison. The original 14 October launch plan required one matching untouched baseline and ten adapters, totaling 2,178 responses. Its completed baseline and original-adapter results are now retained as described in the current status above; remaining levels 7-9 are paused. Only GPQA receives the larger response/context allowance; GSM8K, MMLU, ARC-Easy and MBPP retain their existing 3,072-token measurement contract. The [GPQA contract](../../evaluation/supplemental_gpqa.md) and [campaign guide](../../../gpqa_14b_rot13_campaign.md) describe strict profile/cache isolation and verified Drive publication. KaziText remains suspended and unscheduled.
+See the [completion, provenance and budget record](../../../sft_completed_rot13_14b_level10.md). The historical untouched 14B GPQA Diamond baseline remains **49/198 (24.75%)**, with 133 truncated and three malformed outputs under its 3,072-token cap; all 198 count. Its Drive-verified records remain separate from the new `long_32000` comparison. The original 14 October launch plan required one matching untouched baseline and ten adapters, totaling 2,178 responses. Its completed baseline and original-adapter results are now retained as described in the current status above; remaining original levels 7-9 are the current evaluation priority. Only GPQA receives the larger response/context allowance; GSM8K, MMLU, ARC-Easy and MBPP retain their existing 3,072-token measurement contract. The [GPQA contract](../../evaluation/supplemental_gpqa.md) and [campaign guide](../../../gpqa_14b_rot13_campaign.md) describe strict profile/cache isolation and verified Drive publication. KaziText remains suspended and unscheduled.
 
 ## Archived interruption: A100 comparison stopped on 11 October 2026
 
@@ -195,14 +238,14 @@ title: "spec/mermaid/workflows/training/sft/sft_training.mmd"
 ---
 flowchart TD
 %% 16Oct separate ROT13 14B L10 extra epoch COMPLETE625/cumulative1250; training source3a89691.
-%% 26 Drive artifacts verified; trainer exit0. NewL10 GPQA inference observed11:52:41UTC.
-%% Current native128 verified:strict35new/61old/70base on same128; human39/70/74.
-%% CPU128parity and earlier42parity exact; final70running/full198receipt absent.
-%% Wordfreq R-only56.50% of alphabetic reasoning words,48.05% after block removal; proxy not compliance.
-%% Preserve original fits/GPQA caches; original GPQA levels7-9 remain paused.
-%% New matched v2 levels1-10 campaign: PLANNED_NOT_LAUNCHED; one added pass at peak5e-5.
+%% 26 Drive artifacts verified; trainer exit0. High-rate pilot native GPQA198 COMPLETE.
+%% Full198 strictcorrect:52pilot/98originalL10/99base; pilot44wrong/9malformed/93truncated.
+%% Fixed73-word markers168/198,34correct/168: presence only; historical128 human/wordfreq remains prefix only.
+%% Original one-pass GPQA first: L7 RUNNING21:56:48UTC; L8-9 next; base/L1-6/L10 reused.
+%% v2 sourcea196235 launched21:32:26UTC; SIGTERM21:54:29; PAUSED L1checkpoint000064 Driveverified.
+%% 64added/689cumulative; GPU released before GPQA; future training authorized, no SFT autoresume.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
-%% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
+%% Historical high-rate pilot: same peak LR2e-4; fresh cosine625/warmup19; joint intervention.
 %% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
 %% ROT13L1 native masks/recovery passed1x16/GCoff;checkpoint0 Drive-verified;3 busyGPU samples94-98%.
 %% Historicalstartup evidence below remains dated; alltencompleted fits nowhave final625 evidence.
@@ -236,9 +279,10 @@ flowchart TD
     CONT["Separately authorized L10 extra epoch; COMPLETE<br/>scripts/continue_sft_epoch.py at source3a89691<br/>Original fits and GPQA caches retained"]
     PARENT["Verify original complete L10 adapter and full checkpoint<br/>Restore adapter, AdamW moments / counters and RNG<br/>Bind exact original 10000 / 100 records"]
     EPOCH2["New identity and second seed42 shuffle<br/>625 extra updates; same peak LR 2e-4<br/>Fresh cosine / 19 warmup; native think newline<br/>Encoded reasoning, clear final and role masks retained"]
-    CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; efficacy unmeasured"]
-    POST["Running only: new L10 on198 GPQA Diamond<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>New adapter hash and distinct namespace; full198 results pending"]
-    POSTEND["Reuse original L10 and cached matching baseline controls<br/>Native128 verified:35new/61old/70base frozen correct<br/>Posthoc lexical R-only56.50%;not exact text coverage<br/>Final70 runs; full198 receipt pending; levels7-9 paused"]
+    CONTOUT["625 additional /1250 cumulative updates; complete<br/>26 Drive artifacts verified; trainer exit0<br/>Validation loss .615158 on100; joint intervention"]
+    POST["High-rate L10 pilot GPQA198 COMPLETE<br/>Frozen5e6 evaluator; same32k budget / prompts / seeds<br/>52correct /44wrong /9malformed /93truncated"]
+    POSTEND["Full198 frozen correct:pilot52 / originalL10 98 / base99<br/>Fixed73-word markers168/198;34correct/168; presence only<br/>Historical128 human and wordfreq diagnostics remain prefix only<br/>No exact coverage or isolated epoch-effect claim"]
+    ONEPASS["Current priority: ORIGINAL one-pass GPQA first<br/>Reuse complete base / L1-6 / L10 without new inference<br/>L7 RUNNING; L8-9 next; unchanged long_32000 protocol<br/>Operational supervisor2a0f7e2; scientific evaluator5e6be1b<br/>Two recorded recoveries retained; no automatic SFT resume"]
     LEGACY["Separately declared legacy NF4 alternative<br/>Historical states preserved; not queue warm starts"]
     INPUT --> RETAIN --> BASE --> BARRIER
     BARRIER -->|No| WAIT
@@ -247,11 +291,12 @@ flowchart TD
     NEXT -->|No| OUT
     OUT -.->|Explicit new user priority| CONT --> PARENT --> EPOCH2 --> CONTOUT
     CONTOUT -->|Only complete and verified| POST --> POSTEND
-    OUT -.->|New authorization; not launched| V2PLAN["Matched v2: 14B ROT13 levels 1-10<br/>One extra pass from EACH ORIGINAL full checkpoint<br/>Preserve original and high-rate L10 pilot endpoints"]
+    POSTEND --> ONEPASS
+    OUT -.->|Authorized future continuation; currently paused| V2PLAN["Matched v2: 14B ROT13 levels 1-10<br/>One extra pass from EACH ORIGINAL full checkpoint<br/>Launched sourcea196235; PAUSED L1checkpoint000064<br/>64added /689cumulative; full state / identity Drive-verified<br/>Preserve originals and high-rate pilot; later selected resume only"]
     V2PLAN --> V2RESTORE["scripts/restore_sft_level_continuation_inputs.py<br/>Verify this level's original adapter / AdamW / RNG and 10k / 100 data<br/>Verify original lineage and separate output namespaces"]
     V2RESTORE --> V2RUN["scripts/run_sft_level_continuation_campaign.py<br/>One GPU serial or two independent disjoint level shards<br/>scripts/continue_sft_level.py; new per-level identity<br/>625 added / 1250 cumulative; peak 5e-5; warmup 19 then cosine<br/>Native think newline; encoding / LoRA / loss / physical mode retained"]
-    V2RUN --> V2VERIFY["Require every endpoint's full state / adapter / result<br/>Payload manifest and completion receipt verified in Drive<br/>Planned only: no new completed endpoint claimed"]
-    V2VERIFY --> V2EVAL["Freeze and review new evaluation identities after all ten endpoints<br/>Reuse compatible base / one-epoch controls; GPQA supplies no training data<br/>No automatic GPQA launch; existing pilot evaluation unchanged"]
+    V2RUN --> V2VERIFY["Require every endpoint's full state / adapter / result<br/>Payload manifest and completion receipt verified in Drive<br/>Current L1 is paused64; no new completed endpoint claimed"]
+    V2VERIFY --> V2EVAL["Freeze and review new evaluation identities after all ten endpoints<br/>Reuse compatible base / one-epoch controls; GPQA supplies no training data<br/>No automatic GPQA launch; completed pilot remains separate"]
     INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class BASE,FIT detail
