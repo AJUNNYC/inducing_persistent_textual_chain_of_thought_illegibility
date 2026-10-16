@@ -298,6 +298,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     runbook.md
     sft_completed_rot13_14b_level10.md
     sft_data_handoff.md
+    sft_level10_training_diagnosis.md
     sft_multi_gpu_execution_plan.md
     sft_optimizations.md
     sft_short_pilot.md

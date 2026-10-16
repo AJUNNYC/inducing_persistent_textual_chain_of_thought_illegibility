@@ -237,3 +237,23 @@ are small, differently selected question groups, so their percentages do not
 establish an accuracy trend or a causal effect of encoding. The private audit
 also retains same-question baseline comparisons and per-item provenance;
 question text and answer keys are excluded from this page.
+
+## Level-5 follow-up, 16 October 2026 UTC
+
+Level 5 completed all 198 full-budget observations and its verified Drive barrier.
+Official outcomes were 97 correct (48.99%), 61 incorrect, 37 malformed and three
+truncated. The baseline remained 99/198 (50.00%); official scores were unchanged.
+
+The same fixed 73-word screen identified 10/198 responses (5.05%) containing
+ROT13 passages, versus 11/198 at level 4 and zero baseline positives. The primary
+assistant and an independent reviewer each inspected raw and decoded passages
+from all ten positives; these include genuine encoded phrases and paragraphs.
+Five answered correctly, four incorrectly and one was truncated. These counts
+do not establish full level-5 target compliance or perfect detector recall.
+
+One truncated response supplies 1,954 of the 2,750 marker occurrences. Aggregate
+marker volume must therefore not be presented as population-wide improvement.
+Encoding remains inconsistent, with no observed monotonic frequency gradient
+across levels 1–5. The private compressed response/score export has SHA-256
+`0408423024d4999bea428729f6e114503a2df7dfbd2703d1c7762b27d113d9aa`;
+licensed question text and answer keys are not published here.
