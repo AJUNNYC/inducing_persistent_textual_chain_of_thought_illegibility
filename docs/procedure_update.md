@@ -1,6 +1,18 @@
-# Current procedure: 14 October 2026
+# Current procedure: 16 October 2026
 
-## Current status: all ten 14B ROT13 fits complete; GPQA long-profile evaluation next
+## Planned matched two-total-epoch campaign
+
+The user authorized one additional pass from each original 625-update 14B ROT13
+level 1–10 full checkpoint, using the existing data/encoding, peak `5e-5` and
+native thinking newline. The campaign is **`PLANNED_NOT_LAUNCHED`**. Preserve
+original one-epoch evidence and the completed high-rate L10 pilot; its frozen
+GPQA continues unchanged with 128 native records verified and full-198 receipt
+pending. Original GPQA levels 7–9 remain unrun/paused. New matched evaluation
+requires verified new endpoints and frozen identity review, without autolaunch.
+See the [policy/API/commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+and [one-/two-GPU worker plan](sft_multi_gpu_execution_plan.md).
+
+## Historical original completion and GPQA handoff, 14 October
 
 All ten **14B ROT13 SFT levels are complete**, with final adapters, recovery states and results verified in Google Drive. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source `2ea4fb9a7737cff806226366e73743eec5935fad`. The priority queue was observed complete on 14 October 2026, with zero pending or failed publications and its GPU idle. Each independent fit used all 10,000 certified training examples once, a 625-update cosine horizon and 19 warmup updates. KaziText level 10 remains paused at 444/625 with verified full recovery state and no automatic restart. All forty prepared condition datasets and historical 7B results remain available; their availability does not imply completed fits. The next selected work is GPQA Diamond for the untouched 14B base plus all ten ROT13 levels, using the separate `long_32000` evaluation profile. Training, data, recipe and original four-domain evaluation budgets are unchanged. See [the campaign guide](gpqa_14b_rot13_campaign.md) and [the training record](sft_completed_rot13_14b_level10.md).
 

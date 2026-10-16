@@ -1,6 +1,21 @@
 # sft_fit.md
 
-## Current status: extra epoch complete; first 128 native records verified, full 198 pending
+## Planned level continuation API
+
+The matched 14B ROT13 levels 1–10 campaign is **`PLANNED_NOT_LAUNCHED`**.
+[`level_continuation.py`](../../../../../src/training/sft/level_continuation.py)
+and [`continue_sft_level.py`](../../../../../scripts/continue_sft_level.py) require
+this level's verified original 625-update adapter/full AdamW/RNG checkpoint and
+unchanged 10,000/100 records. Select `ContinuationSpec(level, additional_epochs=1,
+learning_rate=5e-5)`: 625 added/1,250 cumulative updates, native thinking newline,
+19 nonzero warmup updates then cosine. Preserve original physical mode,
+LoRA/loss/targets; a new identity binds the changed phase. The completed `2e-4`
+L10 pilot is retained and cannot be a parent. Exact recovery inside v2 restores
+its own exposure/scheduler cursor. See the [campaign policy and commands](../sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+for validation, Drive completion and evaluation barriers. Three-total-epoch API
+support is not selected by this authorization.
+
+## Completed high-rate L10 pilot: first 128 native records verified, full 198 pending
 
 The separately identified 14B ROT13 L10 extra epoch is complete under training
 source `3a89691`: 625 additional updates (1,250 cumulative), 10,000 additional
@@ -23,7 +38,7 @@ All 198 prompts, seeds, the scorer and the 32,000-token limit remain frozen at
 `5e6be1b`, protocol
 `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`.
 The remaining 70-question group is running; the full 198-question receipt is
-absent. Levels 7–9 remain paused; no other training is scheduled.
+absent. Original GPQA levels 7–9 remain paused; the new campaign has not launched.
 
 Post hoc classification of reasoning words with pinned wordfreq gives a 56.50%
 ROT13-only share among all 719,767 alphabetic word occurrences, 48.05% after
@@ -173,6 +188,7 @@ flowchart TD
 %% Final70running/full198receipt absent; posthoc lexical R-only56.50%,not exact coverage/causal proof.
 %% New phase changes exposure, restarted schedule and native think-newline serialization.
 %% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
+%% New matched v2 levels1-10 campaign PLANNED_NOT_LAUNCHED; one additional epoch,peak5e-5.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
 %% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
 %% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
@@ -215,6 +231,8 @@ flowchart TD
     AUDIT -->|Yes| OUT
     OUT -.->|Separately authorized L10 phase| PARENT --> CONT --> CONTEND
     CONTEND -->|Complete625 and actual Drive verification| POST
+    OUT -.->|Planned matched v2 from original parent only| V2["src/training/sft/level_continuation.py<br/>ContinuationSpec: level, additional_epochs=1, learning_rate=5e-5<br/>Restore original adapter / AdamW / RNG and recorded physical mode<br/>625 added / 1250 cumulative; nonzero warmup 19 then cosine<br/>Native think newline; same data / encoding / masks / loss<br/>New identity; high-rate pilot cannot be parent"]
+    V2 --> V2OUT["PLANNED_NOT_LAUNCHED<br/>Save full state at 100s, update313 and final625<br/>Final adapter / result / payloads / receipt must be Drive-verified<br/>No new endpoint or performance claim"]
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

@@ -13,6 +13,18 @@ GSM8K, MMLU, ARC-Easy and MBPP evaluations are unchanged. No training restart is
 required. This capability-only campaign calls no provider judges and does not
 run legibility evaluation, RL or linear probes.
 
+## Planned two-total-epoch comparison, not launched
+
+The user authorized one additional SFT pass for all ten 14B ROT13 levels from
+their own original full checkpoints, at peak `5e-5`, with unchanged existing
+data/encoding and native thinking newline. This planned campaign preserves
+one-epoch evidence and the separate high-rate L10 pilot. It uses no GPQA
+training data. New matched GPQA does not autolaunch: verify all ten new endpoints
+and freeze/review their evaluation identities first; retain compatible baseline
+and original-level outputs. Original GPQA levels 7–9 remain unrun/paused. The
+current high-rate pilot's frozen full-198 evaluation continues unchanged. See
+the [SFT policy and commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110).
+
 ## Current evidence: native first 128 verified; final 70 running
 
 The separate L10 extra epoch is complete: 625 additional/1,250 cumulative updates,
@@ -105,8 +117,8 @@ Independent audit reproduced 4,608 per-response tables and 96 summaries exactly.
 See the [diagnosis and evidence hashes](sft_level10_training_diagnosis.md#within-response-amount-post-hoc-english-lexicon-diagnostic)
 for definitions, provenance and dated historical snapshots. No prompt/response
 text, question IDs or token values are added to Git. The [24-file private prefix/analysis bundle](https://drive.google.com/drive/folders/1dgMvq2Zl_7CYk8bTHPh_4CbWk5ct9Kid) is Drive-verified; it is not the missing full198 native receipt. Native metrics and the
-32,000-token frozen evaluation continue unchanged; L7-9 remain paused and no
-other training is scheduled.
+32,000-token frozen evaluation continue unchanged; original GPQA L7-9 remain
+paused and the separately authorized training campaign is not launched.
 
 Evaluate all 198 Diamond questions with the original `long_32000` contract:
 32,000 new tokens per response, context 40,960, eight concurrent sequences,

@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 596,
+  "files": 602,
   "directories_including_root": 202,
   "entries": [
     {
@@ -3655,6 +3655,17 @@
       "blank": false
     },
     {
+      "path": "scripts/continue_sft_level.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/continue_sft_level.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_a666b484cc45f0",
+      "blank": false
+    },
+    {
       "path": "scripts/coordinate_verification_shard.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -3842,6 +3853,17 @@
       "blank": false
     },
     {
+      "path": "scripts/restore_sft_level_continuation_inputs.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/restore_sft_level_continuation_inputs.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d2dd47c32feeff",
+      "blank": false
+    },
+    {
       "path": "scripts/revalidate_collection_inputs.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -3982,6 +4004,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_5db50e4653f724",
+      "blank": false
+    },
+    {
+      "path": "scripts/run_sft_level_continuation_campaign.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_sft_level_continuation_campaign.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_e62aa2d1d22734",
       "blank": false
     },
     {
@@ -6910,6 +6943,17 @@
       "blank": false
     },
     {
+      "path": "src/training/sft/level_continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "src/training/sft/level_continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_cee05eae1a6790",
+      "blank": false
+    },
+    {
       "path": "src/training/sft/published_execution.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -8047,6 +8091,17 @@
       "blank": false
     },
     {
+      "path": "tests/unit/operations/test_sft_level_continuation_ops.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_sft_level_continuation_ops.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_8a01fbda12711b",
+      "blank": false
+    },
+    {
       "path": "tests/unit/operations/test_sft_optimization_benchmark.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -8462,6 +8517,17 @@
       "display_path": "tests/unit/training/sft/test_fused_loss.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_64c52c54ec6ee4",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/training/sft/test_level_continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/training/sft/test_level_continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_08405657d41400",
       "blank": false
     },
     {

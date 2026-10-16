@@ -299,6 +299,8 @@ flowchart TD
     EXT --> p_2a2c7ae36f8de7
     p_f39fcc29084c55["scripts/continue_sft_epoch.py"]
     EXT --> p_f39fcc29084c55
+    p_a666b484cc45f0["scripts/continue_sft_level.py"]
+    EXT --> p_a666b484cc45f0
     p_7029ef2faa51cf["scripts/coordinate_verification_shard.py"]
     EXT --> p_7029ef2faa51cf
     p_31e177f4d00995["scripts/coordinate_vllm_sft_preparation.py"]
@@ -333,6 +335,8 @@ flowchart TD
     EXT --> p_05a1825d9110e8
     p_169853292e3b76["scripts/restore_gpqa_sft_inputs.py"]
     EXT --> p_169853292e3b76
+    p_d2dd47c32feeff["scripts/restore_sft_level_continuation_inputs.py"]
+    EXT --> p_d2dd47c32feeff
     p_4da5d2a00cdc8a["scripts/revalidate_collection_inputs.py"]
     EXT --> p_4da5d2a00cdc8a
     p_a8af62978b1907["scripts/run_14b_sft_campaign.py"]
@@ -355,6 +359,8 @@ flowchart TD
     EXT --> p_a47207fc0391be
     p_0b17e8b1f8bd2d["scripts/run_optimized_sft_queue.py"]
     EXT --> p_0b17e8b1f8bd2d
+    p_e62aa2d1d22734["scripts/run_sft_level_continuation_campaign.py"]
+    EXT --> p_e62aa2d1d22734
     p_b6d8d53088aabc["scripts/run_supplemental_gpqa.py"]
     EXT --> p_b6d8d53088aabc
     p_8c941d8eb9fa9f["scripts/run_vllm_baseline_repeatability.py"]
@@ -437,6 +443,8 @@ flowchart TD
     EXT --> p_2b763b344f6f0e
     p_80fc4cb188144a["src/training/sft/fused_loss.py"]
     EXT --> p_80fc4cb188144a
+    p_cee05eae1a6790["src/training/sft/level_continuation.py"]
+    EXT --> p_cee05eae1a6790
     p_dc1d1fb1fc50ba["src/training/sft/published_execution.py"]
     EXT --> p_dc1d1fb1fc50ba
     p_99a65f8a3876e4["src/training/sft/runtime_migration.py"]
@@ -495,6 +503,8 @@ flowchart TD
     EXT --> p_b2d6a54f4764ea
     p_6bcf3a7fba2a76["tests/unit/operations/test_sft_handoff_reuse.py"]
     EXT --> p_6bcf3a7fba2a76
+    p_8a01fbda12711b["tests/unit/operations/test_sft_level_continuation_ops.py"]
+    EXT --> p_8a01fbda12711b
     p_160e24d100aebd["tests/unit/operations/test_sft_optimization_benchmark.py"]
     EXT --> p_160e24d100aebd
     p_7063c063a3bb89["tests/unit/operations/test_sft_reconcile_execution.py"]
@@ -513,6 +523,8 @@ flowchart TD
     EXT --> p_6c5a258a3484b2
     p_64c52c54ec6ee4["tests/unit/training/sft/test_fused_loss.py"]
     EXT --> p_64c52c54ec6ee4
+    p_08405657d41400["tests/unit/training/sft/test_level_continuation.py"]
+    EXT --> p_08405657d41400
     p_542c5d6135f7d1["tests/unit/training/sft/test_loss_layout.py"]
     EXT --> p_542c5d6135f7d1
     p_2c25b64929ffe3["tests/unit/training/sft/test_runtime_migration.py"]

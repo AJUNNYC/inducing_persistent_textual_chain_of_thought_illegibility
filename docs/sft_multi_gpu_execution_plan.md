@@ -1,6 +1,88 @@
 # Efficient SFT deployment and available condition ownership
 
-## Current status: all ten 14B ROT13 fits complete; GPQA long-profile evaluation next
+## Current plan: matched two-total-epoch ROT13 campaign, not launched
+
+The authorized new campaign adds **one pass to each original 14B ROT13 level
+1–10 checkpoint**: 625 added/1,250 cumulative updates per level, peak `5e-5`,
+19 nonzero warmup updates then cosine, and native thinking newline. Reuse each
+level's unchanged 10,000/100 records and its own verified original adapter,
+AdamW and RNG. Preserve originals and the completed high-rate L10 pilot in
+separate namespaces; the pilot cannot replace this campaign's L10 endpoint.
+Status is **`PLANNED_NOT_LAUNCHED`**. The [SFT module](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+controls policy/API and the direct validation command.
+
+One GPU owns a serial level queue. Two GPUs may own disjoint level shards, each
+running one level at a time with separate outputs and verified completion
+receipts. This is independent level parallelism, not splitting a model or
+changing effective batch. No queue advances past an unverified endpoint. The
+current L10 pilot evaluation continues unchanged; original GPQA levels 7–9
+remain unrun/paused, and new matched GPQA requires all ten verified endpoints
+plus frozen identity review before launch. Do not regenerate existing compatible
+baseline or one-epoch outputs.
+
+The measured original L10 fit was 96.6 minutes; the separate high-rate pilot
+was 4h51m. The slowdown's cause remains unknown. Neither measurement establishes
+new per-level times, a campaign finish time or a two-GPU speedup.
+
+## Restore and plan the selected levels
+
+Run from reviewed implementation `a1962353a4301744dc6db5adafb0e6b212354679`,
+using its exact checkout or byte-verified export and matching
+`SOURCE_CODE_COMMIT` as described in the [SFT commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110).
+Later documentation revisions do not change this planned execution identity.
+
+The original-parent inventory has 141 sealed metadata-verified artifacts across
+all ten levels. This does **not** mean their payloads have been restored, a new
+training worker has launched, or startup guards have passed on a new worker.
+The inventory identity is retained in [source provenance](../spec/source_provenance.json).
+
+Current Pod staging is now complete: all 141 files were downloaded and fully
+verified; restored manifest `12a4420192b129c45637772d8a6d04bf21d3b7bdb0ba66a326446329493c36a5`.
+The published campaign command produced a valid all-ten plan without GPU work.
+Training remains unlaunched while the existing pilot evaluation owns the GPU.
+
+The private sealed inventory binds each original checkpoint and exact dataset
+files. The restoration command verifies Drive metadata and downloaded bytes;
+it performs no GPU training:
+
+```bash
+python scripts/restore_sft_level_continuation_inputs.py \
+  --inventory /workspace/private/original_rot13_parents.json \
+  --destination-root /workspace/continuation_inputs --workers 2
+```
+
+Successful restoration writes `sft_level_continuation_inputs_manifest.json`
+with status `VERIFIED`. Once all payloads are present, adding `--validate-only`
+rechecks those local bytes without network, writes or GPU work; it is not an
+inventory-only dry run before download. Then inspect a serial all-level plan
+without starting work:
+
+```bash
+python scripts/run_sft_level_continuation_campaign.py \
+  --inputs-manifest /workspace/continuation_inputs/sft_level_continuation_inputs_manifest.json \
+  --levels 1,2,3,4,5,6,7,8,9,10 --additional-epochs 1 --learning-rate 5e-5 \
+  --output /workspace/continuation_campaign/all_levels \
+  --model-cache /workspace/models --device cuda:0 --plan-only
+```
+
+For two GPUs, inspect two separate plans with **odd levels**
+`--levels 1,3,5,7,9` and **even levels** `--levels 2,4,6,8,10`, distinct output
+roots, and their assigned device on each worker. This spreads high levels
+between shards; it does not establish equal runtimes. Any disjoint partition
+is allowed. Keep all other policy flags identical. `--python` may name the pinned GPU
+interpreter. Removing `--plan-only` starts only that selected serial queue;
+these examples record the plan, not a launch receipt.
+
+Each queue has explicit `PLANNED`, `RUNNING`, `PAUSED`, `FAILED` or `COMPLETE`
+status. A failed or paused level prevents later levels from starting. Signals
+request a whole-update safe pause and verified Drive recovery. A completed job
+is skipped only after its original parent/policy, full state, adapter, sealed
+receipt and live Drive copy verify. Once every selected level completes,
+`evaluation_endpoints.json` lists that shard's endpoints; it does not launch
+GPQA or establish that other shards are complete. The all-ten evaluation barrier
+must combine and verify both disjoint shards.
+
+## Historical original one-epoch completion and GPQA handoff, 14 October
 
 All ten **14B ROT13 SFT levels are complete**, with final adapters, recovery states and results verified in Google Drive. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 keeps source `2ea4fb9a7737cff806226366e73743eec5935fad`. The priority queue was observed complete on 14 October 2026, with zero pending or failed publications and its GPU idle. Each independent fit used all 10,000 certified training examples once, a 625-update cosine horizon and 19 warmup updates. KaziText level 10 remains paused at 444/625 with verified full recovery state and no automatic restart. All forty prepared condition datasets and historical 7B results remain available; their availability does not imply completed fits. The next selected work is GPQA Diamond for the untouched 14B base plus all ten ROT13 levels, using the separate `long_32000` evaluation profile. Training, data, recipe and original four-domain evaluation budgets are unchanged. See [the campaign guide](gpqa_14b_rot13_campaign.md) and [the training record](sft_completed_rot13_14b_level10.md).
 
@@ -12,13 +94,13 @@ The user requested implementation without another optimization test or timing ca
 
 See the [completion, provenance and budget record](sft_completed_rot13_14b_level10.md). The historical untouched 14B GPQA Diamond baseline remains **49/198 (24.75%)**, with 133 truncated and three malformed outputs under its 3,072-token cap; all 198 count. Its Drive-verified records remain separate from the new `long_32000` comparison. A new matching untouched baseline must run once before all ten completed ROT13 adapters, yielding 2,178 unique outputs. No trained-state GPQA result is claimed yet. Only GPQA receives the larger response/context allowance; GSM8K, MMLU, ARC-Easy and MBPP retain their existing 3,072-token measurement contract. The [GPQA contract](modules/evaluation/supplemental_gpqa.md) and [campaign guide](gpqa_14b_rot13_campaign.md) describe strict profile/cache isolation and verified Drive publication. KaziText remains suspended and unscheduled.
 
-## Selection and independent workers
+## Historical fresh-fit selection and independent workers
 
 The original selected queue contained fresh 14B ROT13 level 10 and 14B KaziText level 10, each from the untouched pinned base. ROT13 level 10 is now complete and retained under its immutable source/configuration identity; it need not be retrained merely to add evaluation. The unchanged inventory has forty conditions; the broader prepared scope is 20 independent 14B fits across both families and ten levels. All ten ROT13 fits are now complete; ten KaziText fits are uncompleted, including the safely paused level 10. Prepared 7B data/history are retained outside this scope. New workers must own disjoint remaining fits and must not silently repeat or extend the completed 625-update fit.
 
 Each selected fit starts fresh with separate adapter, optimizer, scheduler, RNG/sampler and immutable Drive namespace. Separate GPUs can run independent selected fits concurrently; completion time is the longest assigned queue, not the sum of concurrent durations. No resource allocation or restart is authorized by this document alone. The existing user-owned CPU Colab session remains unaffected.
 
-## Current handoff: ten ROT13 adapters complete
+## Historical handoff: ten original ROT13 adapters complete
 
 All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue.
 

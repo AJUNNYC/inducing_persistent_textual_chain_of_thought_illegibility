@@ -5,6 +5,18 @@ the existing GPQA evaluation continued. This CPU-only audit inspected the actual
 14B ROT13 level-10 corpus and frozen training implementation. It did not change
 training, evaluation protocols, saved adapters, targets or official scores.
 
+## New matched campaign authorization: planned, not launched
+
+The subsequent authorization is a separate **two-total-epoch 14B ROT13 levels
+1–10 campaign**, with one added pass from each original 625-update full
+checkpoint at peak `5e-5` and native thinking newline. Existing level-specific
+data/encoding, original one-epoch results and the completed `2e-4` L10 pilot are
+retained. The pilot evaluation below continues unchanged; its full-198 receipt
+remains pending. No new matched GPQA evaluation is launched by this plan. See
+the [authoritative continuation policy/API/commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+and [worker plan](sft_multi_gpu_execution_plan.md). The new campaign has no
+observed training performance or endpoint result yet.
+
 ## Actual target and token-mask findings
 
 The 10,000 training and 100 validation records independently reproduce dataset
@@ -137,7 +149,8 @@ there is no full-198 native completion receipt.** Training source `3a89691`,
 operations source `dfcae353` and frozen evaluator `5e6be1b` remain unchanged.
 All questions retain the same native prompts, option order, item seeds, sampling,
 32,000-token allowance and strict scorer, including its bold-final limitation.
-Levels 7-9 remain paused; no further training or other jobs are authorized.
+Original GPQA levels 7-9 remain paused. The separately authorized matched
+training campaign is planned, not launched.
 
 | State, same first 128 questions | Frozen scorer correct / 128 | Supplementary visible-choice correct / 128 |
 | --- | ---: | ---: |

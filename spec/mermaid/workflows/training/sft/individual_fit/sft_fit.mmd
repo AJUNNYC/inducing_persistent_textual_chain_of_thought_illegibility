@@ -8,6 +8,7 @@ flowchart TD
 %% Final70running/full198receipt absent; posthoc lexical R-only56.50%,not exact coverage/causal proof.
 %% New phase changes exposure, restarted schedule and native think-newline serialization.
 %% Preserved AdamW/RNG/physical mode; no claimed benefit or pure-epoch causal isolation.
+%% New matched v2 levels1-10 campaign PLANNED_NOT_LAUNCHED; one additional epoch,peak5e-5.
 %% efficient_one_epoch_v1: BF16 unquantized base/head, full-gradient direct CCE, SDPA, AdamW.
 %% CCE pinned upstream; filter_eps=None, filter_e_grad=False, filter_c_grad=False.
 %% FP32 loss and hidden-gradient accumulation; no gradient pruning or Qwen patch.
@@ -50,6 +51,8 @@ flowchart TD
     AUDIT -->|Yes| OUT
     OUT -.->|Separately authorized L10 phase| PARENT --> CONT --> CONTEND
     CONTEND -->|Complete625 and actual Drive verification| POST
+    OUT -.->|Planned matched v2 from original parent only| V2["src/training/sft/level_continuation.py<br/>ContinuationSpec: level, additional_epochs=1, learning_rate=5e-5<br/>Restore original adapter / AdamW / RNG and recorded physical mode<br/>625 added / 1250 cumulative; nonzero warmup 19 then cosine<br/>Native think newline; same data / encoding / masks / loss<br/>New identity; high-rate pilot cannot be parent"]
+    V2 --> V2OUT["PLANNED_NOT_LAUNCHED<br/>Save full state at 100s, update313 and final625<br/>Final adapter / result / payloads / receipt must be Drive-verified<br/>No new endpoint or performance claim"]
     AUDIT -->|Known artifact repair only| FINAL
     SETUP -.->|Execution failure| RECOVER
     GUARDS -.->|Execution failure| RECOVER

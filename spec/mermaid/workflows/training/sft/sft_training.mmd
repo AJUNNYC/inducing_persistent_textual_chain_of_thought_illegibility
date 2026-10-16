@@ -7,7 +7,8 @@ flowchart TD
 %% Current native128 verified:strict35new/61old/70base on same128; human39/70/74.
 %% CPU128parity and earlier42parity exact; final70running/full198receipt absent.
 %% Wordfreq R-only56.50% of alphabetic reasoning words,48.05% after block removal; proxy not compliance.
-%% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
+%% Preserve original fits/GPQA caches; original GPQA levels7-9 remain paused.
+%% New matched v2 levels1-10 campaign: PLANNED_NOT_LAUNCHED; one added pass at peak5e-5.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
 %% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
@@ -54,6 +55,11 @@ flowchart TD
     NEXT -->|No| OUT
     OUT -.->|Explicit new user priority| CONT --> PARENT --> EPOCH2 --> CONTOUT
     CONTOUT -->|Only complete and verified| POST --> POSTEND
+    OUT -.->|New authorization; not launched| V2PLAN["Matched v2: 14B ROT13 levels 1-10<br/>One extra pass from EACH ORIGINAL full checkpoint<br/>Preserve original and high-rate L10 pilot endpoints"]
+    V2PLAN --> V2RESTORE["scripts/restore_sft_level_continuation_inputs.py<br/>Verify this level's original adapter / AdamW / RNG and 10k / 100 data<br/>Verify original lineage and separate output namespaces"]
+    V2RESTORE --> V2RUN["scripts/run_sft_level_continuation_campaign.py<br/>One GPU serial or two independent disjoint level shards<br/>scripts/continue_sft_level.py; new per-level identity<br/>625 added / 1250 cumulative; peak 5e-5; warmup 19 then cosine<br/>Native think newline; encoding / LoRA / loss / physical mode retained"]
+    V2RUN --> V2VERIFY["Require every endpoint's full state / adapter / result<br/>Payload manifest and completion receipt verified in Drive<br/>Planned only: no new completed endpoint claimed"]
+    V2VERIFY --> V2EVAL["Freeze and review new evaluation identities after all ten endpoints<br/>Reuse compatible base / one-epoch controls; GPQA supplies no training data<br/>No automatic GPQA launch; existing pilot evaluation unchanged"]
     INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class BASE,FIT detail

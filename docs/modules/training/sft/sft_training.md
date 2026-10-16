@@ -1,6 +1,75 @@
 # sft_training.md
 
-## Current status: extra epoch complete; first 128 native records verified, full 198 pending
+## Planned matched two-total-epoch campaign: levels 1–10
+
+**Status: `PLANNED_NOT_LAUNCHED`.** The user authorized one additional pass for
+each 14B ROT13 level, starting from that level's **original 625-update full
+checkpoint**. Each endpoint will have 625 added/1,250 cumulative updates and
+20,000 cumulative example presentations. Reuse the existing level-specific
+10,000 training and 100 validation records; do not regenerate data or change
+encoding levels. Original one-epoch adapters/evaluations and the completed
+high-rate L10 pilot remain separate, immutable evidence. The pilot is not a
+parent for this matched campaign.
+
+Policy `published_rot13_level_continuation_v2` restores each original adapter,
+AdamW moments/step counters, RNG and recorded physical execution mode. Keep
+BF16/CCE, LoRA, masks, equal-example loss, effective batch 16, full targets and
+seed 42. Use the next seed-42 permutation, native `<think>\n` serialization and
+a new **`5e-5` peak** with one 625-update cosine phase and 19 nonzero warmup
+updates (first LR `5e-5 / 19`). This is a separately identified intervention,
+not exact recovery of the exhausted original schedule or an isolated epoch
+comparison. No new learning or throughput result is claimed.
+
+The [level continuation API](../../../../src/training/sft/level_continuation.py)
+exposes `ContinuationSpec(level, additional_epochs=1, learning_rate=5e-5)`,
+`prepare_inputs(...)`, `run_continuation(...)` and `verified_completion(...)`.
+Preparation rejects continuation parents and binds source, exact original
+parent/data, derived tokenization, exposure order and policy hashes into a new
+level/target-epoch run identity. The API also accepts two extra epochs, but the
+current authorization selects **one extra epoch only**.
+
+The reviewed implementation is commit
+`a1962353a4301744dc6db5adafb0e6b212354679`. Run these commands from that exact
+checkout or a byte-verified export, with its source identity declared:
+
+```bash
+export SOURCE_CODE_COMMIT=a1962353a4301744dc6db5adafb0e6b212354679
+```
+
+A Git checkout must have the same HEAD; this variable cannot relabel a later
+documentation checkout. The later documentation commit is not the training
+producer. Validate one restored level without GPU work or Drive requests:
+
+```bash
+python scripts/continue_sft_level.py \
+  --parent-fit artifacts/sft/original_level_01 \
+  --parent-checkpoint artifacts/sft/original_level_01/checkpoint_000625 \
+  --train data/sft/rot13_14b_level_01_train.jsonl \
+  --validation data/sft/rot13_14b_level_01_validation.jsonl \
+  --output artifacts/sft/continuation_v2/level_01 \
+  --model-cache /workspace/model_cache --level 1 \
+  --additional-epochs 1 --learning-rate 5e-5 --validate-only
+```
+
+Paths above are examples; use the verified restoration report's actual paths.
+The training invocation uses the same arguments without `--validate-only` and
+requires the configured Drive artifact service. Save full state every 100 added
+updates, at update 313 (5,008 actual added examples), and final 625; a pause drains
+a whole optimizer update. Completion requires checksummed final adapter/full
+state, fit result, payload manifest and completion receipt verified in Drive.
+No process exit or adapter-only export substitutes for that barrier.
+
+One GPU runs levels serially; two GPUs may own disjoint level shards with
+separate outputs and no shared level ownership. Resource count is not a new
+training recipe. Observed L10 fit times remain 96.6 minutes originally and
+4h51m for the high-rate pilot, whose slowdown has no established cause; neither
+is a new campaign ETA. The current pilot GPQA continues unchanged, its full-198
+receipt remains pending, and original GPQA levels 7–9 remain unrun/paused. No
+new matched GPQA evaluation autolaunches: first verify all ten new endpoints,
+then freeze and review their evaluation identities and compatible control reuse.
+GPQA supplies no training data.
+
+## Completed high-rate L10 pilot: first 128 native records verified, full 198 pending
 
 The separately identified 14B ROT13 L10 extra epoch is complete under training
 source `3a89691`: 625 additional updates (1,250 cumulative), 10,000 additional
@@ -23,7 +92,8 @@ All 198 prompts, seeds, the scorer and the 32,000-token limit remain frozen at
 `5e6be1b`, protocol
 `57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b`.
 The remaining 70-question group is running; the full 198-question receipt is
-absent. Levels 7–9 remain paused; no other training is scheduled.
+absent. Original GPQA levels 7–9 remain paused. The new training campaign above
+has not launched.
 
 Post hoc classification of reasoning words with pinned wordfreq gives a 56.50%
 ROT13-only share among all 719,767 alphabetic word occurrences, 48.05% after
@@ -129,7 +199,8 @@ flowchart TD
 %% Current native128 verified:strict35new/61old/70base on same128; human39/70/74.
 %% CPU128parity and earlier42parity exact; final70running/full198receipt absent.
 %% Wordfreq R-only56.50% of alphabetic reasoning words,48.05% after block removal; proxy not compliance.
-%% Preserve original fits/GPQA caches; levels7-9 remain paused; no other jobs.
+%% Preserve original fits/GPQA caches; original GPQA levels7-9 remain paused.
+%% New matched v2 levels1-10 campaign: PLANNED_NOT_LAUNCHED; one added pass at peak5e-5.
 %% Continuation restores parent adapter/AdamW/RNG; new identity, second shuffle, native newline.
 %% Same peak LR2e-4; fresh cosine625/warmup19. Combined change, benefit unmeasured.
 %% Current14Oct: nine-levelROT13queue COMPLETE, all625/finalDriveverified; retainedL10 alsocomplete.
@@ -176,6 +247,11 @@ flowchart TD
     NEXT -->|No| OUT
     OUT -.->|Explicit new user priority| CONT --> PARENT --> EPOCH2 --> CONTOUT
     CONTOUT -->|Only complete and verified| POST --> POSTEND
+    OUT -.->|New authorization; not launched| V2PLAN["Matched v2: 14B ROT13 levels 1-10<br/>One extra pass from EACH ORIGINAL full checkpoint<br/>Preserve original and high-rate L10 pilot endpoints"]
+    V2PLAN --> V2RESTORE["scripts/restore_sft_level_continuation_inputs.py<br/>Verify this level's original adapter / AdamW / RNG and 10k / 100 data<br/>Verify original lineage and separate output namespaces"]
+    V2RESTORE --> V2RUN["scripts/run_sft_level_continuation_campaign.py<br/>One GPU serial or two independent disjoint level shards<br/>scripts/continue_sft_level.py; new per-level identity<br/>625 added / 1250 cumulative; peak 5e-5; warmup 19 then cosine<br/>Native think newline; encoding / LoRA / loss / physical mode retained"]
+    V2RUN --> V2VERIFY["Require every endpoint's full state / adapter / result<br/>Payload manifest and completion receipt verified in Drive<br/>Planned only: no new completed endpoint claimed"]
+    V2VERIFY --> V2EVAL["Freeze and review new evaluation identities after all ten endpoints<br/>Reuse compatible base / one-epoch controls; GPQA supplies no training data<br/>No automatic GPQA launch; existing pilot evaluation unchanged"]
     INPUT -.->|Separate scientific choice| LEGACY
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class BASE,FIT detail

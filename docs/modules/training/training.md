@@ -2,6 +2,14 @@
 
 **Owner:** `coordinator`. **Current status:** All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. The separately identified 16 October L10 extra epoch is also complete: 625 additional/1,250 cumulative updates and 26 Drive-verified artifacts. Its new-adapter GPQA run has 128 verified native records. On these same 128 questions, frozen-correct counts are 35 for the new adapter, 61 for original L10 and 70 for the base; supplementary visible-choice counts are 39, 70 and 74, respectively. The final 70-question group is running, and the full 198-question receipt is pending. Post hoc wordfreq classification assigns 56.50% of alphabetic reasoning words to the ROT13-only class, or 48.05% after removing repeated blocks; this does not establish exact coverage or scientific success. Original levels 7–9 stay paused. Exposure, schedule restart and native-newline alignment changed jointly; no isolated epoch effect is established. See the [current SFT record](sft/sft_training.md).
 
+The user has now authorized a separate matched **two-total-epoch** campaign for
+14B ROT13 levels 1–10, **`PLANNED_NOT_LAUNCHED`**: one added 625-update pass from
+each original full checkpoint at peak `5e-5`, with unchanged data/encoding and
+native thinking-newline alignment. Originals and the high-rate L10 pilot retain
+their identities. One GPU is serial; two may own disjoint levels. New GPQA
+requires verified endpoints and frozen identity review; it does not autolaunch.
+See the [continuation policy and commands](sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110).
+
 | Artifact | Exact repository path |
 |---|---|
 | Implementation | `src/training/training.py` |
@@ -70,6 +78,7 @@ flowchart TD
 %% Native128 verified:35new/61old/70base strictcorrect; final70running/full198pending.
 %% Posthoc wordfreq R-only56.50% of alphabetic reasoning words; vocabulary-sensitive,not full coverage.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
+%% Matched two-total-epoch14B ROT13 levels1-10 v2: PLANNED_NOT_LAUNCHED, ownoriginalparents,peak5e-5.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -92,6 +101,7 @@ flowchart TD
     INPUT --> SFT --> SFTOUT --> WAIT
     INPUT --> RL --> RLOUT --> WAIT
     INPUT --> BASE --> WAIT
+    SFTOUT -.->|Separate planned authorization| V2["Matched two-total-epoch ROT13 levels 1-10<br/>Each ORIGINAL full checkpoint plus one pass at peak 5e-5<br/>Unchanged data / encoding; native think newline; new identity<br/>One GPU serial or two disjoint level shards<br/>Preserve originals and high-rate L10 pilot<br/>Not launched; verified endpoints then evaluation identity review<br/>No automatic GPQA launch"]
     WAIT --> OUT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class SFT,RL detail

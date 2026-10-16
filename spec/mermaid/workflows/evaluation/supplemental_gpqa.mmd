@@ -47,5 +47,7 @@ flowchart TD
     BR -. exact matching baseline reuse .-> POSTREPORT
     ORIGINAL10[Archived original L10 raw responses and scores] --> POSTREPORT
     POSTREPORT --> POSTDRIVE[Require all198 raw/scores/report/receipt verified in Drive<br/>Levels7-9 remain paused; no other automatic jobs]
+    A -.->|Future matched continuation; not launched| V2["Planned two-total-epoch 14B ROT13 levels 1-10<br/>One added pass from each ORIGINAL full state at peak 5e-5<br/>No new data / encoding; preserve high-rate L10 pilot<br/>Original GPQA levels 7-9 stay unrun / paused"]
+    V2 --> V2GATE["All ten new endpoints Drive-verified first<br/>Freeze and review evaluation identities and compatible control reuse<br/>No automatic GPQA launch; current pilot continues unchanged"]
     OLD[Historical 3,072-token GPQA baseline: 49/198<br/>Preserved separately; incompatible with 32k comparison] -. archived .-> OLD
     X[Primary four-domain suite stays at 3,072 tokens<br/>SFT data, recipe and original criteria unchanged] -. unchanged .-> X

@@ -4,7 +4,7 @@
   "pdf": {
     "path": "spec/experiment.pdf",
     "pages": 81,
-    "sha256": "bb6f71da2fa323ff9f9d385b60a771324dbd8ca32a2724f3dba0e1ef5f1f2ba2"
+    "sha256": "52728235db4d5a1de5f2dbc13b10c198eea5650c0358f8b333250f375bb3bc46"
   },
   "original_pdf": {
     "path": "spec/archive/experiment_original.pdf",
@@ -36,7 +36,7 @@
     "first128 native GPQA raw/score verification and exact private CPU parity; full198 incomplete",
     "posthoc wordfreq reasoning-word amount diagnostic and independent4608-table/96-summary reproduction"
   ],
-  "procedure_update_sha256": "16db6aeecf2699710a2dc08ffaf0fbef4cc2fe3de82d97eaecc625250aad270a",
+  "procedure_update_sha256": "c954a6e74dbeb55318779cc9a6d7ff7c3654b8ef34cb9952a7a477847cc9c10c",
   "active_sft_design": {
     "recipe": "efficient_one_epoch_v1",
     "status": "ROT13_14B_ALL_TEN_COMPLETE_KAZITEXT_PAUSED",
@@ -1334,6 +1334,153 @@
       "receipt_sha256": "eb6a67ef3f555ede7159211ca2837f2b0ae7f662bc981741b0b1e1f88452399a",
       "native_full198_completion_or_checkpoint_barrier": false,
       "scope": "private_formal_denominator_contextual_orientation_and_correct_candidate_full_review_of_verified_first128"
+    }
+  },
+  "sft_rot13_14b_matched_two_total_epoch_continuation_v2": {
+    "revision_date_utc": "2026-10-16",
+    "status": "PLANNED_NOT_LAUNCHED",
+    "authorized_scope": "one_additional_pass_from_each_original_14b_rot13_level1_through10_full_checkpoint",
+    "selected_model_size": "14b",
+    "selected_family": "rot13",
+    "selected_levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "selected_additional_epochs": 1,
+    "selected_cumulative_epochs": 2,
+    "additional_updates_per_level": 625,
+    "cumulative_updates_per_level": 1250,
+    "additional_examples_per_level": 10000,
+    "cumulative_examples_per_level": 20000,
+    "policy_version": "published_rot13_level_continuation_v2",
+    "planned_peak_learning_rate": 5e-05,
+    "warmup_updates": 19,
+    "first_update_learning_rate": "5e-5/19",
+    "scheduler": "single_nonzero_linear_warmup_then_cosine_added_phase_v2",
+    "parent_requirement": "each_levels_own_original_published_one_epoch625_update_full_adapter_adamw_rng_checkpoint",
+    "original_parent_sources": {
+      "levels1_through9": "9de8813031da737453f491723a10b305679dc42d",
+      "level10": "2ea4fb9a7737cff806226366e73743eec5935fad"
+    },
+    "preserved": [
+      "original_level_specific10000_train100_validation_records",
+      "encoding_levels_and_target_bytes",
+      "lora_and_completion_only_equal_example_loss",
+      "bf16_exact_cce_adamw_policy",
+      "effective_batch16",
+      "seed42",
+      "recorded_parent_physical_execution_mode",
+      "original_one_epoch_adapters_checkpoints_and_evaluation_outputs",
+      "high_rate_level10_pilot_and_its_frozen_evaluation"
+    ],
+    "changed": [
+      "one_additional_exposure_pass",
+      "new_lower_peak_lr_and_nonzero_warmup_cosine_schedule",
+      "native_think_newline_derived_tokenization",
+      "new_source_parent_data_tokenization_order_policy_bound_run_identity"
+    ],
+    "added_sampler": "second_seed42_permutation_after_original_epoch1",
+    "full_state_checkpoint_updates": [
+      100,
+      200,
+      300,
+      313,
+      400,
+      500,
+      600,
+      625
+    ],
+    "half_epoch_checkpoint_actual_added_examples": 5008,
+    "high_rate_level10_pilot_may_be_parent_or_matched_endpoint": false,
+    "optional_generic_two_additional_epoch_support_selected_or_authorized": false,
+    "execution_source_commit": null,
+    "immutable_implementation_source_binding_required_before_launch": true,
+    "implementation_paths": [
+      "src/training/sft/level_continuation.py",
+      "scripts/continue_sft_level.py",
+      "scripts/restore_sft_level_continuation_inputs.py",
+      "scripts/run_sft_level_continuation_campaign.py"
+    ],
+    "original_parent_inventory_preparation": {
+      "status": "SEALED_METADATA_VERIFIED_NO_PAYLOAD_RESTORE",
+      "inventory_sha256": "440eb243efea34bb5a98a565bdf2e44e80aa00fbcc5c4eded0eb1783774b5619",
+      "inventory_hash": "11efd9298ba2e5234aac9e8a4e2d10fc7ce3693404e8818ceeb71fd9fe8ace88",
+      "artifact_count": 141,
+      "total_payload_bytes": 6869931504,
+      "ten_original_full_state_payload_bytes": 4137158850,
+      "payloads_restored": false
+    },
+    "resource_plan": {
+      "one_gpu": "serial_levels",
+      "two_gpus": "independent_disjoint_level_shards_serial_within_each_shard",
+      "shared_level_ownership_allowed": false,
+      "measured_speedup_or_campaign_eta_claimed": false,
+      "balanced_two_gpu_example": {
+        "shard_odd": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ],
+        "shard_even": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ]
+      }
+    },
+    "completion_barrier": [
+      "final_full_state_and_adapter_verified",
+      "fit_result_and_payload_manifest_sealed",
+      "completion_receipt_verified_in_drive",
+      "every_selected_level_verified_before_shard_endpoints_export"
+    ],
+    "new_training_launched": false,
+    "completed_new_endpoints": 0,
+    "gpqa_supplies_training_data": false,
+    "new_gpqa_autolaunch": false,
+    "new_gpqa_requires_all_ten_verified_endpoints_and_frozen_identity_review": true,
+    "compatible_existing_base_and_original_one_epoch_outputs_reused": true,
+    "original_gpqa_levels7_through9": "UNRUN_PAUSED",
+    "high_rate_pilot_gpqa_protocol_unchanged": "57898f795997a55ebfce68cc68d2cc155312e6cd138b4bb2a927fe6cba863f9b",
+    "high_rate_pilot_full198_native_receipt_verified": false,
+    "historical_fit_observations": {
+      "original_level10_seconds": 5793.143751,
+      "high_rate_pilot_seconds": 17470.26931851078,
+      "slowdown_cause": "UNKNOWN",
+      "new_campaign_runtime_or_performance_measured": false
+    },
+    "prior_provenance_blocks_retained_as_dated_evidence": true,
+    "new_question_prompt_response_or_token_values_in_git": false,
+    "isolated_epoch_causality_or_scientific_success_established": false,
+    "planned_execution_source_commit": "a1962353a4301744dc6db5adafb0e6b212354679",
+    "source_export_requires_matching_SOURCE_CODE_COMMIT_and_byte_verification": true,
+    "later_documentation_commit_is_execution_producer": false,
+    "focused_implementation_checks": {
+      "core_cpu_checks_passed": 17,
+      "operations_cpu_checks_passed": 11,
+      "gpu_tests_run": false,
+      "full_suite_run": false
+    },
+    "current_pod_input_staging": {
+      "status": "RESTORED_PAYLOADS_VERIFIED_PLAN_READY_GPU_NOT_LAUNCHED",
+      "artifact_count": 141,
+      "restored_inputs_manifest_hash": "12a4420192b129c45637772d8a6d04bf21d3b7bdb0ba66a326446329493c36a5",
+      "immutable_source_export_sha256": "302a9128a213f8eb53c208887154d9af9a6d0a6e0279a7f01de4fbe816909925",
+      "plan_file_sha256": "c898bfb7b4611155b6295e0a4a238920323d83e9a452aa8ef26769077824736d",
+      "existing_pilot_evaluation_unchanged": true,
+      "second_gpu_required": false
     }
   }
 }

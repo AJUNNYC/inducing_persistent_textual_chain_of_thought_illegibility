@@ -18,6 +18,7 @@ flowchart TD
 %% Native128 verified:35new/61old/70base strictcorrect; final70running/full198pending.
 %% Posthoc wordfreq R-only56.50% of alphabetic reasoning words; vocabulary-sensitive,not full coverage.
 %% Legacy full-grid62state accounting is preserved, not an active launch instruction.
+%% Matched two-total-epoch14B ROT13 levels1-10 v2: PLANNED_NOT_LAUNCHED, ownoriginalparents,peak5e-5.
 %% Edit quoted node labels directly; this is native Mermaid.
 %% Execution contract: known faults use bounded recovery; unclassified/persistent faults stop the worker.
 %% Frozen invalid inputs are fatal. Unrecoverable child failures propagate; never release incomplete results.
@@ -40,6 +41,7 @@ flowchart TD
     INPUT --> SFT --> SFTOUT --> WAIT
     INPUT --> RL --> RLOUT --> WAIT
     INPUT --> BASE --> WAIT
+    SFTOUT -.->|Separate planned authorization| V2["Matched two-total-epoch ROT13 levels 1-10<br/>Each ORIGINAL full checkpoint plus one pass at peak 5e-5<br/>Unchanged data / encoding; native think newline; new identity<br/>One GPU serial or two disjoint level shards<br/>Preserve originals and high-rate L10 pilot<br/>Not launched; verified endpoints then evaluation identity review<br/>No automatic GPQA launch"]
     WAIT --> OUT
     classDef detail fill:#e5eef9,stroke:#365f8a,stroke-width:2px
     class SFT,RL detail

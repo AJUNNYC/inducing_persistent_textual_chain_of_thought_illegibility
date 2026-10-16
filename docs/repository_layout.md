@@ -342,6 +342,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     build_protocol_pdf.py
     certify_sft_handoff.py
     continue_sft_epoch.py
+    continue_sft_level.py
     coordinate_verification_shard.py
     coordinate_vllm_sft_preparation.py
     coordinator_topology.py
@@ -359,6 +360,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     refresh_dependency_locks.py
     rescore_vllm_baselines.py
     restore_gpqa_sft_inputs.py
+    restore_sft_level_continuation_inputs.py
     revalidate_collection_inputs.py
     run_14b_sft_campaign.py
     run_baseline_repeatability.py
@@ -372,6 +374,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_model_generation_worker.py
     run_optimized_sft_queue.py
     run_preflight.py
+    run_sft_level_continuation_campaign.py
     run_supplemental_gpqa.py
     run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
@@ -645,6 +648,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         individual_fit/
           __init__.py
           sft_fit.py
+        level_continuation.py
         published_execution.py
         runtime_migration.py
         scheduled_spatial_loss.py
@@ -751,6 +755,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_runpod.py
         test_sft_budget_reconcile.py
         test_sft_handoff_reuse.py
+        test_sft_level_continuation_ops.py
         test_sft_optimization_benchmark.py
         test_sft_reconcile_execution.py
       shared_procedures/
@@ -790,6 +795,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
           test_data_handoff.py
           test_execution_profile.py
           test_fused_loss.py
+          test_level_continuation.py
           test_loss_layout.py
           test_runtime_migration.py
           test_scheduled_spatial_loss.py

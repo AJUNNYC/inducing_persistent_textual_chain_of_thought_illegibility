@@ -1,5 +1,14 @@
 # Completed 14B ROT13 SFT and historical level-10 budget
 
+## Planned matched continuation, separate from completed records
+
+The user authorized one added pass for each original 14B ROT13 level 1–10 at
+peak `5e-5` with native thinking newline and unchanged existing data/encoding.
+This two-total-epoch campaign is **`PLANNED_NOT_LAUNCHED`**. Each level restores
+its own original full state; the completed `2e-4` L10 pilot and all original
+evaluation outputs remain separate. See the [policy and commands](modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110).
+The pilot's frozen GPQA continues; its full-198 receipt is still pending.
+
 ## Current completion and evaluation handoff
 
 All ten 14B ROT13 levels are complete with verified Drive adapters, full state and fit results. The nine fresh levels 1–9 each reached 625 updates under scientific source `9de8813031da737453f491723a10b305679dc42d`; retained level 10 preserves source `2ea4fb9a7737cff806226366e73743eec5935fad`. KaziText level 10 remains safely paused at 444/625 with verified recovery state and no automatic restart. No other KaziText fit or 7B fit is newly completed by this queue. The priority queue was observed complete on 14 October 2026. The original [GPQA campaign](gpqa_14b_rot13_campaign.md) retains its 32,000-token baseline and completed original-adapter results. Its remaining levels 7-9 are paused. The sections below retain the dated level-10 measurement, original budget forecasts and subsequent priority change.

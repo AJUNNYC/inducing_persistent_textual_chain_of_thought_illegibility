@@ -1,6 +1,6 @@
 # Inducing Persistent Textual Chain-of-Thought Illegibility
 
-Implemented first-stage research software for paired clean-trace construction,40 independent SFT fits, two GRPO trajectories, vLLM evaluation of62states and prospective construction analysis. No trained experimental outcomes are supplied. Mandatory live launch gates remain enforced.
+First-stage research software for paired clean-trace construction, the original forty SFT conditions, two GRPO trajectories, vLLM evaluation and prospective construction analysis. Executed evidence and planned work are distinguished below. Mandatory live launch gates remain enforced.
 
 The controlling scientific source is [the protocol PDF](spec/experiment.pdf). AppendixH governs its explicit amendments; AppendixG retains the construction criteria. The [complete source extraction](docs/protocol_reference.md), [scientific overview](docs/overview.md), [contracts](docs/contracts.md) and [decisions](docs/decisions.md) explain the design. The historical source PDF remains byte-for-byte preserved; the active 81-page PDF integrates the [current procedure](docs/procedure_update.md) directly into its relevant sections.
 
@@ -24,6 +24,17 @@ python3.12 scripts/setup_environment.py --profile cpu --venv .venv
 [Validation evidence](docs/validation_report.md) and [acceptance assessment](docs/implementation_acceptance.md) distinguish engineering checks, actual runtime controls and scientific results. Runtime datasets, checkpoints, model caches and secrets are excluded from Git. They are content-hashed, compatibility-checked and preserved through the canonical artifact service on authorized production runs.
 
 ## Current procedure
+
+The planned matched **two-total-epoch 14B ROT13 levels 1–10 campaign** adds one
+pass from each original full checkpoint at peak `5e-5`, preserving existing
+data/encoding and adding the native thinking newline. GPU training has **not launched**. All 141 original-parent/data input files
+have been restored and byte-verified on the current Pod while its existing
+evaluation continues. Original one-epoch results and the separate completed high-rate L10 pilot remain
+preserved. The pilot's frozen GPQA is still running: first 128 native records
+verified, full-198 receipt pending. See the [continuation policy/API/commands](docs/modules/training/sft/sft_training.md#planned-matched-two-total-epoch-campaign-levels-110)
+and [worker plan](docs/sft_multi_gpu_execution_plan.md).
+
+The following setup record is historical:
 
 Corpus preparation is complete. The first 7B ROT13 fit is [paused at step 214 of 1,250](docs/evidence/sft_training_pause_214.json), with full recovery state verified in Drive. The [launch receipt](docs/evidence/sft_launch_readiness.json) records thirteen passing gates for its frozen consumer `773cfd3`. The [RTX PRO 6000 optimization plan](docs/sft_optimizations.md) implements explicit redundant-check and SDPA candidates, with the baseline still the production default. CPU equality tests pass; new-source certification and actual target-GPU measurements remain pending. Existing H100 evidence does not certify the changed implementation or hardware.
 
