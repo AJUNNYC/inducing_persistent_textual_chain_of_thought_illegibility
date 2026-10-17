@@ -103,11 +103,13 @@ def main():
     parser.add_argument("--level", type=int, choices=range(1, 11), required=True)
     parser.add_argument("--additional-epochs", type=int, choices=(1, 2), required=True)
     parser.add_argument("--learning-rate", type=float, required=True)
+    parser.add_argument("--enable-gradient-checkpointing", action="store_true",
+                        help="Declare RNG-preserving activation recomputation for this new continuation")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--validate-only", action="store_true",
                         help="Verify original full parent and unchanged data without GPU or Drive requests")
     args = parser.parse_args()
-    continuation = ContinuationSpec(args.level, args.additional_epochs, args.learning_rate)
+    continuation = ContinuationSpec(args.level, args.additional_epochs, args.learning_rate, args.enable_gradient_checkpointing)
     output = validate_output_directory(args.output, args.parent_fit, args.parent_checkpoint)
     train, validation = load_sft_records(args.train), load_sft_records(args.validation)
     source = code_revision()

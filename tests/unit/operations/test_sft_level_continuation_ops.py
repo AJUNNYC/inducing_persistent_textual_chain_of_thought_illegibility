@@ -270,3 +270,16 @@ def test_child_pause_stops_shard_without_next_level_and_plan_only_writes_nothing
     args.plan_only = True
     assert CAMPAIGN.run_campaign(args)["status"] == "PLANNED"
     assert not Path(args.output).exists()
+
+
+def test_checkpointing_campaign_has_distinct_identity_and_passes_flag(tmp_path):
+    _, inventory = parent_fixture(tmp_path)
+    kw = dict(source='b' * 40, additional_epochs=1, learning_rate=5e-5)
+    regular = CAMPAIGN.campaign_plan({'manifest_hash': 'f' * 64}, inventory['levels'], [1], **kw)
+    selected = CAMPAIGN.campaign_plan({'manifest_hash': 'f' * 64}, inventory['levels'], [1],
+                                      enable_gradient_checkpointing=True, **kw)
+    assert regular['plan_hash'] != selected['plan_hash']
+    assert regular['jobs'][0]['job_hash'] != selected['jobs'][0]['job_hash']
+    args = SimpleNamespace(python='python', model_cache='models', additional_epochs=1,
+                           learning_rate=5e-5, device='cuda:0', enable_gradient_checkpointing=True)
+    assert '--enable-gradient-checkpointing' in CAMPAIGN.training_command(selected['jobs'][0], args, tmp_path/'out')

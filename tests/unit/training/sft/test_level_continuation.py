@@ -331,3 +331,17 @@ def test_sealed_drive_receipt_retries_without_rewriting_scientific_payloads(tmp_
                                                        if key != "receipt_hash"})
         assert CLI.publish_drive_completion(service, output, ident) == receipt
         assert all(path.read_bytes() == contents for path, contents in saved.items())
+
+
+def test_checkpointing_is_declared_new_phase_only_and_preserves_training_budget():
+    original = c.ContinuationSpec(5, 1, 5e-5)
+    selected = c.ContinuationSpec(5, 1, 5e-5, True)
+    assert {k: v for k, v in selected.policy().items() if k != 'physical_execution'} == {
+        k: v for k, v in original.policy().items() if k != 'physical_execution'}
+    assert c.spec_from_identity({'continuation_policy': selected.policy()}) == selected
+    assert c.spec_from_identity({'continuation_policy': original.policy()}) == original
+    assert c.continuation_checkpointing(selected, False, resuming=False) is True
+    assert c.continuation_checkpointing(selected, True, resuming=True) is True
+    assert c.continuation_checkpointing(original, False, resuming=True) is False
+    with pytest.raises(c.SFTInputError, match='declared checkpointing'):
+        c.continuation_checkpointing(selected, False, resuming=True)

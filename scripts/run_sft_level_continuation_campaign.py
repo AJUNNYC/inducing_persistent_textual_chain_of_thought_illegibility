@@ -49,13 +49,13 @@ def parse_levels(value):
     return levels
 
 
-def campaign_plan(manifest, entries, levels, *, source, additional_epochs, learning_rate):
+def campaign_plan(manifest, entries, levels, *, source, additional_epochs, learning_rate, enable_gradient_checkpointing=False):
     available = {entry["level"]: entry for entry in entries}
     if len(set(levels)) != len(levels) or not set(levels) <= available.keys():
         raise ValueError("Campaign levels must be distinct and present in the restored input manifest")
     jobs = []
     for level in levels:
-        spec = ContinuationSpec(level, additional_epochs, learning_rate)
+        spec = ContinuationSpec(level, additional_epochs, learning_rate, enable_gradient_checkpointing)
         entry = available[level]
         binding = {"level": level, "parent_checkpoint_hash": entry["parent_checkpoint_hash"],
                    "parent_identity_hash": entry["parent_identity_hash"], "policy": spec.policy(),
@@ -73,6 +73,8 @@ def campaign_plan(manifest, entries, levels, *, source, additional_epochs, learn
 
 def training_command(job, args, output):
     command = [args.python, "-u", str(ROOT / "scripts/continue_sft_level.py")]
+    if getattr(args, "enable_gradient_checkpointing", False):
+        command.append("--enable-gradient-checkpointing")
     for name in ("parent_fit", "parent_checkpoint", "train", "validation"):
         command += ["--" + name.replace("_", "-"), job[name]]
     return command + ["--output", str(output), "--model-cache", args.model_cache,
@@ -157,7 +159,8 @@ def run_campaign(args, *, popen=subprocess.Popen, sleep=time.sleep, store=None):
     entries = validate_inputs_manifest(manifest)
     source = code_revision()
     plan = campaign_plan(manifest, entries, args.levels, source=source,
-                         additional_epochs=args.additional_epochs, learning_rate=args.learning_rate)
+                         additional_epochs=args.additional_epochs, learning_rate=args.learning_rate,
+                         enable_gradient_checkpointing=getattr(args, "enable_gradient_checkpointing", False))
     output = safe_path(args.output)
     model_cache = safe_path(args.model_cache)
     if not model_cache.is_dir():
@@ -255,6 +258,8 @@ def main(argv=None):
     parser.add_argument("--output", required=True)
     parser.add_argument("--model-cache", required=True)
     parser.add_argument("--python", default=sys.executable)
+    parser.add_argument("--enable-gradient-checkpointing", action="store_true",
+                        help="Declare RNG-preserving activation recomputation for each new continuation")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--plan-only", action="store_true", help="Check local inputs and print plan without writes/GPU/Drive")
     result = run_campaign(parser.parse_args(argv))

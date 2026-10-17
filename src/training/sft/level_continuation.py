@@ -41,8 +41,11 @@ class ContinuationSpec:
     level: int
     additional_epochs: int
     learning_rate: float
+    enable_gradient_checkpointing: bool = False
 
     def __post_init__(self) -> None:
+        if type(self.enable_gradient_checkpointing) is not bool:
+            raise SFTInputError("Gradient checkpointing selection must be boolean")
         if type(self.level) is not int or not 1 <= self.level <= 10:
             raise SFTInputError("Continuation level must be an integer from 1 to 10")
         if type(self.additional_epochs) is not int or self.additional_epochs not in (1, 2):
@@ -76,7 +79,9 @@ class ContinuationSpec:
             "target_text": "unchanged_parent_encoded_reasoning_and_clear_final_answer",
             "rendering": "native_training_template_think_newline_v1",
             "loss_mask": "unchanged_native_role_prefix_boundary_structural_tokens_supervised",
-            "physical_execution": "preserve_parent_microbatch_accumulation_and_checkpointing",
+            "physical_execution": ("preserve_parent_batch_enable_rng_preserving_checkpointing"
+                if self.enable_gradient_checkpointing else
+                "preserve_parent_microbatch_accumulation_and_checkpointing"),
             "checkpoint_updates": 100,
             "additional_checkpoint_boundaries": "ceil_half_epoch_at_whole_optimizer_update",
             "parent_updates": UPDATES_PER_EPOCH,
@@ -86,10 +91,25 @@ class ContinuationSpec:
         }
 
 
+def continuation_checkpointing(spec: ContinuationSpec, saved: bool, *, resuming: bool) -> bool:
+    """Change activation storage only at a declared new-phase boundary.
+
+    Resume must retain the already-recorded execution mode. RNG-preserving,
+    non-reentrant checkpointing recomputes activations; it does not change the
+    examples, loss, optimizer state, sequence limit or effective batch size.
+    """
+    if spec.enable_gradient_checkpointing:
+        if resuming and saved is not True:
+            raise SFTInputError("Saved continuation lacks its declared checkpointing mode")
+        return True
+    return saved
+
+
 def spec_from_identity(identity: Mapping) -> ContinuationSpec:
     policy = identity["continuation_policy"]
     spec = ContinuationSpec(policy["condition"]["level"], policy["additional_epochs"],
-                            policy["learning_rate_peak"])
+                            policy["learning_rate_peak"], policy.get("physical_execution") ==
+                            "preserve_parent_batch_enable_rng_preserving_checkpointing")
     if policy != spec.policy():
         raise SFTInputError("Continuation identity has a different declared policy")
     return spec
@@ -394,6 +414,7 @@ def run_continuation(parent_fit: str | Path, parent_checkpoint: str | Path,
         if (type(micro) is not int or type(accumulation) is not int
                 or (micro, accumulation) not in ((1, 16), (2, 8)) or type(checkpointing) is not bool):
             raise SFTInputError("Parent execution mode is not fully recorded")
+        checkpointing = continuation_checkpointing(continuation, checkpointing, resuming=checkpoint is not None)
         from training.sft.published_execution import capacity_setup
         capacity = capacity_setup(model, max(train, key=lambda example: len(example["input_ids"])),
             tokenizer.pad_token_id, optimizer=optimizer, fixed_microbatch_size=micro,
