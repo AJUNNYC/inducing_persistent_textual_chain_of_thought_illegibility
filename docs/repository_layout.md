@@ -376,6 +376,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_model_generation_worker.py
     run_optimized_sft_queue.py
     run_preflight.py
+    run_sft_gpqa_queue.py
     run_sft_level_continuation_campaign.py
     run_supplemental_gpqa.py
     run_vllm_baseline_repeatability.py
@@ -758,6 +759,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_protocol_provenance.py
         test_runpod.py
         test_sft_budget_reconcile.py
+        test_sft_gpqa_queue.py
         test_sft_handoff_reuse.py
         test_sft_level_continuation_ops.py
         test_sft_optimization_benchmark.py

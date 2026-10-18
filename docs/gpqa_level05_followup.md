@@ -44,3 +44,20 @@ differences; they are recorded, not represented as bitwise-identical execution.
 
 The supervisor does not stop RunPod billing. Never terminate a pod merely because
 all GPU inference appears finished; wait for the verified upload barrier.
+
+## Additional levels on one GPU
+
+`scripts/run_sft_gpqa_queue.py --configs LEVEL3_CONFIG LEVEL7_CONFIG --output QUEUE_OUTPUT`
+serializes each selected level's published continuation and the same frozen GPQA
+dispatcher. The October 18 extension selects only 14B ROT13 levels 3 and 7, each
+from its own original one-epoch parent, with one additional epoch, peak LR 5e-5,
+restored optimizer state and gradient checkpointing, matching the level-5 pilot.
+Order is level 3 training, level 3 evaluation, level 7 training, level 7 evaluation.
+Each receives the original 198-question Diamond panel and 32,000 output tokens;
+the existing baseline is reused, and all prior results remain in separate paths.
+The queue advances only after native training endpoints and evaluation completion
+receipts are Drive-verified. It stops on failure, rather than skipping a level.
+`PAUSE_REQUESTED` in the queue directory or SIGTERM requests a checkpoint-safe
+training pause, or stops the evaluation supervisor. A restart runs the same
+idempotent paths; never run another GPU job concurrently on the same device.
+No new training recipe, score parser or inference settings are introduced.

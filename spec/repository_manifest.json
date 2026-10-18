@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 606,
+  "files": 608,
   "directories_including_root": 202,
   "entries": [
     {
@@ -4026,6 +4026,17 @@
       "entry_type": "file",
       "diagram": "spec/mermaid/repository/support_layout.mmd",
       "node": "p_5db50e4653f724",
+      "blank": false
+    },
+    {
+      "path": "scripts/run_sft_gpqa_queue.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/run_sft_gpqa_queue.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_0d55fce0c5848e",
       "blank": false
     },
     {
@@ -8121,6 +8132,17 @@
       "display_path": "tests/unit/operations/test_sft_budget_reconcile.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_b2d6a54f4764ea",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_sft_gpqa_queue.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_sft_gpqa_queue.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_de206dd9a123ed",
       "blank": false
     },
     {
