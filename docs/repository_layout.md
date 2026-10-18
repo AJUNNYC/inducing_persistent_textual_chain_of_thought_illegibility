@@ -185,6 +185,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     final_field_scoring.md
     gpqa_14b_rot13_campaign.md
     gpqa_baseline_level1_response_audit.md
+    gpqa_level05_followup.md
     implementation_acceptance.md
     implementation_prompt.md
     modules/
@@ -385,6 +386,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     synchronize_manifest.py
     validate_repository.py
     validate_statistical_coverage.py
+    watch_gpqa_continuation.py
   spec/
     archive/
       experiment_original.pdf
@@ -750,6 +752,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
         test_consent_notebook.py
         test_coordinator_topology.py
         test_drive.py
+        test_gpqa_continuation_dispatcher.py
         test_operations.py
         test_optimized_sft_queue.py
         test_protocol_provenance.py

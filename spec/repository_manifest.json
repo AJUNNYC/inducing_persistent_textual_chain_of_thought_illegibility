@@ -4,7 +4,7 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 603,
+  "files": 606,
   "directories_including_root": 202,
   "entries": [
     {
@@ -1966,6 +1966,17 @@
       "display_path": "docs/gpqa_baseline_level1_response_audit.md",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_7a916f8c89910b",
+      "blank": false
+    },
+    {
+      "path": "docs/gpqa_level05_followup.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "docs/gpqa_level05_followup.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_c2fb79edcc24e9",
       "blank": false
     },
     {
@@ -4125,6 +4136,17 @@
       "display_path": "scripts/validate_statistical_coverage.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_7f50ac1ba05997",
+      "blank": false
+    },
+    {
+      "path": "scripts/watch_gpqa_continuation.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "scripts/watch_gpqa_continuation.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_e0a41e4bd9e009",
       "blank": false
     },
     {
@@ -8033,6 +8055,17 @@
       "display_path": "tests/unit/operations/test_drive.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_a7a6af1a909d4f",
+      "blank": false
+    },
+    {
+      "path": "tests/unit/operations/test_gpqa_continuation_dispatcher.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "tests/unit/operations/test_gpqa_continuation_dispatcher.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_1a417441a7caaf",
       "blank": false
     },
     {
