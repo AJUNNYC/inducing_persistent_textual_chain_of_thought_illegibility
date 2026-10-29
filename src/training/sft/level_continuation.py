@@ -49,8 +49,8 @@ class ContinuationSpec:
             raise SFTInputError("Unknown continuation family")
         if type(self.enable_gradient_checkpointing) is not bool:
             raise SFTInputError("Gradient checkpointing selection must be boolean")
-        if type(self.level) is not int or not 1 <= self.level <= 10:
-            raise SFTInputError("Continuation level must be an integer from 1 to 10")
+        if type(self.level) is not int or not (0 if self.family == "rot13" else 1) <= self.level <= 10:
+            raise SFTInputError("Continuation level must be 1–10, or 0 for the ROT13 control")
         if type(self.additional_epochs) is not int or self.additional_epochs not in (1, 2):
             raise SFTInputError("Continuation supports one or two explicitly declared extra epochs")
         if (type(self.learning_rate) not in (int, float)

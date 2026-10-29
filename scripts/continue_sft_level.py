@@ -101,7 +101,7 @@ def main():
     parser.add_argument("--family", choices=("rot13", "kazitext"), default="rot13")
     for key in ("parent-fit", "parent-checkpoint", "train", "validation", "output", "model-cache"):
         parser.add_argument("--" + key, required=True)
-    parser.add_argument("--level", type=int, choices=range(1, 11), required=True)
+    parser.add_argument("--level", type=int, choices=range(0, 11), required=True)
     parser.add_argument("--additional-epochs", type=int, choices=(1, 2), required=True)
     parser.add_argument("--learning-rate", type=float, required=True)
     parser.add_argument("--enable-gradient-checkpointing", action="store_true",

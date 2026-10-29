@@ -90,7 +90,7 @@ def test_wrong_lr_cursor_and_invalid_policy_are_rejected():
              "progress": {"completed_steps": 4}}
     with pytest.raises(SFTInputError, match="scheduler/LR"):
         c.restore_optimizer_scheduler(optimizer, state, spec, continuing_phase=True)
-    for arguments in ((0, 1, 5e-5), (11, 1, 5e-5), (True, 1, 5e-5),
+    for arguments in ((-1, 1, 5e-5), (11, 1, 5e-5), (True, 1, 5e-5),
                       (1, 0, 5e-5), (1, 3, 5e-5), (1, 1, 0), (1, 1, float("nan")), (1, 1, True)):
         with pytest.raises(SFTInputError):
             c.ContinuationSpec(*arguments)
@@ -345,3 +345,13 @@ def test_checkpointing_is_declared_new_phase_only_and_preserves_training_budget(
     assert c.continuation_checkpointing(original, False, resuming=True) is False
     with pytest.raises(c.SFTInputError, match='declared checkpointing'):
         c.continuation_checkpointing(selected, False, resuming=True)
+
+
+def test_zero_control_continuation_matches_encoded_schedule():
+    control = c.ContinuationSpec(0, 1, 5e-5).policy()
+    encoded = c.ContinuationSpec(8, 1, 5e-5).policy()
+    assert control.pop("condition")["level"] == 0
+    encoded.pop("condition")
+    assert control == encoded
+    with pytest.raises(SFTInputError):
+        c.ContinuationSpec(0, 1, 5e-5, family="kazitext")
