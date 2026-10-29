@@ -42,8 +42,11 @@ class ContinuationSpec:
     additional_epochs: int
     learning_rate: float
     enable_gradient_checkpointing: bool = False
+    family: str = "rot13"
 
     def __post_init__(self) -> None:
+        if self.family not in ("rot13", "kazitext"):
+            raise SFTInputError("Unknown continuation family")
         if type(self.enable_gradient_checkpointing) is not bool:
             raise SFTInputError("Gradient checkpointing selection must be boolean")
         if type(self.level) is not int or not 1 <= self.level <= 10:
@@ -65,7 +68,7 @@ class ContinuationSpec:
     def policy(self) -> dict:
         return {
             "version": VERSION,
-            "condition": {"family": "rot13", "model_id": "14b", "level": self.level},
+            "condition": {"family": self.family, "model_id": "14b", "level": self.level},
             "additional_epochs": self.additional_epochs,
             "additional_examples": TRAIN_COUNT * self.additional_epochs,
             "additional_optimizer_steps": self.total_steps,
@@ -109,7 +112,8 @@ def spec_from_identity(identity: Mapping) -> ContinuationSpec:
     policy = identity["continuation_policy"]
     spec = ContinuationSpec(policy["condition"]["level"], policy["additional_epochs"],
                             policy["learning_rate_peak"], policy.get("physical_execution") ==
-                            "preserve_parent_batch_enable_rng_preserving_checkpointing")
+                            "preserve_parent_batch_enable_rng_preserving_checkpointing",
+                            policy["condition"]["family"])
     if policy != spec.policy():
         raise SFTInputError("Continuation identity has a different declared policy")
     return spec
@@ -212,7 +216,7 @@ def prepare_inputs(parent_fit: str | Path, parent_checkpoint: str | Path,
     identity = {
         **original, "implementation_version": VERSION,
         "training_budget": "efficient_level_continuation_v2",
-        "run_id": (f"rot13_14b_level_{continuation.level:02d}_continuation_"
+        "run_id": (f"{continuation.family}_14b_level_{continuation.level:02d}_continuation_"
                    f"total_epochs_{1 + continuation.additional_epochs:02d}_{digest[:12]}"),
         "configuration_hash": digest, "code_revision": source_revision,
         "parent": parent, "continuation_policy": continuation.policy(),

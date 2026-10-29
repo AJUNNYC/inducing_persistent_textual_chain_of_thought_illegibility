@@ -150,15 +150,17 @@ def sft_execution_selection(config: dict) -> list[dict]:
         for name, values, allowed in (
                 ('models', models, ('7b', '14b')),
                 ('families', families, ('rot13', 'kazitext')),
-                ('levels', levels, tuple(range(1, 11)))):
+                ('levels', levels, tuple(range(0, 11)))):
             if (not isinstance(values, list) or not values
                     or any(type(value) is not (int if name == 'levels' else str) for value in values)
                     or len(set(values)) != len(values) or any(value not in allowed for value in values)):
                 raise ConfigurationError('invalid sft.selection.' + name)
+    if 0 in levels and families != ['rot13']:
+        raise ConfigurationError('Level zero is an explicit ROT13 control only')
     return [{'family': family, 'model_id': model, 'level': level}
             for family in ('rot13', 'kazitext') if family in families
             for model in ('7b', '14b') if model in models
-            for level in range(1, 11) if level in levels]
+            for level in range(0, 11) if level in levels]
 
 def _reject_secrets(value: Any, prefix: str = '') -> None:
     if isinstance(value, dict):

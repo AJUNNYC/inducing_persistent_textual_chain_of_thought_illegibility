@@ -98,6 +98,7 @@ def publish_drive_completion(service, output: Path, identity: dict) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--family", choices=("rot13", "kazitext"), default="rot13")
     for key in ("parent-fit", "parent-checkpoint", "train", "validation", "output", "model-cache"):
         parser.add_argument("--" + key, required=True)
     parser.add_argument("--level", type=int, choices=range(1, 11), required=True)
@@ -109,7 +110,7 @@ def main():
     parser.add_argument("--validate-only", action="store_true",
                         help="Verify original full parent and unchanged data without GPU or Drive requests")
     args = parser.parse_args()
-    continuation = ContinuationSpec(args.level, args.additional_epochs, args.learning_rate, args.enable_gradient_checkpointing)
+    continuation = ContinuationSpec(args.level, args.additional_epochs, args.learning_rate, args.enable_gradient_checkpointing, args.family)
     output = validate_output_directory(args.output, args.parent_fit, args.parent_checkpoint)
     train, validation = load_sft_records(args.train), load_sft_records(args.validation)
     source = code_revision()
@@ -122,13 +123,13 @@ def main():
     token, folder = os.environ.get("GOOGLE_OAUTH_TOKEN_FILE"), os.environ.get("GOOGLE_DRIVE_FOLDER_ID")
     if not token or not folder:
         raise RuntimeError("Private Drive token path and project folder ID are required")
-    configure_worker_recovery(output, worker_id=f"sft_rot13_14b_level_{args.level:02d}_continuation_v2")
+    configure_worker_recovery(output, worker_id=f"sft_{args.family}_14b_level_{args.level:02d}_continuation_v2")
     service = ArtifactService(output, output / "drive_registry.json",
                               DriveStore(drive_service(token), folder), drive_recovery=True)
     def preserve(path, metadata):
         identity = read_json(output / "run_identity.json")
         provenance = {
-            "experiment_id": identity["configuration_hash"], "branch": "rot13_level_continuation",
+            "experiment_id": identity["configuration_hash"], "branch": f"{args.family}_level_continuation",
             "model": "14b", "run_id": identity["run_id"], "stage": "sft_level_continuation",
             "producer": "continue_sft_level", "source_code_commit": source,
             "configuration_hash": identity["configuration_hash"],

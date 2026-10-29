@@ -121,7 +121,8 @@ class SFTFitSpec:
 
     def __post_init__(self) -> None:
         self.recipe.validate()
-        if self.family not in LEVELS or self.model_id not in MODELS or type(self.level) is not int or not 1 <= self.level <= 10:
+        if (self.family not in LEVELS or self.model_id not in MODELS or type(self.level) is not int
+                or not (1 <= self.level <= 10 or (self.family == 'rot13' and self.level == 0))):
             raise SFTInputError("Unknown SFT family/model/level")
         for key in ("model_revision", "tokenizer_revision"):
             value = getattr(self, key)
@@ -143,6 +144,8 @@ class SFTFitSpec:
 
     @property
     def strength(self) -> float:
+        if self.level == 0:
+            return 0.0
         return LEVELS[self.family][self.level - 1]
 
     @property

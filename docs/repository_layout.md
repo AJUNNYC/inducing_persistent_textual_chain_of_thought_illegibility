@@ -284,6 +284,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             sft_fit.md
           sft_training.md
         training.md
+    october_control_and_kazitext_launch.md
     operations/
       artifacts.md
       collection_inputs.md
@@ -379,6 +380,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
     run_sft_gpqa_queue.py
     run_sft_level_continuation_campaign.py
     run_supplemental_gpqa.py
+    run_unencoded_sft_control.py
     run_vllm_baseline_repeatability.py
     run_vllm_generation_worker.py
     schedule_gpqa_priority_handoff.py
@@ -798,6 +800,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
             test_training_budget.py
           test_causal_gradient_loss.py
           test_continuation.py
+          test_control_selection.py
           test_data_handoff.py
           test_execution_profile.py
           test_fused_loss.py
