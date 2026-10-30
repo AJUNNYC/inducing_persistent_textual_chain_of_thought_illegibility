@@ -244,7 +244,7 @@ def comparison_states(adapter_path: str | Path, cache_root: str | Path) -> list[
     from training.sft.individual_fit.sft_fit import verify_adapter_manifest
     verify_adapter_manifest(root, identity)
     family, level = identity.get("family"), identity.get("level")
-    if family not in {"rot13", "kazitext"} or type(level) is not int or level not in range(1, 11):
+    if family not in {"rot13", "kazitext"} or type(level) is not int or level not in (range(0, 11) if family == "rot13" else range(1, 11)):
         raise ValueError("GPQA comparison currently accepts completed SFT final adapters")
     result = read_json(root.parent / "fit_result.json")
     if (result.get("status") != "complete" or result.get("identity") != identity

@@ -101,7 +101,7 @@ def validate_state(state: Mapping[str, Any]) -> None:
     required = ("state_id", "model", "model_revision", "tokenizer_revision", "checkpoint_hash", "runtime_hash")
     if any(not isinstance(state.get(key), str) or not state[key] for key in required):
         raise ValueError("State lacks immutable checkpoint/model/tokenizer/runtime identity")
-    if not re.fullmatch(r"(?:base_(?:7b|14b)|(?:rot13|kazitext)_(?:7b|14b)_level_(?:0[1-9]|10)|rl_(?:7b|14b)_step_(?:0[1-9]0|100))", state["state_id"]):
+    if not re.fullmatch(r"(?:base_(?:7b|14b)|rot13_(?:7b|14b)_level_00|(?:rot13|kazitext)_(?:7b|14b)_level_(?:0[1-9]|10)|rl_(?:7b|14b)_step_(?:0[1-9]0|100))", state["state_id"]):
         raise ValueError("State ID is outside the frozen scientific matrix")
     if state["model"] not in MODEL_IDS:
         raise ValueError("Only the fixed 7b and 14b construction models are permitted")

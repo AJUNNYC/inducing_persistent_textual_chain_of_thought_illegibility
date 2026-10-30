@@ -462,3 +462,25 @@ def test_long_engine_loads_frozen_context_and_concurrency_only_when_model_allows
         with pytest.raises(ValueError, match="Frozen model context"):
             generator._load(state)
         assert not calls
+
+
+@pytest.mark.parametrize("family,level,accepted", [("rot13",0,True),("kazitext",0,False),("rot13",-1,False),("rot13",11,False)])
+def test_explicit_zero_rot13_control_keeps_adapter_integrity(tmp_path, family, level, accepted):
+    root = adapter(tmp_path)
+    manifest = read_json(root / "manifest.json")
+    manifest["identity"].update(family=family, level=level)
+    manifest = seal(manifest, "manifest_hash")
+    atomic_write_json(root / "manifest.json", manifest)
+    result = read_json(root.parent / "fit_result.json")
+    result.update(identity=manifest["identity"], adapter_manifest_hash=manifest["manifest_hash"])
+    atomic_write_json(root.parent / "fit_result.json", result)
+    if not accepted:
+        with pytest.raises(ValueError):
+            comparison_states(root, tmp_path / "model_cache")
+        return
+    states = comparison_states(root, tmp_path / "model_cache")
+    assert states[0]["state_id"] == "base_14b"
+    assert states[1]["state_id"] == "rot13_14b_level_00"
+    (root / "adapter_model.safetensors").write_bytes(b"corrupted")
+    with pytest.raises(ValueError):
+        comparison_states(root, tmp_path / "model_cache")
