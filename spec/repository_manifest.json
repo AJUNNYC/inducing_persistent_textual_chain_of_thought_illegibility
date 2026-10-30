@@ -729,17 +729,6 @@
       "node": "p_fd740d12172c48"
     },
     {
-      "path": "deployment/october_2026_operations/README.md",
-      "kind": "implementation_extension",
-      "entry_type": "file",
-      "owner": "coordinator",
-      "source": "User implementation assignment; operational H9 conventions",
-      "display_path": "deployment/october_2026_operations/README.md",
-      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
-      "node": "p_aa4c7f4af4b9af",
-      "blank": false
-    },
-    {
       "path": "deployment/october_2026_operations/brief_progress.py",
       "kind": "implementation_extension",
       "entry_type": "file",
@@ -814,6 +803,17 @@
       "display_path": "deployment/october_2026_operations/list_verified_backups.py",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_d63b95aca09bb2",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/operations_overview.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/operations_overview.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_af0b1a864f7baa",
       "blank": false
     },
     {

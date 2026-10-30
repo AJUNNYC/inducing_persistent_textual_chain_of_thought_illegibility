@@ -1,11 +1,11 @@
 {
-  "README.md": "47a7eba1e8ed4036eee531c5bc1d3a600fd786367355c4a5cbb7806a93f10070",
   "brief_progress.py": "190dc19156f1b32624df9e899d6ff2b6f89fa799302b863b89931701065c742d",
   "fix_rot_adapter.py": "e5f71936bc95de60019608aa38ea112feeba8741277c12d326684e8829aab353",
   "install_health_monitor.py": "0cd8abc6ec61b271e06fc0c23a9fed4a4e2f7304a3e75fb807dc2b026222f729",
   "install_kazi_89.py": "ef0ab800c699cec81ce45da9c3334cfd22c5929e5d60f3c1871c5fe472cd0288",
   "kazi_verified_cleanup_source.py": "4fc4104550b82f0ee98ff9fc21b35eaaf4854220293cb21654f23c0e3d2b2f07",
   "list_verified_backups.py": "f1dd3f20f76e9abbfadf84ab7973da6bb515b9e740fe63be1665c8d969b735cd",
+  "operations_overview.md": "47a7eba1e8ed4036eee531c5bc1d3a600fd786367355c4a5cbb7806a93f10070",
   "ordered_training_queue.py": "d627f986e208c32831bc6e1ba01c2999686ae3c8292d60189f547830af58e5f1",
   "queue_kazi_backup.py": "1ac73d1e72a71348d017f0a42167090d30613e0a87738705453fd9023d0626b6",
   "repair_kazi_sync_launch.py": "86d466ab3de64474bdc7c55150fca95b1e4092cc88ca6ca908e60fc54e83c163",

@@ -72,7 +72,6 @@ inducing_persistent_textual_chain_of_thought_illegibility/
   deployment/
     coordinator.json
     october_2026_operations/
-      README.md
       brief_progress.py
       file_hashes.json
       fix_rot_adapter.py
@@ -80,6 +79,7 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       install_kazi_89.py
       kazi_verified_cleanup_source.py
       list_verified_backups.py
+      operations_overview.md
       ordered_training_queue.py
       queue_kazi_backup.py
       repair_kazi_sync_launch.py
