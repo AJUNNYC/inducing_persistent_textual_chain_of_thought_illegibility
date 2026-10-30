@@ -484,3 +484,26 @@ def test_explicit_zero_rot13_control_keeps_adapter_integrity(tmp_path, family, l
     (root / "adapter_model.safetensors").write_bytes(b"corrupted")
     with pytest.raises(ValueError):
         comparison_states(root, tmp_path / "model_cache")
+
+
+def test_historical_baseline_reuse_preserves_old_identity_and_rejects_drift(tmp_path):
+    from copy import deepcopy
+    from evaluation.supplemental_gpqa import HISTORICAL_GPQA_IMPLEMENTATIONS, validate_gpqa_protocol
+    states = comparison_states(adapter(tmp_path), tmp_path / "model_cache")
+    base = baseline_state("14b", tmp_path / "model_cache", model_revision="a"*40, tokenizer_revision="b"*40)
+    original = freeze_gpqa_baseline(panel(), base, backend="vllm", generation_profile="long_32000")
+    original["generation"]["implementation_sha256"] = deepcopy(HISTORICAL_GPQA_IMPLEMENTATIONS)
+    original["states"][0]["runtime_hash"] = content_hash(original["generation"])
+    original = seal(original, "protocol_hash")
+    validate_gpqa_protocol(original)
+    paired = freeze_gpqa_protocol(panel(), states, backend="vllm", generation_profile="long_32000", baseline_protocol=original)
+    assert paired["baseline_reuse"]["protocol_hash"] == original["protocol_hash"]
+    assert paired["baseline_reuse"]["state"] == original["states"][0]
+    for key in ["settings", "implementation_sha256"]:
+        bad = deepcopy(original)
+        if key == "settings": bad["generation"][key]["max_new_tokens"] = 3072
+        else: bad["generation"][key]["src/shared_procedures/response_parsing.py"] = "0"*64
+        bad["states"][0]["runtime_hash"] = content_hash(bad["generation"])
+        bad = seal(bad, "protocol_hash")
+        with pytest.raises(ValueError):
+            freeze_gpqa_protocol(panel(), states, backend="vllm", generation_profile="long_32000", baseline_protocol=bad)

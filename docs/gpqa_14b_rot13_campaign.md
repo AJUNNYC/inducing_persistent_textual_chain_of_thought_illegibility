@@ -422,3 +422,18 @@ or a completion deadline.
 See the [module contract](modules/evaluation/supplemental_gpqa.md) for source
 handling, profile isolation and limitations, and the
 [historical baseline results](14b_baseline_results.md) for the short-budget run.
+
+## October 30 zero-control and second-epoch evaluations
+
+The selected concurrent conditions are 14B ROT13 zero-percent control, level 8 and
+level 9, each at two total epochs, one A40 per condition. Zero percent is a trained
+LoRA control, never the untouched base. The evaluator admits its exact level-00
+identity while retaining completed-fit and adapter byte checks.
+
+The original 198-question baseline can be reused across this explicit zero-control
+extension. Compatibility requires the exact historical implementation inventory,
+unchanged prompt, decoding, scoring and backend settings, and the audited identity
+validator/SFT source hashes. Original baseline protocol, state, response identities
+and hashes remain unchanged inside baseline_reuse. New comparisons retain their
+new source inventory. Unknown historical inventories and setting changes fail.
+This is not a general waiver of source compatibility checks.

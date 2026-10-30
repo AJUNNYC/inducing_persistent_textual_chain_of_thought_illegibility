@@ -216,10 +216,32 @@ def _generation_profile(contract: Mapping) -> str:
     return contract.get("generation_profile", "legacy_3072")
 
 
-def _validate_generation_contract(contract: Mapping, backend: str) -> None:
+# Audited predecessor 5e6be1b: only zero-control admission changed in the
+# evaluator/state validator/SFT identity. Prompting, generation and scoring did not.
+HISTORICAL_GPQA_IMPLEMENTATIONS = {'scripts/run_supplemental_gpqa.py': 'd2f6805c7211bd76744eab78d22db8f16bc3e2c517a41e5d3fd16c5897f5018c', 'src/evaluation/shared_model_evaluation/item_evaluation/capability_scoring/capability_scoring.py': '87614862e9ad33af1e8a12aa52bc4bd4dc492b7c69c8994b39fb212345af0383', 'src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py': '1041cac7156c88916cf2c84120b7511d628d6b7eaf6aaa9c53fe84e99e6673f9', 'src/evaluation/shared_model_evaluation/item_evaluation/native_output/vllm_generation.py': 'c973ce8436ad0db2f52a33e7551becaeeb9466bc2308c8fd215a329bf2053433', 'src/evaluation/supplemental_gpqa.py': '07ff7235aadd0dec16e5e34c9f56bea84ae0e2e0bcdbb5f7da938fbd6c44f994', 'src/operations/assets.py': '898909c45b2dc50c8949f6c05df2a1ecbf085e91e1358cd376f043a612da4ff7', 'src/shared_procedures/identity.py': '42bdf7a349557a42d2bc14d842b7b3adcb485412b6ec3b2919d3f7dc2a828887', 'src/shared_procedures/response_parsing.py': 'fa80b63e8eb3e1e6626f347d444e0f6f3f22f9a95ed82a61833f64ac007a2ad3', 'src/shared_procedures/storage.py': '9c13b7c91ddd13667db96a541d24c75d6f5ffd2685ffec8b565bf408af4cf9f8', 'src/training/sft/individual_fit/sft_fit.py': '1a3a0b4c3e470bc83addc7a0eb8037ae1dc7609c7a06dbed146cf2f9c8ab4fd8'}
+
+
+def _compatible_baseline_contract(old: Mapping, current: Mapping) -> bool:
+    if old == current:
+        return True
+    if old.get("implementation_sha256") != HISTORICAL_GPQA_IMPLEMENTATIONS:
+        return False
+    if {k: v for k, v in old.items() if k != "implementation_sha256"} != {k: v for k, v in current.items() if k != "implementation_sha256"}:
+        return False
+    audited = {'src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py': '088813f0b160acf7caadb524931fb8a5e74a00872eff8ed1dc5bb6c5b673efd1', 'src/training/sft/individual_fit/sft_fit.py': 'fd4b82d76f4884376cacabc3372e1019d3b5453c583dcb2b83112be76279b16b'}
+    if any(current["implementation_sha256"].get(name) != digest for name, digest in audited.items()):
+        return False
+    changed = {name for name, digest in current["implementation_sha256"].items()
+               if digest != HISTORICAL_GPQA_IMPLEMENTATIONS.get(name)}
+    return changed <= {"src/evaluation/supplemental_gpqa.py",
+                       "src/evaluation/shared_model_evaluation/item_evaluation/native_output/output_generation.py",
+                       "src/training/sft/individual_fit/sft_fit.py"}
+
+
+def _validate_generation_contract(contract: Mapping, backend: str, *, historical_baseline: bool = False) -> None:
     profile = _generation_profile(contract)
     current = generation_contract(backend, profile)
-    if contract == current:
+    if contract == current or (historical_baseline and _compatible_baseline_contract(contract, current)):
         return
     raise ValueError("GPQA protocol settings differ from the frozen supplemental design")
 
@@ -322,7 +344,7 @@ def freeze_gpqa_protocol(panel: Mapping, states: list[dict], *, backend: str,
         validate_gpqa_protocol(baseline_protocol)
         if baseline_protocol["version"] != BASELINE_VERSION:
             raise ValueError("GPQA reuse requires a frozen base-only protocol")
-        if baseline_protocol["generation"] != contract:
+        if not _compatible_baseline_contract(baseline_protocol["generation"], contract):
             raise ValueError("GPQA baseline reuse differs in generation profile or implementation")
         protocol["baseline_reuse"] = {
             "protocol_hash": baseline_protocol["protocol_hash"],
@@ -340,7 +362,7 @@ def validate_gpqa_protocol(protocol: Mapping, *, verify_adapters: bool = True) -
     validate_gpqa_panel(protocol.get("panel", {}))
     contract = protocol.get("generation", {})
     backend = "vllm" if (contract.get("backend") or {}).get("name") == "vllm" else "native"
-    _validate_generation_contract(contract, backend)
+    _validate_generation_contract(contract, backend, historical_baseline=protocol.get("version") == BASELINE_VERSION)
     base_only = protocol.get("version") == BASELINE_VERSION
     if (protocol.get("version") not in {PROTOCOL_VERSION, BASELINE_VERSION} or protocol.get("scope") != "supplemental_capability_only"
             or protocol.get("seed") != 42
@@ -382,10 +404,16 @@ def validate_gpqa_protocol(protocol: Mapping, *, verify_adapters: bool = True) -
                                              generation_profile=_generation_profile(contract))
         except ValueError as error:
             raise ValueError("GPQA baseline reuse changed its original official model identity") from error
+        # Restore the historical protocol verbatim rather than relabeling cached answers.
+        restored["generation"] = deepcopy(reuse["generation"])
+        restored["states"] = [deepcopy(reuse["state"])]
+        restored.pop("protocol_hash", None)
+        _seal(restored, "protocol_hash")
+        validate_gpqa_protocol(restored)
         if (set(reuse) != {"protocol_hash", "panel_hash", "generation", "state"}
                 or reuse["protocol_hash"] != restored["protocol_hash"]
                 or reuse["panel_hash"] != protocol["panel"]["panel_hash"]
-                or reuse["generation"] != contract
+                or not _compatible_baseline_contract(reuse["generation"], contract)
                 or any(reuse["state"].get(k) != states[0].get(k)
                        for k in ("model", "model_revision", "tokenizer_revision"))):
             raise ValueError("GPQA baseline reuse differs in panel, engine, prompt, seed, or model/tokenizer pins")
