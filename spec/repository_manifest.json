@@ -4,8 +4,8 @@
   "scope": "Complete intended tracked source/documentation tree; runtime datasets/artifacts,credentials and dependency caches excluded.",
   "naming_rule": "Lowercase letters/digits/underscores, dots for extensions/hidden conventions; no hyphens/spaces. External identifiers and historical source strings unchanged.",
   "source_of_science": "spec/experiment.pdf with H/G precedence; supplied procedural Mermaid sources",
-  "files": 611,
-  "directories_including_root": 202,
+  "files": 626,
+  "directories_including_root": 203,
   "entries": [
     {
       "kind": "directory",
@@ -716,6 +716,181 @@
       "display_path": "deployment/coordinator.json",
       "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
       "node": "p_47e075e61e913f",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations",
+      "kind": "directory",
+      "entry_type": "directory",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_fd740d12172c48"
+    },
+    {
+      "path": "deployment/october_2026_operations/README.md",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/README.md",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_aa4c7f4af4b9af",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/brief_progress.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/brief_progress.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_7634bcb1c729ee",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/file_hashes.json",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/file_hashes.json",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_6d026628190a57",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/fix_rot_adapter.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/fix_rot_adapter.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_c955b4746330bf",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/install_health_monitor.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/install_health_monitor.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_73557818c009bc",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/install_kazi_89.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/install_kazi_89.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_18f5d3550e81bf",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/kazi_verified_cleanup_source.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/kazi_verified_cleanup_source.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_2bf85567411d94",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/list_verified_backups.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/list_verified_backups.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_d63b95aca09bb2",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/ordered_training_queue.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/ordered_training_queue.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_246961b89392fb",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/queue_kazi_backup.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/queue_kazi_backup.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_9e30f26a315a8a",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/repair_kazi_sync_launch.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/repair_kazi_sync_launch.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_fb178c470701de",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/resume_kazi_after_cleanup.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/resume_kazi_after_cleanup.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_b7d94bd63c3dd3",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/start_second_kazi_queue.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/start_second_kazi_queue.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_63dc44af4ced91",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/verify_all_drive.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/verify_all_drive.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_4992050474db8d",
+      "blank": false
+    },
+    {
+      "path": "deployment/october_2026_operations/volume_checkpoint_exporter.py",
+      "kind": "implementation_extension",
+      "entry_type": "file",
+      "owner": "coordinator",
+      "source": "User implementation assignment; operational H9 conventions",
+      "display_path": "deployment/october_2026_operations/volume_checkpoint_exporter.py",
+      "diagram": "spec/mermaid/repository/implementation_extensions.mmd",
+      "node": "p_df2cfff7a29ab8",
       "blank": false
     },
     {

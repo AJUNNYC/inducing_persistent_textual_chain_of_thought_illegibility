@@ -71,6 +71,22 @@ inducing_persistent_textual_chain_of_thought_illegibility/
       pod.json
   deployment/
     coordinator.json
+    october_2026_operations/
+      README.md
+      brief_progress.py
+      file_hashes.json
+      fix_rot_adapter.py
+      install_health_monitor.py
+      install_kazi_89.py
+      kazi_verified_cleanup_source.py
+      list_verified_backups.py
+      ordered_training_queue.py
+      queue_kazi_backup.py
+      repair_kazi_sync_launch.py
+      resume_kazi_after_cleanup.py
+      start_second_kazi_queue.py
+      verify_all_drive.py
+      volume_checkpoint_exporter.py
   dockerfile
   docs/
     14b_baseline_results.md

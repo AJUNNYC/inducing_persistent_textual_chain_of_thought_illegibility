@@ -1,0 +1,16 @@
+{
+  "README.md": "47a7eba1e8ed4036eee531c5bc1d3a600fd786367355c4a5cbb7806a93f10070",
+  "brief_progress.py": "190dc19156f1b32624df9e899d6ff2b6f89fa799302b863b89931701065c742d",
+  "fix_rot_adapter.py": "e5f71936bc95de60019608aa38ea112feeba8741277c12d326684e8829aab353",
+  "install_health_monitor.py": "0cd8abc6ec61b271e06fc0c23a9fed4a4e2f7304a3e75fb807dc2b026222f729",
+  "install_kazi_89.py": "ef0ab800c699cec81ce45da9c3334cfd22c5929e5d60f3c1871c5fe472cd0288",
+  "kazi_verified_cleanup_source.py": "4fc4104550b82f0ee98ff9fc21b35eaaf4854220293cb21654f23c0e3d2b2f07",
+  "list_verified_backups.py": "f1dd3f20f76e9abbfadf84ab7973da6bb515b9e740fe63be1665c8d969b735cd",
+  "ordered_training_queue.py": "d627f986e208c32831bc6e1ba01c2999686ae3c8292d60189f547830af58e5f1",
+  "queue_kazi_backup.py": "1ac73d1e72a71348d017f0a42167090d30613e0a87738705453fd9023d0626b6",
+  "repair_kazi_sync_launch.py": "86d466ab3de64474bdc7c55150fca95b1e4092cc88ca6ca908e60fc54e83c163",
+  "resume_kazi_after_cleanup.py": "cb23c2d0e07503bf8cf09f35021f494aa5660ba56b80578d8d7f1cdad73bd1b7",
+  "start_second_kazi_queue.py": "c6ff4921c47d529abbf2ca59c8310a8a9d94384767271cbe4042bca0ffb7e335",
+  "verify_all_drive.py": "0061af46f13c4b5bb2738ed5dbd8bb919b7045dcd355302b5901f79a11bd3caa",
+  "volume_checkpoint_exporter.py": "2e14f03cf082e14cf9621840cb9b90ddd89ec0b3777d8c70531b531ada0785f9"
+}
