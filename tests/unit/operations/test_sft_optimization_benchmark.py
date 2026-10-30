@@ -14,7 +14,8 @@ SPEC.loader.exec_module(MODULE)
 
 def static_inputs(tmp_path, monkeypatch):
     commit = "a" * 40
-    config = {"runtime": {"implementation_revision": commit, "dependency_lock_hash": "d" * 64}}
+    # Pin the guard fixture to its legacy recipe, independently of deployment defaults.
+    config = {"sft": {"training_budget": "legacy_two_epoch_v1"}, "runtime": {"implementation_revision": commit, "dependency_lock_hash": "d" * 64}}
     task = {"family": "rot13", "model_id": "7b", "level": 1,
             "spec": MODULE.sft_fit.SFTFitSpec("rot13", "7b", 1, "d" * 40, "e" * 40,
                 "f" * 64, "b" * 64, "a" * 64, "c" * 64).identity(),

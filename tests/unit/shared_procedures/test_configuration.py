@@ -6,8 +6,8 @@ CONFIG=Path(__file__).resolve().parents[3]/'config.yaml'
 
 def test_config_fixed_science_and_matrix():
     c=load_configuration(CONFIG)
-    assert len(sft_matrix(c))==2
-    assert c['sft']['selection']=={'models':['14b'],'families':['rot13','kazitext'],'levels':[10]}
+    assert len(sft_matrix(c))==20
+    assert c['sft']['selection']=={'models':['14b'],'families':['rot13','kazitext'],'levels':list(range(1,11))}
     assert c['sft']['training_budget']=='efficient_one_epoch_v1' and c['sft']['epochs']==1
     assert sum(c['evaluation']['capability_counts'].values())==1233
     assert len(c['interventions']['kazitext']['alphas'])==10

@@ -32,6 +32,9 @@ class FixtureOfficialNoise:
 
 def test_source_generation_transform_record_schema_and_forty_fit_worklist():
     config=yaml.safe_load((Path(__file__).parents[2]/'config.yaml').read_text())
+    # Exercise the full historical matrix independently of the deployment selection.
+    config['sft']['selection']={'models':['7b','14b'],
+                                'families':['rot13','kazitext'],'levels':list(range(1,11))}
     config_hash=configuration_hash(config)
     tokenizer=FixtureTokenizer();noise=FixtureOfficialNoise()
     candidate={'example_id':'template','prompt':'exact prompt','source_content_hash':content_hash('exact prompt')}

@@ -1,3 +1,24 @@
+## GitHub Actions failure audit — 2026-10-30
+
+Local verification after the fixture corrections passed all **1208 unit/integration tests**
+in 208.41 seconds, static repository validation (626 files), and all 76 Mermaid diagrams.
+This CPU result does not rerun or certify historical GPU experiments.
+
+The API inventory through validation run #141 contains 141 runs, including 75 failures.
+Job metadata locates 36 failures in static repository validation and 39 in unit/integration tests.
+These counts identify failing workflow steps, not 75 independent defects or failed training runs.
+Detailed logs for every historical run are not yet available because some GitHub log-storage
+hosts require an environment network-policy publication. Do not treat metadata as a full log audit.
+
+Run #140 failed on the noncanonical operations README filename, corrected in commit `383b6d0`.
+Run #141 then reached pytest and reported 17 failures and 1191 passes. Retrieved logs for
+runs #134 and #138 show the same 17 failing tests. The current corrections restore the
+historical NF4 recipe in the budget-amendment fixture, declare the benchmark fixture's SFT
+budget, update the deployment-matrix expectation to twenty 14B conditions, and explicitly
+select both model sizes in the forty-condition handoff integration test. Scientific source,
+production configuration, checkpoint bytes and validation guards are unchanged. Historical
+red workflow runs remain historical failures even after a subsequent fix passes.
+
 ## Current SFT completion and authorization — 2026-10-13
 
 ## Current status: all ten 14B ROT13 fits complete; GPQA long-profile evaluation next

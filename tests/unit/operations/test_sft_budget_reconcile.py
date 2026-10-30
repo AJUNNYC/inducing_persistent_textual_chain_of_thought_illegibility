@@ -18,7 +18,10 @@ def budgets():
     legacy = load_configuration(ROOT / 'config.yaml')
     legacy['sft'].pop('training_budget', None)
     legacy['sft'].pop('selection', None)
-    legacy['sft']['epochs'] = 2
+    legacy['sft'].update(epochs=2, quantization='nf4', load_in_4bit=True,
+                         double_quantization=True, optimizer='paged_adamw_32bit',
+                         gradient_checkpointing=True, microbatch_size=1,
+                         gradient_accumulation_steps=16)
     pilot = deepcopy(legacy)
     pilot['sft'].update(training_budget='one_epoch_pilot_v1', epochs=1)
     return legacy, pilot
